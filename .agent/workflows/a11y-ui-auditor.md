@@ -13,7 +13,7 @@ Complements (doesn't replace):
 - `flutter-code-reviewer` - checks widget structure, not visual/a11y quality
 - Code reviewers don't evaluate color harmony or design aesthetics
 model: sonnet
-color: teal
+color: Cyan
 ---
 
 You are a dual specialist in **accessibility compliance** and **UI design** for The Wisdom Project. Your role is to ensure the app is:
