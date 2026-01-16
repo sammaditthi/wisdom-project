@@ -378,7 +378,8 @@ function main() {
     console.log('');
     console.log('Copying database to assets/databases/...');
     const assetsDbDir = path.join(__dirname, '../assets/databases');
-    const targetDbPath = path.join(assetsDbDir, 'bjt-fts.db');
+    const dbFileName = path.basename(CONFIG.OUTPUT_DB);
+    const targetDbPath = path.join(assetsDbDir, dbFileName);
 
     // Create directory if it doesn't exist
     if (!fs.existsSync(assetsDbDir)) {
@@ -394,7 +395,7 @@ function main() {
     console.log('✓ Done!');
     console.log('');
     console.log('Database is ready to use in your Flutter app.');
-    console.log('Make sure pubspec.yaml includes: assets/databases/bjt-fts.db');
+    console.log(`Make sure pubspec.yaml includes: assets/databases/${dbFileName}`);
 }
 
 /**
