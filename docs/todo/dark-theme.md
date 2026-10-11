@@ -1,6 +1,6 @@
 # Dark theme
 
-Placeholder. The dark theme is not designed yet. Known issues are collected here so they are not lost; the plan comes later.
+The warm dark theme is now designed: see [`dark-theme/warm-dark-theme.md`](dark-theme/warm-dark-theme.md) (spec) and [`dark-theme/warm-dark-code.md`](dark-theme/warm-dark-code.md) (code to paste). Each issue below is mapped to its fix in the spec's "Known issues → resolutions" table. Graphite is still to come.
 
 The warm theme is also a dark colour scheme, so issues here usually hit it too.
 
@@ -22,7 +22,7 @@ Where it shows:
 
 Search for `onSurfaceVariant.withValues` to find any others.
 
-Two ways to fix, to decide when designing the theme:
+Two ways to fix. The warm dark spec takes the root fix (a solid `onSurfaceVariant`):
 
 - Per call site: multiply, as in the example above.
 - At the root: give dark and warm an opaque `onSurfaceVariant` (the colour already blended onto the surface), so `withValues(alpha:)` behaves the same in every theme. The blend is exact only on `surface`: muted text on other backgrounds, such as the expanded-matches box (`surfaceContainerLow`), comes out slightly different from today.
