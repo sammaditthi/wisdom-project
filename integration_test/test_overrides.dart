@@ -13,14 +13,19 @@ library;
 
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
+import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
+import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
+import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
+import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 
 class InMemoryKeyValueStore implements KeyValueStore {
   final Map<String, Object> _values = {};
@@ -169,6 +174,40 @@ Future<void> typeText(WidgetTester tester, Finder finder, String text) {
   });
 }
 
+/// Pumps the tab bar over the reader, with the real data sources, and waits
+/// for the navigation tree to load.
+Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        bjtDocumentDataSourceProvider.overrideWithValue(
+          BJTDocumentLocalDataSourceImpl(),
+        ),
+        keyValueStoreOverride(),
+      ],
+      child: const MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Column(
+            children: [
+              TabBarWidget(),
+              Expanded(child: MultiPaneReaderWidget()),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  final container = ProviderScope.containerOf(
+    tester.element(find.byType(MaterialApp)),
+  );
+  await container.read(navigationTreeProvider.future);
+  await pumpForSettle(tester);
+  return container;
+}
+
 /// A tab reading the unit rooted at [nodeKey].
 ///
 /// A tab **is** the node: where the unit starts, where it ends and which file
@@ -195,5 +234,5 @@ Future<void> openTab(
   container.read(tabsProvider.notifier).addTab(tab);
   container.read(activeTabIndexProvider.notifier).state =
       container.read(tabsProvider).length - 1;
-  await pumpForSettle(tester, const Duration(seconds: 2));
+  await pumpForSettle(tester);
 }

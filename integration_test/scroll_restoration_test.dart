@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
-import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
-import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
-import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 
 import 'test_overrides.dart';
 
@@ -41,32 +37,7 @@ void main() {
       'should restore scroll position when switching between tabs via UI',
       (tester) async {
         // ARRANGE - Create test app with real providers
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              bjtDocumentDataSourceProvider.overrideWithValue(
-                BJTDocumentLocalDataSourceImpl(),
-              ),
-              keyValueStoreOverride(),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(
-                body: Column(
-                  children: [
-                    TabBarWidget(),
-                    Expanded(child: MultiPaneReaderWidget()),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MaterialApp)),
-        );
+        final container = await pumpReaderApp(tester);
 
         // Two tabs on real node keys — a tab is a node now, and a key the
         // tree does not hold resolves to no unit and renders nothing to
@@ -99,7 +70,7 @@ void main() {
         container.read(tabsProvider.notifier).addTab(tabB);
         container.read(activeTabIndexProvider.notifier).state = 0;
 
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         expect(container.read(activeContentFileIdProvider), 'dn-1',
             reason: 'Tab A reads the dn-1 file');
@@ -112,17 +83,14 @@ void main() {
         );
         expect(scrollableA, findsOneWidget,
             reason: 'Should find vertical ListView for content');
-        final controllerA = tester.widget<ListView>(scrollableA).controller;
-        if (controllerA != null && controllerA.hasClients) {
-          controllerA.jumpTo(300);
-          await pumpForSettle(tester);
-        }
+        tester.widget<ListView>(scrollableA).controller!.jumpTo(300);
+        await pumpForSettle(tester);
 
         // STEP 2: Tap Tab B to switch (simulating real user action).
         // Tab labels follow the Content Language (default Sinhala), so the tab
         // displays tabB.sinhalaName — not its 'DN 2' label.
         await tester.tap(find.text(tabB.sinhalaName!));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify Tab A's position was saved when we switched away
         final tabAPositionAfterSwitch = readScrollOffset(container, 0);
@@ -143,15 +111,12 @@ void main() {
               widget is ListView && widget.scrollDirection == Axis.vertical,
         );
         expect(scrollableB, findsOneWidget);
-        final controllerB = tester.widget<ListView>(scrollableB).controller;
-        if (controllerB != null && controllerB.hasClients) {
-          controllerB.jumpTo(600);
-          await pumpForSettle(tester);
-        }
+        tester.widget<ListView>(scrollableB).controller!.jumpTo(600);
+        await pumpForSettle(tester);
 
         // STEP 4: Tap Tab A to switch back (simulating real user action)
         await tester.tap(find.text(tabA.sinhalaName!));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT - Each tab should have its own scroll position preserved
         final tabAPosition = readScrollOffset(container, 0);
@@ -168,7 +133,7 @@ void main() {
 
         // STEP 5: Tap Tab B again to verify its position is also preserved
         await tester.tap(find.text(tabB.sinhalaName!));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify Tab B's scroll position is still preserved
         final tabBPositionAfterReturn = readScrollOffset(container, 1);
@@ -184,32 +149,7 @@ void main() {
         // This tests the bug: Open Tab A, Open Tab B, Go to Tab A and scroll,
         // Close Tab A -> Tab B should NOT inherit Tab A's scroll position
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              bjtDocumentDataSourceProvider.overrideWithValue(
-                BJTDocumentLocalDataSourceImpl(),
-              ),
-              keyValueStoreOverride(),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(
-                body: Column(
-                  children: [
-                    TabBarWidget(),
-                    Expanded(child: MultiPaneReaderWidget()),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MaterialApp)),
-        );
+        final container = await pumpReaderApp(tester);
 
         // Create two tabs
         const tabA = ReaderTab(
@@ -232,13 +172,13 @@ void main() {
         // Content file ID is now derived automatically from the active tab
         container.read(tabsProvider.notifier).addTab(tabA);
         container.read(activeTabIndexProvider.notifier).state = 0;
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // STEP 2: Open Tab B (tap to switch)
         container.read(tabsProvider.notifier).addTab(tabB);
         await pumpForSettle(tester);
         await tester.tap(find.text('Tab B'));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify Tab B is active and at scroll position 0
         expect(container.read(activeTabIndexProvider), 1);
@@ -247,20 +187,17 @@ void main() {
 
         // STEP 3: Go back to Tab A and scroll down
         await tester.tap(find.text('Tab A'));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Scroll Tab A down
         final scrollable = find.byWidgetPredicate(
           (widget) =>
               widget is ListView && widget.scrollDirection == Axis.vertical,
         );
-        if (scrollable.evaluate().isNotEmpty) {
-          final controller = tester.widget<ListView>(scrollable).controller;
-          if (controller != null && controller.hasClients) {
-            controller.jumpTo(500);
-            await pumpForSettle(tester);
-          }
-        }
+        expect(scrollable, findsOneWidget,
+            reason: 'Tab A text must be on screen to scroll it');
+        tester.widget<ListView>(scrollable).controller!.jumpTo(500);
+        await pumpForSettle(tester);
 
         // STEP 4: Close Tab A (tap close button on Tab A)
         // Find the close button in Tab A's tab item
@@ -268,7 +205,7 @@ void main() {
         expect(closeButtons, findsNWidgets(2),
             reason: 'Should find 2 close buttons (one for each tab)');
         await tester.tap(closeButtons.first); // Close Tab A
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Tab B should now be the only tab and at index 0
         expect(container.read(tabsProvider).length, 1);
@@ -286,32 +223,7 @@ void main() {
       'should start with scroll position 0 for new tabs',
       (tester) async {
         // ARRANGE
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              bjtDocumentDataSourceProvider.overrideWithValue(
-                BJTDocumentLocalDataSourceImpl(),
-              ),
-              keyValueStoreOverride(),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(
-                body: Column(
-                  children: [
-                    TabBarWidget(),
-                    Expanded(child: MultiPaneReaderWidget()),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MaterialApp)),
-        );
+        final container = await pumpReaderApp(tester);
 
         // Create and add a new tab
         const tab = ReaderTab(
@@ -326,7 +238,7 @@ void main() {
         container.read(tabsProvider.notifier).addTab(tab);
         container.read(activeTabIndexProvider.notifier).state = 0;
 
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT - New tab should start with scroll position 0
         final scrollPosition = readScrollOffset(container, 0);
@@ -339,32 +251,7 @@ void main() {
       'should clear scroll position when tab is closed',
       (tester) async {
         // ARRANGE
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              bjtDocumentDataSourceProvider.overrideWithValue(
-                BJTDocumentLocalDataSourceImpl(),
-              ),
-              keyValueStoreOverride(),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: Scaffold(
-                body: Column(
-                  children: [
-                    TabBarWidget(),
-                    Expanded(child: MultiPaneReaderWidget()),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MaterialApp)),
-        );
+        final container = await pumpReaderApp(tester);
 
         // Create and add a tab
         const tab = ReaderTab(
@@ -379,20 +266,17 @@ void main() {
         container.read(tabsProvider.notifier).addTab(tab);
         container.read(activeTabIndexProvider.notifier).state = 0;
 
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Scroll and save position
         final scrollable = find.byWidgetPredicate(
           (widget) =>
               widget is ListView && widget.scrollDirection == Axis.vertical,
         );
-        if (scrollable.evaluate().isNotEmpty) {
-          final controller = tester.widget<ListView>(scrollable).controller;
-          if (controller != null && controller.hasClients) {
-            controller.jumpTo(250);
-            await pumpForSettle(tester);
-          }
-        }
+        expect(scrollable, findsOneWidget,
+            reason: 'The tab text must be on screen to scroll it');
+        tester.widget<ListView>(scrollable).controller!.jumpTo(250);
+        await pumpForSettle(tester);
         writeScrollOffset(container, 0, 250.0);
 
         // Verify it was saved

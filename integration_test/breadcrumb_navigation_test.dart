@@ -223,7 +223,7 @@ void main() {
         final spans = getBreadcrumbSpans(tester);
         final parentRecognizer = spans.first.recognizer as TapGestureRecognizer;
         parentRecognizer.onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: New tab was created
         final tabs = container.read(tabsProvider);
@@ -265,7 +265,7 @@ void main() {
         // ACT: Tap first parent to navigate to root
         final spans = getBreadcrumbSpans(tester);
         (spans.first.recognizer as TapGestureRecognizer).onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Breadcrumb now shows shorter path (just root)
         final textAfter = getBreadcrumbText(tester);
@@ -357,7 +357,7 @@ void main() {
                 'to tap otherwise, and nothing below would be checked');
 
         await tester.tap(dnText.first);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Tab created with correct data
         final tabs = container.read(tabsProvider);

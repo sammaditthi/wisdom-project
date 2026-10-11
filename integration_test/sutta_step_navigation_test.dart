@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/reader_unit_provider.dart';
-import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
-import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
-import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 
 import 'test_overrides.dart';
 
@@ -46,45 +41,6 @@ import 'test_overrides.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
-  // ---------------------------------------------------------------
-  // Helper: pumps the test app and returns the ProviderContainer.
-  // Includes localization delegates (needed for tooltip strings)
-  // and the real BJT data source + real navigation tree.
-  // ---------------------------------------------------------------
-  Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          bjtDocumentDataSourceProvider.overrideWithValue(
-            BJTDocumentLocalDataSourceImpl(),
-          ),
-          keyValueStoreOverride(),
-        ],
-        child: const MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(
-            body: Column(
-              children: [
-                TabBarWidget(),
-                Expanded(child: MultiPaneReaderWidget()),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(MaterialApp)),
-    );
-
-    // Wait for the navigation tree to finish loading from assets
-    await container.read(navigationTreeProvider.future);
-
-    return container;
-  }
 
   group('Previous Sutta Navigation', () {
     // =================================================================
@@ -140,7 +96,7 @@ void main() {
 
         // ACT: Tap the scroll-to-top button
         await tester.tap(find.byIcon(Icons.vertical_align_top));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: back at the unit's own first row — a plain scroll now,
         // since the unit was never paginated to begin with.
@@ -188,7 +144,7 @@ void main() {
 
         // ACT: Tap the button
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Now at the previous sutta (dn-1-1)
         expect(container.read(activeNodeKeyProvider), 'dn-1-1',
@@ -213,21 +169,21 @@ void main() {
         // --- First tap: dn-1-4 → dn-1-3 ---
         expect(find.byIcon(Icons.skip_previous), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-3',
             reason: 'First tap: should navigate to dn-1-3');
 
         // --- Second tap: dn-1-3 → dn-1-2, and across a content file ---
         expect(find.byIcon(Icons.skip_previous), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-2',
             reason: 'Second tap: should navigate to dn-1-2');
 
         // --- Third tap: dn-1-2 → dn-1-1 ---
         expect(find.byIcon(Icons.skip_previous), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-1',
             reason: 'Third tap: should navigate to dn-1-1');
       },
@@ -253,7 +209,7 @@ void main() {
         // ACT: Tap the previous sutta button
         expect(find.byIcon(Icons.skip_previous), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Now at dn-1-10, in a different content file (dn-1-6)
         expect(container.read(activeNodeKeyProvider), 'dn-1-10',
@@ -330,7 +286,7 @@ void main() {
 
         // ACT: Navigate to previous
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Tab entity updated to the previous node's data
         final tabsAfter = container.read(tabsProvider);
@@ -359,7 +315,7 @@ void main() {
 
         // ACT: Navigate to previous
         await tester.tap(find.byIcon(Icons.skip_previous));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Navigator selection updated to dn-1-1
         expect(container.read(selectedNodeProvider), 'dn-1-1',
@@ -448,7 +404,7 @@ void main() {
 
         // ACT: Tap the scroll-to-top button
         await tester.tap(find.byIcon(Icons.vertical_align_top));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Back at the top, button reverts to skip_previous (Mode 1)
         // `.hitTestable()` for the same reason the absence above needs it:
@@ -494,7 +450,7 @@ void main() {
 
         // ACT: Tap the button
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Now at the next sutta (dn-1-2)
         expect(container.read(activeNodeKeyProvider), 'dn-1-2',
@@ -518,21 +474,21 @@ void main() {
         // --- First tap: dn-1-1 → dn-1-2 ---
         expect(find.byIcon(Icons.skip_next), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-2',
             reason: 'First tap: should navigate to dn-1-2');
 
         // --- Second tap: dn-1-2 → dn-1-3, and across a content file ---
         expect(find.byIcon(Icons.skip_next), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-3',
             reason: 'Second tap: should navigate to dn-1-3');
 
         // --- Third tap: dn-1-3 → dn-1-4 ---
         expect(find.byIcon(Icons.skip_next), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(container.read(activeNodeKeyProvider), 'dn-1-4',
             reason: 'Third tap: should navigate to dn-1-4');
       },
@@ -558,7 +514,7 @@ void main() {
         // ACT: Tap the next sutta button
         expect(find.byIcon(Icons.skip_next), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Now at dn-1-11, in a different content file (dn-1-11)
         expect(container.read(activeNodeKeyProvider), 'dn-1-11',
@@ -643,7 +599,7 @@ void main() {
         // ACT
         expect(find.byIcon(Icons.skip_next), findsOneWidget);
         await tester.tap(find.byIcon(Icons.skip_next));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: dn-1-3, the leaf after the last one the vagga showed.
         // This is where the two directions stop being mirrors: previous from

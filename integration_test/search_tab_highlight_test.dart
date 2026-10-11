@@ -28,26 +28,8 @@ import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/screens/reader_screen.dart';
 
+import 'search_test_helper.dart';
 import 'test_overrides.dart';
-
-// ---------------------------------------------------------------------------
-// Helper: wait for search results to finish loading
-// ---------------------------------------------------------------------------
-
-/// Polls until the CircularProgressIndicator disappears (30 s timeout).
-Future<void> _waitForSearchResults(WidgetTester tester) async {
-  const maxWait = Duration(seconds: 30);
-  final deadline = DateTime.now().add(maxWait);
-
-  while (DateTime.now().isBefore(deadline)) {
-    await tester.pump(const Duration(milliseconds: 250));
-    if (find.byType(CircularProgressIndicator).evaluate().isEmpty) {
-      await pumpForSettle(tester, const Duration(milliseconds: 200));
-      return;
-    }
-  }
-  fail('_waitForSearchResults timed out after $maxWait');
-}
 
 // ---------------------------------------------------------------------------
 // Test
@@ -101,10 +83,7 @@ void main() {
         // ================================================================
         // STEP 1: Search "mahaasathi" → verify counts
         // ================================================================
-        await typeText(tester, find.byType(TextField), 'mahaasathi');
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 400));
-        await _waitForSearchResults(tester);
+        await tester.searchFor('mahaasathi');
 
         final counts = container.read(searchStateProvider).countByResultType;
         expect(
@@ -124,14 +103,14 @@ void main() {
         // ================================================================
         await tester.tap(find.text('Full text'));
         await pumpForSettle(tester);
-        await _waitForSearchResults(tester);
+        await tester.waitForSearchResults();
 
         // Tap the first ListTile (search result)
         final ftsListTiles = find.byType(ListTile);
         expect(ftsListTiles, findsWidgets,
             reason: 'Step 2: FTS results visible');
         await tester.tap(ftsListTiles.first);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify: 1 tab open, FTS highlight set for tab 0
         expect(
@@ -158,7 +137,7 @@ void main() {
         // Switch to Titles tab in search results (results already loaded)
         await tester.tap(find.text('Titles'));
         await pumpForSettle(tester);
-        await _waitForSearchResults(tester);
+        await tester.waitForSearchResults();
 
         // Tap the first Title result
         final titleListTiles = find.byType(ListTile);
@@ -168,7 +147,7 @@ void main() {
           reason: 'Step 3: Title results visible',
         );
         await tester.tap(titleListTiles.first);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify: 2 tabs open
         expect(
@@ -219,7 +198,7 @@ void main() {
           greaterThanOrEqualTo(0),
           reason: 'Step 5: Node dn-2-9 should be found in tree',
         );
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         expect(
           container.read(tabsProvider).length,
@@ -278,7 +257,7 @@ void main() {
           reason: 'Step 8: Should find 3 close buttons (one per tab)',
         );
         await tester.tap(closeButtons.first);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify: 2 tabs remaining, map still empty, active index in bounds
         final remainingTabs = container.read(tabsProvider);

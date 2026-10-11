@@ -334,7 +334,7 @@ void main() {
       // ---- 13. Picking a result opens it and leaves search mode ----
       expect(find.byType(SearchResultsPanel), findsOneWidget);
       await tester.tap(find.byType(SearchResultTile).first);
-      await pumpForSettle(tester, const Duration(seconds: 2));
+      await pumpForSettle(tester);
       expect(container.read(tabsProvider), hasLength(1));
       expectClosed(container, '13. result picked');
       // The breadcrumb names what opened.

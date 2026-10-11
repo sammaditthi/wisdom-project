@@ -68,7 +68,7 @@ extension SearchTestHelpers on WidgetTester {
       ),
     );
     // Let the tree and providers initialise.
-    await pumpAndSettle();
+    await pumpForSettle(this);
   }
 
   // ---- Core search actions ----
@@ -99,7 +99,7 @@ extension SearchTestHelpers on WidgetTester {
       // Search is done when no spinner is visible.
       if (find.byType(CircularProgressIndicator).evaluate().isEmpty) {
         // One more settle to let any pending rebuilds finish.
-        await pumpAndSettle(const Duration(milliseconds: 200));
+        await pumpForSettle(this, const Duration(milliseconds: 200));
         return;
       }
     }
@@ -132,7 +132,7 @@ extension SearchTestHelpers on WidgetTester {
   /// Switch to a result tab by its display name (e.g., "Titles", "Full text").
   Future<void> switchToTab(String tabName) async {
     await tap(find.text(tabName));
-    await pumpAndSettle();
+    await pumpForSettle(this);
     await waitForSearchResults();
   }
 
@@ -141,7 +141,7 @@ extension SearchTestHelpers on WidgetTester {
     // Clear the text field.
     await typeText(this, find.byType(TextField), '');
     await pump();
-    await pumpAndSettle();
+    await pumpForSettle(this);
   }
 
   /// Tap a scope filter chip by its label (e.g., "Sutta", "Commentaries").
@@ -191,14 +191,14 @@ extension SearchTestHelpers on WidgetTester {
   Future<void> _inMatchMenu(Future<void> Function() choose) async {
     final button = find.byType(MatchOptionsButton);
     await tap(button);
-    await pumpAndSettle();
+    await pumpForSettle(this);
     await choose();
     // A distance change waits for the 300 ms typing pause before searching.
     await pump(const Duration(milliseconds: 400));
     await waitForSearchResults();
     // Tapping the button again closes the menu.
     await tap(button);
-    await pumpAndSettle();
+    await pumpForSettle(this);
   }
 
   /// A menu option by its title. Scoped to the radio rows, as the button's
@@ -228,7 +228,7 @@ extension SearchTestHelpers on WidgetTester {
     // Lay out the scrolled row, or the tap lands where Refine was.
     await pump();
     await tap(refine);
-    await pumpAndSettle();
+    await pumpForSettle(this);
   }
 
   /// Open the Refine dialog, select tree nodes by their Sinhala names,
@@ -247,7 +247,7 @@ extension SearchTestHelpers on WidgetTester {
       final clearButton = find.text('Clear');
       if (clearButton.evaluate().isNotEmpty) {
         await tap(clearButton);
-        await pumpAndSettle();
+        await pumpForSettle(this);
       }
     }
 
@@ -265,7 +265,7 @@ extension SearchTestHelpers on WidgetTester {
           final collapsed = find.byIcon(Icons.chevron_right);
           if (collapsed.evaluate().isEmpty) break;
           await tap(collapsed.first);
-          await pumpAndSettle();
+          await pumpForSettle(this);
           if (find.text(name).evaluate().isNotEmpty) break;
         }
       }
@@ -293,12 +293,12 @@ extension SearchTestHelpers on WidgetTester {
         reason: 'Checkbox for "$name" should exist',
       );
       await tap(checkbox.first);
-      await pumpAndSettle();
+      await pumpForSettle(this);
     }
 
     // Close the dialog.
     await tap(find.text('Done'));
-    await pumpAndSettle();
+    await pumpForSettle(this);
     await waitForSearchResults();
   }
 
@@ -333,7 +333,7 @@ extension SearchTestHelpers on WidgetTester {
     }
 
     await tap(find.text('Done'));
-    await pumpAndSettle();
+    await pumpForSettle(this);
     await waitForSearchResults();
   }
 
@@ -404,7 +404,7 @@ extension SearchTestHelpers on WidgetTester {
     expect(refineChip, findsOneWidget,
         reason: 'Refine chip should be visible on Definitions tab');
     await tap(refineChip);
-    await pumpAndSettle();
+    await pumpForSettle(this);
 
     // Toggle each dictionary by name.
     // Scope to the Dialog to avoid matching dictionary names in result
@@ -431,12 +431,12 @@ extension SearchTestHelpers on WidgetTester {
       expect(checkbox, findsWidgets,
           reason: 'Checkbox for "$name" should exist');
       await tap(checkbox.first);
-      await pumpAndSettle();
+      await pumpForSettle(this);
     }
 
     // Close the dialog
     await tap(find.text('Done'));
-    await pumpAndSettle();
+    await pumpForSettle(this);
     await waitForSearchResults();
   }
 

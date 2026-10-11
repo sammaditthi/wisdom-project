@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
-import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 import 'package:the_wisdom_project/presentation/models/in_page_search_state.dart';
-import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/in_page_search_provider.dart';
-import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
-import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/in_page_search_bar.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/singlish_preview.dart';
@@ -23,43 +18,6 @@ void main() {
     // ---------------------------------------------------------------
     // Shared helpers
     // ---------------------------------------------------------------
-
-    /// Pumps a minimal reader app with real providers and waits for the
-    /// navigation tree to load from assets.
-    Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            bjtDocumentDataSourceProvider.overrideWithValue(
-              BJTDocumentLocalDataSourceImpl(),
-            ),
-            keyValueStoreOverride(),
-          ],
-          child: const MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Column(
-                children: [
-                  TabBarWidget(),
-                  Expanded(child: MultiPaneReaderWidget()),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(MaterialApp)),
-      );
-
-      // Wait for the real navigation tree to load from assets
-      await container.read(navigationTreeProvider.future);
-      await pumpForSettle(tester);
-
-      return container;
-    }
 
     /// Opens the in-page search bar.
     ///
@@ -239,7 +197,7 @@ void main() {
 
         // Switch back to Tab A
         container.read(activeTabIndexProvider.notifier).state = 0;
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Tab A's state should be fully preserved
         final stateARestored = readSearchState(container, 0);
@@ -254,7 +212,7 @@ void main() {
 
         // Switch to Tab B
         container.read(activeTabIndexProvider.notifier).state = 1;
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Tab B's state should be fully preserved
         final stateBRestored = readSearchState(container, 1);
@@ -339,7 +297,7 @@ void main() {
 
         // Wrap to the LAST match (previous from 0 → last match at end of sutta)
         await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Verify we reached the last match
         expect(readSearchState(container, 0).currentMatchIndex, matchCount - 1,
@@ -485,7 +443,7 @@ void main() {
         expect(tabCloseButtons, findsNWidgets(2),
             reason: 'Should find 2 tab close buttons');
         await tester.tap(tabCloseButtons.last); // Close Tab B (rightmost)
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // Only Tab A should remain
         expect(container.read(tabsProvider).length, 1);
