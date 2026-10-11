@@ -97,10 +97,8 @@ A re-run of the original code took 87 s with its first test failing early;
 
 ## Later
 
-- `test_overrides.dart` now holds all shared test helpers (typing, tabs, the
-  reader), so the name no longer fits. Rename it when no runs are in progress.
-- Two helper styles remain: `tester.waitForSearchResults()` (extension) and
-  `pumpForSettle(tester)` (function). Pick one.
+Follow-ups (rename `test_overrides.dart`, one helper style, the seven 1 s
+waits) are in [`../todo/integration-test-followups.md`](../todo/integration-test-followups.md).
 
 ## Overlapping tests (for information only)
 
