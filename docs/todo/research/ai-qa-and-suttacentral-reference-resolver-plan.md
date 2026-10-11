@@ -9,7 +9,7 @@
 > **build tool** (`tools/suttacentral_map/`) that grows the seed to
 > all suttas. Per-step state is in the Build-order
 > section; concordance evidence in
-> [`suttacentral-bjt-concordance-findings.md`](./suttacentral-bjt-concordance-findings.md).
+> [`sutta-references-plan.md`](../sutta-references-plan.md) (Part B).
 > **Captured:** 2026-06-27.
 > **Companion to** [`wisdom-project-rag-qa-design.md`](./wisdom-project-rag-qa-design.md)
 > (the upstream NotebookLM-style RAG design). That doc decides *what* the AI
@@ -301,12 +301,12 @@ where saṁyuttas are numbered 1–56 continuously. Our BJT tree is **nested**:
 `assets/data/file-map.json` keys SN as `sn-1 … sn-5` — the **five vaggas**
 (Sagāthā, Nidāna, Khandha, Saḷāyatana, Mahā) — with saṁyuttas nested underneath,
 **plus a vagga level inside each saṁyutta**, and BJT **bundles SN 12+13 into one
-node** so the saṁyutta positions shift (both proven in the
-[findings doc](./suttacentral-bjt-concordance-findings.md) §4):
+node** so the saṁyutta positions shift (both proven in
+[`sutta-references-plan.md`](../sutta-references-plan.md), Part B):
 
 ```
 sn15.3   →   sn-2-3-1-3      (leaf-title-confirmed: අස්සුසුත්තං / Assu)
-             (this doc originally said sn-2-4-3 — wrong on two counts; see findings §0)
+             (this doc originally said sn-2-4-3 — wrong on two counts; see `sutta-references-plan.md`, Part B)
 ```
 
 This is the same flat-vs-nested gap the `mahamevnawa-link-mapping.md` tool
@@ -351,22 +351,8 @@ String? resolveToNodeKey(String uid);
 
 ### B.4 Building the concordance (`tools/suttacentral_map/`)
 
-Reuse the Mahamevnawa playbook: **propose by canonical position, confirm by an
-independent signal.** SuttaCentral's uids *are* the canonical reference system,
-and both editions enumerate the same canon in the same order, so:
-
-1. Walk our `assets/data/tree.json` and SuttaCentral's structure together
-   (nikāya → saṁyutta/vagga → sutta), aligning by position within each
-   already-matched parent.
-2. Confirm against a cross-reference signal (SC publishes BJT alignment; the
-   local `tipitaka.lk` project and `bilara-data` segment ids are also available)
-   and **drop** any pair the signal contradicts — exactly how the Mahamevnawa
-   build rejects *peyyāla* drift.
-3. Emit `sc-to-bjt.json` + an `unmatched.txt` grouped by reason, for review.
-
-> Detailed build rules are deferred to when the tool is written; the point here
-> is that the **architecture is settled** (build-time Python → committed JSON →
-> pure-Dart lookup) and **proven** by the sibling tool.
+Moved to [`sutta-references-plan.md`](../sutta-references-plan.md), Part B
+(2026-10-11).
 
 ### B.5 Slots this fills that already exist
 

@@ -167,7 +167,7 @@ exactly which SuttaCentral snapshot any given store id represents.
 ## 7. Open questions
 
 - **Also affects the concordance.** bilara-data seeds the SuttaCentral side of the
-  SC↔BJT concordance (see [suttacentral-bjt-concordance-findings.md](./suttacentral-bjt-concordance-findings.md)).
+  SC↔BJT concordance (see [sutta-references-plan.md](./sutta-references-plan.md), Part B).
   A bilara-data update could shift SC enumeration, so a re-sync may need a concordance
   re-check too — not just a re-ingest.
 - **Detecting "meaningful" change** — Sujato revises wording often; do we re-ingest on

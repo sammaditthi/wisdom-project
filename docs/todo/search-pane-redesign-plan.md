@@ -19,9 +19,10 @@ Chunks, in order:
 | C | 4, 8 + Task 10: Treatises naming | Filter row and match menu | Done |
 | D | 9 | Search icon on phones, one back arrow, one-line breadcrumb | Done; checked by eye 2026-10-09 |
 | D2 | 12 | Tablets use the desktop bar; result tabs drag with a mouse | Done, not committed; check by eye |
-| E | 11 | Sutta abbreviations | Not started |
 
-B and C both edit `search_results_panel.dart`, so never run them side by side. D needs A and C; D2 needs D. E can run any time after A. When a chunk is done, set its status and add a handover note at the end of this doc.
+B and C both edit `search_results_panel.dart`, so never run them side by side. D needs A and C; D2 needs D. When a chunk is done, set its status and add a handover note at the end of this doc.
+
+Moved out on 2026-10-11: Task 11 (sutta references) is now `sutta-references-plan.md`, and the shortcuts sheet is `keyboard-shortcuts-sheet.md`.
 
 Tasks:
 
@@ -37,7 +38,6 @@ Tasks:
 | 8 | "Starts with ▾" match menu | 2 | L | 4 |
 | 9 | Search icon that expands, on phones | 7 | L | 2, 8 |
 | 10 | Small fixes | — | S | — |
-| 11 | No Singlish preview while typing a sutta reference | — | S | 1 |
 | 12 | Tablets use the desktop bar; result tabs drag with a mouse | — | S | 9 |
 
 Rules for every task:
@@ -256,49 +256,6 @@ Quick, independent items. Each one ships with the chunk that edits the same file
 - [x] Make "View N more" a real button with a 40px+ tap area (`grouped_fts_tile.dart`).
 - [x] "Treatises" vs "වෙනත්": both now mean "Other": English "Other", Sinhala අන්‍ය, the name tree.json gives the `anya` section (decided 2026-10-07). Key `scopeOther`, chip id `other`.
 
-## Task 11 — No Singlish preview while typing a sutta reference
-
-**Goal:** typing "SN", "Dhp" or "SN 1" shows no Singlish preview. Today `singlishPreviewText` hides it only for what `parseRef` reads as a reference: a listed book plus a number, any case. So "SN" and "Dhp" alone still show a preview, and "an 3" is hidden although it should show.
-
-**The rule:** hide the preview only when the typed text can never be the start of a real search: no word in the corpus, the dictionaries or the titles. That includes what the text grows into: "an" is අන් now, but අන… once a vowel follows.
-
-**Measured 2026-10-06** (`bjt.db` fts5vocab, `dict.db` headwords, `tree.json` names). Each abbreviation was tried alone, with every possible next letter, and followed by a number.
-
-| Typed | Can it start a real search? | Preview |
-| --- | --- | --- |
-| KN alone | Yes. "KN" is how this scheme types ඤ, as in ඤාණ: 1,970 corpus words, 1,078 dictionary words, 33 titles | Shown |
-| AN alone | Yes. AN + a vowel → ඇණ…: 62 corpus words | Shown |
-| Nd, Thig alone | Yes, barely: one corpus word each (ණ්ඩං; "Thigh…" → ථිඝාතකා) | Shown |
-| The other 23 alone, in their listed case (SN, DN, MN, Dhp, Thag, Snp, …) | No | Hidden |
-| Any abbreviation alone in lowercase ("an", "sn", "ud") | Lowercase is how Singlish is typed; "an" alone starts 3,501 words | Shown |
-| Listed abbreviation + number, any case ("SN 1", "sn15.3", "AN 3", "KN 2") | No | Hidden |
-| "an" + number ("an 3") | Yes: අන් followed by a number is in 2 texts | Shown |
-| Single letters (A, D, M, S), with or without a number | Not checked; they start thousands of words | Shown |
-
-**Keep it true:** zero today is not zero forever, because the corpus and the dictionaries can change. A test should re-run this check against the bundled databases and fail when a hidden form starts matching a word. The test agent writes it.
-
-**Steps:**
-
-1. One `const` table of abbreviations in `wisdom_shared`, next to the resolver: abbreviation, title, and whether it hides the preview when it stands alone. It replaces `SuttaCentralRefResolver.knownBooks` and `_displayBook`. Source: [Access to Insight](https://accesstoinsight.org/abbrev.html).
-2. Keep every Access to Insight entry, with a comment on the ones the resolver cannot open yet: Vinaya (Cv, Mv), Khp, Miln, Nd, Nm, Nc, the commentaries (DhpA, KhpA, ThagA, ThigA) and the single letters. Later they can point at BJT sections, and the help docs list them all.
-3. Sutta Nipāta is "Snp". In the table, "Sn" is noted as meaning SN here, because the resolver ignores case.
-4. Replace the `parseRef` check in `singlishPreviewText` with this rule. The find bar and the main box read it from there, and recent searches save its result (Task 3). So the rule also changes what is saved: once "Dhp" alone shows no preview, it is saved as typed, not as Sinhala.
-
-**Optional, static site:** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the concordance as extra rows in `search-index.json` (all of `sc-to-bjt.json` is 1,144 bytes on 2026-10-06; it grows as the concordance is authored), plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so the "no Sinhala, no URLs in site.js" rule still holds. Do it only while it stays this small.
-
-**Files:** `packages/wisdom_shared/lib/src/refs/`, `lib/core/utils/search_query_utils.dart`.
-
-**Decided 2026-10-06:**
-
-- The table is a `const` in `wisdom_shared`, not a JSON asset: no new static files on the app side.
-- Sutta Nipāta is "Snp". Checked: SuttaCentral's ID is `snp1.8`, shown as "Snp 1.8". Access to Insight, dhammatalks.org and Wikipedia use "Sn", but only case-sensitively, and phones auto-capitalise "sn 1.8" to "Sn 1.8".
-- Every Access to Insight entry stays in the table; the ones that cannot open anything yet carry a comment.
-
-**Done when:**
-
-- [ ] "SN", "SN 1", "sn15.3", "AN 3" and "Dhp" show no preview in the find bar or the main box, and are saved to recent searches as typed.
-- [ ] "AN", "KN", "an", "an 3", "a", "s" and "m" still show their previews.
-
 ## Task 12 — Tablets use the desktop bar; result tabs drag with a mouse
 
 Found in the by-eye check on 2026-10-09; both parts decided by the user the same day.
@@ -333,7 +290,7 @@ Done: Tasks 1, 2 and 3, plus the clear ✕ tooltip in the search box (Task 10).
 - `singlishPreviewText(raw)` in `search_query_utils.dart` returns the Sinhala to show, or null when there is none. It keeps the joiners: tatra → ටට්‍ර renders joined in the bundled font (HarfBuzz check, 2026-10-06). The Pali word තත්‍ර is typed thathra. Widgets read it through `singlishPreviewProvider(raw)` (`providers/singlish_preview_provider.dart`), which runs the conversion once per query. Calling it in `build` re-ran the converter on every rebuild: each find-bar match step, and every recent row each time the search bar rebuilt.
 - `SinglishPreview` applies the 45% width cap itself; callers pass `fieldWidth`. No arrow: the tag alone marks the preview.
 - The main box puts the preview at the right end of the field, before the clear ✕, not right after the typed text. Task 8 removed the two toggles that also sat there.
-- The find bar and the main box hide the preview for a reference like "SN 15.3": `singlishPreviewText` checks `parseRef`. Recent searches save such a reference as typed. Task 11 refines that rule.
+- The find bar and the main box hide the preview for a reference like "SN 15.3": `singlishPreviewText` checks `parseRef`. Recent searches save such a reference as typed. `sutta-references-plan.md` refines that rule.
 - The `isSinglishConverted` getters on both search states and `querySinglishConverted` were removed: nothing used them once the preview had its own rule.
 - New l10n key: `removeRecentSearch`.
 - Tests, all passing on macOS on 2026-10-06: new `test/core/utils/search_query_utils_test.dart` (the preview rule); `integration_test/in_page_search_test.dart` test 2 checks the find-bar preview; `integration_test/search_flow_integration_test.dart` 10.1 checks the main-box preview and that a Singlish recent entry shows only the Sinhala.
@@ -470,8 +427,6 @@ Done: Task 12.
 ### Next (handover, 2026-10-09)
 
 1. The user checks D2 by eye on macOS: 768, 900 and 1023px (box, dropdown corners, side panel, back arrow), the result tabs in a 300px panel with a mouse, and the breadcrumb, reader tabs and chips still dragging. Then commit.
-2. Chunk E is Task 11. Start in `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`), which today hides the preview when `SuttaCentralRefResolver.parseRef` reads a reference. The new table replaces `knownBooks` and `_displayBook` in `packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`. Task 11 has the rule and the measured cases. The test agent writes the corpus check ("Keep it true").
-3. Not tracked anywhere yet: the shortcuts sheet that replaces the box's hint.
 
 Running tests: one integration file per `flutter test … -d macos`. The macOS test window lays out 502px wide, so a new harness sets `tester.view.physicalSize`. Before pinning an old one, run it at 400px and 1280px: a failure only at 400px can be a real phone bug, as 3b was. The chip row is lazy: `scrollUntilVisible`, then `pump()`, before tapping a chip past the edge.
 

@@ -6,7 +6,7 @@
 > **Reviewed against:**
 > [`ai-qa-and-suttacentral-reference-resolver-plan.md`](../ai-qa-and-suttacentral-reference-resolver-plan.md),
 > [`wisdom-project-rag-qa-design.md`](../wisdom-project-rag-qa-design.md),
-> [`suttacentral-bjt-concordance-findings.md`](../suttacentral-bjt-concordance-findings.md).
+> `suttacentral-bjt-concordance-findings.md` (since merged into [`sutta-references-plan.md`](../sutta-references-plan.md)).
 > **No code was changed** — this is the findings log.
 > **Follow-up plans:**
 > Findings **#1, #2, #4, #5, #6** (the error-handling cluster) were consolidated,
