@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
@@ -7,7 +9,7 @@ import '../../providers/search_provider.dart';
 import '../../../domain/entities/search/recent_search.dart';
 
 /// Simplified overlay that only shows recent searches
-/// Displayed when search bar is focused with empty or short query
+/// Displayed when search bar is focused with an empty query
 class RecentSearchOverlay extends ConsumerWidget {
   /// Callback when the overlay should be dismissed
   final VoidCallback onDismiss;
@@ -23,53 +25,51 @@ class RecentSearchOverlay extends ConsumerWidget {
 
   /// Calculate max height based on screen size.
   ///
-  /// Mobile: fill the available height (minus safe-area insets and a small
-  /// gap for the search bar above). Tablet/desktop: cap at 66% so the
-  /// overlay doesn't dominate the viewport.
+  /// Mobile: fill the available height (minus safe-area insets, the keyboard
+  /// and a small gap for the search bar above). Tablet/desktop: also cap at
+  /// 66% so the overlay doesn't dominate the viewport.
   double _calculateMaxHeight(BuildContext context) {
-    // Safe-area insets (status bar, home indicator) — not a responsive
-    // decision, so MediaQuery is still the right source here.
-    final mediaQuery = MediaQuery.of(context);
-    final topPadding = mediaQuery.padding.top;
-    final bottomPadding = mediaQuery.padding.bottom;
+    // Safe-area insets (status bar, home indicator) and the keyboard — not a
+    // responsive decision, so MediaQuery is still the right source here.
+    final padding = MediaQuery.paddingOf(context);
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
     final screenHeight = ResponsiveUtils.screenHeight(context);
 
-    if (ResponsiveUtils.isMobile(context)) {
-      return screenHeight - topPadding - bottomPadding - 100;
-    } else {
-      return screenHeight * 0.66;
-    }
+    final available =
+        screenHeight - padding.top - padding.bottom - keyboard - 100;
+    final maxHeight = ResponsiveUtils.isMobile(context)
+        ? available
+        : math.min(available, screenHeight * 0.66);
+    // A negative max height would fail BoxConstraints' assert.
+    return math.max(0, maxHeight);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchState = ref.watch(searchStateProvider);
+    // Only the list, so unrelated search-state changes don't rebuild the rows.
+    final recentSearches =
+        ref.watch(searchStateProvider.select((s) => s.recentSearches));
     final theme = Theme.of(context);
 
-    final hasRecentSearches = searchState.recentSearches.isNotEmpty;
-
-    if (!hasRecentSearches) {
+    if (recentSearches.isEmpty) {
       return const SizedBox.shrink();
     }
 
     final maxHeight = _calculateMaxHeight(context);
+    const borderRadius = BorderRadius.all(Radius.circular(12));
 
     return SizedBox(
       width: width,
       child: Material(
         elevation: 8,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: borderRadius,
         color: theme.colorScheme.surfaceContainer,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: borderRadius,
             child: SingleChildScrollView(
-              child: _buildRecentSearches(
-                context,
-                ref,
-                searchState.recentSearches,
-              ),
+              child: _buildRecentSearches(context, ref, recentSearches),
             ),
           ),
         ),
@@ -83,45 +83,51 @@ class RecentSearchOverlay extends ConsumerWidget {
     List<RecentSearch> recentSearches,
   ) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(context, ref,
-            AppLocalizations.of(context).recentSearches.toUpperCase()),
-        ...recentSearches.map((search) => ListTile(
-              dense: true,
-              leading: Icon(
-                Icons.history,
-                size: 20,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              title: Text(search.queryText,
-                  style: context.typography.listRowTitle),
-              trailing: GestureDetector(
-                onTap: () {
-                  ref
-                      .read(searchStateProvider.notifier)
-                      .removeRecentSearch(search.queryText);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.close,
-                    size: 18,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              onTap: () {
-                // Dismiss overlay first
-                onDismiss();
-                // Then trigger search with this query
+        _sectionHeader(context, ref, l10n.recentSearches.toUpperCase()),
+        ...recentSearches.map((search) {
+          // Singlish searches are saved as their Sinhala
+          // (saveRecentSearchAndDismiss), so the saved text is what we show.
+          final queryText = search.queryText;
+
+          return ListTile(
+            dense: true,
+            leading: Icon(
+              Icons.history,
+              size: 20,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            title: Text(
+              queryText,
+              style: context.typography.listRowTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.close, size: 18),
+              color: theme.colorScheme.onSurfaceVariant,
+              visualDensity: VisualDensity.compact,
+              tooltip: l10n.removeRecentSearch,
+              onPressed: () {
                 ref
                     .read(searchStateProvider.notifier)
-                    .selectRecentSearch(search.queryText);
+                    .removeRecentSearch(queryText);
               },
-            )),
+            ),
+            onTap: () {
+              // Dismiss overlay first
+              onDismiss();
+              // Then trigger search with this query
+              ref
+                  .read(searchStateProvider.notifier)
+                  .selectRecentSearch(queryText);
+            },
+          );
+        }),
       ],
     );
   }

@@ -33,5 +33,5 @@ done
 
 echo "app ios --$TARGET is not set up yet:"
 echo "  no signing or store upload yet. The first release is planned in"
-echo "  docs/todo/mobile-release/first-mobile-release.md."
+echo "  docs/todo/mobile-release/first-ios-release.md."
 exit 3

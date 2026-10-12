@@ -348,7 +348,7 @@ project.
 
 After C, most citations won't open in the reader: the concordance maps
 SN 15 only. Growing it is its own job —
-`docs/todo/suttacentral-bjt-concordance-findings.md`.
+`docs/todo/sutta-references-plan.md` (Part B).
 
 ## Risks
 

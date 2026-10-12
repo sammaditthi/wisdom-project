@@ -1,12 +1,14 @@
 /// Widget tests for SearchResultsPanel — edge cases that need mocked state.
 ///
 /// These complement the E2E integration tests in `integration_test/search/`.
-/// Only scenarios that are impossible to reproduce with real data are kept here:
-/// loading states, error states, boundary badge values, and callback wiring.
+/// Only scenarios that need exact state are kept here: loading states, error
+/// states, boundary badge values, "See all", group expansion and callback
+/// wiring.
 library;
 
 import 'dart:io' show SocketException;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,6 +16,7 @@ import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart
 import 'package:the_wisdom_project/domain/entities/content/content_language.dart';
 import 'package:the_wisdom_project/domain/entities/failure.dart';
 import 'package:the_wisdom_project/domain/entities/navigation/tipitaka_tree_node.dart';
+import 'package:the_wisdom_project/domain/entities/search/grouped_search_result.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result_type.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
@@ -21,55 +24,25 @@ import 'package:the_wisdom_project/presentation/providers/navigation_tree_provid
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
+import 'package:the_wisdom_project/presentation/widgets/search/secondary_match_tile.dart';
 
+import '../../helpers/fake_search_state_notifier.dart';
 import '../../helpers/pump_app.dart';
-
-/// Fake implementation for testing — allows injecting arbitrary SearchState.
-///
-/// Implements only the methods the panel actually calls. Anything else
-/// throws an [UnimplementedError] that names the missing member, so a
-/// future panel change that calls a new method fails loudly with a useful
-/// message (instead of the cryptic NoSuchMethodError you'd get from
-/// super.noSuchMethod).
-class FakeSearchStateNotifier extends StateNotifier<SearchState>
-    implements SearchStateNotifier {
-  FakeSearchStateNotifier(super.state);
-
-  @override
-  Future<void> selectResultType(SearchResultType category) async {
-    state = state.copyWith(selectedResultType: category);
-  }
-
-  // Lets the §4b live-update test flip the search language at runtime.
-  @override
-  void setLanguageFilter({bool? pali, bool? sinhala}) {
-    state = state.copyWith(
-      searchInPali: pali ?? state.searchInPali,
-      searchInSinhala: sinhala ?? state.searchInSinhala,
-    );
-  }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    throw UnimplementedError(
-      'FakeSearchStateNotifier does not implement '
-      '${invocation.memberName} — add it to the fake if your test needs it.',
-    );
-  }
-}
 
 /// Helper to pump SearchResultsPanel with a given [SearchState].
 ///
 /// Returns the [FakeSearchStateNotifier] so a test can mutate state at runtime
 /// (e.g. flip the search language). Extra [overrides] let a test supply a real
 /// navigation tree / display language for the result-tile label tests.
+/// [width] sets the panel's width; null fills the screen.
 Future<FakeSearchStateNotifier> _pumpPanel(
   WidgetTester tester, {
   required SearchState state,
-  VoidCallback? onClose,
   void Function(SearchResult)? onResultTap,
   List<Override> overrides = const [],
+  double? width,
 }) async {
+  final panel = SearchResultsPanel(onResultTap: onResultTap);
   final notifier = FakeSearchStateNotifier(state);
   await tester.pumpWidget(
     ProviderScope(
@@ -85,10 +58,12 @@ Future<FakeSearchStateNotifier> _pumpPanel(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
-          body: SearchResultsPanel(
-            onClose: onClose ?? () {},
-            onResultTap: onResultTap,
-          ),
+          body: width == null
+              ? panel
+              : Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(width: width, child: panel),
+                ),
         ),
       ),
     ),
@@ -224,29 +199,117 @@ void main() {
       );
 
       expect(find.text('100'), findsOneWidget);
-      expect(find.text('100+'), findsNothing);
+      // Only the invisible "100+" that holds the badge's width.
+      expect(find.text('100+'), findsOneWidget);
     });
 
-    // ── Callback wiring ─────────────────────────────────────────────────
+    // ── "See all" in the Top results headers ────────────────────────────
 
-    testWidgets('onClose callback fires when close button tapped',
+    // One title row in Top results; only the counts change per test.
+    SearchState topResultsWith(Map<SearchResultType, int> counts) =>
+        SearchState(
+          rawQueryText: 'metta',
+          effectiveQueryText: 'metta',
+          groupedResults: const GroupedSearchResult(
+            resultsByType: {
+              SearchResultType.title: [
+                SearchResult(
+                  id: 'title_sn-1',
+                  editionId: 'bjt',
+                  resultType: SearchResultType.title,
+                  title: 'මෙත්තසුත්තං',
+                  subtitle: 'සුත්තනිපාතො',
+                  matchedText: '',
+                  contentFileId: 'sn-1',
+                  pageIndex: 0,
+                  entryIndex: 0,
+                  nodeKey: 'sn-1',
+                  language: 'pali',
+                ),
+              ],
+            },
+          ),
+          countByResultType: counts,
+        );
+
+    testWidgets('no "See all" before the counts load', (tester) async {
+      await _pumpPanel(tester, state: topResultsWith({}));
+      await tester.pumpAndSettle();
+
+      expect(find.text('TITLES'), findsOneWidget);
+      expect(find.text('See all'), findsNothing);
+    });
+
+    testWidgets('no "See all" when the section shows every result',
         (tester) async {
-      bool closeCalled = false;
+      await _pumpPanel(
+        tester,
+        state: topResultsWith({SearchResultType.title: 1}),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('TITLES'), findsOneWidget);
+      expect(find.text('See all'), findsNothing);
+    });
+
+    testWidgets('"See all" opens the Titles tab when there are more results',
+        (tester) async {
+      final notifier = await _pumpPanel(
+        tester,
+        state: topResultsWith({SearchResultType.title: 5}),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('See all'));
+      await tester.pumpAndSettle();
+
+      expect(notifier.state.selectedResultType, SearchResultType.title);
+      // The tab bar follows the state: Titles is the second tab.
+      expect(tester.widget<TabBar>(find.byType(TabBar)).controller!.index, 1);
+    });
+
+    // ── "View N more" in a full-text group ──────────────────────────────
+
+    testWidgets('"View 2 more" shows the hidden matches and "Show Less"',
+        (tester) async {
+      // Three matches in one sutta: one primary row and two hidden ones.
+      SearchResult match(int entryIndex) => SearchResult(
+            id: 'fts_dn-1_$entryIndex',
+            editionId: 'bjt',
+            resultType: SearchResultType.fullText,
+            title: 'බ්‍රහ්මජාලසුත්තං',
+            subtitle: 'දීඝනිකායො',
+            matchedText: 'එවං මෙ සුතං',
+            contentFileId: 'dn-1',
+            pageIndex: 0,
+            entryIndex: entryIndex,
+            nodeKey: 'dn-1',
+            language: 'pali',
+          );
 
       await _pumpPanel(
         tester,
-        state: const SearchState(
-          rawQueryText: 'test',
-          effectiveQueryText: 'test',
+        state: SearchState(
+          rawQueryText: 'සුතං',
+          effectiveQueryText: 'සුතං',
+          selectedResultType: SearchResultType.fullText,
+          fullResults: AsyncValue.data([match(0), match(1), match(2)]),
         ),
-        onClose: () => closeCalled = true,
       );
+      await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.close));
-      await tester.pump();
+      expect(find.byType(SecondaryMatchTile), findsNothing);
 
-      expect(closeCalled, isTrue);
+      await tester.tap(find.text('View 2 more'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Show Less'), findsOneWidget);
+      expect(find.byType(SecondaryMatchTile), findsNWidgets(2));
     });
+
+    // ── Callback wiring ─────────────────────────────────────────────────
+    // The panel has no close button: the search field's back arrow closes
+    // it (integration_test/search_mode_test.dart).
 
     testWidgets('onResultTap callback fires when result is tapped',
         (tester) async {
@@ -283,6 +346,52 @@ void main() {
       expect(tappedResult, isNotNull);
       expect(tappedResult?.title, equals('Metta Sutta'));
     });
+  });
+
+  // ── Result tabs in the narrowest side panel ──────────────────────────────
+  //
+  // 300px is the side panel's minimum, where the four tabs don't fit (M11 in
+  // search-width-checks-test-plan.md).
+  group('SearchResultsPanel — result tabs in a 300px panel', () {
+    const state = SearchState(
+      rawQueryText: 'metta',
+      effectiveQueryText: 'metta',
+      groupedResults: GroupedSearchResult(resultsByType: {}),
+      countByResultType: {
+        SearchResultType.title: 12,
+        SearchResultType.fullText: 140,
+        SearchResultType.definition: 30,
+      },
+    );
+
+    for (final kind in [PointerDeviceKind.mouse, PointerDeviceKind.touch]) {
+      testWidgets('a ${kind.name} drag brings the last tab on screen',
+          (tester) async {
+        await _pumpPanel(tester, state: state, width: 300);
+        await tester.pumpAndSettle();
+
+        final panel = tester.getRect(find.byType(SearchResultsPanel));
+        Rect lastTab() => tester.getRect(find.ancestor(
+              of: find.text('Definitions'),
+              matching: find.byType(Tab),
+            ));
+        expect(lastTab().right, greaterThan(panel.right),
+            reason: 'the tabs must not fit, or there is nothing to drag');
+
+        await tester.dragFrom(
+          tester.getCenter(find.byType(TabBar)),
+          const Offset(-600, 0),
+          kind: kind,
+        );
+        await tester.pumpAndSettle();
+
+        expect(
+          panel.right - lastTab().right,
+          greaterThanOrEqualTo(8),
+          reason: 'the bar ends with 8px of padding, as it starts',
+        );
+      });
+    }
   });
 
   // ── Result-tile label follows the search-display language (§4b) ──────────

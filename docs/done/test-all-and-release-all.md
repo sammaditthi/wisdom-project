@@ -419,4 +419,5 @@ Gaps the investigation found, each its own item:
 - The HTML validator (backlog C9).
 - `research_server` has no tests.
 - Mobile release: signing, iOS export, store upload — tracked in
-  [`first-mobile-release.md`](../todo/mobile-release/first-mobile-release.md).
+  [`first-ios-release.md`](../todo/mobile-release/first-ios-release.md) and
+  [`first-android-release.md`](../todo/mobile-release/first-android-release.md).

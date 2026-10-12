@@ -18,6 +18,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get readerTitle => 'Reader';
 
   @override
+  String get showNavigator => 'Show Navigator';
+
+  @override
+  String get hideNavigator => 'Hide Navigator';
+
+  @override
   String get layoutPaliOnly => 'Pali Only';
 
   @override
@@ -148,6 +154,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recentSearches => 'Recent searches';
 
   @override
+  String get removeRecentSearch => 'Remove from recent searches';
+
+  @override
   String viewMore(int count) {
     return 'View $count more';
   }
@@ -156,21 +165,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get showLess => 'Show Less';
 
   @override
-  String get wordProximity => 'Word Proximity';
+  String get seeAll => 'See all';
 
   @override
-  String get phraseSearch => 'Phrase search (exact consecutive words)';
-
-  @override
-  String wordsApart(int count) {
-    return '$count words apart';
+  String viewingResults(int shown, int total) {
+    return 'Viewing $shown out of $total results';
   }
-
-  @override
-  String get exactConsecutiveWords => 'Exact consecutive words';
-
-  @override
-  String get apply => 'Apply';
 
   @override
   String get reset => 'Reset';
@@ -197,16 +197,74 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scopeCommentaries => 'Commentaries';
 
   @override
-  String get scopeTreatises => 'Treatises';
-
-  @override
-  String get searchAsPhrase => 'Search as complete phrase';
-
-  @override
-  String get searchAsSeparateWords => 'Search as separate words';
+  String get scopeOther => 'Other';
 
   @override
   String get anywhereInText => 'Anywhere in the same text';
+
+  @override
+  String get openSearch => 'Search';
+
+  @override
+  String get matchOptions => 'Match options';
+
+  @override
+  String get matchEachWord => 'Match each word';
+
+  @override
+  String get matchStartsWith => 'Starts with';
+
+  @override
+  String get matchStartsWithHint => 'Finds the word and its longer forms';
+
+  @override
+  String get matchWholeWord => 'Whole word';
+
+  @override
+  String get matchWholeWordHint => 'Finds only the exact word';
+
+  @override
+  String get matchHowWordsSit => 'How words sit together';
+
+  @override
+  String get matchPhrase => 'As a phrase';
+
+  @override
+  String get matchPhraseHint => 'Finds the words together, as typed';
+
+  @override
+  String get matchPhraseShort => 'Phrase';
+
+  @override
+  String get matchAnywhereHint => 'Finds the words in any order';
+
+  @override
+  String get matchAnywhereShort => 'Anywhere';
+
+  @override
+  String get matchNear => 'Near each other';
+
+  @override
+  String get matchNearHint => 'Finds the words close together';
+
+  @override
+  String matchNearShort(int count) {
+    return 'Near $count';
+  }
+
+  @override
+  String matchNearWithin(int count) {
+    return 'Within $count words';
+  }
+
+  @override
+  String get fewerWords => 'Fewer words';
+
+  @override
+  String get moreWords => 'More words';
+
+  @override
+  String get resetToDefault => 'Reset to default';
 
   @override
   String get noDefinitionsFound => 'No definitions found';

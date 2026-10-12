@@ -31,3 +31,15 @@ Two things to decide when someone picks it up:
 - **How often to ask.** Per scroll frame is wasteful and per settle is laggy;
   the answer only changes at a row boundary, so it should key off the
   top-visible index changing, not off scroll offset.
+
+## R2. Review the Sinhala labels in the search match menu
+
+The "Starts with ▾" menu (search pane redesign, Task 8, 2026-10-07) shipped with
+first-draft Sinhala. Review the titles in `app_si.arb`: `matchOptions`,
+`matchEachWord`, `matchStartsWith`, `matchWholeWord`, `matchHowWordsSit`,
+`matchPhrase`, `matchPhraseShort`, `matchAnywhereShort`, `matchNear`,
+`matchNearShort`, `matchNearWithin`, `fewerWords`, `moreWords`,
+`resetToDefault`.
+
+Phones show no tooltips, so each title must make sense alone. The least clear
+is ඇරඹෙන වචන ("Starts with").

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/utils/search_query_utils.dart'
-    show computeEffectiveQuery, querySinglishConverted;
+    show computeEffectiveQuery, singlishPreviewText;
 import '../../domain/entities/search/grouped_search_result.dart';
 import '../../domain/entities/search/recent_search.dart';
 import '../../domain/entities/search/search_result_type.dart';
@@ -119,22 +119,21 @@ class SearchState with _$SearchState {
   bool get isResultsPanelVisible =>
       rawQueryText.trim().isNotEmpty && !isPanelDismissed;
 
-  /// Whether a Singlish conversion was applied
-  bool get isSinglishConverted =>
-      querySinglishConverted(rawQueryText, effectiveQueryText);
-
   /// True if "All" is effectively selected (no specific scope chosen)
   bool get isAllSelected => scope.isEmpty;
 }
 
 /// Manages search state with simplified UX flow
 ///
-/// The panel visibility is computed from queryText.length >= 2,
+/// The panel visibility is computed from whether the query has text,
 /// eliminating the need for explicit mode tracking.
 class SearchStateNotifier extends StateNotifier<SearchState> {
   final TextSearchRepository _searchRepository;
   final RecentSearchesRepository _recentSearchesRepository;
   Timer? _debounceTimer;
+
+  /// Pause after the last keystroke (or − / + tap) before searching.
+  static const _debounceDelay = Duration(milliseconds: 300);
 
   /// Request ID for tracking in-flight searches.
   /// Incremented on each new search to invalidate stale async results.
@@ -153,12 +152,6 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       recentSearches: recentSearches,
       isPanelDismissed: false, // Reopen panel if there's query text
     );
-  }
-
-  /// Called when search bar loses focus
-  /// Does nothing special - panel visibility is computed from queryText
-  void onBlur() {
-    _debounceTimer?.cancel();
   }
 
   /// Update search query text (debounced search)
@@ -198,10 +191,7 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       fullResults: const AsyncValue.loading(),
     );
 
-    _debounceTimer = Timer(
-      const Duration(milliseconds: 300),
-      _performSearch,
-    );
+    _debounceTimer = Timer(_debounceDelay, _performSearch);
   }
 
   /// Execute search based on selected category.
@@ -238,12 +228,9 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     if (_searchRequestId != requestId) return;
 
     result.fold(
-      (failure) {
-        // Keep existing counts on failure
-      },
-      (counts) {
-        state = state.copyWith(countByResultType: counts);
-      },
+      // Old counts would sit beside the new results; show none instead.
+      (failure) => state = state.copyWith(countByResultType: {}),
+      (counts) => state = state.copyWith(countByResultType: counts),
     );
   }
 
@@ -314,8 +301,12 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   Future<void> saveRecentSearchAndDismiss() async {
     if (state.rawQueryText.trim().isEmpty) return;
 
-    // Save to recent searches (user found what they wanted)
-    await _recentSearchesRepository.addRecentSearch(state.rawQueryText);
+    // Save to recent searches (user found what they wanted). Singlish is
+    // saved as its Sinhala: "vedana" and "wedana" are one search, so one row.
+    // Sinhala and references like "SN 15.3" stay as typed.
+    final raw = state.rawQueryText;
+    await _recentSearchesRepository
+        .addRecentSearch(singlishPreviewText(raw) ?? raw);
 
     // Update recent searches list for next time
     final recentSearches = await _recentSearchesRepository.getRecentSearches();
@@ -329,6 +320,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   Future<void> selectResultType(SearchResultType resultType) async {
     if (state.selectedResultType == resultType) return;
 
+    // Drop a search still waiting on the typing pause: this one replaces it.
+    _debounceTimer?.cancel();
     _searchRequestId++; // Invalidate any in-flight searches
 
     // Reset fullResults to loading to prevent stale data rendering
@@ -402,13 +395,6 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     );
   }
 
-  /// Toggle exact match mode
-  /// When enabled, searches for exact word matches only (no prefix matching)
-  void toggleExactMatch() {
-    state = state.copyWith(isExactMatch: !state.isExactMatch);
-    _refreshSearchIfNeeded();
-  }
-
   /// Toggle an edition in the search
   void toggleEdition(String editionId) {
     final newEditions = Set<String>.from(state.selectedEditions);
@@ -469,16 +455,17 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
   /// Clear all filters (reset to defaults)
   void clearFilters() {
+    const defaults = SearchState();
     state = state.copyWith(
-      selectedEditions: {},
-      searchInPali: true,
-      searchInSinhala: true,
-      scope: {},
-      isPhraseSearch: true,
-      isAnywhereInText: false,
-      proximityDistance: 10,
-      isExactMatch: false,
-      selectedDictionaryIds: {},
+      selectedEditions: defaults.selectedEditions,
+      searchInPali: defaults.searchInPali,
+      searchInSinhala: defaults.searchInSinhala,
+      scope: defaults.scope,
+      isPhraseSearch: defaults.isPhraseSearch,
+      isAnywhereInText: defaults.isAnywhereInText,
+      proximityDistance: defaults.proximityDistance,
+      isExactMatch: defaults.isExactMatch,
+      selectedDictionaryIds: defaults.selectedDictionaryIds,
     );
     _refreshSearchIfNeeded();
   }
@@ -516,31 +503,32 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   }
 
   // ============================================================================
-  // PHRASE/PROXIMITY SETTINGS
+  // MATCH OPTIONS
   // ============================================================================
 
-  /// Toggle phrase search mode.
-  /// When enabled (default), searches for consecutive words.
-  /// When disabled, searches for words within proximity distance.
-  void setPhraseSearch(bool isPhraseSearch) {
-    state = state.copyWith(isPhraseSearch: isPhraseSearch);
-    _refreshSearchIfNeeded();
-  }
-
-  /// Toggle "anywhere in text" mode.
-  /// Only applies when [isPhraseSearch] is false.
-  /// When enabled, ignores proximity distance and searches anywhere in the text.
-  void setAnywhereInText(bool isAnywhereInText) {
-    state = state.copyWith(isAnywhereInText: isAnywhereInText);
-    _refreshSearchIfNeeded();
-  }
-
-  /// Set proximity distance for multi-word separate-word searches.
-  /// [distance] = 1-100 for NEAR/n proximity.
-  /// Only applies when [isPhraseSearch] is false and [isAnywhereInText] is false.
-  void setProximityDistance(int distance) {
-    state = state.copyWith(proximityDistance: distance);
-    _refreshSearchIfNeeded();
+  /// Sets any of the match options at once, with one search. Used by the
+  /// match options menu. A change to the distance alone waits for a pause,
+  /// as typing does: the − / + stepper can send several in a row.
+  void setMatchOptions({
+    bool? isExactMatch,
+    bool? isPhraseSearch,
+    bool? isAnywhereInText,
+    int? proximityDistance,
+  }) {
+    final next = state.copyWith(
+      isExactMatch: isExactMatch ?? state.isExactMatch,
+      isPhraseSearch: isPhraseSearch ?? state.isPhraseSearch,
+      isAnywhereInText: isAnywhereInText ?? state.isAnywhereInText,
+      proximityDistance: proximityDistance ?? state.proximityDistance,
+    );
+    final distanceOnly = next.isExactMatch == state.isExactMatch &&
+        next.isPhraseSearch == state.isPhraseSearch &&
+        next.isAnywhereInText == state.isAnywhereInText;
+    if (distanceOnly && next.proximityDistance == state.proximityDistance) {
+      return;
+    }
+    state = next;
+    _refreshSearchIfNeeded(afterPause: distanceOnly);
   }
 
   // ============================================================================
@@ -564,30 +552,32 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
   /// Refresh search if query is active
   /// Used when filters change (scope, language, etc.)
-  void _refreshSearchIfNeeded() {
+  /// [afterPause] waits like typing does, so quick repeated changes run one
+  /// search.
+  void _refreshSearchIfNeeded({bool afterPause = false}) {
     if (state.rawQueryText.trim().isEmpty) return;
 
+    // Drop a search still waiting on the typing pause: this one replaces it.
+    _debounceTimer?.cancel();
     _searchRequestId++; // Invalidate any in-flight searches
     // Reset fullResults to loading to prevent stale data rendering
     state = state.copyWith(
       isLoading: true,
       fullResults: const AsyncValue.loading(),
     );
-    _performSearch();
-  }
-
-  /// Clear search and reset state
-  void clearSearch() {
-    _debounceTimer?.cancel();
-    _searchRequestId++; // Invalidate any in-flight searches
-    state = const SearchState();
+    if (afterPause) {
+      _debounceTimer = Timer(_debounceDelay, _performSearch);
+    } else {
+      _performSearch();
+    }
   }
 
   /// Dismiss the results panel but keep the query text
   /// Used when user clicks a result, clicks outside, or presses Escape
   /// Panel will reopen when user focuses the search bar again
   void dismissResultsPanel() {
-    _debounceTimer?.cancel();
+    // A search still waiting on the typing pause runs anyway: reopening
+    // doesn't search, so cancelling it would leave the spinner up.
     state = state.copyWith(isPanelDismissed: true);
   }
 

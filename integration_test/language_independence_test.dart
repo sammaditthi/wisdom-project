@@ -12,7 +12,6 @@ import 'package:the_wisdom_project/domain/entities/content/content_language.dart
 import 'package:the_wisdom_project/presentation/providers/app_language_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
-import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/breadcrumb_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
@@ -40,6 +39,12 @@ void main() {
     // The app, with MaterialApp.locale wired to appLanguageProvider exactly
     // like main.dart. A localized chrome label sits above the data surfaces.
     Future<ProviderContainer> pumpApp(WidgetTester tester) async {
+      // A fixed desktop size. The test window's own size varies, and a narrow
+      // one overflows the reader beside the 250px navigator.
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -90,12 +95,7 @@ void main() {
         final paliTransformed =
             beautifyPaliText(leaf.paliName, PaliLetterOptions.defaults);
 
-        container.read(tabsProvider.notifier).addTab(
-              tabFromNode(container, 'dn-1-1'),
-            );
-        container.read(activeTabIndexProvider.notifier).state =
-            container.read(tabsProvider).length - 1;
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await openTab(tester, container, tabFromNode(container, 'dn-1-1'));
 
         // ---------- Baseline: App = English, Content = Sinhala ----------
         expect(appLocale(tester), const Locale('en'));

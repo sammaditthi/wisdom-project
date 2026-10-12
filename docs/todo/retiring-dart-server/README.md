@@ -26,7 +26,8 @@ The research (RAG) server stays as the one scale-to-zero backend; notes → Fire
    [`reduce-mobile-size-and-move-to-drift.md`](./reduce-mobile-size-and-move-to-drift.md),
    all done 2026-09-18: the app is on Drift and ships no JSON. The device
    pass that was step 10 is in
-   [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+   [`first-ios-release.md`](../mobile-release/first-ios-release.md) and
+   [`first-android-release.md`](../mobile-release/first-android-release.md).
 3. ~~**Move web onto Drift** (wasm + OPFS).~~ **DONE 2026-09-23.** The same
    datasources, reading a database downloaded once rather than bundled:
    [`move-web-onto-drift.md`](../../done/retiring-dart-server/move-web-onto-drift.md).

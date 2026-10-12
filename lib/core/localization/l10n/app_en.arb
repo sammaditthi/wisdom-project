@@ -16,6 +16,16 @@
     "description": "Title for the reading screen"
   },
 
+  "showNavigator": "Show Navigator",
+  "@showNavigator": {
+    "description": "Tooltip for the app bar menu button while the navigator is hidden"
+  },
+
+  "hideNavigator": "Hide Navigator",
+  "@hideNavigator": {
+    "description": "Tooltip for the app bar menu button while the navigator shows"
+  },
+
   "layoutPaliOnly": "Pali Only",
   "@layoutPaliOnly": {
     "description": "Label for Pali-only reader layout"
@@ -231,6 +241,11 @@
     "description": "Header above the list of the user's recent search queries"
   },
 
+  "removeRecentSearch": "Remove from recent searches",
+  "@removeRecentSearch": {
+    "description": "Tooltip on the ✕ that deletes one entry from the recent searches list"
+  },
+
   "viewMore": "View {count} more",
   "@viewMore": {
     "description": "Expand link revealing additional secondary matches from the same text",
@@ -246,34 +261,22 @@
     "description": "Collapse link that hides the expanded secondary matches again"
   },
 
-  "wordProximity": "Word Proximity",
-  "@wordProximity": {
-    "description": "Label for the word proximity section in refine dialog"
+  "seeAll": "See all",
+  "@seeAll": {
+    "description": "Button in a Top results section header that opens that section's own tab"
   },
 
-  "phraseSearch": "Phrase search (exact consecutive words)",
-  "@phraseSearch": {
-    "description": "Label for phrase search checkbox"
-  },
-
-  "wordsApart": "{count} words apart",
-  "@wordsApart": {
-    "description": "Label showing proximity distance",
+  "viewingResults": "Viewing {shown} out of {total} results",
+  "@viewingResults": {
+    "description": "Footer under a results list that shows only the first part of the matches",
     "placeholders": {
-      "count": {
+      "shown": {
+        "type": "int"
+      },
+      "total": {
         "type": "int"
       }
     }
-  },
-
-  "exactConsecutiveWords": "Exact consecutive words",
-  "@exactConsecutiveWords": {
-    "description": "Label shown when phrase search is enabled"
-  },
-
-  "apply": "Apply",
-  "@apply": {
-    "description": "Button label to apply changes"
   },
 
   "reset": "Reset",
@@ -316,24 +319,124 @@
     "description": "Label for Commentaries (Atthakatha) scope chip"
   },
 
-  "scopeTreatises": "Treatises",
-  "@scopeTreatises": {
-    "description": "Label for Treatises scope chip"
-  },
-
-  "searchAsPhrase": "Search as complete phrase",
-  "@searchAsPhrase": {
-    "description": "Radio button label for phrase search mode (words must be adjacent)"
-  },
-
-  "searchAsSeparateWords": "Search as separate words",
-  "@searchAsSeparateWords": {
-    "description": "Radio button label for separate-word search mode (words within proximity)"
+  "scopeOther": "Other",
+  "@scopeOther": {
+    "description": "Scope chip for the books outside the Tipitaka and commentaries (tree node 'anya', e.g. Visuddhimagga)"
   },
 
   "anywhereInText": "Anywhere in the same text",
   "@anywhereInText": {
-    "description": "Checkbox label to search words anywhere in the text without proximity constraint"
+    "description": "Match menu option: the words may be anywhere in the same text, in any order"
+  },
+
+  "openSearch": "Search",
+  "@openSearch": {
+    "description": "Tooltip for the app bar search icon on phones; tapping it opens the search field"
+  },
+
+  "matchOptions": "Match options",
+  "@matchOptions": {
+    "description": "Tooltip for the filter-row button that opens the match options menu"
+  },
+
+  "matchEachWord": "Match each word",
+  "@matchEachWord": {
+    "description": "Match menu section header: how each typed word is matched"
+  },
+
+  "matchStartsWith": "Starts with",
+  "@matchStartsWith": {
+    "description": "Match menu option and button label: a word matches anything that starts with it"
+  },
+
+  "matchStartsWithHint": "Finds the word and its longer forms",
+  "@matchStartsWithHint": {
+    "description": "Tooltip on the Starts with option"
+  },
+
+  "matchWholeWord": "Whole word",
+  "@matchWholeWord": {
+    "description": "Match menu option and button label: only the exact word matches"
+  },
+
+  "matchWholeWordHint": "Finds only the exact word",
+  "@matchWholeWordHint": {
+    "description": "Tooltip on the Whole word option"
+  },
+
+  "matchHowWordsSit": "How words sit together",
+  "@matchHowWordsSit": {
+    "description": "Match menu section header, shown for two or more words"
+  },
+
+  "matchPhrase": "As a phrase",
+  "@matchPhrase": {
+    "description": "Match menu option: the words must be together, as typed"
+  },
+
+  "matchPhraseHint": "Finds the words together, as typed",
+  "@matchPhraseHint": {
+    "description": "Tooltip on the As a phrase option"
+  },
+
+  "matchPhraseShort": "Phrase",
+  "@matchPhraseShort": {
+    "description": "Short form of As a phrase, added to the match button label"
+  },
+
+  "matchAnywhereHint": "Finds the words in any order",
+  "@matchAnywhereHint": {
+    "description": "Tooltip on the Anywhere in the same text option"
+  },
+
+  "matchAnywhereShort": "Anywhere",
+  "@matchAnywhereShort": {
+    "description": "Short form of Anywhere in the same text, added to the match button label"
+  },
+
+  "matchNear": "Near each other",
+  "@matchNear": {
+    "description": "Match menu option: the words must be within a few words of each other"
+  },
+
+  "matchNearHint": "Finds the words close together",
+  "@matchNearHint": {
+    "description": "Tooltip on the Near each other option"
+  },
+
+  "matchNearShort": "Near {count}",
+  "@matchNearShort": {
+    "description": "Short form of Near each other, added to the match button label",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "matchNearWithin": "Within {count} words",
+  "@matchNearWithin": {
+    "description": "Distance shown beside the - / + stepper under Near each other",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "fewerWords": "Fewer words",
+  "@fewerWords": {
+    "description": "Tooltip for the - button of the distance stepper"
+  },
+
+  "moreWords": "More words",
+  "@moreWords": {
+    "description": "Tooltip for the + button of the distance stepper"
+  },
+
+  "resetToDefault": "Reset to default",
+  "@resetToDefault": {
+    "description": "Match menu action: back to Starts with, As a phrase, distance 10"
   },
 
   "noDefinitionsFound": "No definitions found",

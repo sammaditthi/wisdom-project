@@ -41,6 +41,12 @@ void main() {
     // tree navigator on the left, tab bar + reader on the right).
     // -----------------------------------------------------------------
     Future<ProviderContainer> pumpBreadcrumbApp(WidgetTester tester) async {
+      // A fixed desktop size. The test window's own size varies, and a narrow
+      // one overflows the reader beside the 250px navigator.
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -217,7 +223,7 @@ void main() {
         final spans = getBreadcrumbSpans(tester);
         final parentRecognizer = spans.first.recognizer as TapGestureRecognizer;
         parentRecognizer.onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: New tab was created
         final tabs = container.read(tabsProvider);
@@ -259,7 +265,7 @@ void main() {
         // ACT: Tap first parent to navigate to root
         final spans = getBreadcrumbSpans(tester);
         (spans.first.recognizer as TapGestureRecognizer).onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Breadcrumb now shows shorter path (just root)
         final textAfter = getBreadcrumbText(tester);
@@ -351,7 +357,7 @@ void main() {
                 'to tap otherwise, and nothing below would be checked');
 
         await tester.tap(dnText.first);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         // ASSERT: Tab created with correct data
         final tabs = container.read(tabsProvider);

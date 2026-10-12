@@ -4,21 +4,27 @@ import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart
 import '../../../core/theme/app_typography.dart';
 import '../../providers/main_search_focus_provider.dart';
 import '../../providers/overlay_stack_provider.dart';
+import '../../providers/search_mode_provider.dart';
 import '../../providers/reader_scroll_provider.dart';
 import '../../providers/search_provider.dart';
-import '../common/circular_toggle_button.dart';
-import 'proximity_dialog.dart';
+import '../../providers/singlish_preview_provider.dart';
 import 'recent_search_overlay.dart';
+import 'singlish_preview.dart';
 
 /// Simple search bar for AppBar with dropdown overlay for recent searches
-/// Results panel is shown separately when query has 2+ characters
+/// Results panel is shown separately once the query has text
 class SearchBar extends ConsumerStatefulWidget {
-  final double width;
+  /// Box width; null fills the space given.
+  final double? width;
 
   const SearchBar({
     super.key,
     this.width = 360,
   });
+
+  /// Search mode on phones: fills the app bar, takes focus as it appears, and
+  /// shows recent searches as a card under the bar, as wide as the field.
+  const SearchBar.fullWidth({super.key}) : width = null;
 
   @override
   ConsumerState<SearchBar> createState() => _SearchBarState();
@@ -28,7 +34,6 @@ class _SearchBarState extends ConsumerState<SearchBar> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final OverlayPortalController _overlayController = OverlayPortalController();
-  final LayerLink _layerLink = LayerLink();
 
   // Provider handles captured once in initState. dispose() detaches through
   // these instead of `ref`: using `ref` after the ConsumerStatefulElement is
@@ -58,22 +63,38 @@ class _SearchBarState extends ConsumerState<SearchBar> {
       if (queryText.isNotEmpty && _controller.text != queryText) {
         _controller.text = queryText;
       }
+      if (_isFullWidth) {
+        // Opening search mode is asking to type. Not `autofocus`: Flutter
+        // skips that when something else has focus, such as reader text
+        // after a long press.
+        _focusNode.requestFocus();
+      } else {
+        // The desktop box has no search mode. Clear one left on by widening
+        // the window while search was open, or narrowing would reopen it.
+        ref.read(searchModeProvider.notifier).state = false;
+      }
     });
   }
 
   @override
   void dispose() {
-    // Detach from the provider before tearing down our node — otherwise a
-    // late Ctrl/Cmd+Shift+F could call requestFocus on a disposed node.
-    // Identity check guards against a freshly-mounted SearchBar already
-    // having published a new node while we were still in flight.
-    if (identical(_searchFocusController.state, _focusNode)) {
-      _searchFocusController.state = null;
-    }
-    // Drop any lingering ESC-stack registration before our state is gone,
-    // otherwise DismissTopOverlayAction could invoke _hideOverlay on a
-    // disposed _focusNode / _overlayController.
-    _overlayStack.remove('recent-searches');
+    // On phones this bar goes away with search mode. Riverpod
+    // forbids changing a provider while the tree is torn down, so detach
+    // after the frame.
+    final focusController = _searchFocusController;
+    final overlayStack = _overlayStack;
+    final focusNode = _focusNode;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Unpublish our node, or a late Ctrl/Cmd+Shift+F would focus a
+      // disposed one. Identity check: a new SearchBar (desktop ↔ narrower
+      // width) may have published its node already.
+      if (focusController.mounted &&
+          identical(focusController.state, focusNode)) {
+        focusController.state = null;
+      }
+      // Drop the ESC-stack entry, or ESC would call into this disposed state.
+      if (overlayStack.mounted) overlayStack.remove('recent-searches');
+    });
     _focusNode.removeListener(_onFocusChange);
     _controller.dispose();
     _focusNode.dispose();
@@ -103,6 +124,8 @@ class _SearchBarState extends ConsumerState<SearchBar> {
 
       // Load recent searches
       await ref.read(searchStateProvider.notifier).onFocus();
+      // Search mode may have closed while we waited.
+      if (!mounted) return;
 
       // Only show overlay if query is empty
       // When query has any text, the results panel is shown instead
@@ -123,11 +146,16 @@ class _SearchBarState extends ConsumerState<SearchBar> {
           DismissibleOverlay(
             id: 'recent-searches',
             // ESC mirrors the tap-outside flow: drop the dropdown AND
-            // release search-bar focus.
-            dismiss: _hideOverlay,
+            // release search-bar focus. In search mode it leaves search mode.
+            dismiss: _isFullWidth ? _closeSearch : _hideOverlay,
           ),
         );
   }
+
+  bool get _isFullWidth => widget.width == null;
+
+  /// Closes the panel, and search mode with this bar in it.
+  void _closeSearch() => ref.read(closeSearchProvider)();
 
   /// Hide the dropdown without touching focus. Used when the user starts
   /// typing — query becomes non-empty, the FTS results panel takes over,
@@ -139,18 +167,11 @@ class _SearchBarState extends ConsumerState<SearchBar> {
   }
 
   /// Full close: hide the dropdown and release search-bar focus.
-  /// Wired to ESC (via the dismiss callback above), tap-outside, and as
-  /// the closing half of [_closeAndClear].
+  /// Wired to ESC (via the dismiss callback above) and tap-outside, so
+  /// neither resets the filters.
   void _hideOverlay() {
     _hideRecentOverlay();
     _focusNode.unfocus();
-  }
-
-  /// Close overlay and clear all search state (for dismissal)
-  void _closeAndClear() {
-    _hideOverlay();
-    _controller.clear();
-    ref.read(searchStateProvider.notifier).clearSearch();
   }
 
   @override
@@ -171,29 +192,15 @@ class _SearchBarState extends ConsumerState<SearchBar> {
     // Same scroll signal the AppBar uses, so the pill's fill stays aligned.
     final scrolledUnder = ref.watch(readerScrolledUnderProvider);
 
-    // Watch exact match state for toggle button
-    final isExactMatch =
-        ref.watch(searchStateProvider.select((s) => s.isExactMatch));
-
-    // Watch proximity state for toggle button
-    // Active when: not using default settings (phrase search with proximity 10)
-    final isPhraseSearch =
-        ref.watch(searchStateProvider.select((s) => s.isPhraseSearch));
-    final isAnywhereInText =
-        ref.watch(searchStateProvider.select((s) => s.isAnywhereInText));
-    final proximityDistance =
-        ref.watch(searchStateProvider.select((s) => s.proximityDistance));
-
-    // Proximity button is active when NOT using default phrase search
-    // OR when using non-default proximity settings
-    final isProximityActive =
-        !isPhraseSearch || isAnywhereInText || proximityDistance != 10;
-
-    // Show proximity button only when user has started typing a second word
-    // (i.e., there's a space followed by at least one non-space character)
     final rawQueryText =
         ref.watch(searchStateProvider.select((s) => s.rawQueryText));
-    final showProximityButton = RegExp(r'\s\S').hasMatch(rawQueryText);
+
+    // Search is open: the back arrow at the field's start closes it. The one
+    // close button at every width.
+    final isSearchOpen = _isFullWidth || isResultsPanelVisible;
+
+    // Sinhala preview for Singlish input (none for a reference like "SN 15.3").
+    final singlishPreview = ref.watch(singlishPreviewProvider(rawQueryText));
 
     // Listen to queryText changes and sync controller
     ref.listen(searchStateProvider.select((s) => s.rawQueryText), (prev, next) {
@@ -216,41 +223,8 @@ class _SearchBarState extends ConsumerState<SearchBar> {
       }
     });
 
-    return OverlayPortal(
-      controller: _overlayController,
-      overlayChildBuilder: (context) {
-        // Don't render overlay when results panel is visible
-        if (isResultsPanelVisible) {
-          return const SizedBox.shrink();
-        }
-
-        return Stack(
-          children: [
-            // Full-screen barrier for outside taps
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _closeAndClear,
-                behavior: HitTestBehavior.opaque,
-                child: const ColoredBox(color: Colors.transparent),
-              ),
-            ),
-            // Dropdown content
-            CompositedTransformFollower(
-              link: _layerLink,
-              targetAnchor: Alignment.bottomRight,
-              followerAnchor: Alignment.topRight,
-              offset: const Offset(0, 8),
-              child: RecentSearchOverlay(
-                onDismiss: _hideOverlay,
-              ),
-            ),
-          ],
-        );
-      },
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: SizedBox(
-          width: widget.width,
+    Widget searchBox(double width) => SizedBox(
+          width: width,
           height: 40,
           child: Container(
             decoration: BoxDecoration(
@@ -277,45 +251,37 @@ class _SearchBarState extends ConsumerState<SearchBar> {
               decoration: InputDecoration(
                 hintText: l10n.searchHint,
                 hintStyle: hintStyle,
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: 20,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+                prefixIcon: isSearchOpen
+                    ? BackButton(
+                        onPressed: _closeSearch,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        style: const ButtonStyle(
+                          iconSize: WidgetStatePropertyAll(20),
+                        ),
+                      )
+                    : Icon(
+                        Icons.search,
+                        size: 20,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                // Desktop's compact size on every platform, so the back
+                // button and the ✕ fit the 40px box on phones too.
+                prefixIconConstraints:
+                    const BoxConstraints.tightFor(width: 40, height: 40),
+                suffixIconConstraints:
+                    const BoxConstraints(minWidth: 40, minHeight: 40),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 isDense: true,
                 suffixIcon: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Exact match toggle button with clear visual state
-                    CircularToggleButton(
-                      isActive: isExactMatch,
-                      icon: Icons.abc,
-                      iconSize: 24,
-                      tooltip: l10n.isExactMatchToggle,
-                      onPressed: () {
-                        ref
-                            .read(searchStateProvider.notifier)
-                            .toggleExactMatch();
-                      },
-                    ),
-                    // Proximity toggle button - opens proximity dialog
-                    // Only visible when user starts typing a second word
-                    if (showProximityButton)
-                      CircularToggleButton(
-                        isActive: isProximityActive,
-                        icon: Icons.space_bar,
-                        iconSize: 24,
-                        tooltip: l10n.wordProximity,
-                        onPressed: () => ProximityDialog.show(context),
-                      ),
+                    if (singlishPreview != null)
+                      SinglishPreview(singlishPreview, fieldWidth: width),
                     // Clear button (only shown when text is present)
                     if (_controller.text.isNotEmpty)
-                      Container(
-                        height: 30,
-                        width: 30,
-                        margin: const EdgeInsets.only(left: 4, right: 4),
+                      SizedBox.square(
+                        dimension: 40,
                         child: IconButton(
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -324,11 +290,14 @@ class _SearchBarState extends ConsumerState<SearchBar> {
                             size: 20,
                             color: theme.colorScheme.primary,
                           ),
+                          tooltip: l10n.clear,
                           onPressed: () {
+                            // Empties the query only: filters and recent
+                            // searches stay, so the recent list comes back.
                             _controller.clear();
                             ref
                                 .read(searchStateProvider.notifier)
-                                .clearSearch();
+                                .updateQuery('');
                             _focusNode.requestFocus();
                           },
                         ),
@@ -347,8 +316,71 @@ class _SearchBarState extends ConsumerState<SearchBar> {
               },
             ),
           ),
-        ),
-      ),
+        );
+
+    // Positioned from layout info, not a CompositedTransformFollower: a
+    // follower breaks tooltips inside the dropdown (they need the paint
+    // transform during layout).
+    return OverlayPortal.overlayChildLayoutBuilder(
+      controller: _overlayController,
+      overlayChildBuilder: (context, info) {
+        // Don't render overlay when results panel is visible
+        if (isResultsPanelVisible) {
+          return const SizedBox.shrink();
+        }
+
+        // The search box's bottom-right corner, in overlay coordinates.
+        final anchor = MatrixUtils.transformPoint(
+          info.childPaintTransform,
+          info.childSize.bottomRight(Offset.zero),
+        );
+        final boxLeft =
+            MatrixUtils.transformPoint(info.childPaintTransform, Offset.zero)
+                .dx;
+        // 8px below the box; in search mode that is the app bar's bottom.
+        final top = anchor.dy + 8;
+
+        return Stack(
+          children: [
+            // Barrier for outside taps. In search mode it starts under the
+            // app bar, so the field and its back arrow stay live.
+            Positioned.fill(
+              top: _isFullWidth ? top : 0,
+              child: GestureDetector(
+                onTap: _isFullWidth ? _closeSearch : _hideOverlay,
+                behavior: HitTestBehavior.opaque,
+                child: const ColoredBox(color: Colors.transparent),
+              ),
+            ),
+            if (_isFullWidth)
+              // A floating card, not edge to edge: below the bar it read as
+              // part of it. As wide as the field, lined up with it; no gap
+              // under the bar, as on desktop.
+              Positioned(
+                top: top,
+                left: boxLeft,
+                right: info.overlaySize.width - anchor.dx,
+                child: RecentSearchOverlay(onDismiss: _hideOverlay),
+              )
+            else
+              // Right edges aligned with the box
+              Positioned(
+                top: top,
+                right: info.overlaySize.width - anchor.dx,
+                child: RecentSearchOverlay(
+                  onDismiss: _hideOverlay,
+                ),
+              ),
+          ],
+        );
+      },
+      child: _isFullWidth
+          // The preview's 45% cap is a share of the field's real width.
+          ? LayoutBuilder(
+              builder: (context, constraints) =>
+                  searchBox(constraints.maxWidth),
+            )
+          : searchBox(widget.width!),
     );
   }
 }

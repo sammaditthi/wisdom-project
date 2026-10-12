@@ -1,30 +1,27 @@
-# First Mobile Release
+# First iOS Release
 
-> **Status 2026-09-18: not started.** Android and iOS have not been built since
+> **Status 2026-09-18: not started.** iOS and Android have not been built since
 > the app moved to Drift. Nothing ships to a phone until sections 1–4 are done.
-> This Mac has no Android SDK and no iOS signing, so all of it needs another
-> machine, or this one set up.
+> This Mac has no iOS signing, so all of it needs another machine, or this one
+> set up.
+
+This doc also holds what both phones share. Android's own items are in
+[`first-android-release.md`](first-android-release.md), with the same section
+numbers (split 2026-10-12).
 
 Background: [`reduce-mobile-size-and-move-to-drift.md`](../retiring-dart-server/reduce-mobile-size-and-move-to-drift.md).
 Section 2 was its step 10.
 
-## 1. Build both apps
+## 1. Build
 
-- The first Android and iOS builds since Drift. They are also the first to
+- The first iOS and Android builds since Drift. They are also the first to
   fetch `package:sqlite3`'s native binaries.
-- **Android build tools.** Gradle, the Android Gradle Plugin, Kotlin and Java
-  are older than Flutter accepts, so the first Android build fails until they
-  are raised: "Already broken: Android" in
-  [`flutter-3-47-upgrade-plan.md`](../flutter-3-47-upgrade-plan.md).
-- **Signing.** Android release builds still use the debug key
-  (`android/app/build.gradle`). iOS needs a signed export.
+- **Signing.** iOS needs a signed export.
 - **Store upload** isn't scripted: the mobile `deploy.sh` scripts are
   placeholders in [`test-all-and-release-all.md`](../../done/test-all-and-release-all.md).
 - **App names** are still `flutter create` leftovers. Use the name the app
   shows (`appTitle`), and a short one under the home-screen icon, where only
   about 12 characters fit. The web app uses "The Wisdom Project" and "Wisdom".
-  - Android: `android:label` in `android/app/src/main/AndroidManifest.xml` is
-    `the_wisdom_project`.
   - iOS: `CFBundleDisplayName` in `ios/Runner/Info.plist` is "The Wisdom
     Project", too long for the home screen. `CFBundleName` is
     `the_wisdom_project`.
@@ -43,18 +40,12 @@ On both platforms:
 - Time the first-launch copy. `openLocalExecutor` copies each bundled
   database into `databases/`, so the file lives twice on disk from then on.
 - Install over an older build. The database must copy again (plan step 7).
+- Search on a phone: tap the search icon, type, pick a result, go back.
+  Checked only at phone width on macOS, 2026-10-09 (search pane redesign,
+  Task 9).
 
-On Android only:
-- Time the first search after install on a low-end phone. The engine inflates
-  the whole asset on the UI thread.
-- Clear the app's cache. Nothing may copy again, because on Android the copy
-  lives in the files folder, not the cache.
-- Auto Backup must leave `files/databases/` out:
-  `adb shell bmgr backupnow <package>` succeeds.
-
-**Full phone.** Fill the device's storage, then search. The partial copy must be
-gone afterwards (`adb shell run-as <package> ls files/databases`), and the app
-must stay usable. The failed-copy path has never run: a full disk can't be
+**Full phone.** Fill the device's storage, then search. The partial copy in
+`databases/` must be gone afterwards, and the app must stay usable. The failed-copy path has never run: a full disk can't be
 reproduced on the Mac.
 
 ## 3. Decide from what section 2 shows
@@ -66,19 +57,14 @@ reproduced on the Mac.
   is 300 ms, and a failed open is forgotten so the next search opens again. On
   Android each try unpacks the whole asset again. Should it stop until the app
   restarts?
-- **`noCompress` for `.db` on Android.** It skips the inflate but costs about
-  190 MB installed: deflate takes `bjt.db` from 170 to 113 MB and `dict.db`
-  from 163 to 28 MB (measured 2026-09-17). Decide once the first search has
-  been timed.
 
 ## 4. Measure the real artifacts
 
 Every size figure so far is either a macOS bundle or a per-file deflate
 estimate. None came out of an APK or IPA.
-- Download and installed size from a real APK and IPA. Compare them with the
+- Download and installed size from a real IPA and APK. Compare them with the
   plan's estimates in **Size — the bonus, on two axes** and its step 4, where
-  the download rose from 92 to 114 MB. `flutter build apk --analyze-size` gives
-  the Android breakdown.
+  the download rose from 92 to 114 MB.
 - Optional: time a search and a reader open on the phone. The speed-up was
   measured on the two code paths (plan step 2), never in the running app.
 

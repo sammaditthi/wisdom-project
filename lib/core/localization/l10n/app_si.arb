@@ -7,6 +7,10 @@
 
   "readerTitle": "පාඨකය",
 
+  "showNavigator": "සංචාලකය පෙන්වන්න",
+
+  "hideNavigator": "සංචාලකය සඟවන්න",
+
   "layoutPaliOnly": "පාළි පමණයි",
 
   "layoutSinhalaOnly": "සිංහල පමණයි",
@@ -39,7 +43,7 @@
 
   "theme": "තේමාව",
 
-  "themeLight": "ශ්වේ​ත",
+  "themeLight": "ශ්වේත",
 
   "appLanguage": "යෙදුම් භාෂාව",
 
@@ -73,7 +77,7 @@
 
   "refine": "සීමා කිරීම",
 
-  "expand": "ඉහළ​ට",
+  "expand": "ඉහළට",
 
   "collapse": "හකුළන්න",
 
@@ -93,19 +97,15 @@
 
   "recentSearches": "මෑත සෙවුම්",
 
-  "viewMore": "තවත් ගැළපී​ම් {count}ක් ඇත",
+  "removeRecentSearch": "මෑත සෙවුම්වලින් ඉවත් කරන්න",
+
+  "viewMore": "තවත් ගැළපීම් {count}ක් ඇත",
 
   "showLess": "හකුළන්න",
 
-  "wordProximity": "වචන අතර දුර",
+  "seeAll": "සියල්ල බලන්න",
 
-  "phraseSearch": "වාක්‍ය ඛණ්ඩ සෙවීම (පිළිවෙලට ඇති වචන)",
-
-  "wordsApart": "වචන {count}ක් පරතරයකින්",
-
-  "exactConsecutiveWords": "හරියටම පිළිවෙලට ඇති වචන",
-
-  "apply": "යොදන්න",
+  "viewingResults": "ප්‍රතිඵල {total}කින් {shown}ක් පෙන්වයි",
 
   "reset": "යළි සකසන්න",
 
@@ -123,13 +123,49 @@
 
   "scopeCommentaries": "අට්ඨකථා",
 
-  "scopeTreatises": "වෙනත්",
-
-  "searchAsPhrase": "සම්පුර්ණ වාක්‍යක් ලෙස",
-
-  "searchAsSeparateWords": "වෙන්වූ වචන සමූහයක් ලෙස",
+  "scopeOther": "අන්‍ය",
 
   "anywhereInText": "එකම පෙළෙහි ඕනෑම තැනක",
+
+  "openSearch": "සොයන්න",
+
+  "matchOptions": "ගැළපීමේ විකල්ප",
+
+  "matchEachWord": "එක් එක් වචනය ගැළපෙන ආකාරය",
+
+  "matchStartsWith": "ඇරඹෙන වචන",
+
+  "matchStartsWithHint": "වචනය සහ එයින් ඇරඹෙන දිගු වචන සොයයි",
+
+  "matchWholeWord": "සම්පූර්ණ වචනය",
+
+  "matchWholeWordHint": "එම වචනයම පමණක් සොයයි",
+
+  "matchHowWordsSit": "වචන එකට පිහිටන ආකාරය",
+
+  "matchPhrase": "වාක්‍යයක් ලෙස",
+
+  "matchPhraseHint": "ලියූ පිළිවෙළටම, වචන එකට සොයයි",
+
+  "matchPhraseShort": "වාක්‍යය",
+
+  "matchAnywhereHint": "වචන ඕනෑම පිළිවෙළකින් සොයයි",
+
+  "matchAnywhereShort": "ඕනෑම තැනක",
+
+  "matchNear": "එකිනෙකට ළඟින්",
+
+  "matchNearHint": "එකිනෙකට ළඟින් ඇති වචන සොයයි",
+
+  "matchNearShort": "ළඟින් {count}",
+
+  "matchNearWithin": "වචන {count}ක් ඇතුළත",
+
+  "fewerWords": "වචන අඩු කරන්න",
+
+  "moreWords": "වචන වැඩි කරන්න",
+
+  "resetToDefault": "පෙරනිමියට යළි සකසන්න",
 
   "noDefinitionsFound": "අර්ථ දැක්වීම් හමු නොවීය",
 
@@ -191,7 +227,7 @@
 
   "updateBannerTitle": "නව අනුවාදයක් තිබේ",
 
-  "updateBannerRefreshAction": "රීලෝ​ඩ් කරන්න",
+  "updateBannerRefreshAction": "රීලෝඩ් කරන්න",
 
   "updateBannerDismissTooltip": "ඉවත් කරන්න",
 

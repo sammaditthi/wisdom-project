@@ -2,16 +2,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/presentation/providers/dictionary_provider.dart';
-import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
-import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/dictionary/dictionary_bottom_sheet.dart';
 import 'package:the_wisdom_project/presentation/widgets/dictionary/refine_dictionary_dialog.dart';
-import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
-import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 import 'package:the_wisdom_project/core/utils/pali_conjunct_transformer.dart';
 import 'package:the_wisdom_project/domain/entities/dictionary/dictionary_params.dart';
 
@@ -85,41 +80,6 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Dictionary editable word lookup', () {
-    // -----------------------------------------------------------------
-    // Helpers (same pattern as sutta_step_navigation_test.dart)
-    // -----------------------------------------------------------------
-    Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            bjtDocumentDataSourceProvider.overrideWithValue(
-              BJTDocumentLocalDataSourceImpl(),
-            ),
-            keyValueStoreOverride(),
-          ],
-          child: const MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Column(
-                children: [
-                  TabBarWidget(),
-                  Expanded(child: MultiPaneReaderWidget()),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(MaterialApp)),
-      );
-
-      await container.read(navigationTreeProvider.future);
-      return container;
-    }
-
     // =================================================================
     // Test 1: Word tap → sheet opens → edit word → results update
     // =================================================================

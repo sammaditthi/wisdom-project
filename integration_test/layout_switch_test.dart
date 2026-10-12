@@ -3,17 +3,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
-import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
 import 'package:the_wisdom_project/presentation/models/in_page_search_state.dart';
 import 'package:the_wisdom_project/presentation/models/reader_layout.dart';
-import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/in_page_search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/last_reader_layout_provider.dart';
-import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
-import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
-import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
 
 import 'test_overrides.dart';
 
@@ -21,46 +15,6 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('Layout Switch Integration Tests', () {
-    // ---------------------------------------------------------------
-    // Local helpers. Opening a tab is a shared one now — `tabFromNode`
-    // and `openTab` live in test_overrides.dart.
-    // ---------------------------------------------------------------
-
-    Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            bjtDocumentDataSourceProvider.overrideWithValue(
-              BJTDocumentLocalDataSourceImpl(),
-            ),
-            keyValueStoreOverride(),
-          ],
-          child: const MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(
-              body: Column(
-                children: [
-                  TabBarWidget(),
-                  Expanded(child: MultiPaneReaderWidget()),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-      final container = ProviderScope.containerOf(
-        tester.element(find.byType(MaterialApp)),
-      );
-
-      // Wait for the real navigation tree to load from assets.
-      await container.read(navigationTreeProvider.future);
-      await pumpForSettle(tester);
-
-      return container;
-    }
-
     // The `(page, entry)` of the entry nearest the top of the reader's
     // viewport, or null when nothing is mounted.
     //
@@ -565,7 +519,7 @@ void main() {
         // state listener fires _scrollToCurrentMatch, which reveals
         // match[0] back near the top of the unit.
         container.read(inPageSearchStatesProvider.notifier).openSearch();
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
 
         expect(
           readSearchState(container, 0).matchCount,
@@ -662,7 +616,7 @@ void main() {
         // 1. First tab via the real creator with nothing saved → falls
         //    back to the landscape orientation default (sideBySide).
         final idxA = container.read(openTabFromNodeKeyProvider)('dn-1-1');
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(idxA, isNonNegative, reason: 'dn-1-1 should open');
         expect(
           container.read(tabsProvider)[idxA].layout,
@@ -690,7 +644,7 @@ void main() {
         //    (sinhalaOnly is neither orientation's default).
         final idxLandscape =
             container.read(openTabFromNodeKeyProvider)('dn-1-1');
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(
           container.read(tabsProvider)[idxLandscape].layout,
           ReaderLayout.sinhalaOnly,
@@ -699,7 +653,7 @@ void main() {
 
         final idxPortrait = container.read(openTabFromNodeKeyProvider)('dn-1-1',
             isPortraitMode: true);
-        await pumpForSettle(tester, const Duration(seconds: 2));
+        await pumpForSettle(tester);
         expect(
           container.read(tabsProvider)[idxPortrait].layout,
           ReaderLayout.sinhalaOnly,

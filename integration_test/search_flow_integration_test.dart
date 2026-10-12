@@ -27,6 +27,7 @@ import 'package:the_wisdom_project/presentation/widgets/search/dictionary_search
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/highlighted_fts_search_text.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/recent_search_overlay.dart';
+import 'package:the_wisdom_project/presentation/widgets/search/singlish_preview.dart';
 
 import 'search_test_helper.dart';
 import 'test_overrides.dart';
@@ -260,19 +261,16 @@ void main() {
     );
 
     testWidgets(
-      '3.4 "කර්ම ඵල" exact + separate words, proximity 20 → 14 FTS',
+      '3.4 "කර්ම ඵල" exact + separate words, proximity 20 → 17 FTS',
       (tester) async {
         await tester.pumpSearchApp(prefs);
         await tester.searchFor('කර්ම ඵල');
         // Exact match must be ON first (user's flow: 3.1 → 3.1.2).
         await tester.toggleExactMatch();
 
-        await tester.setProximitySettings(
-          isPhraseSearch: false,
-          proximityDistance: 20,
-        );
+        await tester.matchWordsNear(20);
 
-        tester.expectCounts(fullText: 14);
+        tester.expectCounts(fullText: 17);
       },
     );
 
@@ -284,10 +282,7 @@ void main() {
         // Exact match must be ON first (user's flow: 3.1 → 3.1.3).
         await tester.toggleExactMatch();
 
-        await tester.setProximitySettings(
-          isPhraseSearch: false,
-          isAnywhereInText: true,
-        );
+        await tester.matchWordsAnywhere();
 
         tester.expectCounts(fullText: 45);
       },
@@ -309,10 +304,7 @@ void main() {
         await tester.pumpSearchApp(prefs);
         await tester.searchFor('ජායෙථ වා');
 
-        await tester.setProximitySettings(
-          isPhraseSearch: false,
-          proximityDistance: 50,
-        );
+        await tester.matchWordsNear(50);
 
         tester.expectCounts(fullText: 13);
       },
@@ -324,10 +316,7 @@ void main() {
         await tester.pumpSearchApp(prefs);
         await tester.searchFor('ජායෙථ වා');
 
-        await tester.setProximitySettings(
-          isPhraseSearch: false,
-          proximityDistance: 50,
-        );
+        await tester.matchWordsNear(50);
         await tester.toggleExactMatch();
 
         tester.expectCounts(fullText: 12);
@@ -436,12 +425,19 @@ void main() {
     });
 
     testWidgets(
-      '10.1 search is saved and appears in recent searches',
+      '10.1 search is saved and appears in recent searches, Sinhala first',
       (tester) async {
         await tester.pumpSearchApp(prefs);
 
-        // Perform a search.
-        await tester.searchFor('මහාසති');
+        // Perform a Singlish search. The box previews the Sinhala.
+        await tester.searchFor('aanandha');
+        expect(
+          find.descendant(
+            of: find.byType(SinglishPreview),
+            matching: find.text('ආනන්ද'),
+          ),
+          findsOneWidget,
+        );
 
         // Selecting a result is what saves the search. That call lives in
         // ReaderScreen, which this harness does not build, so drive the same
@@ -463,14 +459,15 @@ void main() {
 
         // Scoped to the overlay: an unscoped finder also matches the query
         // still sitting in the search field, so it passes even when no recent
-        // search was ever saved.
-        expect(
+        // search was ever saved. The row shows only the Sinhala.
+        final row = tester.widget<ListTile>(
           find.descendant(
             of: find.byType(RecentSearchOverlay),
-            matching: find.textContaining('මහාසති'),
+            matching: find.byType(ListTile),
           ),
-          findsWidgets,
         );
+        expect((row.title! as Text).data, 'ආනන්ද');
+        expect(row.subtitle, isNull);
       },
     );
   });
@@ -543,6 +540,41 @@ void main() {
 
         // Verify Titles count (calibrated from database).
         tester.expectCounts(titles: 27);
+      },
+    );
+
+    testWidgets(
+      'A4 "මහාසති" + Sutta → back arrow closes, ✕ clears; Sutta stays',
+      (tester) async {
+        await tester.pumpSearchApp(prefs);
+        // The box's back arrow shows only while the panel is open.
+        expect(find.byType(BackButton), findsNothing);
+
+        await tester.searchFor('මහාසති');
+        await tester.tapScopeChip('Sutta');
+        final sutta = tester.getSearchState().scope;
+        expect(sutta, isNotEmpty);
+        final counts = tester.getResultCounts();
+
+        // The back arrow is the panel's one close button. It keeps the query.
+        await tester.tap(find.byType(BackButton));
+        await pumpForSettle(tester);
+        expect(find.byType(SearchResultsPanel), findsNothing);
+        expect(find.byType(BackButton), findsNothing);
+        expect(tester.getSearchState().rawQueryText, 'මහාසති');
+
+        // Focusing the box again brings the same results back.
+        await tester.tap(find.byType(TextField));
+        await tester.waitForSearchResults();
+        expect(find.byType(SearchResultsPanel), findsOneWidget);
+        expect(tester.getResultCounts(), counts);
+
+        // ✕ empties the query only: filters stay until the user changes them.
+        await tester.tap(find.byTooltip('Clear'));
+        await pumpForSettle(tester);
+        final state = tester.getSearchState();
+        expect(state.rawQueryText, isEmpty);
+        expect(state.scope, sutta);
       },
     );
   });

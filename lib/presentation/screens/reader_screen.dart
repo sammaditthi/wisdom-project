@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../widgets/navigation/tree_navigator_widget.dart';
 import '../widgets/reader/multi_pane_reader_widget.dart';
@@ -9,8 +10,9 @@ import '../widgets/search/search_bar.dart' as app;
 import '../widgets/search/search_results_panel.dart';
 import '../widgets/common/resizable_divider.dart';
 import '../widgets/navigation/breadcrumb_widget.dart';
-import '../providers/main_search_focus_provider.dart';
+import '../providers/app_section_provider.dart';
 import '../providers/navigator_visibility_provider.dart';
+import '../providers/search_mode_provider.dart';
 import '../providers/tab_provider.dart';
 import '../providers/search_provider.dart';
 import '../providers/pane_width_provider.dart';
@@ -67,18 +69,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     if (isMobile) {
       ref.read(navigatorVisibleProvider.notifier).state = false;
     }
+    // Release the field too: on Android/iOS a touch outside it doesn't, so on
+    // a tablet's desktop box the keyboard would stay up and typing again
+    // wouldn't reopen the panel. Leaves search mode, so the breadcrumb shows
+    // what was opened.
+    ref.read(closeSearchProvider)();
   }
 
-  void _closeSearchPanel() {
-    // Drop search-bar focus first. Without this, the TextField keeps focus
-    // while isPanelDismissed flips true, so onFocus() never re-fires when the
-    // user types again and the panel stays hidden against a non-empty query.
-    // Same fix as the ESC path in overlay_stack_sync.dart — applied here so
-    // tap-outside, the mobile back button, and the panel's X button all
-    // recover cleanly.
-    ref.read(mainSearchFocusNodeProvider)?.unfocus();
-    ref.read(searchStateProvider.notifier).dismissResultsPanel();
-  }
+  void _closeSearchPanel() => ref.read(closeSearchProvider)();
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +93,16 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     // only needs the flag to decide whether to render the overlay/divider.
     final isSearchPanelVisible = ref.watch(
       searchStateProvider.select((s) => s.isResultsPanelVisible),
+    );
+
+    // On phones search is an icon, and tapping it puts the app bar in search
+    // mode. An open panel counts too, so it always has a way out. Tablets keep
+    // the desktop box: a full-width field over their side panel looked split.
+    final isSearchMode =
+        isMobile && (ref.watch(searchModeProvider) || isSearchPanelVisible);
+    // The shell keeps this screen alive behind other sections.
+    final isReaderShowing = ref.watch(
+      selectedAppSectionProvider.select((s) => s == AppSection.reader),
     );
 
     // Watch pane widths from providers
@@ -122,164 +130,180 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final scrolledUnder = ref.watch(readerScrolledUnderProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        // See scrolledUnder comment above — we set backgroundColor manually
-        // from the M3 surface-container ladder instead.
-        notificationPredicate: (_) => false,
-        backgroundColor: scrolledUnder
-            ? colorScheme.surfaceContainer
-            : colorScheme.surfaceContainerLow,
-        title: const BreadcrumbWidget(),
-        titleSpacing: 4.0,
-        leading: IconButton(
-          icon: Icon(navigatorVisible ? Icons.menu_open : Icons.menu),
-          tooltip: navigatorVisible ? 'Hide Navigator' : 'Show Navigator',
-          onPressed: () {
-            ref.read(navigatorVisibleProvider.notifier).state =
-                !navigatorVisible;
-          },
-        ),
-        actions: const [
-          // Search bar (fixed width with overlay dropdown)
-          app.SearchBar(),
+    return PopScope(
+      // System back closes search: search mode on phones, or the panel under
+      // the box on tablets. Not while another section shows: back is that
+      // section's.
+      canPop: !isReaderShowing || !(isSearchMode || isSearchPanelVisible),
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _closeSearchPanel();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          // See scrolledUnder comment above — we set backgroundColor manually
+          // from the M3 surface-container ladder instead.
+          notificationPredicate: (_) => false,
+          backgroundColor: scrolledUnder
+              ? colorScheme.surfaceContainer
+              : colorScheme.surfaceContainerLow,
+          title: isSearchMode
+              ? const app.SearchBar.fullWidth()
+              : const BreadcrumbWidget(),
+          // Search mode has no leading or actions (the field has its own back
+          // arrow), so the field gets the same gap at both ends.
+          titleSpacing: isSearchMode ? 8.0 : 4.0,
+          leading: isSearchMode
+              ? null
+              : IconButton(
+                  icon: Icon(navigatorVisible ? Icons.menu_open : Icons.menu),
+                  tooltip: navigatorVisible
+                      ? AppLocalizations.of(context).hideNavigator
+                      : AppLocalizations.of(context).showNavigator,
+                  onPressed: () {
+                    ref.read(navigatorVisibleProvider.notifier).state =
+                        !navigatorVisible;
+                  },
+                ),
+          actions: [
+            if (!isMobile)
+              // Search bar (fixed width with overlay dropdown)
+              const app.SearchBar()
+            else if (!isSearchMode)
+              IconButton(
+                icon: const Icon(Icons.search),
+                tooltip: AppLocalizations.of(context).openSearch,
+                onPressed: () =>
+                    ref.read(searchModeProvider.notifier).state = true,
+              ),
 
-          // Settings menu
-          SettingsMenuButton(),
-        ],
-      ),
-      body: Stack(
-        children: [
-          // Main reader layout - Navigator full height, Divider below tab bar
-          Row(
-            children: [
-              // Navigator (full height, left side)
-              if (isTabletOrDesktop && navigatorVisible)
-                SizedBox(
-                  width: navigatorWidth,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                          color: Theme.of(context).dividerColor,
-                          width: 1,
+            // Settings menu
+            if (!isSearchMode) const SettingsMenuButton(),
+          ],
+        ),
+        body: Stack(
+          children: [
+            // Main reader layout - Navigator full height, Divider below tab bar
+            Row(
+              children: [
+                // Navigator (full height, left side)
+                if (isTabletOrDesktop && navigatorVisible)
+                  SizedBox(
+                    width: navigatorWidth,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(
+                            color: Theme.of(context).dividerColor,
+                            width: 1,
+                          ),
                         ),
                       ),
+                      child: const TreeNavigatorWidget(),
                     ),
-                    child: const TreeNavigatorWidget(),
+                  ),
+
+                // Reader area with tabs and divider
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Tab bar (full width of this column)
+                      const TabBarWidget(),
+                      // Content area with divider + reader
+                      Expanded(
+                        child: Row(
+                          children: [
+                            // Resizable divider (only in content area, below tab bar)
+                            if (isTabletOrDesktop && navigatorVisible)
+                              ResizableDivider(
+                                isEnabled: isTabletOrDesktop,
+                                onDragUpdate: (delta) {
+                                  final newWidth = navigatorWidth + delta;
+                                  ref
+                                      .read(navigatorWidthProvider.notifier)
+                                      .state = newWidth.clamp(
+                                    PaneWidthConstants.navigatorMin,
+                                    PaneWidthConstants.navigatorMax,
+                                  );
+                                },
+                              ),
+                            // Reader content
+                            const Expanded(child: MultiPaneReaderWidget()),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-              // Reader area with tabs and divider
-              Expanded(
-                child: Column(
-                  children: [
-                    // Tab bar (full width of this column)
-                    const TabBarWidget(),
-                    // Content area with divider + reader
-                    Expanded(
-                      child: Row(
-                        children: [
-                          // Resizable divider (only in content area, below tab bar)
-                          if (isTabletOrDesktop && navigatorVisible)
-                            ResizableDivider(
-                              isEnabled: isTabletOrDesktop,
-                              onDragUpdate: (delta) {
-                                final newWidth = navigatorWidth + delta;
-                                ref
-                                    .read(navigatorWidthProvider.notifier)
-                                    .state = newWidth.clamp(
-                                  PaneWidthConstants.navigatorMin,
-                                  PaneWidthConstants.navigatorMax,
-                                );
-                              },
-                            ),
-                          // Reader content
-                          const Expanded(child: MultiPaneReaderWidget()),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          // Mobile: Full-screen navigator overlay (tablet/desktop use sidebar)
-          if (isMobile && navigatorVisible)
-            Positioned.fill(
-              child: Material(
-                color: Theme.of(context).colorScheme.surface,
-                child: const TreeNavigatorWidget(),
-              ),
+              ],
             ),
 
-          // Search panel overlay (desktop: side panel, mobile: full-screen)
-          if (isSearchPanelVisible) ...[
-            // Dim barrier
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _closeSearchPanel,
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedOpacity(
-                  opacity: 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Container(color: Colors.black54),
-                ),
-              ),
-            ),
-
-            // Search results panel
-            if (isMobile)
-              // Mobile: Full-screen overlay with back button handling
+            // Mobile: Full-screen navigator overlay (tablet/desktop use sidebar)
+            if (isMobile && navigatorVisible)
               Positioned.fill(
-                child: PopScope(
-                  canPop: false,
-                  onPopInvokedWithResult: (didPop, result) {
-                    if (!didPop) {
-                      _closeSearchPanel();
-                    }
-                  },
+                child: Material(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: const TreeNavigatorWidget(),
+                ),
+              ),
+
+            // Search panel overlay (desktop: side panel, mobile: full-screen)
+            if (isSearchPanelVisible) ...[
+              // Dim barrier
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: _closeSearchPanel,
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Container(color: Colors.black54),
+                  ),
+                ),
+              ),
+
+              // Search results panel
+              if (isMobile)
+                // Mobile: full-screen overlay. Search mode is always on while
+                // this shows, so the field's back arrow closes it.
+                Positioned.fill(
                   child: SearchResultsPanel(
-                    onClose: _closeSearchPanel,
                     onResultTap: _handleSearchResultTap,
                   ),
-                ),
-              )
-            else
-              // Desktop/Tablet: Side panel sliding in from right
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: effectiveSearchWidth + PaneWidthConstants.dividerWidth,
-                child: Row(
-                  children: [
-                    // Resizable divider on left edge of search panel
-                    ResizableDivider(
-                      isEnabled: isTabletOrDesktop,
-                      showPillBorder: true, // More visible on dark background
-                      onDragUpdate: (delta) {
-                        // Negative delta (drag left) = wider panel
-                        final newWidth = searchPanelWidth - delta;
-                        ref.read(searchPanelWidthProvider.notifier).state =
-                            newWidth.clamp(
-                          PaneWidthConstants.searchMin,
-                          searchPanelMaxWidth,
-                        );
-                      },
-                    ),
-                    Expanded(
-                      child: SearchResultsPanel(
-                        onClose: _closeSearchPanel,
-                        onResultTap: _handleSearchResultTap,
+                )
+              else
+                // Desktop/Tablet: Side panel sliding in from right
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: effectiveSearchWidth + PaneWidthConstants.dividerWidth,
+                  child: Row(
+                    children: [
+                      // Resizable divider on left edge of search panel
+                      ResizableDivider(
+                        isEnabled: isTabletOrDesktop,
+                        showPillBorder: true, // More visible on dark background
+                        onDragUpdate: (delta) {
+                          // Negative delta (drag left) = wider panel
+                          final newWidth = searchPanelWidth - delta;
+                          ref.read(searchPanelWidthProvider.notifier).state =
+                              newWidth.clamp(
+                            PaneWidthConstants.searchMin,
+                            searchPanelMaxWidth,
+                          );
+                        },
                       ),
-                    ),
-                  ],
+                      Expanded(
+                        child: SearchResultsPanel(
+                          onResultTap: _handleSearchResultTap,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
