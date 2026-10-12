@@ -13,8 +13,9 @@
 > compression sample stays optional (**Compression sample — optional, later**).
 >
 > **No mobile release until
-> [`first-mobile-release.md`](../mobile-release/first-mobile-release.md) is
-> done.** It holds the real-device pass that was step 10, and everything else
+> [`first-ios-release.md`](../mobile-release/first-ios-release.md) and
+> [`first-android-release.md`](../mobile-release/first-android-release.md) are
+> done.** They hold the real-device pass that was step 10, and everything else
 > a phone release waits on.
 
 > **UPDATE 2026-07-16 — CONFIRMED, and promoted to the keystone of a server-free
@@ -797,7 +798,7 @@ CREATE TABLE bjt_content (
    rises** 92 → 114 MB while storage falls. Measured as deflate per file rather
    than out of a built APK: there is no Android SDK on this machine and iOS
    wants a signed build. Confirming it against a real artifact is section 4
-   of [`first-mobile-release.md`](../mobile-release/first-mobile-release.md);
+   of [`first-ios-release.md`](../mobile-release/first-ios-release.md);
    it will not change the direction.
 
    **Answered 2026-09-14:** accepted. Plain pages ship at 114 MB; a
@@ -915,7 +916,8 @@ CREATE TABLE bjt_content (
    swap — with no expectation changed and no Drift warning or SQLite error in
    any log. `flutter build web --release` still builds. **Not run: Android and
    iOS** (no SDK or signing here) — see
-   [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+   [`first-ios-release.md`](../mobile-release/first-ios-release.md) and
+   [`first-android-release.md`](../mobile-release/first-android-release.md).
 
    **Stage 2 — the content datasource.**
    - **The page-span rule has one home:** `SliceRange.pageSpan` returns a
@@ -1038,7 +1040,7 @@ CREATE TABLE bjt_content (
      exists, so nothing is deleted under an open database.
    - **A full phone is still a bad place to be:** every search retries the
      copy. What it should do instead is decided on a device, in
-     [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+     [`first-ios-release.md`](../mobile-release/first-ios-release.md).
    - **Where: a `databases/` folder** the code creates, in a place that
      depends on the platform:
      - **Android: the files folder**, `getApplicationSupportDirectory()`.
@@ -1130,9 +1132,10 @@ CREATE TABLE bjt_content (
      suites were not run again.
    - **Not exercised:** the failed-copy path. Filling the disk isn't
      reproducible here; the full-phone check in
-     [`first-mobile-release.md`](../mobile-release/first-mobile-release.md)
+     [`first-ios-release.md`](../mobile-release/first-ios-release.md)
      covers it.
-   - **Android is unchecked:** this Mac has no Android SDK. The same doc
+   - **Android is unchecked:** this Mac has no Android SDK.
+     [`first-android-release.md`](../mobile-release/first-android-release.md)
      covers the files folder and the backup rules.
 
    **Also changed: the startup check in `main.dart`.** It checked `bjt.db` was
@@ -1152,7 +1155,7 @@ CREATE TABLE bjt_content (
      the engine source, not measured: Android has not been built since the
      move to Drift. The copy still pays that once per install or database
      update. Whether `noCompress` for `.db` is worth its installed size is
-     decided in [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+     decided in [`first-android-release.md`](../mobile-release/first-android-release.md).
 
    **7.1 — Rename `bjt-fts.db` to `bjt.db` — DONE 2026-09-16, in its own
    commit.** The file stopped being a search index at step 5: it holds
@@ -1293,7 +1296,7 @@ CREATE TABLE bjt_content (
    proved the *text* is identical, not that the app got faster. Nobody has
    timed a search or a reader open in the real app before and after. If that
    number is wanted, take it on a device — an optional item in
-   [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+   [`first-ios-release.md`](../mobile-release/first-ios-release.md).
 
    **Recap for whoever starts step 9:** its first check already passes —
    `grep -rn "assets/text" lib/` now finds nothing at all, the last doc comment
@@ -1328,7 +1331,7 @@ CREATE TABLE bjt_content (
    neither confirms nor replaces them. In particular the **download** still
    rises (92 → 114 MB, step 4): a pre-compressed blob cannot deflate again.
    Nothing here was measured out of a real APK or IPA; that is in
-   [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+   [`first-ios-release.md`](../mobile-release/first-ios-release.md).
 
    **How absence was proved**, three ways, since a size drop alone would not
    show it:
@@ -1366,7 +1369,8 @@ CREATE TABLE bjt_content (
    failure. The first `flutter build macos` after the edit also died once on
    `Failed to copy Flutter framework`; it built on an unchanged retry.
 10. **The real-device pass — moved 2026-09-18** to
-    [`first-mobile-release.md`](../mobile-release/first-mobile-release.md),
+    [`first-ios-release.md`](../mobile-release/first-ios-release.md) and
+    [`first-android-release.md`](../mobile-release/first-android-release.md),
     with everything else a mobile release waits on.
 11. **Web onto Drift — moved 2026-09-18** to
     [`move-web-onto-drift.md`](../../done/retiring-dart-server/move-web-onto-drift.md), its own plan.
@@ -1407,7 +1411,7 @@ through Drift. It goes with the server; do not repoint it at `bjt_content`.
 
 - **Delivery is an untouched axis.** Every figure here assumes the DB ships
   inside the APK/IPA. Downloading it instead is listed, not costed, under
-  **Later** in [`first-mobile-release.md`](../mobile-release/first-mobile-release.md).
+  **Later** in [`first-ios-release.md`](../mobile-release/first-ios-release.md).
 
 - **`dict.db` — settled 2026-09-12: no size work, and here is why not.** It is
   in `pubspec.yaml` and ships in the APK, but appears in *none* of the headline

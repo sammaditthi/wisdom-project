@@ -33,5 +33,5 @@ done
 
 echo "app android --$TARGET is not set up yet:"
 echo "  no signing or store upload yet (release builds use the debug key). The"
-echo "  first release is planned in docs/todo/mobile-release/first-mobile-release.md."
+echo "  first release is planned in docs/todo/mobile-release/first-android-release.md."
 exit 3

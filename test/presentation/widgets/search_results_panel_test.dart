@@ -23,7 +23,6 @@ import 'package:the_wisdom_project/presentation/providers/content_language_provi
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
-import 'package:the_wisdom_project/presentation/widgets/common/right_edge_fade.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/secondary_match_tile.dart';
 
@@ -366,8 +365,7 @@ void main() {
     );
 
     for (final kind in [PointerDeviceKind.mouse, PointerDeviceKind.touch]) {
-      testWidgets(
-          'a ${kind.name} drag brings the last tab on screen, clear of the fade',
+      testWidgets('a ${kind.name} drag brings the last tab on screen',
           (tester) async {
         await _pumpPanel(tester, state: state, width: 300);
         await tester.pumpAndSettle();
@@ -389,8 +387,8 @@ void main() {
 
         expect(
           panel.right - lastTab().right,
-          greaterThanOrEqualTo(RightEdgeFade.width),
-          reason: 'the last tab ends before the fade starts',
+          greaterThanOrEqualTo(8),
+          reason: 'the bar ends with 8px of padding, as it starts',
         );
       });
     }

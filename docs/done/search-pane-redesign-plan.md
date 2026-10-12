@@ -1,6 +1,6 @@
 # Search pane redesign — task plan
 
-Started 2026-10-05.
+Started 2026-10-05. Done 2026-10-12: every chunk is committed and checked by eye on macOS. The checks that need a phone are in `first-ios-release.md` (both phones) and `first-android-release.md` (`docs/todo/mobile-release/`).
 
 ## How to use this plan
 
@@ -18,7 +18,7 @@ Chunks, in order:
 | B | 5, 6, 7 + Task 10: footer text, "View N more" button | Results list | Done |
 | C | 4, 8 + Task 10: Treatises naming | Filter row and match menu | Done |
 | D | 9 | Search icon on phones, one back arrow, one-line breadcrumb | Done; checked by eye 2026-10-09 |
-| D2 | 12 | Tablets use the desktop bar; result tabs drag with a mouse | Done, not committed; check by eye |
+| D2 | 12 | Tablets use the desktop bar; result tabs drag with a mouse | Done; checked by eye 2026-10-12 |
 
 B and C both edit `search_results_panel.dart`, so never run them side by side. D needs A and C; D2 needs D. When a chunk is done, set its status and add a handover note at the end of this doc.
 
@@ -109,10 +109,10 @@ What does NOT change:
 
 **Done when:**
 
-- [ ] Existing saved searches still load.
-- [ ] A Singlish search shows in the list as Sinhala. Sinhala and reference entries show as typed.
-- [ ] Two Singlish spellings of one word ("vedana", "wedana") give one entry.
-- [ ] The ✕ has a tooltip and is reachable by keyboard.
+- [x] Existing saved searches still load.
+- [x] A Singlish search shows in the list as Sinhala. Sinhala and reference entries show as typed.
+- [x] Two Singlish spellings of one word ("vedana", "wedana") give one entry.
+- [x] The ✕ has a tooltip and is reachable by keyboard. Its place in the tab order will be handled separately (user, 2026-10-12).
 
 ## Task 4 — Filter row: close-panel icon and one shared chip (canvas 10, 4)
 
@@ -127,12 +127,11 @@ What does NOT change:
 3. Create `PillChip(label, selected, onPressed)` (and `PillChip.refine`) as a real button, so it has hover, focus, ripple and semantics. 32px tall, 13px text, tap area 40px or more.
 4. Replace `_ScopeChip` and `_FilterChip` with it. Delete both.
 5. Refine stays the last chip and scrolls with the others, as today.
-6. Add a soft fade on the right edge of the scrolling chips.
-7. Keep today's colours: the row on `surfaceContainerHighest`, chips and Refine as they were (decided after review, 2026-10-07). The row is 56px tall.
+6. Keep today's colours: the row on `surfaceContainerHighest`, chips and Refine as they were (decided after review, 2026-10-07). The row is 56px tall.
 
 **Done when:**
 
-- [ ] The search field's back arrow closes the panel; Esc, tap outside and phone back still work. Checked by eye at every width on macOS, 2026-10-09. Left: system back on Android.
+- [x] The search field's back arrow closes the panel; Esc, tap outside and phone back still work. Checked by eye at every width on macOS, 2026-10-09. System back on Android: `first-android-release.md`.
 - [x] Tab reaches every chip; Enter or Space toggles it.
 - [x] Scope and dictionary rows use the same chip.
 
@@ -184,7 +183,7 @@ What does NOT change:
 
 **Done when:**
 
-- [ ] BJT-only results show no badge; mixed editions still do. BJT-only checked; mixed can't be checked until a second edition exists.
+- [x] BJT-only results show no badge. Mixed editions can't be checked until a second edition exists.
 
 ## Task 8 — "Starts with ▾" match menu (canvas 2, detail artboard)
 
@@ -243,7 +242,7 @@ What does NOT change:
 **Done when:**
 
 - [x] No overflow at 360px width; the breadcrumb shows when search is closed, on one line, ending in the sutta name, with room before the search icon.
-- [ ] Open, type, pick a result, go back: all work on Android and iOS. At phone width they worked, checked by eye on 2026-10-09.
+- [x] Open, type, pick a result, go back: all work at phone width, checked by eye on 2026-10-09. On Android and iOS: `first-ios-release.md`.
 - [x] Tablet width (768–1023px): side panel; back closes it. Checked with the icon on 2026-10-09; it looked split, so Task 12 gave tablets the desktop box.
 - [x] Desktop: the back arrow in the box closes the panel.
 
@@ -269,17 +268,17 @@ Found in the by-eye check on 2026-10-09; both parts decided by the user the same
 1. The search icon only below 768px (`mobileBreakpoint`): in `reader_screen.dart`, the icon and search mode use `isMobile`, the same check that makes the panel full screen. Tablets get the 360px box, its dropdown and the side panel under it, as on desktop. Phones don't change: their panel is full screen, so a full-width field matches it.
    - Cost: at 768px the breadcrumb gets about 200px (768 − 80 navigation rail − 56 menu − 8 spacing − 360 box − 48 settings − 12 end gap), with the navigator open or not: the app bar spans the screen beside the rail either way. It scrolls sideways and ends in the sutta name, so it doesn't break; it shows fewer parents.
    - Not chosen: an icon at tablet width that turns into the box when tapped. It keeps the whole breadcrumb while reading, but the box would need search mode's focus, back arrow, tap outside and system back. Possible later if the shorter breadcrumb bothers.
-2. The result tabs drag with a mouse, and fade at the right edge like the chip row, with end padding equal to the fade.
+2. The result tabs drag with a mouse.
 3. System back: one `PopScope` around the whole screen, so back closes search mode on phones and the side panel under the box on tablets. It used to wrap the full-width field, so at 768px and up (most Android phones turned sideways too) back with the panel open left the app (review, 2026-10-09).
-4. One helper each for what the sideways rows share: `MouseDragScroll` (mouse drag, no scrollbar or overscroll effect) for the breadcrumb, the reader's tab bar, the chip row and the result tabs; `RightEdgeFade` for the chip row and the result tabs.
+4. One helper for what the sideways rows share: `MouseDragScroll` (mouse drag, no scrollbar or overscroll effect) for the breadcrumb, the reader's tab bar, the chip row and the result tabs.
 
 **Done when:**
 
-- [ ] 768–1023px: the desktop box with the panel under it; no full-width field.
-- [ ] Below 768px: unchanged.
-- [ ] At 768px and up, system back closes the panel (Android).
-- [ ] In a 300px panel the tabs scroll with a mouse drag and a trackpad, and the fade shows there are more.
-- [ ] The breadcrumb, the reader's tab bar and the chip row still drag with a mouse.
+- [x] 768–1023px: the desktop box with the panel under it; no full-width field.
+- [x] Below 768px: unchanged.
+- [x] At 768px and up, system back closes the panel. On Android: `first-android-release.md`.
+- [x] In a 300px panel the tabs scroll with a mouse drag and a trackpad.
+- [x] The breadcrumb, the reader's tab bar and the chip row still drag with a mouse.
 
 ## Handover notes
 
@@ -322,7 +321,7 @@ Done: Tasks 5, 6 and 7, plus the footer text and the "View N more" button (Task 
 Done: Tasks 4 and 8, plus the Treatises naming (Task 10).
 
 - `PillChip` (`common/pill_chip.dart`) replaces `_ScopeChip`, `_FilterChip` and both `_RefineChip` copies; `PillChip.refine` is the Refine chip, with its own colours as before. It is a `TextButton`: 32px pill, 13px text (`AppFonts.chipFontSize`), 48px tap area. Colours are the ones from before this chunk. `PillChip.styleOf` gives the same look to "Starts with ▾", with 8px corners.
-- `PillChipRow` (`common/pill_chip_row.dart`) is the one scrolling row both chip widgets now use, with the right-edge fade. Its end padding equals the fade width, so the last chip is clear of the fade when scrolled to the end. Both chip widgets take `leading`: the match button and the divider, so they scroll with the chips.
+- `PillChipRow` (`common/pill_chip_row.dart`) is the one scrolling row both chip widgets now use. Both chip widgets take `leading`: the match button and the divider, so they scroll with the chips.
 - `ScopeFilterChips` watches only scope and the two language flags (`select`). It watched the whole search state and rebuilt on every keystroke.
 - The chip font is 13px, so the research mode selector, which borrows `chipLabel`, grew from 12px to 13px too.
 - The row is 56px, on the same `surfaceContainerHighest` as before.
@@ -332,7 +331,7 @@ Done: Tasks 4 and 8, plus the Treatises naming (Task 10).
 - Esc: the menu registers on `overlayStackProvider` while open, and its `dispose` removes the entry too, because a menu closed by disposal never calls `onClose`. It does so after the frame: Riverpod forbids changing a provider while widgets are torn down.
 - Deleted: `ProximityDialog`, and the l10n keys only it or the toggles used: `wordProximity`, `wordsApart`, `apply`, `searchAsPhrase`, `searchAsSeparateWords`. `anywhereInText` is reused for the menu option. `CircularToggleButton` stays (the dictionary sheet uses it). Also `toggleExactMatch`, `setPhraseSearch`, `setAnywhereInText` and `setProximityDistance` on the notifier; their tests moved to `setMatchOptions`.
 - Not renamed: `TipitakaNodeKeys.treatises` and `isTreatise` (code names, never shown).
-- New l10n keys: `matchOptions`, `matchEachWord`, `matchStartsWith`, `matchStartsWithHint`, `matchWholeWord`, `matchWholeWordHint`, `matchHowWordsSit`, `matchPhrase`, `matchPhraseHint`, `matchPhraseShort`, `matchAnywhereHint`, `matchAnywhereShort`, `matchNear`, `matchNearHint`, `matchNearShort`, `matchNearWithin`, `fewerWords`, `moreWords`, `resetToDefault`; `scopeTreatises` became `scopeOther`. The Sinhala for the menu is a first draft: review it (user, later). Phones show no tooltips, so each title must make sense alone; ඇරඹෙන වචන ("Starts with") is the least clear.
+- New l10n keys: `matchOptions`, `matchEachWord`, `matchStartsWith`, `matchStartsWithHint`, `matchWholeWord`, `matchWholeWordHint`, `matchHowWordsSit`, `matchPhrase`, `matchPhraseHint`, `matchPhraseShort`, `matchAnywhereHint`, `matchAnywhereShort`, `matchNear`, `matchNearHint`, `matchNearShort`, `matchNearWithin`, `fewerWords`, `moreWords`, `resetToDefault`; `scopeTreatises` became `scopeOther`. The Sinhala for the menu is a first draft: its review is R2 in `app-reader-backlog.md`.
 
 Review fixes (2026-10-07):
 
@@ -342,7 +341,7 @@ Review fixes (2026-10-07):
 - `clearFilters` reads its defaults from `const SearchState()`, as the menu does.
 - `OverlayStackNotifier.remove` does nothing when the id isn't there (the match button's `dispose` calls it on every tab switch).
 - Deleted the unused l10n keys `phraseSearch` and `exactConsecutiveWords`.
-- Moved to `perf-top10-killers.md`: the header rebuilding on every keystroke (item 5) and the fade's offscreen layer (B5).
+- Moved to `perf-top10-killers.md`: the header rebuilding on every keystroke (item 5).
 
 Review fixes (2026-10-08):
 
@@ -402,33 +401,34 @@ Checked by eye on macOS on 2026-10-09, at 360, 400, 768–1023 and 1280px, and w
 - At tablet width the full-width field sits over a narrow side panel and looks split. The same after narrowing a desktop window with the panel open.
 - In a narrow panel the result tabs scroll only when tapped, not when dragged with a mouse.
 
-Not checked: Android and iOS. Android builds are broken on Flutter 3.44.1, and iOS was never built.
+Not checked: Android and iOS. Android builds are broken on Flutter 3.44.1, and iOS was never built. Moved to `first-ios-release.md` and `first-android-release.md`.
 
-Test gaps from the same check: `search-width-checks-test-plan.md`, for the test agent.
+Test gaps from the same check: `search-width-checks-test-plan.md`. Its tests were written in cb03740.
 
 Known edges, not fixed:
 
 - Esc does nothing when search mode shows only an empty, unfocused field (after Enter on an empty query). Back works.
 - The static site's breadcrumb still shrinks and drops segments, and its comments (`site_chrome.dart`, `stylesheet.dart`) say the app's does the same. Both change with `static-site-backlog.md` C12.
 
-### Chunk D2: done, not committed (2026-10-09)
+### Chunk D2: done (7a22168, tests cb03740)
 
 Done: Task 12.
 
 - Tablets show the 360px box, as desktop does. Search mode and the full-width field are phone-only now.
 - On phones the recent list is a floating card, not edge to edge: with the same colour as a scrolled app bar and no gap, it read as part of the bar (user, 2026-10-09). Its left and right come from the field's real position (as the desktop dropdown's right edge does), so it lines up with the field, and it sits at the bar's bottom edge, 8px below the field, as on desktop: an extra 8px gap under the bar was tried and dropped, as it showed a strip of the reader. 12px corners at every width, as the desktop dropdown has. `RecentSearchOverlay` no longer checks the width for its corners.
 - Comments and the `openSearch` description that said "below desktop width" now say "on phones" (`search_bar.dart`, `search_mode_provider.dart`, `shortcut_actions.dart`, `app_en.arb`; l10n regenerated).
-- New `common/mouse_drag_scroll.dart` and `common/right_edge_fade.dart`. The breadcrumb, the reader's tab bar and `PillChipRow` use them in place of their own copies. The reader's tab bar and the chip row now also take the default drag devices they had left out (inverted stylus, unknown) and have no overscroll effect; their physics bounce, so nothing shows.
-- Result tabs: the `TabBar` sits in `RightEdgeFade` and `MouseDragScroll`, with 24px end padding. Its divider is now a bottom border outside the fade, so the line doesn't fade at its end. The `TabBar` keeps `dividerHeight: 1` with a transparent colour: at 0 a scrollable `TabBar` shrinks to its tabs.
-- `perf-top10-killers.md` B5 now covers both fades. The fade's shader callback is a static method, so the panel's rebuild on each keystroke doesn't repaint the mask.
+- New `common/mouse_drag_scroll.dart`. The breadcrumb, the reader's tab bar and `PillChipRow` use it in place of their own copies. The reader's tab bar and the chip row now also take the default drag devices they had left out (inverted stylus, unknown) and have no overscroll effect; their physics bounce, so nothing shows.
+- Result tabs: the `TabBar` sits in `MouseDragScroll`.
 - System back: the `PopScope` moved from the field to the whole screen (Task 12 step 3). In `reader_screen.dart` search mode uses `isMobile`; the separate `isCompactBar` is gone.
 - `dart analyze` and `dart format`: clean. Its tests are the width checks, written 2026-10-10: `search-width-checks-test-plan.md`.
 
-### Next (handover, 2026-10-09)
+### After the by-eye check (2026-10-12)
 
-1. The user checks D2 by eye on macOS: 768, 900 and 1023px (box, dropdown corners, side panel, back arrow), the result tabs in a 300px panel with a mouse, and the breadcrumb, reader tabs and chips still dragging. Then commit.
+The user checked D2 on macOS at 768, 900 and 1023px, the result tabs in a 300px panel with a mouse and a trackpad, and the breadcrumb, reader tabs and chips still dragging: all fine. One change: the right-edge fades on the chip row and the result tabs were too much, so both are gone, with `right_edge_fade.dart` and perf B5. Each row now ends with padding that mirrors its start: 12px for the chips, 8px for the tabs. The tabs' divider is the `TabBar`'s own again; it was a border outside the fade only so the line wouldn't fade.
 
-Running tests: one integration file per `flutter test … -d macos`. The macOS test window lays out 502px wide, so a new harness sets `tester.view.physicalSize`. Before pinning an old one, run it at 400px and 1280px: a failure only at 400px can be a real phone bug, as 3b was. The chip row is lazy: `scrollUntilVisible`, then `pump()`, before tapping a chip past the edge.
+### Running tests
+
+One integration file per `flutter test … -d macos`. The macOS test window lays out 502px wide, so a new harness sets `tester.view.physicalSize`. Before pinning an old one, run it at 400px and 1280px: a failure only at 400px can be a real phone bug, as 3b was. The chip row is lazy: `scrollUntilVisible`, then `pump()`, before tapping a chip past the edge.
 
 ## Done outside the chunks (2026-10-08)
 

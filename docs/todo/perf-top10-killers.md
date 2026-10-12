@@ -243,19 +243,6 @@ group inside a `SingleChildScrollView`. Reader `SingleColumnPane` and `StackedPa
 - **Fix:** Use a `ValueListenableBuilder<bool>` inside a thin AppBar-tint widget so only the
   colored container rebuilds.
 
-### B5. The search panel's edge fades draw an offscreen layer every frame
-
-`lib/presentation/widgets/common/right_edge_fade.dart` (`ShaderMask`), used by the chip row
-and the result tabs.
-
-- **Why it matters:** `ShaderMask` draws the row into an offscreen layer, then fades it. The
-  screen is redrawn on every frame anything moves, the cursor blink included, so each row pays
-  for that layer on each frame while the panel is open. Small: two thin strips.
-- **Fix:** paint a gradient from transparent to the row colour over the row's end
-  (`PositionedDirectional` + `IgnorePointer`) instead, in `RightEdgeFade`. Each caller then
-  passes its row colour (`surfaceContainerHighest` for the chips, the panel's `surface` for the
-  tabs). Measure on a low-end phone first.
-
 ---
 
 ## Why these are the priorities

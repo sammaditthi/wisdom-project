@@ -48,7 +48,7 @@ All covered (2026-10-10). Each `search_mode_test` test is named here by its open
 | M8 | Desktop: the panel has no close button of its own; the box's back arrow is the only `BackButton` on screen. | 1280 | `search_mode_test` "desktop", step 2 |
 | M9 | Desktop: a click outside the recent list closes it and keeps the scope and match options. | 1280 | `search_mode_test` "desktop", step 4 |
 | M10 | Desktop with the panel open, narrowed: at 900 the box keeps its back arrow and the side panel; at 400 the panel fills the screen under the full-width field. One tap closes it. | 1280 → 900 → 400 | `search_mode_test` "desktop", steps 5–7 |
-| M11 | Result tabs in a 300px panel: a mouse drag and a touch drag bring the last tab on screen, at least 24px (`RightEdgeFade.width`) from the panel's right edge. | 300px panel | `search_results_panel_test` |
+| M11 | Result tabs in a 300px panel: a mouse drag and a touch drag bring the last tab on screen, at least 8px (the tab bar's end padding) from the panel's right edge. | 300px panel | `search_results_panel_test` |
 | M12 | The chip row and the reader's tab bar scroll with a mouse drag. | any | `pill_chip_row_test`, `tab_bar_widget_test` |
 
 Proved by breaking a scratch copy, each failing only the tests meant to catch it: no mouse in `MouseDragScroll`, the breadcrumb not reversed or not keyed by its path, no end padding on the result tabs, the recent list ignoring the keyboard, the preview capped by 360px instead of the field's width, the phone card not lined up with the field, and system back ignoring the tablet panel.
@@ -58,5 +58,5 @@ Proved by breaking a scratch copy, each failing only the tests meant to catch it
 No test can judge these. The user checks them after each layout change.
 
 - At tablet width, the box and the side panel look right together (Task 12).
-- The fade at the end of the result tabs looks right, and the line under the tabs runs to the panel's edge without fading (Task 12).
-- Android system back, and everything on iOS: Android builds are broken on Flutter 3.44.1, and iOS was never built.
+- The line under the result tabs runs to the panel's edge (Task 12).
+- Android system back, and everything on iOS: Android builds are broken on Flutter 3.44.1, and iOS was never built. Now in `first-android-release.md` and `first-ios-release.md`.
