@@ -17,6 +17,9 @@
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
+  <!-- Sizes #boot for phones. Flutter swaps in its own when it starts (debug
+       builds log that it found this one). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Read the Buddha Jayanti Tipitaka and its commentaries in Pali and Sinhala.">
 
@@ -29,15 +32,128 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
-  <!-- Preload critical Sinhala font for faster text rendering -->
-  <link rel="preload"
-        href="assets/fonts/noto-sans-sinhala/NotoSansSinhala-Regular.ttf"
-        as="font" type="font/ttf" crossorigin>
-
   <title>Sammaditthi</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- The page is blank until Flutter's engine, code and fonts have arrived,
+       which on a slow connection takes long enough to look stuck. #boot covers
+       that wait in the install screen's words, colours and layout, and
+       flutter_bootstrap.js removes it once Flutter has painted. -->
+  <style>
+    body { margin: 0; background: #FAF9F5; }
+    #boot {
+      position: fixed; inset: 0;
+      display: grid; grid-template-rows: 1fr 1fr; justify-items: center;
+      font: 16px/1.4 system-ui, sans-serif; text-align: center;
+      /* A short landscape phone may not fit the error and its button. */
+      overflow-y: auto;
+    }
+    /* The install screen's geometry (_EmblemLayout, _Panel and _Preparing in
+       database_install_screen.dart), so nothing moves when Flutter takes over:
+       emblem 24px above the middle, a column at most 360px wide below it. */
+    #boot img { align-self: end; margin-bottom: 24px; }
+    #boot .below {
+      align-self: start; box-sizing: border-box;
+      width: min(100%, 424px); padding: 16px 32px 0;
+    }
+    #boot p { margin: 0; }
+    /* emptyStateMessage and resultSubtitle in app_typography.dart. */
+    #boot .lead { color: rgba(66, 39, 1, 0.6); }
+    #boot .sub { margin-top: 4px; font-size: 14px; color: #705E46; }
+    /* errorMessage, the install screen's failure title. */
+    #boot .error .lead { font-size: 14px; color: #B3261E; }
+    /* Indeterminate: a short piece sliding along the track. */
+    #boot .bar {
+      height: 6px; margin-bottom: 12px; border-radius: 3px;
+      overflow: hidden; background: #D0CABE;
+    }
+    #boot .bar span {
+      display: block; width: 30%; height: 100%; border-radius: 3px;
+      background: #5A3A18; animation: boot-slide 1.4s ease-in-out infinite;
+    }
+    @keyframes boot-slide {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(340%); }
+    }
+    /* flutter_bootstrap.js adds .failed when Flutter fails to start. Raised
+       above Flutter's view, which may already be on the page, so the button
+       takes the click. */
+    #boot .error, #boot.failed .loading { display: none; }
+    #boot.failed { z-index: 1; }
+    #boot.failed .error { display: block; }
+    /* OutlinedButton: the theme's outline round it, primary text. 32px tall
+       on desktops (compact density), 40px on phones and tablets. */
+    #boot button {
+      margin-top: 16px; height: 32px; padding: 0 24px; border: 1px solid #D6C9B8;
+      border-radius: 20px; background: none; color: #5A3A18;
+      font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+    }
+    @media (pointer: coarse) { #boot button { height: 40px; } }
+    /* One language: the page's, set by the script below. */
+    html[lang="si"] #boot [lang="en"],
+    html[lang="en"] #boot [lang="si"] { display: none; }
+  </style>
+  <!-- #boot in the app's language, by the app's rule (AppLanguage.fromStorage,
+       then AppLanguage.fromLocales): the saved choice, else the first of si/en
+       in the browser's list, else English. Here, before the first paint. -->
+  <script>
+    {
+      let lang;
+      try {
+        // shared_preferences stores StorageKeys.appLanguage as JSON, under
+        // its "flutter." prefix.
+        lang = { sinhala: 'si', english: 'en' }[
+          JSON.parse(localStorage.getItem('flutter.app_language_v1'))];
+      } catch {}
+      lang ??= navigator.languages
+        .map((tag) => tag.split('-')[0].toLowerCase())
+        .find((code) => code === 'si' || code === 'en') ?? 'en';
+      // Also the page's language for screen readers, until Flutter sets it to
+      // the same, from the app's locale.
+      document.documentElement.lang = lang;
+    }
+  </script>
 </head>
 <body>
+  <!-- The words are the ARB strings named beside them, in both languages;
+       the script in <head> hides one. -->
+  <div id="boot" role="status">
+    <!-- AppEmblem.asset or one of its copies, at the URL Flutter serves its
+         assets from. Low priority: it downloads after Flutter's own files and
+         shows when it arrives; nothing waits for it. -->
+    <img width="96" height="96" alt="" fetchpriority="low">
+    <script>
+      {
+        // The copy AssetImage picks (image_resolution.dart), from the ratio
+        // Flutter uses (engine display.dart). srcset picks differently between
+        // densities, e.g. at 125%, so the emblem changed at the handover.
+        const ratio = (devicePixelRatio || 1) * (window.visualViewport?.scale ?? 1);
+        // Below 2x the copy above; otherwise the nearest, the lower at halfway.
+        const copy = Math.min(4, Math.max(1, Math.ceil(ratio < 2 ? ratio : ratio - 0.5)));
+        document.querySelector('#boot img').src = copy === 1
+          ? 'assets/assets/icons/emblem.webp'
+          : `assets/assets/icons/${copy}.0x/emblem.webp`;
+      }
+    </script>
+    <div class="below">
+      <!-- databaseInstallPreparing -->
+      <div class="loading">
+        <div class="bar"><span></span></div>
+        <p class="lead" lang="si">සූදානම් වෙමින්…</p>
+        <p class="lead" lang="en">Getting ready…</p>
+      </div>
+      <!-- databaseInstallFailedTitle, the first sentence of
+           databaseInstallFailedDescription, databaseInstallRetry -->
+      <div class="error">
+        <p class="lead" lang="si">බාගත කිරීම අවසන් නොවීය</p>
+        <p class="lead" lang="en">The download did not finish</p>
+        <p class="sub" lang="si">ඔබගේ සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.</p>
+        <p class="sub" lang="en">Check your connection and try again.</p>
+        <button type="button"><span lang="si">නැවත උත්සාහ කරන්න</span><span
+          lang="en">Try again</span></button>
+      </div>
+    </div>
+  </div>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

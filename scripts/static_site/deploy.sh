@@ -346,11 +346,12 @@ fi
 # to index anything. Every value below comes from the build, so a mismatch is
 # always a bug in the build.
 
-# The three committed inputs (make_emblem.sh's rasters, site.js by hand). The
-# generator only warns about a missing one — sitegen.dart's _readPackageAsset —
-# and a warning in a 10,000-page build scrolls past. None makes a page wrong,
-# which is exactly why they need catching here: SiteAssets emits the URL from
-# whatever bytes it got, so an absent file 404s on every page at once.
+# The four committed inputs (make_emblem.sh's rasters, make_icons.sh's favicon,
+# site.js by hand). The generator only warns about a missing one —
+# sitegen.dart's _readPackageAsset — and a warning in a 10,000-page build
+# scrolls past. None makes a page wrong, which is exactly why they need
+# catching here: SiteAssets emits the URL from whatever bytes it got, so an
+# absent file 404s on every page at once.
 #
 # Named one at a time, in sitegen.dart's order and its words.
 if [ ! -f "$OUT/assets/site.js" ]; then
@@ -373,6 +374,13 @@ if [ ! -f "$OUT/assets/og-card.png" ]; then
   echo "       URL rather than a card. Run" >&2
   echo "       static_site_generator/assets/make_emblem.sh and commit its" >&2
   echo "       output. Nothing uploaded." >&2
+  exit 1
+fi
+if [ ! -f "$OUT/assets/favicon.png" ]; then
+  echo "error: $OUT/assets/favicon.png is missing — browser tabs would show" >&2
+  echo "       the browser's default icon, and every page would link a 404." >&2
+  echo "       Run assets/icons/make_icons.sh and commit its output. Nothing" >&2
+  echo "       uploaded." >&2
   exit 1
 fi
 

@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,19 +7,15 @@ import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/theme/app_typography.dart';
 import '../../data/database/database_installation.dart';
 import '../providers/database_install_provider.dart';
-import '../widgets/common/status_message_view.dart';
-
-/// How long a start stays blank before the screen says anything.
-///
-/// A reload has nothing to download, but it still passes through
-/// [DatabaseInstallPhase.checking] while the manifest is fetched and the
-/// stamps are read. Without this the screen would flash a line it takes
-/// straight back.
-const Duration _quietStart = Duration(milliseconds: 400);
+import '../widgets/common/app_emblem.dart';
 
 /// Megabytes as a download shows them: 1 MB = 1,000,000 bytes, which is what
 /// the browser and the operating system report.
 const int _bytesPerMb = 1000000;
+
+/// The emblem's gap above the middle of the window. `#boot` in web/index.html
+/// uses the same number, so the emblem holds still when Flutter takes over.
+const double _emblemGap = 24;
 
 /// Covers the app until its databases are installed.
 ///
@@ -45,7 +41,7 @@ class DatabaseInstallGate extends ConsumerWidget {
 
 /// What the gate shows: one [DatabaseInstallStatus], in the four shapes it
 /// comes in.
-class DatabaseInstallScreen extends StatefulWidget {
+class DatabaseInstallScreen extends StatelessWidget {
   const DatabaseInstallScreen({
     super.key,
     required this.status,
@@ -56,50 +52,54 @@ class DatabaseInstallScreen extends StatefulWidget {
   final VoidCallback onRetry;
 
   @override
-  State<DatabaseInstallScreen> createState() => _DatabaseInstallScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: _EmblemLayout(
+          below: switch (status.phase) {
+            DatabaseInstallPhase.failed =>
+              _Failure(failure: status.failure, onRetry: onRetry),
+            DatabaseInstallPhase.installing => _Progress(status: status),
+            // `ready` never reaches here — the gate shows the app instead.
+            DatabaseInstallPhase.checking ||
+            DatabaseInstallPhase.ready =>
+              const _Preparing(),
+          },
+        ),
+      ),
+    );
+  }
 }
 
-class _DatabaseInstallScreenState extends State<DatabaseInstallScreen> {
-  Timer? _quietTimer;
-  bool _quiet = true;
+/// The emblem with [below] under it, placed like `#boot` in web/index.html:
+/// the emblem's bottom edge [_emblemGap] above the middle, [below] from the
+/// middle down. Only [below] changes between phases, so the emblem stays put.
+/// In a window too short for that, the whole screen scrolls.
+class _EmblemLayout extends StatelessWidget {
+  const _EmblemLayout({required this.below});
 
-  @override
-  void initState() {
-    super.initState();
-    _quietTimer = Timer(_quietStart, () {
-      if (mounted) setState(() => _quiet = false);
-    });
-  }
-
-  @override
-  void dispose() {
-    _quietTimer?.cancel();
-    super.dispose();
-  }
+  final Widget below;
 
   @override
   Widget build(BuildContext context) {
-    final status = widget.status;
-    // A reload is usually past `checking` before the quiet start is over, and
-    // should look like a normal start rather than a flash of text.
-    if (_quiet && status.phase == DatabaseInstallPhase.checking) {
-      return const Scaffold(body: SizedBox.expand());
-    }
-
-    return Scaffold(
-      body: SafeArea(
-        child: switch (status.phase) {
-          DatabaseInstallPhase.failed =>
-            _Failure(failure: status.failure, onRetry: widget.onRetry),
-          DatabaseInstallPhase.installing => _Progress(status: status),
-          // `ready` never reaches here — the gate shows the app instead.
-          DatabaseInstallPhase.checking ||
-          DatabaseInstallPhase.ready =>
-            StatusMessageView(
-              variant: StatusVariant.loading,
-              title: AppLocalizations.of(context).databaseInstallPreparing,
-            ),
-        },
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: SizedBox(
+          width: constraints.maxWidth,
+          child: Column(
+            children: [
+              SizedBox(
+                height: math.max(
+                  0,
+                  constraints.maxHeight / 2 - _emblemGap - AppEmblem.size,
+                ),
+              ),
+              const AppEmblem(),
+              const SizedBox(height: _emblemGap),
+              below,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -127,44 +127,89 @@ class _Progress extends StatelessWidget {
             status.total ~/ _bytesPerMb,
           );
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 360),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                l10n.databaseInstallTitle,
-                style: typography.emptyStateMessage,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              LinearProgressIndicator(
-                value: fraction,
-                minHeight: 6,
-                borderRadius: const BorderRadius.all(Radius.circular(3)),
-                // No semanticsValue: Flutter fills it with this same bare
-                // percentage, clamped (`progress_indicator.dart`). The
-                // megabytes are read from the line below, a `Text` like any
-                // other.
-                semanticsLabel: l10n.databaseInstallTitle,
-              ),
-              if (progress != null) ...[
-                const SizedBox(height: 8),
-                Text(progress, style: typography.resultSubtitle),
-              ],
-              const SizedBox(height: 16),
-              Text(
-                l10n.databaseInstallDescription,
-                style: typography.resultSubtitle,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+    return _Panel(
+      children: [
+        Text(
+          l10n.databaseInstallTitle,
+          style: typography.emptyStateMessage,
+          textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 16),
+        _Bar(value: fraction, label: l10n.databaseInstallTitle),
+        if (progress != null) ...[
+          const SizedBox(height: 8),
+          Text(progress, style: typography.resultSubtitle),
+        ],
+        const SizedBox(height: 16),
+        Text(
+          l10n.databaseInstallDescription,
+          style: typography.resultSubtitle,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+/// Before the download starts: the bar and the line as `#boot` in
+/// web/index.html shows them, in the same language, so the HTML loader hands
+/// over without a jump.
+class _Preparing extends StatelessWidget {
+  const _Preparing();
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppLocalizations.of(context).databaseInstallPreparing;
+    return _Panel(
+      children: [
+        _Bar(value: null, label: label),
+        const SizedBox(height: 12),
+        Text(
+          label,
+          style: context.typography.emptyStateMessage,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+/// The column under the emblem: as wide as `#boot .below` in web/index.html.
+class _Panel extends StatelessWidget {
+  const _Panel({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Column(mainAxisSize: MainAxisSize.min, children: children),
       ),
+    );
+  }
+}
+
+/// The install's bar, the same in every phase and as `#boot .bar` in
+/// web/index.html. Indeterminate while [value] is null.
+class _Bar extends StatelessWidget {
+  const _Bar({required this.value, required this.label});
+
+  final double? value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return LinearProgressIndicator(
+      value: value,
+      minHeight: 6,
+      borderRadius: const BorderRadius.all(Radius.circular(3)),
+      // No semanticsValue: Flutter fills it with this same bare percentage,
+      // clamped (`progress_indicator.dart`). The megabytes are read from the
+      // line below, a `Text` like any other.
+      semanticsLabel: label,
     );
   }
 }
@@ -198,41 +243,32 @@ class _Failure extends StatelessWidget {
         ),
     };
 
-    // Nothing about this browser would change on a second try, so it gets no
-    // button. Everything else does.
-    final retryable = kind != DatabaseInstallFailureKind.unsupportedBrowser;
-
-    return Column(
+    final typography = context.typography;
+    return _Panel(
       children: [
-        Expanded(
-          // Centred while there is room, scrollable when there is not: a short
-          // window must not clip the screen that says what went wrong.
-          child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: StatusMessageView(
-                  variant: kind == DatabaseInstallFailureKind.download
-                      ? StatusVariant.offline
-                      : StatusVariant.error,
-                  title: title,
-                  description: description,
-                  action: retryable
-                      ? OutlinedButton.icon(
-                          icon: const Icon(Icons.refresh),
-                          label: Text(l10n.databaseInstallRetry),
-                          onPressed: onRetry,
-                        )
-                      : null,
-                ),
-              ),
-            ),
-          ),
+        Text(title,
+            style: typography.errorMessage, textAlign: TextAlign.center),
+        const SizedBox(height: 4),
+        Text(
+          description,
+          style: typography.resultSubtitle,
+          textAlign: TextAlign.center,
         ),
+        // Nothing about this browser would change on a second try, so it gets
+        // no button. Everything else does.
+        if (kind != DatabaseInstallFailureKind.unsupportedBrowser) ...[
+          const SizedBox(height: 16),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: Text(l10n.databaseInstallRetry),
+          ),
+        ],
         // The raw message, for the reader who reports what they saw. Left out
         // where the message above already says everything.
-        if (failure != null && _showsDetail(kind))
+        if (failure != null && _showsDetail(kind)) ...[
+          const SizedBox(height: 16),
           _Detail(message: failure!.message),
+        ],
       ],
     );
   }
@@ -250,15 +286,12 @@ class _Detail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 32, 24),
-      child: SelectableText(
-        message,
-        textAlign: TextAlign.center,
-        maxLines: 3,
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
+    return SelectableText(
+      message,
+      textAlign: TextAlign.center,
+      maxLines: 3,
+      style: theme.textTheme.bodySmall?.copyWith(
+        color: theme.colorScheme.onSurfaceVariant,
       ),
     );
   }

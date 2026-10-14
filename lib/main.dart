@@ -6,10 +6,12 @@ import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/storage/key_value_store_provider.dart';
 import 'core/storage/shared_preferences_key_value_store.dart';
+import 'core/utils/start_failure.dart';
 import 'data/database/database_manifest.dart';
 import 'presentation/keyboard/app_shortcuts.dart';
 import 'presentation/screens/app_shell.dart';
 import 'presentation/screens/database_install_screen.dart';
+import 'presentation/widgets/common/app_emblem.dart';
 import 'presentation/providers/search_provider.dart';
 import 'presentation/providers/app_language_provider.dart';
 import 'presentation/providers/tab_provider.dart'
@@ -23,6 +25,26 @@ import 'core/theme/theme_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await _start();
+  } catch (_) {
+    // Web: no first frame comes, so the loader in web/index.html would say
+    // "Getting ready…" forever. Flutter doesn't pass the error on to it.
+    reportStartFailure();
+    rethrow;
+  }
+}
+
+Future<void> _start() async {
+  // Web: Flutter's first frame takes over from #boot in web/index.html, which
+  // shows the emblem. Start loading it now so it is more likely there by then:
+  // the copy for this screen, the one the widget will ask for.
+  if (kIsWeb) {
+    AppEmblem.image.resolve(ImageConfiguration(
+      devicePixelRatio: WidgetsBinding
+          .instance.platformDispatcher.implicitView?.devicePixelRatio,
+    ));
+  }
 
   // Initialize SharedPreferences for search history
   final sharedPrefs = await SharedPreferences.getInstance();

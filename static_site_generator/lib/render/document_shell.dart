@@ -125,6 +125,7 @@ String htmlDocument({
 <meta name="viewport" content="width=device-width, initial-scale=1">
 $meta
 <link rel="stylesheet" href="${assets.stylesheet}">
+<link rel="icon" type="image/png" href="${assets.favicon}">
 <meta name="generator" content="wisdom-ssg ${build.generatorVersion}">
 $head</head>
 <body>

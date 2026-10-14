@@ -29,6 +29,7 @@ class StorageKeys {
 
   /// String ([AppLanguage.name]) — the user's chosen UI language. Absent means
   /// "never chosen", in which case the app follows the device locale.
+  /// web/index.html reads it too, for its loader.
   static const appLanguage = 'app_language_v1';
 
   /// String ([ContentLanguage.name]) — which text/translation to show for data

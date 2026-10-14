@@ -22,9 +22,6 @@ class _FakeInstallNotifier extends DatabaseInstallNotifier {
   void emit(DatabaseInstallStatus status) => state = status;
 }
 
-/// Longer than the screen's quiet start, so the wait is over.
-const Duration _pastQuietStart = Duration(milliseconds: 500);
-
 Future<void> _pumpScreen(
   WidgetTester tester,
   DatabaseInstallStatus status, {
@@ -37,21 +34,23 @@ Future<void> _pumpScreen(
 
 void main() {
   group('DatabaseInstallScreen', () {
-    testWidgets('says nothing during the quiet start, then asks for a moment',
+    testWidgets('asks for a moment at once, under the loader\'s running bar',
         (tester) async {
       await _pumpScreen(
         tester,
         const DatabaseInstallStatus(phase: DatabaseInstallPhase.checking),
       );
 
-      // A reload is usually past `checking` by now, so the screen is blank.
-      expect(find.text('Getting ready…'), findsNothing);
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-
-      await tester.pump(_pastQuietStart);
-
+      // web/index.html already shows this line and bar, in the app's
+      // language, so they carry on from the first frame rather than
+      // blinking out.
       expect(find.text('Getting ready…'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.text('සූදානම් වෙමින්…'), findsNothing);
+      final bar = tester.widget<LinearProgressIndicator>(
+        find.byType(LinearProgressIndicator),
+      );
+      expect(bar.value, isNull);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
     testWidgets(
@@ -66,7 +65,6 @@ void main() {
         ),
       );
 
-      // No quiet start for a download: it has already begun.
       expect(find.text('Downloading the texts'), findsOneWidget);
       expect(find.text('11% · 42 MB of 351 MB'), findsOneWidget);
 

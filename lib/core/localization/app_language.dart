@@ -26,6 +26,8 @@ enum AppLanguage {
   /// `[ta, si, en]` has Tamil first (which we don't support) but Sinhala
   /// second — the user clearly prefers Sinhala over English, so we honour that
   /// instead of defaulting to English off the primary locale alone.
+  ///
+  /// web/index.html repeats this rule for its loader, which runs before Dart.
   static AppLanguage fromLocales(Iterable<Locale> locales) {
     for (final locale in locales) {
       switch (locale.languageCode) {

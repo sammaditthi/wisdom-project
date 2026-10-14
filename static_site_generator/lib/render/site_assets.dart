@@ -6,7 +6,7 @@
 /// is what makes each URL change when its bytes do — computed by the build,
 /// with nothing for anyone to remember.
 ///
-/// Six files, five tokens:
+/// Seven files, six tokens:
 ///
 /// | file                | token                                     |
 /// |---------------------|-------------------------------------------|
@@ -15,6 +15,7 @@
 /// | `search-index.json` | the same hash                             |
 /// | `emblem.png`        | hash of the image                         |
 /// | `og-card.png`       | hash of the image                         |
+/// | `favicon.png`       | hash of the image                         |
 /// | `fonts/*.woff2`     | one hash of all eight faces, in the CSS   |
 ///
 /// ## Why not a hand-bumped token
@@ -90,14 +91,15 @@ const String assetsOutputDir = 'assets';
 /// URLs above are built from. **Paths, not URLs**: each URL carries a query
 /// string that no file on disk ever will.
 ///
-/// All five here rather than beside the code that generates each one, because
+/// All six here rather than beside the code that generates each one, because
 /// the caching rule has to name the directory they share and deriving that from
-/// one of them would make the other four look independent of it.
+/// one of them would make the other five look independent of it.
 const String stylesheetOutputPath = '$assetsOutputDir/site.css';
 const String siteScriptOutputPath = '$assetsOutputDir/$siteScriptFileName';
 const String searchIndexOutputPath = '$assetsOutputDir/search-index.json';
 const String emblemOutputPath = '$assetsOutputDir/$emblemFileName';
 const String ogCardOutputPath = '$assetsOutputDir/$ogCardFileName';
+const String faviconOutputPath = '$assetsOutputDir/$faviconFileName';
 
 /// The site's one script, under the generator's `assets/` and the output's.
 const String siteScriptFileName = 'site.js';
@@ -125,6 +127,11 @@ const String emblemFileName = 'emblem.png';
 /// rather than failing the build.
 const String ogCardFileName = 'og-card.png';
 
+/// The tab icon: the app's own `web/favicon.png` (from
+/// `assets/icons/make_icons.sh`), read from there rather than copied, so the
+/// site and the app show one icon.
+const String faviconFileName = 'favicon.png';
+
 /// The URLs the pages link, decided once per build.
 ///
 /// Threaded through the templates like `generatorVersion` is: a page cannot
@@ -150,21 +157,25 @@ class SiteAssets {
   /// invite the wrong one being linked.
   final String ogCard;
 
+  /// `/assets/favicon.png?v=<hash of the image>`.
+  final String favicon;
+
   const SiteAssets({
     required this.stylesheet,
     required this.script,
     required this.searchIndex,
     required this.emblem,
     required this.ogCard,
+    required this.favicon,
   });
 
   /// Derives every URL from the bytes that will be written.
   ///
-  /// [script], [emblem] and [ogCard] are files the build *copies* rather than
-  /// generates, and any of them can be absent — the case `SiteGenerator`
-  /// already warns about. An absent one arrives here empty: the URL is still
-  /// emitted and still 404s, exactly as before, and the build stays
-  /// deterministic.
+  /// [script], [emblem], [ogCard] and [favicon] are files the build *copies*
+  /// rather than generates, and any of them can be absent — the case
+  /// `SiteGenerator` already warns about. An absent one arrives here empty: the
+  /// URL is still emitted and still 404s, exactly as before, and the build
+  /// stays deterministic.
   ///
   /// The fonts have no URL here because no page names a font file. Their token
   /// reaches the browser inside the stylesheet, so it is already folded into
@@ -175,6 +186,7 @@ class SiteAssets {
     required String searchIndex,
     required List<int> emblem,
     required List<int> ogCard,
+    required List<int> favicon,
   }) {
     final searchVersion = contentHash('$script$_nul$searchIndex');
     return SiteAssets(
@@ -189,6 +201,7 @@ class SiteAssets {
       // moves the emblem and leaves the card exactly as it is — so a shared
       // token would change a URL whose bytes did not.
       ogCard: '/$ogCardOutputPath?v=${contentHashOfBytes(ogCard)}',
+      favicon: '/$faviconOutputPath?v=${contentHashOfBytes(favicon)}',
     );
   }
 }

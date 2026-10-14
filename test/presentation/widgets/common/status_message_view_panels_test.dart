@@ -37,6 +37,7 @@ import 'package:the_wisdom_project/presentation/providers/document_provider.dart
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
+import 'package:the_wisdom_project/presentation/widgets/common/app_emblem.dart';
 import 'package:the_wisdom_project/presentation/widgets/dictionary/dictionary_bottom_sheet.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
@@ -340,24 +341,9 @@ void main() {
         find.text('Select a sutta from the tree to begin reading'),
         findsOneWidget,
       );
-      // Reader hint now shows the Urna Hair Relic emblem (commit 24054b9)
-      // via [StatusMessageView.imageAsset] instead of the old
-      // menu_book_outlined icon. The override path is proven by the right
-      // AssetImage being rendered. StatusMessageView passes cacheWidth /
-      // cacheHeight to Image.asset, which wraps the AssetImage in a
-      // ResizeImage — unwrap before matching.
-      //
-      // Asset path duplicates the private constant
-      // `_selectSuttaEmblemAsset` in multi_pane_reader_widget.dart; a
-      // mismatch fails this `findsOneWidget` assertion loudly.
-      final emblem = find.byWidgetPredicate((widget) {
-        if (widget is! Image) return false;
-        final image = widget.image;
-        final asset = image is ResizeImage ? image.imageProvider : image;
-        return asset is AssetImage &&
-            asset.assetName == 'assets/icons/app_logo.png';
-      });
-      expect(emblem, findsOneWidget);
+      // Reader hint shows the emblem via [StatusMessageView.leading]
+      // instead of the old menu_book_outlined icon.
+      expect(find.byType(AppEmblem), findsOneWidget);
       // Must not show the generic info_outline — override should win.
       expect(find.byIcon(Icons.info_outline), findsNothing);
     });

@@ -36,6 +36,7 @@ import 'reader_selection_handler.dart';
 import 'in_page_search_bar.dart';
 import 'reader_action_buttons.dart';
 import '../dictionary/dictionary_bottom_sheet.dart';
+import '../common/app_emblem.dart';
 import '../common/status_message_view.dart';
 import '../../../core/utils/responsive_utils.dart';
 
@@ -98,9 +99,6 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   // than a lazy list, so it has to be told which page to open far enough to
   // include. See that class's doc.
   (int, int)? _revealTarget;
-
-  // Emblem shown in the first-run "select a sutta" hint.
-  static const _selectSuttaEmblemAsset = 'assets/icons/app_logo.png';
 
   @override
   void initState() {
@@ -742,8 +740,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     if (unitAsync.hasValue && unitAsync.value == null) {
       return StatusMessageView(
         variant: StatusVariant.info,
-        imageAsset: _selectSuttaEmblemAsset,
-        imageSize: 100,
+        leading: const AppEmblem(),
         title: AppLocalizations.of(context).statusSelectSuttaToRead,
       );
     }

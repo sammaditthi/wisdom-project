@@ -48,9 +48,7 @@ enum StatusVariant {
 /// );
 /// ```
 class StatusMessageView extends StatelessWidget {
-  /// Side length of the leading icon / image, in logical pixels. The [Icon]
-  /// and the [imageSize] default both read this so a tweak to one can't
-  /// silently desync from the other.
+  /// Side length of the leading icon, in logical pixels.
   static const double _leadingSize = 40;
 
   /// Side length of the loading spinner's bounding box, in logical pixels.
@@ -63,16 +61,11 @@ class StatusMessageView extends StatelessWidget {
   /// the whole point of this widget is visual consistency.
   final IconData? iconOverride;
 
-  /// Optional asset image used as the leading visual instead of an icon.
-  /// Rendered as-is (full colour, no tint), so it can be a logo or any
-  /// other artwork. Takes precedence over [iconOverride] and is ignored
-  /// when [variant] is [StatusVariant.loading]. Use sparingly, for the same
+  /// Optional widget shown instead of the variant's icon, such as the
+  /// emblem. Takes precedence over [iconOverride] and is ignored when
+  /// [variant] is [StatusVariant.loading]. Use sparingly, for the same
   /// visual-consistency reason as [iconOverride].
-  final String? imageAsset;
-
-  /// Side length of [imageAsset] in logical pixels. Defaults to the
-  /// standard leading-visual size.
-  final double imageSize;
+  final Widget? leading;
 
   /// Headline message shown to the user. Required for every variant
   /// except [StatusVariant.loading], where it is optional.
@@ -94,8 +87,7 @@ class StatusMessageView extends StatelessWidget {
     required this.variant,
     this.title,
     this.iconOverride,
-    this.imageAsset,
-    this.imageSize = _leadingSize,
+    this.leading,
     this.description,
     this.action,
     this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
@@ -110,37 +102,21 @@ class StatusMessageView extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final typography = context.typography;
 
-    // Leading visual: spinner for loading, asset image, or icon.
-    final Widget leading;
+    // Leading visual: spinner for loading, the caller's [leading], or icon.
+    final Widget visual;
     if (variant == StatusVariant.loading) {
-      leading = const SizedBox(
+      visual = const SizedBox(
         width: _spinnerSize,
         height: _spinnerSize,
         child: CircularProgressIndicator(strokeWidth: 3),
       );
-    } else if (imageAsset != null) {
-      // Supersample: decode at 2x the display's physical pixel size rather
-      // than the source's full 1024px (keeps the image cache small) but with
-      // enough headroom that FilterQuality.medium can mipmap-downscale to the
-      // final size cleanly. Decoding straight to 1:1 aliases a detailed logo
-      // (e.g. a grungy brush ring) into speckle.
-      final cacheExtent =
-          (imageSize * MediaQuery.devicePixelRatioOf(context) * 2).round();
-      // Rendered full-colour (no tint) so logos/artwork show as authored.
-      leading = Image.asset(
-        imageAsset!,
-        width: imageSize,
-        height: imageSize,
-        cacheWidth: cacheExtent,
-        cacheHeight: cacheExtent,
-        filterQuality: FilterQuality.medium,
-      );
     } else {
-      leading = Icon(
-        iconOverride ?? _defaultIcon(variant),
-        size: _leadingSize,
-        color: _iconColor(variant, colorScheme),
-      );
+      visual = leading ??
+          Icon(
+            iconOverride ?? _defaultIcon(variant),
+            size: _leadingSize,
+            color: _iconColor(variant, colorScheme),
+          );
     }
 
     // Title style depends on whether the message is "negative" (error/offline)
@@ -159,7 +135,7 @@ class StatusMessageView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            leading,
+            visual,
             if (title != null) ...[
               const SizedBox(height: 12),
               Text(

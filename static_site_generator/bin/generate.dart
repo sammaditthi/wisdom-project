@@ -66,16 +66,18 @@ void main(List<String> args) {
 
     outputDir = options.outputDir ?? '$_packageRoot/build';
     final packageAssetsPath = '$_packageRoot/assets';
+    final appRoot = Directory(_packageRoot).parent.path;
     report = SiteGenerator(
       reader: reader,
       tree: tree,
       tokens: _readThemeTokens('$packageAssetsPath/theme_tokens.json'),
-      strings: _readAppStrings('${Directory(_packageRoot).parent.path}/'
-          'lib/core/localization/l10n/app_si.arb'),
+      strings:
+          _readAppStrings('$appRoot/lib/core/localization/l10n/app_si.arb'),
       outputDir: outputDir,
       origin: options.origin,
       appOrigin: options.appOrigin,
       packageAssetsPath: packageAssetsPath,
+      appWebPath: '$appRoot/web',
     ).generate(rootKeys);
   } on StateError catch (error) {
     // Every StateError the generator raises is a deliberate, explained refusal

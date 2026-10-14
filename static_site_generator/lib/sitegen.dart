@@ -90,6 +90,10 @@ class SiteGenerator {
   /// `theme_tokens.json` and `emblem.png` here, the WOFF2 subsets there.
   final String packageAssetsPath;
 
+  /// The app's `web/`, where the site takes its favicon from: one file for both,
+  /// so the site and the app cannot show different icons.
+  final String appWebPath;
+
   SiteGenerator({
     required this.reader,
     required this.tree,
@@ -99,6 +103,7 @@ class SiteGenerator {
     required this.origin,
     required this.appOrigin,
     required this.packageAssetsPath,
+    required this.appWebPath,
   });
 
   BuildReport generate(List<String> rootKeys) {
@@ -147,6 +152,12 @@ class SiteGenerator {
       'rather than a card. No page renders differently. Fix: run '
       'static_site_generator/assets/make_emblem.sh and commit its output.',
     );
+    final favicon = _readPackageAsset(
+      faviconFileName,
+      "browser tabs will show the browser's default icon. No page renders "
+      'differently. Fix: run assets/icons/make_icons.sh and commit its output.',
+      directory: appWebPath,
+    );
 
     final assets = SiteAssets.forContent(
       css: css,
@@ -156,6 +167,7 @@ class SiteGenerator {
       searchIndex: searchIndex,
       emblem: emblem ?? const <int>[],
       ogCard: ogCard ?? const <int>[],
+      favicon: favicon ?? const <int>[],
     );
 
     // The values every template needs and none of them can work out: one
@@ -294,6 +306,7 @@ class SiteGenerator {
     if (script != null) _writeBytes('$outputDir/$siteScriptOutputPath', script);
     if (emblem != null) _writeBytes('$outputDir/$emblemOutputPath', emblem);
     if (ogCard != null) _writeBytes('$outputDir/$ogCardOutputPath', ogCard);
+    if (favicon != null) _writeBytes('$outputDir/$faviconOutputPath', favicon);
     for (final font in fonts) {
       _writeBytes(
           '$outputDir/$fontsOutputDir/${font.face.relativePath}', font.bytes);
@@ -355,8 +368,9 @@ class SiteGenerator {
       page.node.contentFileId ??
       (page.suttas.isEmpty ? null : page.suttas.first.contentFileId);
 
-  /// Reads one committed asset (the emblem, `site.js`) — null when it is not
-  /// there.
+  /// Reads one committed asset (the emblem, `site.js`, the app's favicon) —
+  /// null when it is not there. From [packageAssetsPath] unless [directory]
+  /// says otherwise.
   ///
   /// Same contract as the fonts: made by hand, committed, and the build only
   /// moves bytes (D9). **Read here rather than copied straight across** because
@@ -366,8 +380,12 @@ class SiteGenerator {
   ///
   /// A warning, not a throw, matching [_readFonts]: neither absence makes a
   /// page of scripture wrong, and [warning] says what the site loses.
-  List<int>? _readPackageAsset(String fileName, String warning) {
-    final source = File('$packageAssetsPath/$fileName');
+  List<int>? _readPackageAsset(
+    String fileName,
+    String warning, {
+    String? directory,
+  }) {
+    final source = File('${directory ?? packageAssetsPath}/$fileName');
     if (!source.existsSync()) {
       stderr.writeln('WARNING  ${source.path} missing — $warning');
       return null;

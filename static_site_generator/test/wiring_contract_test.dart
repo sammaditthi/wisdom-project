@@ -1056,6 +1056,7 @@ const SiteAssets _assets = SiteAssets(
   searchIndex: '/assets/search-index.json?v=test',
   emblem: '/assets/emblem.png?v=test',
   ogCard: '/assets/og-card.png?v=test',
+  favicon: '/assets/favicon.png?v=test',
 );
 
 SitePage get _suttaPage => SitePage(
