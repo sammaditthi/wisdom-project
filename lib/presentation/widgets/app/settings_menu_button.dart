@@ -431,21 +431,29 @@ class _MenuSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final toggle = Switch(
+      value: value,
+      // The new value is always !value, so we ignore the arg and toggle.
+      onChanged: (_) => onToggle(),
+    );
+    // The theme pads tap targets to 48px only on touch platforms.
+    final isTouch = theme.materialTapTargetSize == MaterialTapTargetSize.padded;
     return Row(
       children: [
         Expanded(
           child: Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: theme.textTheme.bodyMedium,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        Switch(
-          value: value,
-          // The new value is always !value, so we ignore the arg and toggle.
-          onChanged: (_) => onToggle(),
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        // The M3 Switch has a fixed size and ignores visualDensity, so with a
+        // mouse scale it down to match the menu's compact controls.
+        if (isTouch)
+          toggle
+        else
+          SizedBox(height: 28, child: FittedBox(child: toggle)),
       ],
     );
   }
