@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/constants.dart';
@@ -63,12 +64,27 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
     final text = _controller.text;
     if (text.trim().isEmpty) return;
     // The send button disables while a question is in flight, but Enter
-    // (TextField.onSubmitted) still fires — mirror the notifier's gate here
+    // (_onComposerKey) still fires — mirror the notifier's gate here
     // so a dropped send doesn't clear what the user typed.
     final state = ref.read(researchChatProvider);
     if (state.isLoading || state.isAtTurnLimit) return;
     ref.read(researchChatProvider.notifier).send(text);
     _controller.clear();
+  }
+
+  /// Enter sends; Shift+Enter falls through so the field inserts a newline.
+  /// Mid-composition, Enter belongs to the IME (it commits the word).
+  KeyEventResult _onComposerKey(FocusNode node, KeyEvent event) {
+    final isEnter = event.logicalKey == LogicalKeyboardKey.enter ||
+        event.logicalKey == LogicalKeyboardKey.numpadEnter;
+    if (event is KeyUpEvent ||
+        !isEnter ||
+        HardwareKeyboard.instance.isShiftPressed ||
+        !_controller.value.composing.isCollapsed) {
+      return KeyEventResult.ignored;
+    }
+    _send();
+    return KeyEventResult.handled;
   }
 
   /// Jump to the newest message after the frame lays it out.
@@ -263,32 +279,41 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
                   // same 16px at 1.0x, but this one scales with the slider.
                   final inputStyle = context.typography.searchInput;
 
-                  final textField = TextField(
+                  // The Focus only listens for Enter; the TextField keeps
+                  // focus. It carries _fieldKey so the pair moves together.
+                  final textField = Focus(
                     key: _fieldKey,
-                    controller: _controller,
-                    style: inputStyle,
-                    minLines: 1,
-                    // Grows 1 → 5 lines, then holds and scrolls internally so a
-                    // long paragraph stays reviewable without swallowing the
-                    // transcript. maxLength matches the server's
-                    // QUESTION_MAX_CHARS (contracts.ts) — a giant paste stops
-                    // here instead of bouncing off a 400.
-                    maxLines: 5,
-                    maxLength: 4000,
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => _send(),
-                    decoration: InputDecoration(
-                      hintText: l10n.researchInputHint,
-                      // The container owns the shape now — no inner outline.
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 10,
+                    canRequestFocus: false,
+                    skipTraversal: true,
+                    onKeyEvent: _onComposerKey,
+                    child: TextField(
+                      controller: _controller,
+                      style: inputStyle,
+                      minLines: 1,
+                      // Grows 1 → 5 lines, then holds and scrolls internally so a
+                      // long paragraph stays reviewable without swallowing the
+                      // transcript. maxLength matches the server's
+                      // QUESTION_MAX_CHARS (contracts.ts) — a giant paste stops
+                      // here instead of bouncing off a 400.
+                      maxLines: 5,
+                      maxLength: 4000,
+                      // Return types a newline (phone keyboards too); a
+                      // hardware Enter sends via _onComposerKey. `send` here
+                      // would make Shift+Enter send as well.
+                      textInputAction: TextInputAction.newline,
+                      decoration: InputDecoration(
+                        hintText: l10n.researchInputHint,
+                        // The container owns the shape now — no inner outline.
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 10,
+                        ),
+                        // Hide the live "n/4000" counter — typed questions never
+                        // get near the cap; it only exists to stop pastes.
+                        counterText: '',
                       ),
-                      // Hide the live "n/4000" counter — typed questions never
-                      // get near the cap; it only exists to stop pastes.
-                      counterText: '',
                     ),
                   );
 

@@ -175,6 +175,9 @@ interaction flows use the real notifier + `FakeResearchRepository`.
 | W-CHAT-10 | At turn limit while final answer in flight | Banner NOT shown yet (input row + disabled send + thinking row) | — | P1 |
 | W-CHAT-11 | Reopened chat ending in an unanswered user turn (no live error) | Neutral `researchQuestionNotAnswered` notice + Retry — including when at the turn limit (renders above the banner) | **#7** | P0 |
 | W-CHAT-12 | New answer appended | List scrolled to bottom (`position.maxScrollExtent`) | — | P2 |
+| W-CHAT-13 | Text typed, **Shift+Enter** | Nothing sent; text stays in the field. The newline itself comes from the platform, which widget tests don't simulate, so check it by hand | rev 10-14 | P0 |
+| W-CHAT-14 | Text typed, Enter (and numpad Enter) | Question sent, field cleared | rev 10-14 | P0 |
+| W-CHAT-15 | Enter while an IME is composing (seed a `composing` range via `testTextInput.updateEditingValue`) | Not sent: the key is left for the IME to commit the word | rev 10-14 | P1 |
 
 ### 5.2 `ChatHistoryPanel` — `test/presentation/widgets/research/chat_history_panel_test.dart`
 
