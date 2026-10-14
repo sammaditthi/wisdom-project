@@ -849,7 +849,7 @@ the Flutter app. `text_utils.dart` builds both of its copies from it, and the
 wiring test checks `ZERO_WIDTH` against it instead of its own list. The two
 copies inside `text_utils.dart` can be merged on their own, ahead of that.
 
-## C12. Breadcrumb: scroll sideways, like the app
+## C12. Breadcrumb: scroll sideways, like the app — and web text at 100%
 
 **Opened 2026-10-08.** The app's breadcrumb now scrolls sideways when it
 doesn't fit: one line, no scrollbar, opened at its end so the page's own name
@@ -875,7 +875,7 @@ the `title` that named a cut segment; `_trailKeepThree`, `_trailKeepOne`,
 `_trailKeepNone` and their media queries; the `:focus-visible` rule that brings
 back a collapsed segment (a browser scrolls a focused link into view).
 `_layoutsFoldWidth` and `_appPillMinWidth` were set from the trail's old
-widths: re-check them. Rewrite the comments that argue for the ellipsis:
+widths: re-check them, at 100% (below). Rewrite the comments that argue for the ellipsis:
 `.breadcrumb` in `stylesheet.dart` ("Ellipsis and not a scroll box") and
 `breadcrumb()` in `site_chrome.dart` ("Every segment is its own box", "same
 ellipsis"). The up button stays.
@@ -884,6 +884,43 @@ ellipsis"). The up button stays.
 sees no sign that it scrolls; Shift+wheel and a trackpad work. The cut-off text
 at the left edge is the hint, as on SuttaCentral. The app lets a mouse drag; the
 site would need pointer code in `site.js` for that, and it is not proposed.
+
+### Web text at 100%, in the same change
+
+**Added 2026-10-14.** `AppFonts.webDefaultScale` (0.9) makes Flutter web and
+this site 10% smaller than the native app: a paragraph is 15.84px against
+17.6px. Make it 1.0 so all three match. Checked in Chrome against the running
+app: 100% reads better, and at 90% the badges are under 10px. It rides with C12
+because both move the toolbar's breakpoints, so they are measured once.
+
+**What goes:**
+
+- App: `AppFonts.webDefaultScale`, and the `kIsWeb` branch in
+  `FontScaleNotifier` (`theme_notifier.dart`). The default is 1.0 everywhere.
+- Tokens: `webDefaultScale` in `tools/dump_theme_tokens.dart`, in `ThemeTokens`,
+  and in `assets/theme_tokens.json` (re-run the dump, don't hand-edit it).
+- Site: the `html { font-size }` rule, since 100% is the browser's default. The
+  ⚠️ notes saying a `rem` in a media query is a different width: at 100% it is
+  16px everywhere. The search field's `1.12rem` iOS-zoom workaround becomes
+  `1rem`.
+- Comments that state the 90% sizes (14.4px, 15.84px, 12.24px) in
+  `stylesheet.dart`, the dump script's `_paneWeights` note, and the
+  `proseColumnMaxWidth` test in `app_typography_test.dart`.
+
+**The breakpoints move**, because the toolbar's text grows from 12.24px to
+13.6px. Measured 2026-10-14 in headless Chrome: every built page's real trail in
+the real toolbar, the 45px readability floor scaled to 50px, and the shift added
+to today's values, as was done for the ⋮:
+
+| | Today | At 100% |
+|---|---|---|
+| `_layoutsFoldWidth` | 36rem | 38rem |
+| `_appPillMinWidth` | 65rem | 69rem |
+| `_trailKeepThree` / `One` / `None` | 54 / 42 / 28rem | 58 / 45 / 30rem |
+
+These are for the trail that shrinks. C12 deletes the last row. Once the trail
+scrolls, the other two answer a different question (how much room the page's
+name needs), so measure them again at 100% after the scroll is in.
 
 ---
 
@@ -1026,8 +1063,8 @@ hygiene — do them when touching the code they cover, not as a campaign. C8 in 
 should ride along with the next change to `SitePage`, since its whole diff is one
 clause on `hasPreamble`.
 
-**C12 the breadcrumb scroll** is parity with the app, not a fix: one change,
-whenever it is wanted.
+**C12 the breadcrumb scroll and web text at 100%** is parity with the app, not
+a fix: one change, whenever it is wanted.
 
 The build stays ~417 MB after all of it (425 less B2's ~8 MB; B1 is ~40 KB and
 does not show), because **the corpus is the corpus** — **365 MB of the 394 MB
