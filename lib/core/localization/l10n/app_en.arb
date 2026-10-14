@@ -141,6 +141,16 @@
     "description": "Switch 1 — toggles the touching join (ZWJ before hal) for remaining clusters plus long-to-short vowel shortening. Default on."
   },
 
+  "layout": "Layout",
+  "@layout": {
+    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
+  },
+
+  "hideNavigationBar": "Hide navigation bar",
+  "@hideNavigationBar": {
+    "description": "Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Not saved."
+  },
+
   "fontSize": "Font Size",
   "@fontSize": {
     "description": "Label for font size setting"

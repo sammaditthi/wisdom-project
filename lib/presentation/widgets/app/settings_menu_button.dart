@@ -5,9 +5,11 @@ import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/theme_notifier.dart';
+import '../../../core/utils/responsive_utils.dart';
 import '../../../domain/entities/content/content_language.dart';
 import '../../providers/app_language_provider.dart';
 import '../../providers/content_language_provider.dart';
+import '../../providers/navigation_rail_provider.dart';
 import '../../providers/pali_letter_options_provider.dart';
 
 /// Settings menu button for AppBar
@@ -53,6 +55,22 @@ class SettingsMenuButton extends ConsumerWidget {
         ),
 
         const PopupMenuDivider(),
+
+        // Layout — only where the navigation rail exists (phones have none).
+        if (ResponsiveUtils.isTabletOrDesktop(context)) ...[
+          PopupMenuItem<String>(
+            enabled: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _MenuSectionLabel((l10n) => l10n.layout),
+                const SizedBox(height: 4),
+                _LayoutSection(),
+              ],
+            ),
+          ),
+          const PopupMenuDivider(),
+        ],
 
         // App Language selector — UI localization (English / Sinhala).
         PopupMenuItem<String>(
@@ -350,6 +368,21 @@ class _ContentLanguageSelector extends ConsumerWidget {
   }
 }
 
+/// Screen-layout switches. Focus mode joins here later (docs/todo/focus-mode.md).
+class _LayoutSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final railHidden = ref.watch(navigationRailHiddenProvider);
+    return _MenuSwitch(
+      label: l10n.hideNavigationBar,
+      value: railHidden,
+      onToggle: () =>
+          ref.read(navigationRailHiddenProvider.notifier).state = !railHidden,
+    );
+  }
+}
+
 /// The three Pali-letter (conjunct) display switches.
 ///
 /// Like the other selectors here, this is a [ConsumerWidget] so the switches
@@ -364,17 +397,17 @@ class _PaliLettersSection extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _PaliLetterSwitch(
+        _MenuSwitch(
           label: l10n.paliStandardLigatures,
           value: ref.watch(standardLigaturesProvider),
           onToggle: () => ref.read(standardLigaturesProvider.notifier).toggle(),
         ),
-        _PaliLetterSwitch(
+        _MenuSwitch(
           label: l10n.paliSpecialLetters,
           value: ref.watch(specialConjunctsProvider),
           onToggle: () => ref.read(specialConjunctsProvider.notifier).toggle(),
         ),
-        _PaliLetterSwitch(
+        _MenuSwitch(
           label: l10n.paliTouching,
           value: ref.watch(touchingProvider),
           onToggle: () => ref.read(touchingProvider.notifier).toggle(),
@@ -384,9 +417,9 @@ class _PaliLettersSection extends ConsumerWidget {
   }
 }
 
-/// A single compact label + [Switch] row used inside [_PaliLettersSection].
-class _PaliLetterSwitch extends StatelessWidget {
-  const _PaliLetterSwitch({
+/// A single compact label + [Switch] row, shared by the menu's switch sections.
+class _MenuSwitch extends StatelessWidget {
+  const _MenuSwitch({
     required this.label,
     required this.value,
     required this.onToggle,

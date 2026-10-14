@@ -94,6 +94,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliTouching => 'Touching letters';
 
   @override
+  String get layout => 'Layout';
+
+  @override
+  String get hideNavigationBar => 'Hide navigation bar';
+
+  @override
   String get fontSize => 'Font Size';
 
   @override

@@ -94,6 +94,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get paliTouching => 'පාළි බැඳි අකුරු';
 
   @override
+  String get layout => 'පිරිසැලසුම';
+
+  @override
+  String get hideNavigationBar => 'ප්‍රධාන සංචාලකය සඟවන්න';
+
+  @override
   String get fontSize => 'අක්ෂර ප්‍රමාණය';
 
   @override

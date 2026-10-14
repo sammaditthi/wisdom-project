@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../providers/app_section_provider.dart';
+import '../providers/navigation_rail_provider.dart';
 import 'home_screen.dart';
 import 'notes_screen.dart';
 import 'reader_screen.dart';
@@ -30,6 +31,10 @@ class AppShell extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final section = ref.watch(selectedAppSectionProvider);
     final isTabletOrDesktop = ResponsiveUtils.isTabletOrDesktop(context);
+    // Hidden only while the Reader shows: its settings menu holds the switch,
+    // and other sections have no menu to bring the rail back.
+    final railHidden = ref.watch(navigationRailHiddenProvider) &&
+        section == AppSection.reader;
 
     // One spec per shown section, in _navSections order. The exhaustive
     // switch means adding a section won't compile until it gets an icon and
@@ -73,18 +78,32 @@ class AppShell extends ConsumerWidget {
     return Scaffold(
       body: Row(
         children: [
-          if (isTabletOrDesktop)
+          if (isTabletOrDesktop && !railHidden)
             NavigationRail(
               selectedIndex: navIndex,
               onDestinationSelected: selectSection,
-              // Material 3 default: icons only. The labels below are still
-              // read by screen readers.
+              // VS Code-thin: 48 is still the Material minimum tap target.
+              // The 56-wide pill would be squashed, so the filled icon alone
+              // marks the selection.
+              minWidth: 48,
+              useIndicator: false,
+              // Icons only. The labels below are still read by screen
+              // readers; the tooltips show them on hover and stay out of
+              // semantics so the label isn't announced twice.
               labelType: NavigationRailLabelType.none,
               destinations: [
                 for (final s in sections)
                   NavigationRailDestination(
-                    icon: Icon(s.icon),
-                    selectedIcon: Icon(s.selectedIcon),
+                    icon: Tooltip(
+                      message: s.label,
+                      excludeFromSemantics: true,
+                      child: Icon(s.icon),
+                    ),
+                    selectedIcon: Tooltip(
+                      message: s.label,
+                      excludeFromSemantics: true,
+                      child: Icon(s.selectedIcon),
+                    ),
                     label: Text(s.label),
                   ),
               ],

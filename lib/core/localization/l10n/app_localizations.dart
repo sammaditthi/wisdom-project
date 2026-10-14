@@ -266,6 +266,18 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
+  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get layout;
+
+  /// Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Not saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide navigation bar'**
+  String get hideNavigationBar;
+
   /// Label for font size setting
   ///
   /// In en, this message translates to:
