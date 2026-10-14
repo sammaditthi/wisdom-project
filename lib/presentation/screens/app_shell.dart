@@ -9,9 +9,14 @@ import 'notes_screen.dart';
 import 'reader_screen.dart';
 import 'research_screen.dart';
 
-/// The app's top-level shell: a [NavigationRail] on tablet/desktop and a
-/// bottom [NavigationBar] on mobile, switching between the Home / Reader /
-/// Research / Notes sections.
+/// The sections the rail and the bottom bar offer, in display order. Home and
+/// Notes are hidden for the beta; they stay in [AppSection] so nothing else
+/// has to change to bring them back.
+const _navSections = [AppSection.reader, AppSection.research];
+
+/// The app's top-level shell: an icon-only [NavigationRail] on tablet/desktop
+/// and a labelled bottom [NavigationBar] on mobile, switching between the
+/// [_navSections].
 ///
 /// The sections live in an [IndexedStack] so the ReaderScreen keeps its
 /// state (open document tabs, tree expansion, scroll positions) while
@@ -26,13 +31,12 @@ class AppShell extends ConsumerWidget {
     final section = ref.watch(selectedAppSectionProvider);
     final isTabletOrDesktop = ResponsiveUtils.isTabletOrDesktop(context);
 
-    // One spec per AppSection. The exhaustive switch keeps the list in
-    // AppSection.values order by construction — adding a section won't
-    // compile until it gets an icon and a label here. Records because the
-    // rail and the bottom bar (different destination widget types) share
-    // a single definition.
+    // One spec per shown section, in _navSections order. The exhaustive
+    // switch means adding a section won't compile until it gets an icon and
+    // a label here. Records because the rail and the bottom bar (different
+    // destination widget types) share a single definition.
     final sections = [
-      for (final s in AppSection.values)
+      for (final s in _navSections)
         switch (s) {
           AppSection.home => (
               icon: Icons.home_outlined,
@@ -57,9 +61,13 @@ class AppShell extends ConsumerWidget {
         },
     ];
 
+    // A position in the nav, not the enum index: with sections hidden the
+    // two no longer line up.
+    final navIndex = _navSections.indexOf(section);
+
     void selectSection(int index) {
       ref.read(selectedAppSectionProvider.notifier).state =
-          AppSection.values[index];
+          _navSections[index];
     }
 
     return Scaffold(
@@ -67,9 +75,11 @@ class AppShell extends ConsumerWidget {
         children: [
           if (isTabletOrDesktop)
             NavigationRail(
-              selectedIndex: section.index,
+              selectedIndex: navIndex,
               onDestinationSelected: selectSection,
-              labelType: NavigationRailLabelType.all,
+              // Material 3 default: icons only. The labels below are still
+              // read by screen readers.
+              labelType: NavigationRailLabelType.none,
               destinations: [
                 for (final s in sections)
                   NavigationRailDestination(
@@ -102,7 +112,7 @@ class AppShell extends ConsumerWidget {
       bottomNavigationBar: isTabletOrDesktop
           ? null
           : NavigationBar(
-              selectedIndex: section.index,
+              selectedIndex: navIndex,
               onDestinationSelected: selectSection,
               destinations: [
                 for (final s in sections)
