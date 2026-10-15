@@ -22,6 +22,10 @@ class StorageKeys {
   /// visible. Persisted so a reload preserves the user's collapse state.
   static const navigatorVisible = 'navigator_visible_v1';
 
+  /// Bool (stored as int 0/1) — whether the "Hide navigation bar" switch is
+  /// on (tablet/desktop rail). Absent → false (rail shown).
+  static const navigationRailHidden = 'navigation_rail_hidden_v1';
+
   /// String ([ReaderLayout.name]) — the layout mode the user last selected.
   /// Seeds the layout of newly opened tabs. Absent means "never picked one",
   /// in which case new tabs fall back to the orientation default.

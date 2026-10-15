@@ -18,6 +18,8 @@ import 'presentation/providers/tab_provider.dart'
     show activeTabIndexPersistenceProvider;
 import 'presentation/providers/navigator_visibility_provider.dart'
     show navigatorVisiblePersistenceProvider;
+import 'presentation/providers/navigation_rail_provider.dart'
+    show navigationRailHiddenPersistenceProvider;
 import 'presentation/widgets/app/deep_link_listener.dart';
 import 'presentation/widgets/app/overlay_stack_sync.dart';
 import 'presentation/widgets/app/update_available_banner.dart';
@@ -169,8 +171,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       // activeTabIndexProvider get written to disk for the rest of the
       // session. Tabs themselves persist via TabsNotifier directly.
       ref.read(activeTabIndexPersistenceProvider);
-      // Same pattern for the navigator collapse state.
+      // Same pattern for the navigator collapse state and the rail switch.
       ref.read(navigatorVisiblePersistenceProvider);
+      ref.read(navigationRailHiddenPersistenceProvider);
     });
   }
 

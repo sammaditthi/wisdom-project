@@ -148,7 +148,7 @@
 
   "hideNavigationBar": "Hide navigation bar",
   "@hideNavigationBar": {
-    "description": "Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Not saved."
+    "description": "Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Saved across restarts."
   },
 
   "fontSize": "Font Size",

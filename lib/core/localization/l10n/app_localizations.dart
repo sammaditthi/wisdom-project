@@ -272,7 +272,7 @@ abstract class AppLocalizations {
   /// **'Layout'**
   String get layout;
 
-  /// Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Not saved.
+  /// Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Saved across restarts.
   ///
   /// In en, this message translates to:
   /// **'Hide navigation bar'**

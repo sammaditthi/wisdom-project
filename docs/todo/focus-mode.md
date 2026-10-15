@@ -11,7 +11,7 @@ Started 2026-10-14. Design stage, not started.
 
 ## Decided
 
-- Neither is saved. A restart always shows the full layout.
+- "Hide navigation bar" is saved (since 2026-10-15), like the tree navigator's collapse state. Focus mode is not: a restart always leaves it.
 - Shortcut for focus mode: **Ctrl/Cmd+Alt+Z**. The shortcut system has no two-step keys, so VS Code's Cmd+K Z is out. Same shape as close-tab (Ctrl/Cmd+Alt+W).
 
 ## How to build focus mode
