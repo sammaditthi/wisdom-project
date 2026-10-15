@@ -6,7 +6,7 @@
 # read-only mirror of pathnirvana/tipitaka.lk and copies them into those assets,
 # leaving a provenance receipt so "are we stale?" becomes a one-line SHA compare.
 #
-# Full background + rationale: docs/todo/bjt-sync-regen.md
+# Full background + rationale: docs/todo/canon-sources/bjt-sync-regen.md
 #
 # What it does (the pipeline; later steps only run if earlier ones changed things):
 #   Step 0  Heartbeat  — ask GitHub for upstream's latest SHA, compare to receipt.
@@ -125,7 +125,7 @@ receipt_sha() {
 # --- Sanity checks ----------------------------------------------------------
 if [ ! -d "$MIRROR/.git" ]; then
   echo "error: read-only mirror not found at: $MIRROR"
-  echo "       Clone it (blobless) or set \$TIPITAKA_MIRROR. See docs/todo/bjt-sync-regen.md."
+  echo "       Clone it (blobless) or set \$TIPITAKA_MIRROR. See docs/todo/canon-sources/bjt-sync-regen.md."
   exit 1
 fi
 if [ ! -d "$MIRROR_TEXT" ] || [ ! -f "$MIRROR_TREE" ]; then

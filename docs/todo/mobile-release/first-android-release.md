@@ -13,7 +13,7 @@ numbers match.
 - **Build tools.** Gradle, the Android Gradle Plugin, Kotlin and Java are
   older than Flutter accepts, so the first build fails until they are raised:
   "Already broken: Android" in
-  [`flutter-3-47-upgrade-plan.md`](../flutter-3-47-upgrade-plan.md).
+  [`flutter-3-47-upgrade-plan.md`](../upgrades/flutter-3-47-upgrade-plan.md).
 - **Signing.** Release builds still use the debug key
   (`android/app/build.gradle`).
 - **App name.** `android:label` in `android/app/src/main/AndroidManifest.xml`

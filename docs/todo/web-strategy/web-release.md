@@ -132,7 +132,7 @@ no lock, and the second wipes `build/` mid-upload.
 with the release. `.github/workflows/` is empty; every test is run by hand today.
 
 **A workflow calls the project's scripts and holds no logic of its own** — plan
-in [`test-all-and-release-all.md`](../../done/test-all-and-release-all.md). Each
+in [`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md). Each
 product's `scripts/<product>/test.sh` is its release gate and its `deploy.sh`
 runs that first, so what was decided here now lives inside those scripts —
 don't re-derive it:
@@ -171,7 +171,7 @@ does, the one-time setup and rollback are in
 `--prod` is a placeholder.
 
 **Three targets**, all in `scripts/app/web/`
-([`test-all-and-release-all.md`](../../done/test-all-and-release-all.md)):
+([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md)):
 
 | target | command | today |
 |---|---|---|

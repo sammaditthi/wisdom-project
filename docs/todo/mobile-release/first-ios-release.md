@@ -18,7 +18,7 @@ Section 2 was its step 10.
   fetch `package:sqlite3`'s native binaries.
 - **Signing.** iOS needs a signed export.
 - **Store upload** isn't scripted: the mobile `deploy.sh` scripts are
-  placeholders in [`test-all-and-release-all.md`](../../done/test-all-and-release-all.md).
+  placeholders in [`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md).
 - **App names** are still `flutter create` leftovers. Use the name the app
   shows (`appTitle`), and a short one under the home-screen icon, where only
   about 12 characters fit. The web app uses "The Wisdom Project" and "Wisdom".

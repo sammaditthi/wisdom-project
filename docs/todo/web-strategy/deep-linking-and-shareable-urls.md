@@ -138,7 +138,7 @@ Two sibling surfaces share **one URL grammar** but split the work:
   machinery (no `hreflang`/`canonical` edition pages) from the static side.
 - **Multi-edition lives only in the app.** Editions are already app-side data
   (`Edition` entity + registry + per-edition datasource — see
-  [`multi_edition_architecture.md`](../multi_edition_architecture.md)).
+  [`multi_edition_architecture.md`](../../decisions/multi_edition_architecture.md)).
 - **`?edition=<editionId>`** (e.g. `sc`, `apz`) is therefore a query modifier only
   meaningful on the app origin; the static site never emits or reads it. Token = the
   `editionId` the app already stores → URL ⇄ registry, no mapping table (same trick
@@ -599,4 +599,4 @@ Root `flutter test` still does not recurse into `packages/`, so this was once
 `wisdom_shared` too, and `scripts/static_site/test.sh` runs `wisdom_shared` and
 `static_site_generator`, called by its `deploy.sh` and by `sync-regen.sh` (Step 6,
 straight after a corpus re-sync and the `bjt.db` rebuild). `scripts/test_all.sh` runs them all
-([`test-all-and-release-all.md`](../../done/test-all-and-release-all.md)).
+([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md)).

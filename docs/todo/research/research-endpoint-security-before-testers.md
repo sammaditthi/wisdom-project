@@ -64,7 +64,7 @@ reads our bundle it's only a speed bump. That gap is what App Check closes.
 The real "only my app" floor — the device proves to Firebase it runs our
 genuine app and gets a short-lived signed token; the server verifies the
 signature. Not extractable, no user login. Full ladder + details:
-`docs/todo/serverless-deployment-decision.md` §6. Three notes that matter:
+`docs/todo/retiring-dart-server/serverless-deployment-decision.md` §6. Three notes that matter:
 
 - **§6's recipe is Python-era** ("firebase-admin as a FastAPI dependency").
   The server is now TS on Cloudflare Workers, where `firebase-admin` doesn't

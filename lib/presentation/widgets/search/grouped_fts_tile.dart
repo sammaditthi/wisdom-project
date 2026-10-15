@@ -54,7 +54,7 @@ class GroupedFTSTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     // Only this group's flag. The panel still rebuilds every tile: see item 5
-    // in docs/todo/perf-top10-killers.md.
+    // in docs/todo/performance/perf-top10-killers.md.
     final isExpanded = ref.watch(searchStateProvider
         .select((s) => s.expandedFTSGroups.contains(group.nodeKey)));
 

@@ -100,7 +100,7 @@ The upgrade didn't cause this. Flutter 3.44.1 already refuses this setup:
 | Java (`android/app/build.gradle:14`) | 1.8 | 17 | 17 | 17 |
 
 Fix it with the first Android build
-([first-android-release.md](mobile-release/first-android-release.md), section 1).
+([first-android-release.md](../mobile-release/first-android-release.md), section 1).
 AGP 9 has Kotlin built in, so the `kotlin-android` plugin goes. Keep the
 manifest's label and deep-link filters.
 
@@ -114,7 +114,7 @@ manifest's label and deep-link filters.
 - Newer Dart syntax once `sdk:` is raised (step 4).
 - Not fixed: the Windows Sinhala IME bug. Its fix (#189968) is only on Flutter
   master so far; see
-  [windows-sinhala-ime-bug.md](../General/windows-sinhala-ime-bug.md) for when
+  [windows-sinhala-ime-bug.md](../../General/windows-sinhala-ime-bug.md) for when
   it reaches stable.
 
 ## Performance

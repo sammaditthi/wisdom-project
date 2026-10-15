@@ -2,7 +2,7 @@
 
 **Status:** open, 2026-10-11
 Left over from the faster-waits work
-([`../done/integration_test_performance_and_duplication.md`](../done/integration_test_performance_and_duplication.md)).
+([`../../done/testing/integration_test_performance_and_duplication.md`](../../done/testing/integration_test_performance_and_duplication.md)).
 Each is small and independent.
 
 ## 1. Rename `test_overrides.dart`

@@ -6,7 +6,7 @@ part 'citation.g.dart';
 /// A single source the AI answer is grounded on.
 ///
 /// Mapped from the backend's `grounding_metadata` — see the `/research` contract in
-/// `docs/todo/wisdom-project-rag-qa-design.md` §5.5 and §7.
+/// `docs/todo/research/wisdom-project-rag-qa-design.md` §5.5 and §7.
 @freezed
 class Citation with _$Citation {
   const factory Citation({

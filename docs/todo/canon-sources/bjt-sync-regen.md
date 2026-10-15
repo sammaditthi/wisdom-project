@@ -154,7 +154,7 @@ would be deleted", which trips the same gate):
   if you type the full word `yes`. `--dry-run` surfaces the same warning without acting.
 
 (TTS material, when that work starts, lives in the mirror's `dev/tts/` and
-`dev/audio/` — see [tipitaka-tts-implementation-plan.md](./tipitaka-tts-implementation-plan.md).)
+`dev/audio/` — see [tipitaka-tts-implementation-plan.md](../audio/tipitaka-tts-implementation-plan.md).)
 
 ### Step 5 — Rebuild `bjt.db` (always)
 
