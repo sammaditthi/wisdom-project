@@ -127,7 +127,7 @@ class ReaderActionMenuFab extends ConsumerWidget {
           if (i > 0 && action.group != actions[i - 1].group)
             const Divider(height: AppMenuTheme.dividerHeight),
           switch (action) {
-            ReaderLayoutChoice choice => _LayoutSubmenu(choice: choice),
+            ReaderLayoutChoice choice => _LayoutRow(choice: choice),
             ReaderCommand command => _MenuRow.command(command),
             ReaderActionMenu menu => SubmenuButton(
                 hoverOpenDelay: _submenuHoverDelay,
@@ -246,47 +246,53 @@ class _ActionMenuButton extends StatelessWidget {
   }
 }
 
-/// The scrolled menu's Layout ›, naming the current layout.
-class _LayoutSubmenu extends StatelessWidget {
+/// The scrolled menu's layouts: all four side by side in a small pill, so a
+/// pick is one tap. A pick closes the menu, as in the toolbar's Layout ▾.
+class _LayoutRow extends StatelessWidget {
   final ReaderLayoutChoice choice;
 
-  const _LayoutSubmenu({required this.choice});
+  const _LayoutRow({required this.choice});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final typography = context.typography;
-    return SubmenuButton(
-      hoverOpenDelay: _submenuHoverDelay,
-      leadingIcon: _MenuIcon(
-        child: _LayoutGlyph(layout: choice.current, color: colorScheme.primary),
-      ),
-      // Stays open after a pick, so layouts can be tried one after another.
-      menuChildren: [
-        for (final layout in ReaderLayout.values)
-          _LayoutMenuItem(
-            layout: layout,
-            choice: choice,
-            closeOnActivate: false,
-          ),
-      ],
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context).layout,
-              style: typography.listRowTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Center(
+        child: Semantics(
+          container: true,
+          label: AppLocalizations.of(context).layout,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (final layout in ReaderLayout.values)
+                    // Read out as one choice of four, like a radio group.
+                    Semantics(
+                      checked: layout == choice.current,
+                      inMutuallyExclusiveGroup: true,
+                      child: _ToolbarButton(
+                        tooltip: _layoutLabel(context, layout),
+                        highlighted: layout == choice.current,
+                        onTap: () {
+                          choice.onChanged(layout);
+                          MenuController.maybeOf(context)?.close();
+                        },
+                        content: (color) =>
+                            _LayoutGlyph(layout: layout, color: color),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            _layoutLabel(context, choice.current),
-            style: typography.menuSectionLabel,
-            maxLines: 1,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -296,13 +302,8 @@ class _LayoutSubmenu extends StatelessWidget {
 class _LayoutMenuItem extends StatelessWidget {
   final ReaderLayout layout;
   final ReaderLayoutChoice choice;
-  final bool closeOnActivate;
 
-  const _LayoutMenuItem({
-    required this.layout,
-    required this.choice,
-    this.closeOnActivate = true,
-  });
+  const _LayoutMenuItem({required this.layout, required this.choice});
 
   @override
   Widget build(BuildContext context) {
@@ -312,7 +313,6 @@ class _LayoutMenuItem extends StatelessWidget {
 
     return MenuItemButton(
       onPressed: () => choice.onChanged(layout),
-      closeOnActivate: closeOnActivate,
       style: MenuItemButton.styleFrom(
         backgroundColor:
             isSelected ? AppMenuTheme.selectedRowColor(colorScheme) : null,
@@ -478,10 +478,16 @@ class _ToolbarButton extends StatelessWidget {
               constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
               child: Padding(
                 padding: padding,
-                child: content(
-                  highlighted
-                      ? colorScheme.onSecondaryContainer
-                      : colorScheme.primary,
+                // Centred in the 44x44 minimum: icons centre themselves,
+                // a letter (P, S) would otherwise sit at the top-left.
+                child: Center(
+                  widthFactor: 1,
+                  heightFactor: 1,
+                  child: content(
+                    highlighted
+                        ? colorScheme.onSecondaryContainer
+                        : colorScheme.primary,
+                  ),
                 ),
               ),
             ),

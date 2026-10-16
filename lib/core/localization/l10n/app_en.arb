@@ -153,7 +153,7 @@
 
   "layout": "Layout",
   "@layout": {
-    "description": "The reader's layout picker (how Pali and Sinhala are arranged): its row in the scrolled actions menu"
+    "description": "The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu"
   },
 
   "appLayout": "App layout",

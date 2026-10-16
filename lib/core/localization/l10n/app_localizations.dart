@@ -272,7 +272,7 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// The reader's layout picker (how Pali and Sinhala are arranged): its row in the scrolled actions menu
+  /// The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu
   ///
   /// In en, this message translates to:
   /// **'Layout'**
