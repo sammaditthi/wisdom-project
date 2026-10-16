@@ -5,6 +5,7 @@ import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/reader_scroll_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/reader_unit_provider.dart';
 
 import 'test_overrides.dart';
@@ -52,31 +53,23 @@ void main() {
         final container = await pumpReaderApp(tester);
 
         // An FTS hit inside බ්රහ්මජාලසුත්තං. The tab is still the whole
-        // sutta — page 5 entry 3 is only where to stop scrolling, and the
-        // reader spends it on the first frame that can reach the row. So
-        // "mid-sutta" is now a scroll position and nothing else, which is
-        // exactly what the two modes below key off.
+        // sutta, anchored at page 5 entry 3: it opens on that row with the
+        // pages above it still to scroll up into, which is what the two
+        // modes below key off.
         final tab = ReaderTab.fromNode(
           nodeKey: 'dn-1-1',
           paliName: 'බ්රහ්මජාලසුත්තං',
           sinhalaName: 'බ්‍රහ්මජාල සූත්‍රය',
-          landingPageIndex: 5,
-          landingEntryIndex: 3,
+          anchorPageIndex: 5,
+          anchorEntryIndex: 3,
         );
 
         await openTab(tester, container, tab);
 
-        final scrollable = find.byWidgetPredicate(
-          (w) => w is ListView && w.scrollDirection == Axis.vertical,
-        );
-        expect(scrollable, findsOneWidget,
-            reason: 'The reader must be showing the sutta — without the '
-                'ListView the line below throws an opaque StateError instead '
-                'of saying what went missing');
-        final controller = tester.widget<ListView>(scrollable).controller!;
-        expect(controller.offset, greaterThan(0),
-            reason: 'The landing row is pages into the sutta, so opening '
-                'the tab must have scrolled down to it');
+        final controller = readerScrollController(tester);
+        expect(controller.position.extentBefore, greaterThan(0),
+            reason: 'The anchor row is pages into the sutta, so the tab '
+                'must open with those pages above the viewport');
 
         // Scrolled down shows the expandable FAB (Mode 2) instead of the
         // pill (Mode 1). The scroll-to-top icon is inside the collapsed FAB.
@@ -98,10 +91,14 @@ void main() {
         await tester.tap(find.byIcon(Icons.vertical_align_top));
         await pumpForSettle(tester);
 
-        // ASSERT: back at the unit's own first row — a plain scroll now,
-        // since the unit was never paginated to begin with.
+        // ASSERT: back at the unit's own first row. Scroll-to-top drops the
+        // anchor rather than scrolling up to the top.
+        expect(container.read(activeAnchorProvider), isNull,
+            reason: 'Scroll-to-top should drop the anchor');
         expect(controller.offset, 0.0,
             reason: 'Scroll-to-top should return to the top of the unit');
+        expect(controller.position.extentBefore, 0.0,
+            reason: 'Nothing of the unit may be left above the viewport');
         expect(container.read(activeNodeKeyProvider), 'dn-1-1',
             reason: 'nodeKey should remain the same');
         // `.hitTestable()` matters: Mode 1 is always in the tree, kept out of
@@ -234,9 +231,7 @@ void main() {
         // Guard: the assertions below are both "findsNothing", so they
         // would also pass on a reader showing no text at all.
         expect(
-          find.byWidgetPredicate(
-            (w) => w is ListView && w.scrollDirection == Axis.vertical,
-          ),
+          readerScrollView,
           findsOneWidget,
           reason: 'vp must actually render text for a hidden button to mean '
               'anything',
@@ -350,16 +345,7 @@ void main() {
         expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
             reason: 'Initially at sutta beginning → skip-previous icon');
 
-        // Get the CONTENT ListView's scroll controller (not the TabBarWidget's
-        // horizontal ListView). The content ListView is vertical (default axis).
-        final contentListViewFinder = find.byWidgetPredicate(
-          (widget) =>
-              widget is ListView && widget.scrollDirection == Axis.vertical,
-        );
-        expect(contentListViewFinder, findsOneWidget,
-            reason: 'Should find the vertical content ListView');
-        final listView = tester.widget<ListView>(contentListViewFinder);
-        final controller = listView.controller!;
+        final controller = readerScrollController(tester);
 
         // Verify content is scrollable past one viewport
         final maxExtent = controller.position.maxScrollExtent;
@@ -540,9 +526,7 @@ void main() {
         // Guard: the assertion below is "findsNothing", so it would also
         // pass on a reader showing no text at all.
         expect(
-          find.byWidgetPredicate(
-            (w) => w is ListView && w.scrollDirection == Axis.vertical,
-          ),
+          readerScrollView,
           findsOneWidget,
           reason: 'anya-vm-23-6 must actually render text for a hidden button '
               'to mean anything',
@@ -608,6 +592,60 @@ void main() {
         expect(container.read(activeNodeKeyProvider), 'dn-1-3',
             reason: 'Next from a multi-file container resumes at the leaf '
                 'after the last one it rendered');
+      },
+    );
+
+    // =================================================================
+    // Test 6: From the top of an anchored tab, next opens in Mode 1
+    // =================================================================
+    testWidgets(
+      '6. Anchored tab scrolled to its top: next opens the sutta in Mode 1',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        // සාමඤ්ඤඵලසුත්තං first, so its text is already loaded when the step
+        // reaches it. Then the reader keeps its scroll view across the step,
+        // and nothing reloads to re-read the scroll state for it.
+        await openTab(tester, container, tabFromNode(container, 'dn-1-2'));
+
+        // බ්රහ්මජාලසුත්තං anchored mid-sutta, as a search hit opens it.
+        await openTab(
+          tester,
+          container,
+          tabFromNode(container, 'dn-1-1')
+              .copyWith(anchorPageIndex: 5, anchorEntryIndex: 3),
+        );
+
+        // Scroll up to the unit's top. Above the anchor the top is an
+        // estimate until those pages are built, so one jump can stop short:
+        // jump until nothing is left above.
+        final controller = readerScrollController(tester);
+        for (var i = 0; i < 20 && controller.position.extentBefore > 0; i++) {
+          controller.jumpTo(controller.position.minScrollExtent);
+          await tester.pump();
+        }
+        await pumpForSettle(tester);
+        expect(controller.position.extentBefore, 0,
+            reason: 'The step must start from the very top of the unit');
+        expect(find.byIcon(Icons.skip_next).hitTestable(), findsOneWidget,
+            reason: 'At the top, Mode 1 shows with its next button');
+
+        // ACT. The anchor row still has pages above it, so a jump to offset 0
+        // measured against this layout reads as "scrolled down".
+        await tester.tap(find.byIcon(Icons.skip_next));
+        await pumpForSettle(tester);
+
+        // ASSERT: the next sutta opens at its own top, and the reader says so.
+        expect(container.read(activeNodeKeyProvider), 'dn-1-2');
+        expect(container.read(activeAnchorProvider), isNull,
+            reason: 'A step opens the sutta at its top, with no anchor');
+        expect(controller.position.extentBefore, 0,
+            reason: 'Nothing of the new sutta is above the viewport');
+        expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
+            reason: 'At the top of the new sutta Mode 1 must show, not the '
+                'scrolled-down FAB');
+        expect(container.read(readerScrolledUnderProvider), isFalse,
+            reason: 'And the app bar must not be tinted as scrolled under');
       },
     );
   });

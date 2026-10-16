@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
-import '../../../core/constants/constants.dart';
-import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/text_entry_theme.dart';
+import '../../../domain/entities/bjt/bjt_page.dart';
+import '../../../domain/entities/bjt/bjt_section.dart';
 import '../../../domain/entities/reader/document_slice.dart';
 import '../../models/in_page_search_state.dart';
+import 'anchored_page_list.dart';
 import 'entry_key_registry.dart';
 import 'reader_entry_builder.dart';
 
 /// A single-column reader pane for paliOnly or sinhalaOnly display modes.
 ///
-/// Renders a lazy [ListView.builder] of page numbers and entries.
 /// Parameterized by [languageCode] and [enableDictionaryLookup] to handle
 /// both Pali and Sinhala modes without duplication.
 class SingleColumnPane extends StatelessWidget {
@@ -18,11 +18,11 @@ class SingleColumnPane extends StatelessWidget {
     super.key,
     required this.scrollController,
     required this.slice,
+    required this.anchor,
     required this.searchState,
     required this.languageCode,
     required this.enableDictionaryLookup,
     required this.entryKeyRegistry,
-    required this.onTapEmpty,
     this.onWordTap,
     required this.onSelectionChanged,
     required this.contextMenuBuilder,
@@ -34,6 +34,9 @@ class SingleColumnPane extends StatelessWidget {
   /// inside the first and last of them.
   final DocumentSlice slice;
 
+  /// The row scroll offset 0 sits on; null is the unit's top.
+  final (int, int)? anchor;
+
   final InPageSearchState searchState;
 
   /// 'pi' for Pali or 'si' for Sinhala.
@@ -44,71 +47,41 @@ class SingleColumnPane extends StatelessWidget {
   /// across layout switches AND to drive in-page-search scroll-to-match.
   final EntryKeyRegistry entryKeyRegistry;
 
-  /// Called when tapping empty space (clears highlights).
-  final VoidCallback onTapEmpty;
-
   /// Called when a word is tapped (for dictionary lookup).
   final void Function(String word)? onWordTap;
 
   final void Function(SelectedContent?) onSelectionChanged;
   final Widget Function(BuildContext, SelectableRegionState) contextMenuBuilder;
 
+  BJTSection _section(BJTPage page) =>
+      languageCode == 'pi' ? page.paliSection : page.sinhalaSection;
+
   @override
   Widget build(BuildContext context) {
     return SelectionArea(
       onSelectionChanged: onSelectionChanged,
       contextMenuBuilder: contextMenuBuilder,
-      child: GestureDetector(
-        // Clear all highlights when tapping empty space
-        onTap: onTapEmpty,
-        behavior: HitTestBehavior.translucent,
-        // LayoutBuilder exposes the pane's own width so the reading column can
-        // be capped and centered on wide screens (calmer margins), while
-        // medium/small panes keep the standard uniform padding.
-        child: LayoutBuilder(
-          builder: (context, constraints) => ListView.builder(
-            controller: scrollController,
-            padding:
-                context.textEntryTheme.readingPadding(constraints.maxWidth),
-            itemCount: slice.pages.length + 1, // +1 for top spacer
-            itemBuilder: (context, index) {
-              // First item is a spacer so content doesn't hide behind button group
-              if (index == 0) {
-                return const SizedBox(
-                    height: PaneWidthConstants.readerActionButtonGroupHeight);
-              }
-              // Adjust index for pages (index-1 since spacer is at 0)
-              final pageIndex = index - 1;
-              final absolutePageIndex = slice.absolutePageStart + pageIndex;
-              final page = slice.pages[pageIndex];
-              final section =
-                  languageCode == 'pi' ? page.paliSection : page.sinhalaSection;
-              // The unit may begin and end mid-page, so both ends are trimmed.
-              final (actualEntryStart, entryEnd) =
-                  slice.entriesOn(pageIndex, section.entries.length);
-              final entries =
-                  section.entries.sublist(actualEntryStart, entryEnd);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ReaderEntryBuilder.buildPageNumber(context, page.pageNumber),
-                  const SizedBox(height: AppFonts.pageNumberGapPx),
-                  ...ReaderEntryBuilder.buildEntries(
-                    context,
-                    entries,
-                    enableDictionaryLookup: enableDictionaryLookup,
-                    searchState: searchState,
-                    absolutePageIndex: absolutePageIndex,
-                    entryStartOffset: actualEntryStart,
-                    languageCode: languageCode,
-                    onWordTap: onWordTap,
-                    entryKeyRegistry: entryKeyRegistry,
-                  ),
-                  // Space between pages
-                  const SizedBox(height: AppFonts.pageGapPx),
-                ],
-              );
-            },
+      // LayoutBuilder exposes the pane's own width so the reading column can
+      // be capped and centered on wide screens (calmer margins), while
+      // medium/small panes keep the standard uniform padding.
+      child: LayoutBuilder(
+        builder: (context, constraints) => AnchoredPageList(
+          controller: scrollController,
+          slice: slice,
+          anchor: anchor,
+          padding: context.textEntryTheme.readingPadding(constraints.maxWidth),
+          rowCount: (page) => _section(page).entries.length,
+          buildRows: (context, index, start, end) =>
+              ReaderEntryBuilder.buildEntries(
+            context,
+            _section(slice.pages[index]).entries.sublist(start, end),
+            enableDictionaryLookup: enableDictionaryLookup,
+            searchState: searchState,
+            absolutePageIndex: slice.absolutePageStart + index,
+            entryStartOffset: start,
+            languageCode: languageCode,
+            onWordTap: onWordTap,
+            entryKeyRegistry: entryKeyRegistry,
           ),
         ),
       ),

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart' show computeHitSlop, kPrimaryButton;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
@@ -19,6 +19,7 @@ import '../../providers/in_page_search_provider.dart';
 import '../../providers/tab_provider.dart'
     show
         activeTabIndexProvider,
+        activeTabProvider,
         tabsProvider,
         activeReaderLayoutProvider,
         activeNodeKeyProvider;
@@ -50,8 +51,12 @@ class MultiPaneReaderWidget extends ConsumerStatefulWidget {
 
 class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     with ReaderSelectionHandler<MultiPaneReaderWidget> {
-  // Single scroll controller for all modes
-  final ScrollController _scrollController = ScrollController();
+  // Single scroll controller for all modes. Each new scroll view (a tab
+  // switch, a layout switch, a unit that just loaded) starts at the active
+  // tab's saved offset, so its first frame is already where that tab was left.
+  late final ScrollController _scrollController = _TabScrollController(
+    () => ref.read(activeTabProvider)?.scrollOffset ?? 0,
+  );
 
   // Registry for entry-level GlobalKeys used to sync scroll position
   // across layout switches AND to drive in-page-search scroll-to-match.
@@ -73,9 +78,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   static const _scrollSaveDelay = Duration(milliseconds: 400);
 
   // When true, _onScroll skips the debounced auto-save. Toggled around
-  // programmatic jumpTo() calls during scroll restoration so the clamped
-  // jumpTo (when ListView's maxExtent is still small on cold load) can't
-  // overwrite the genuinely saved offset on disk.
+  // programmatic jumpTo() calls during scroll restoration so a jump clamped
+  // to a still-estimated extent can't overwrite the genuinely saved offset.
   bool _suppressScrollSave = false;
 
   // Bound on *stalled* restoration retries — see [_restoreScrollWithRetry].
@@ -84,21 +88,14 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   // toward (content shrunk, etc.).
   static const _restoreMaxRetries = 30;
 
-  // Bound on scroll-to-entry retries — see [_ensureEntryVisible].
-  // [_stepViewportToward] skips far pages by estimate, so a few frames reach
-  // any page; this stops it spinning forever if the target is unreachable.
-  static const _entryScrollMaxRetries = 10;
+  // True while [_anchorAt] jumps: that jump measures the old content, so
+  // [_onScroll] leaves the scroll state to the sync after the new layout.
+  bool _anchoring = false;
 
-  // Bumped by each new reveal, tab switch, layout switch and sutta step. A
-  // retry still holding an older value has been superseded and stops: two
-  // chains stepping the same list at once push each other past both targets.
-  int _revealGeneration = 0;
-
-  // The entry [_ensureEntryVisible] is currently reaching for, or null.
-  // Only [DualColumnPane] reads it — it builds a window of the unit rather
-  // than a lazy list, so it has to be told which page to open far enough to
-  // include. See that class's doc.
-  (int, int)? _revealTarget;
+  // The pointer and position of a primary press on the page, while it may
+  // still be a tap — see [_clearOnTap].
+  int? _tapPointer;
+  Offset? _tapDownPosition;
 
   @override
   void initState() {
@@ -109,20 +106,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   /// Scroll listener for scroll-position tracking.
   void _onScroll() {
     if (_scrollController.hasClients) {
-      final currentScroll = _scrollController.position.pixels;
-
-      // Track whether the user has scrolled meaningfully from the top.
-      // Small fixed threshold (not a full viewport) so Mode 2 kicks in
-      // promptly once the user starts scrolling, while still ignoring
-      // overscroll/bounce jitter near the top.
-      const scrollAwayFromTopThreshold = 60.0;
-      final scrolledDown = currentScroll > scrollAwayFromTopThreshold;
-      if (scrolledDown != _isScrolledDown) {
-        setState(() => _isScrolledDown = scrolledDown);
-      }
-
-      // Keep the app bar's "scrolled under" tint in sync with this scroll.
-      _syncScrolledUnder();
+      if (!_anchoring) _syncScrollState();
 
       // Debounced persist of scroll position into the active tab. Without
       // this, a reload while parked in a tab (no tab switch) would lose
@@ -140,19 +124,29 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     }
   }
 
-  /// Publishes whether the reader content is scrolled away from the top into
-  /// [readerScrolledUnderProvider], which drives the app bar's tint.
+  /// Syncs the two things that follow how much of the unit is above the
+  /// viewport: Mode 1/Mode 2 of the action buttons, and the app bar's
+  /// "scrolled under" tint ([readerScrolledUnderProvider]).
   ///
-  /// Uses `extentBefore > 0` — the exact threshold Material 3's built-in
-  /// scrolled-under detection uses — so the tint behaves identically, just
-  /// reliably. Called from [_onScroll] (covers genuine scrolling and any
-  /// `jumpTo` to a non-zero offset, both of which notify the controller) and
-  /// explicitly after a tab-switch scroll restore — where a `jumpTo(0)` onto
-  /// a freshly mounted, already-at-0 scroll view is a no-op and would
-  /// otherwise leave the flag stale at the previous tab's value.
-  void _syncScrolledUnder() {
-    if (!_scrollController.hasClients) return;
-    final scrolledUnder = _scrollController.position.extentBefore > 0;
+  /// Both read `extentBefore`, never `pixels`: offset 0 is the anchor row,
+  /// which can sit pages into the unit. The tint uses `extentBefore > 0`, the
+  /// threshold Material 3's own detection uses. Called from [_onScroll], and
+  /// explicitly after anything that changes the content but not the offset
+  /// (a restore, a new anchor), which notifies no scroll listener.
+  void _syncScrollState() {
+    if (!mounted || !_scrollController.hasClients) return;
+    final extentBefore = _scrollController.position.extentBefore;
+
+    // A small fixed threshold (not a full viewport) so Mode 2 kicks in
+    // promptly once the user starts scrolling, while still ignoring
+    // overscroll/bounce jitter near the top.
+    const scrollAwayFromTopThreshold = 60.0;
+    final scrolledDown = extentBefore > scrollAwayFromTopThreshold;
+    if (scrolledDown != _isScrolledDown) {
+      setState(() => _isScrolledDown = scrolledDown);
+    }
+
+    final scrolledUnder = extentBefore > 0;
     final notifier = ref.read(readerScrolledUnderProvider.notifier);
     if (notifier.state != scrolledUnder) {
       notifier.state = scrolledUnder;
@@ -180,32 +174,45 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     }
   }
 
-  /// Scrolls to the beginning of the current unit.
+  /// Scrolls to the beginning of the current unit by dropping the anchor.
   ///
-  /// A plain jump now: the unit's first row is the first thing rendered, so
-  /// there is no pagination to rewind — which is what it used to be doing.
+  /// Not a scroll: above the anchor `minScrollExtent` is only an estimate
+  /// until those pages are built, so a jump to it stops short of the top.
   void _scrollToBeginning() {
     // Reset scroll-tracking state so the button transitions correctly
     // (from scroll-to-top to skip-previous once we're at the beginning).
     setState(() => _isScrolledDown = false);
+    _anchorAt(null);
+  }
+
+  /// Anchors the active tab at [anchor] (null: the unit's top), with the
+  /// viewport on it.
+  ///
+  /// Jumps to 0 here, before the rebuild, so the frame that lays out the new
+  /// anchor already sits at it: nothing between the old position and the new
+  /// one is ever laid out.
+  void _anchorAt((int, int)? anchor) {
+    ref
+        .read(tabsProvider.notifier)
+        .setTabAnchor(ref.read(activeTabIndexProvider), anchor);
     if (_scrollController.hasClients) {
+      _anchoring = true;
       _scrollController.jumpTo(0);
+      _anchoring = false;
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _syncScrollState());
   }
 
   /// Navigates to a neighbouring sutta.
   /// Delegates business logic to [navigateToSuttaProvider] and
   /// handles the widget-specific concern (scroll position).
   void _navigateToSutta(TipitakaTreeNode target) {
-    // Stop any reveal aimed at the old unit.
-    _revealGeneration++;
+    // The new sutta has no anchor and offset 0.
     ref.read(navigateToSuttaProvider)(target);
-
-    // Jump to top — handles the same-file case, where the document does not
-    // reload and nothing else would move the viewport.
-    if (_scrollController.hasClients) {
-      _scrollController.jumpTo(0);
-    }
+    // When its text is already loaded the scroll view stays, and nothing else
+    // moves it or re-reads Mode 1/2 after the new layout. The jump must not
+    // measure the old layout, whose offset 0 may have pages above it.
+    _anchorAt(null);
   }
 
   /// One step slot of the action pill, or null when the corpus ends that way.
@@ -220,61 +227,20 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
               onTap: () => _navigateToSutta(leaf),
             );
 
-  /// Restores scroll position immediately (no extra frame delay).
-  /// Must be called from within an [addPostFrameCallback] where the
-  /// content has already been rebuilt — avoids the double-postFrameCallback
-  /// that caused a visible glitch (title flash) when switching tabs.
+  /// Restores the active tab's saved offset, measured from its anchor row.
+  /// Call from a post-frame callback, once the content has rebuilt.
   ///
-  /// A tab that has never been scrolled lands on what it was opened *for*
-  /// instead: the row a search hit or a `?e=` link named. That landing is
-  /// consumed here — see [TabsNotifier.clearTabLanding] — so coming back to
-  /// the tab later resumes where reading stopped rather than snapping to the
-  /// hit again.
-  ///
-  /// On cold-load the document arrives before the pane has laid out enough of
-  /// the unit — lazily in the one-column layouts, a window at a time in
-  /// side-by-side — so `maxScrollExtent` is initially smaller than the saved
-  /// offset. In that case we re-jump on subsequent frames until we either
-  /// reach the saved offset or run out of retries. Throughout,
-  /// [_suppressScrollSave] is held high so the jumpTo's own scroll
-  /// notification can't trigger an auto-save that would overwrite the
-  /// on-disk offset with a clamped one.
-  void _restoreScrollPositionImmediate() {
-    final activeTabIndex = ref.read(activeTabIndexProvider);
-    final tabs = ref.read(tabsProvider);
-    if (activeTabIndex < 0 || activeTabIndex >= tabs.length) return;
-
-    if (tabs[activeTabIndex].scrollOffset == 0) {
-      final landing = ref.read(activeLandingEntryProvider);
-      if (landing != null) {
-        _ensureEntryVisible(
-          landing.$1,
-          landing.$2,
-          retriesLeft: _entryScrollMaxRetries,
-          alignment: 0.0,
-          animate: false,
-        );
-        // Spend it. The coordinates above are already captured as arguments,
-        // so the retry chain is unaffected by clearing them here.
-        ref.read(tabsProvider.notifier).clearTabLanding(activeTabIndex);
-        _syncScrolledUnder();
-        return;
-      }
-    }
-    _restoreScrollWithRetry(retriesLeft: _restoreMaxRetries);
-  }
-
-  /// Re-jumps toward the saved offset across frames until it is reachable.
-  ///
-  /// [retriesLeft] is spent only on frames that made no progress: in
-  /// side-by-side each clamped jump grows the pane's window one step, so the
-  /// extent climbs a frame at a time and charging those frames would cap the
-  /// restore at whatever 30 growths reach. Charging every *non-increase* is
-  /// what bounds this — not a rising extent, which only side-by-side has: the
-  /// lazy layouts estimate theirs from the average of the children laid out so
-  /// far, and it falls when a jump realises shorter ones.
+  /// Both extents are estimates until the rows out to them are built — below
+  /// the anchor and above it alike — so a saved offset past either is jumped
+  /// to as far as the estimate allows and tried again next frame, by which
+  /// point that jump has built more. [retriesLeft] is spent only on frames
+  /// where neither extent grew, which bounds it when the offset can genuinely
+  /// no longer be reached (the unit got shorter). Throughout,
+  /// [_suppressScrollSave] keeps a clamped jump from overwriting the saved
+  /// offset.
   void _restoreScrollWithRetry({
-    required int retriesLeft,
+    int retriesLeft = _restoreMaxRetries,
+    double? lastMinExtent,
     double? lastMaxExtent,
   }) {
     if (!mounted) return;
@@ -286,29 +252,30 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       return;
     }
     final saved = tabs[activeTabIndex].scrollOffset;
-    final maxExtent = _scrollController.position.maxScrollExtent;
+    final position = _scrollController.position;
+    final minExtent = position.minScrollExtent;
+    final maxExtent = position.maxScrollExtent;
 
     _suppressScrollSave = true;
-    _scrollController.jumpTo(saved.clamp(0.0, maxExtent));
-    // Sync the app bar tint to the tab we just restored. A jumpTo(0) onto a
-    // freshly mounted scroll view (already at 0) is a no-op and fires no
-    // notification, so _onScroll won't run — sync explicitly here.
-    _syncScrolledUnder();
+    _scrollController.jumpTo(saved.clamp(minExtent, maxExtent));
+    // A jump to where the view already is fires no notification, so
+    // _onScroll won't run — sync explicitly here.
+    _syncScrollState();
     // The clamped jumpTo notifies _onScroll synchronously above; clear
     // the flag on the next frame so genuine user scrolls aren't missed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _suppressScrollSave = false;
+      _syncScrollState();
     });
 
-    // Saved offset still beyond what's laid out → try again on the next
-    // frame, by which point the jump above has built more of the list.
-    // Bounded by retriesLeft so a saved offset that can genuinely no longer
-    // be reached (e.g. the unit got shorter) eventually settles.
-    if (saved > maxExtent && retriesLeft > 0) {
-      final progressed = lastMaxExtent == null || maxExtent > lastMaxExtent;
+    if ((saved > maxExtent || saved < minExtent) && retriesLeft > 0) {
+      final progressed = lastMaxExtent == null ||
+          maxExtent > lastMaxExtent ||
+          minExtent < lastMinExtent!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _restoreScrollWithRetry(
           retriesLeft: progressed ? retriesLeft : retriesLeft - 1,
+          lastMinExtent: minExtent,
           lastMaxExtent: maxExtent,
         );
       });
@@ -316,123 +283,42 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   }
 
   /// Scrolls to the current in-page search match.
-  ///
-  /// Every match is inside the rendered unit — that is what bounding the unit
-  /// bought — so there is no range to expand first, only an entry to reveal.
   void _scrollToCurrentMatch(InPageSearchState searchState) {
     final currentMatch = searchState.currentMatch;
     if (currentMatch == null) return;
-    _ensureEntryVisible(
-      currentMatch.pageIndex,
-      currentMatch.entryIndex,
-      retriesLeft: _entryScrollMaxRetries,
-    );
+    _revealEntry(currentMatch.pageIndex, currentMatch.entryIndex);
   }
 
-  /// Reveals the entry at `(pageIndex, entryIndex)`, retrying on subsequent
-  /// frames while its GlobalKey is unmounted.
+  /// Brings the row at `(pageIndex, entryIndex)` to [alignment] of the
+  /// viewport.
   ///
-  /// For a page inside the rendered unit, the only reason the key is missing
-  /// is that [ListView.builder] has not lazy-built it: it sits outside the
-  /// default cacheExtent (~250px). Growing anything is useless there — the
-  /// page is already in the item list — so we move the controller toward the
-  /// target ([_stepViewportToward]) and let the next frame build it.
-  ///
-  /// Bounded by [_entryScrollMaxRetries] so an unreachable target settles
-  /// instead of spinning forever.
-  void _ensureEntryVisible(
-    int pageIndex,
-    int entryIndex, {
-    required int retriesLeft,
-    double alignment = 0.3,
-    bool animate = true,
-    int? generation,
-  }) {
+  /// A built row is scrolled to. One that isn't is anchored at instead: a
+  /// lazy list can't know where an unbuilt row starts without laying out
+  /// every row before it, and the anchor needs none of them.
+  void _revealEntry(int pageIndex, int entryIndex, {double alignment = 0.3}) {
     if (!mounted) return;
-    // A call from outside starts a new reveal; its retries carry its number.
-    final gen = generation ?? ++_revealGeneration;
-    if (gen != _revealGeneration) return;
-    // A target the loaded unit doesn't draw (a stale `?e=` link: a page outside
-    // it, or an entry before its start or past its end) never mounts, so the
-    // reveal ends here. While the unit is still loading, it keeps retrying.
-    final slice = ref.read(activeDocumentSliceProvider);
-    if (slice != null) {
-      final local = pageIndex - slice.absolutePageStart;
-      if (local < 0 || local >= slice.pages.length) return;
-      // The longer section: a Sinhala-only pane can draw entries Pali lacks.
-      final (first, end) =
-          slice.entriesOn(local, slice.pages[local].maxEntryCount);
-      if (entryIndex < first || entryIndex >= end) return;
-    }
-
-    // Publish it before looking the key up: on the first attempt the window
-    // pane may not have built that page yet, and this is what makes it.
-    if (_revealTarget != (pageIndex, entryIndex)) {
-      setState(() => _revealTarget = (pageIndex, entryIndex));
-    }
-
     final key = _entryKeyRegistry.keyFor(pageIndex, entryIndex);
-    final keyContext = key.currentContext;
-    final renderObject = keyContext?.findRenderObject();
-    if (renderObject != null && renderObject.attached) {
+    if (key.currentContext?.findRenderObject()?.attached ?? false) {
       Scrollable.ensureVisible(
-        keyContext!,
+        key.currentContext!,
         alignment: alignment,
-        duration: animate ? const Duration(milliseconds: 300) : Duration.zero,
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
       return;
     }
 
-    if (retriesLeft <= 0) return;
-
-    if (slice != null) _stepViewportToward(pageIndex, slice);
+    final slice = ref.read(activeDocumentSliceProvider);
+    if (slice == null) return;
+    final local = pageIndex - slice.absolutePageStart;
+    if (local < 0 || local >= slice.pages.length) return;
+    _anchorAt((pageIndex, entryIndex));
+    // The anchor puts the row at the top; settle it at [alignment] once the
+    // rows above it are there to scroll into.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ensureEntryVisible(
-        pageIndex,
-        entryIndex,
-        retriesLeft: retriesLeft - 1,
-        alignment: alignment,
-        animate: animate,
-        generation: gen,
-      );
-    });
-  }
-
-  /// Moves the scroll controller toward the page holding the target so the
-  /// next frame's [ListView.builder] builds it. Direction is inferred from the
-  /// currently top-visible entry; when the registry has nothing mounted yet
-  /// (transitional frame), defaults to forward.
-  ///
-  /// Far pages are skipped by estimate (average page height), which can land a
-  /// little past the target; the next frame then steps back toward it. Near
-  /// the target it moves one viewport per frame, which can't skip a page.
-  ///
-  /// Suppresses the debounced scroll-position auto-save: the intermediate
-  /// clamped offsets aren't user-meaningful and shouldn't overwrite disk.
-  /// Mirrors the suppression pattern in [_restoreScrollWithRetry].
-  void _stepViewportToward(int pageIndex, DocumentSlice slice) {
-    if (!_scrollController.hasClients) return;
-
-    final pos = _scrollController.position;
-    final topPage =
-        _entryKeyRegistry.findTopVisibleEntry(_scrollController)?.$1;
-    final scrollingDown = topPage == null || pageIndex > topPage;
-    // Every page between here and the target but the last; ≤ 0 when close.
-    final pagesToSkip = topPage == null ? 0 : (pageIndex - topPage).abs() - 1;
-    final averagePageHeight =
-        (pos.maxScrollExtent + pos.viewportDimension) / slice.pages.length;
-    final distance =
-        math.max(pagesToSkip * averagePageHeight, pos.viewportDimension);
-    final target = (pos.pixels + (scrollingDown ? distance : -distance))
-        .clamp(0.0, pos.maxScrollExtent);
-
-    if (target == pos.pixels) return;
-
-    _suppressScrollSave = true;
-    _scrollController.jumpTo(target);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _suppressScrollSave = false;
+      final context = key.currentContext;
+      if (!mounted || context == null) return;
+      Scrollable.ensureVisible(context, alignment: alignment);
     });
   }
 
@@ -447,29 +333,34 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         // the scroll position restoration below.
         _suppressLayoutListener = true;
 
-        // Save scroll position for the previous tab, but ONLY if:
-        // - previous was a valid tab (>= 0)
-        // - next is also a valid tab (>= 0) - meaning we're switching, not closing
-        // This prevents saving the closed tab's scroll position to the wrong index
+        // Save the previous tab's offset, by its index. Closing the active
+        // tab passes through -1, so a closed tab is never saved. Closing a
+        // tab before the active one moves the index before removing the tab
+        // (closeTabProvider), so `previous` still names the active tab here.
         if (previous >= 0 && next >= 0) {
           _saveScrollPosition(previous);
         }
 
+        // A debounced save still pending from the old tab would otherwise
+        // land on the new one.
+        _scrollSaveDebounce?.cancel();
+
         // Clear entry key registry — old tab's keys are stale
         _entryKeyRegistry.clear();
-        // Stop the old tab's reveal before it steps the new tab's list.
-        _revealGeneration++;
 
         // Layout is now per-tab and derived from activeReaderLayoutProvider
         // No need to override or reset - each tab remembers its own column mode
 
-        // Restore the saved scroll position for the new tab after content renders.
-        // We do NOT jumpTo(0) first — that would briefly flash the sutta title
-        // before the restore fires, causing a visible glitch.
+        // The pane is keyed by the tab's index, so a switch gets a fresh
+        // scroll view that starts at the new tab's saved offset. The restore
+        // after it renders finishes the job when that offset was past what the
+        // first layout built. It also corrects the one case the key misses:
+        // closing the active first tab leaves the index at 0, so the next tab
+        // draws one frame at the closed tab's offset.
         if (next >= 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _suppressLayoutListener = false;
-            _restoreScrollPositionImmediate();
+            _restoreScrollWithRetry();
           });
         } else {
           _suppressLayoutListener = false;
@@ -486,19 +377,16 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // until both are in.
     ref.listen<DocumentSlice?>(activeDocumentSliceProvider, (previous, next) {
       if (next != null && previous == null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _restoreScrollPositionImmediate();
-        });
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _restoreScrollWithRetry());
       }
     });
 
     // Listen to layout changes — sync reading position by logical entry, not
     // pixels. Pixel offsets are meaningless across layouts (stacked is ~2x
-    // taller than side-by-side per entry). Capture which entry is at the
-    // viewport top, then reveal that same entry once the new layout has laid
-    // out. [_ensureEntryVisible] retries across frames, which is what makes
-    // this safe against the extent ListView.builder underestimates on a fresh
-    // layout — the reason this used to reset pagination instead.
+    // taller than side-by-side per entry). The entry at the viewport top
+    // becomes the anchor, so the new layout opens on it and builds nothing
+    // above it.
     ref.listen<ReaderLayout>(activeReaderLayoutProvider, (previous, next) {
       if (previous != null && previous != next && !_suppressLayoutListener) {
         // Capture top-visible entry from the OLD layout (still mounted)
@@ -506,8 +394,6 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
             _entryKeyRegistry.findTopVisibleEntry(_scrollController);
         // Clear stale keys from old layout before rebuild
         _entryKeyRegistry.clear();
-        // Stop any reveal aimed at the old layout's list.
-        _revealGeneration++;
 
         // Match set is layout-scoped — refresh against the new layout.
         // Also covered by the suppression guard above: tab switches skip
@@ -516,19 +402,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
             .read(inPageSearchStatesProvider.notifier)
             .recomputeActiveTabMatches();
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (topEntry == null) {
-            if (_scrollController.hasClients) _scrollController.jumpTo(0);
-            return;
-          }
-          _ensureEntryVisible(
-            topEntry.$1,
-            topEntry.$2,
-            retriesLeft: _entryScrollMaxRetries,
-            alignment: 0.0,
-            animate: false,
-          );
-        });
+        _anchorAt(topEntry);
       }
     });
 
@@ -546,6 +420,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     final unitAsync = ref.watch(activeReaderUnitProvider);
     final contentAsync = ref.watch(currentBJTDocumentProvider);
     final slice = ref.watch(activeDocumentSliceProvider);
+    final anchor = ref.watch(activeAnchorProvider);
     // Watch per-tab reader layout (each tab remembers its own setting)
     final readerLayout = ref.watch(activeReaderLayoutProvider);
     // Watch selected word to conditionally mount the dictionary sheet
@@ -567,10 +442,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // Visibility flags for the two action button modes.
     // Computed once here so IgnorePointer, AnimatedOpacity, and AnimatedSlide
     // all reference the same boolean — avoids duplication and drift.
-    //
-    // The unit always renders from its own first row, so "past the beginning"
-    // is now exactly "scrolled down" — including after a search hit, which
-    // scrolls into the unit rather than starting partway through it.
+    // "Scrolled down" counts everything above the viewport, anchor or not.
     final hasContent = slice != null && !slice.isEmpty;
     final showMode1 = hasContent && !searchState.isVisible && !_isScrolledDown;
     final showMode2 = hasContent && !searchState.isVisible && _isScrolledDown;
@@ -586,6 +458,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
                 unitAsync: unitAsync,
                 contentAsync: contentAsync,
                 slice: slice,
+                anchor: anchor,
                 readerLayout: readerLayout,
                 searchState: searchState,
               ),
@@ -713,6 +586,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     required AsyncValue<ReaderUnit?> unitAsync,
     required AsyncValue<Object?> contentAsync,
     required DocumentSlice? slice,
+    required (int, int)? anchor,
     required ReaderLayout readerLayout,
     required InPageSearchState searchState,
   }) {
@@ -760,15 +634,44 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       );
     }
 
-    return _buildContentLayout(context, slice, readerLayout, searchState);
+    return _clearOnTap(
+      _buildContentLayout(context, slice, anchor, readerLayout, searchState),
+    );
   }
 
-  /// Clears all highlights and bottom sheet when tapping empty space.
+  /// Calls [_clearAllHighlights] on any tap on the page, as a browser clears
+  /// a link-to-text highlight.
+  ///
+  /// A raw [Listener] joins no gesture arena, so the selection and a word
+  /// still get the click. On pointer-up, not down: on a word tap the clear
+  /// and the new word land in the same frame, so the dictionary sheet swaps
+  /// its word instead of closing and reopening.
+  Widget _clearOnTap(Widget child) {
+    return Listener(
+      onPointerDown: (event) {
+        if (event.buttons & kPrimaryButton == 0) return;
+        _tapPointer = event.pointer;
+        _tapDownPosition = event.position;
+      },
+      onPointerUp: (event) {
+        final down = _tapDownPosition;
+        if (event.pointer != _tapPointer || down == null) return;
+        _tapPointer = null;
+        _tapDownPosition = null;
+        final slop = computeHitSlop(
+            event.kind, MediaQuery.maybeGestureSettingsOf(context));
+        if ((event.position - down).distance <= slop) _clearAllHighlights();
+      },
+      onPointerCancel: (event) {
+        if (event.pointer == _tapPointer) _tapDownPosition = null;
+      },
+      child: child,
+    );
+  }
+
+  /// Clears the dictionary and search highlights and closes the dictionary
+  /// sheet. A text selection clears itself: it gets the same click.
   void _clearAllHighlights() {
-    // Clear text selection if active
-    if (ref.read(hasActiveSelectionProvider)) {
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
     // Clear dictionary and FTS highlights (per-tab for FTS)
     ref.read(dictionaryHighlightProvider.notifier).state = null;
     ref.read(selectedDictionaryWordProvider.notifier).state = null;
@@ -792,9 +695,25 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   }
 
   /// Delegates to the appropriate pane widget based on reader layout.
+  ///
+  /// Keyed by the tab's index, so a tab switch starts a fresh scroll view at
+  /// that tab's saved offset rather than keeping the last tab's.
   Widget _buildContentLayout(
     BuildContext context,
     DocumentSlice slice,
+    (int, int)? anchor,
+    ReaderLayout readerLayout,
+    InPageSearchState searchState,
+  ) {
+    return KeyedSubtree(
+      key: ValueKey(ref.watch(activeTabIndexProvider)),
+      child: _buildPane(slice, anchor, readerLayout, searchState),
+    );
+  }
+
+  Widget _buildPane(
+    DocumentSlice slice,
+    (int, int)? anchor,
     ReaderLayout readerLayout,
     InPageSearchState searchState,
   ) {
@@ -803,11 +722,11 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         return SingleColumnPane(
           scrollController: _scrollController,
           slice: slice,
+          anchor: anchor,
           searchState: searchState,
           languageCode: 'pi',
           enableDictionaryLookup: true,
           entryKeyRegistry: _entryKeyRegistry,
-          onTapEmpty: _clearAllHighlights,
           onWordTap: _handleWordTap,
           onSelectionChanged: onSelectionChanged,
           contextMenuBuilder: buildSelectionContextMenu,
@@ -816,11 +735,11 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         return SingleColumnPane(
           scrollController: _scrollController,
           slice: slice,
+          anchor: anchor,
           searchState: searchState,
           languageCode: 'si',
           enableDictionaryLookup: false,
           entryKeyRegistry: _entryKeyRegistry,
-          onTapEmpty: _clearAllHighlights,
           onWordTap: _handleWordTap,
           onSelectionChanged: onSelectionChanged,
           contextMenuBuilder: buildSelectionContextMenu,
@@ -829,10 +748,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         return DualColumnPane(
           scrollController: _scrollController,
           slice: slice,
+          anchor: anchor,
           searchState: searchState,
-          revealTarget: _revealTarget,
           entryKeyRegistry: _entryKeyRegistry,
-          onTapEmpty: _clearAllHighlights,
           onWordTap: _handleWordTap,
           onSelectionChanged: onSelectionChanged,
           contextMenuBuilder: buildSelectionContextMenu,
@@ -841,13 +759,24 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         return StackedPane(
           scrollController: _scrollController,
           slice: slice,
+          anchor: anchor,
           searchState: searchState,
           entryKeyRegistry: _entryKeyRegistry,
-          onTapEmpty: _clearAllHighlights,
           onWordTap: _handleWordTap,
           onSelectionChanged: onSelectionChanged,
           contextMenuBuilder: buildSelectionContextMenu,
         );
     }
   }
+}
+
+/// A [ScrollController] whose new scroll positions start at [_initialOffset]
+/// rather than at a fixed offset.
+class _TabScrollController extends ScrollController {
+  _TabScrollController(this._initialOffset);
+
+  final double Function() _initialOffset;
+
+  @override
+  double get initialScrollOffset => _initialOffset();
 }

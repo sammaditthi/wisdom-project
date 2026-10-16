@@ -366,7 +366,7 @@ void main() {
         final createdTab = tabs.last;
         expect(createdTab.nodeKey, equals('dn'),
             reason: 'Tab nodeKey should match the tapped node');
-        expect(createdTab.landingPageIndex, isNull,
+        expect(createdTab.anchorPageIndex, isNull,
             reason: 'A tree tap names no row to land on — the unit is '
                 'rendered from its own first row');
 

@@ -107,20 +107,21 @@ class TabsNotifier extends StateNotifier<List<ReaderTab>> {
     updateTab(tabIndex, updatedTab);
   }
 
-  /// Drops the tab's landing row, which is a one-shot.
-  ///
-  /// The reader calls this the moment it applies the landing. [scrollOffset]
-  /// cannot stand in for it: scrolling back to the beginning saves an offset
-  /// of 0, and 0 is exactly what makes a landing apply — so without this the
-  /// tab would snap back to the search hit on every re-activation, and again
-  /// after a restart.
-  void clearTabLanding(int tabIndex) {
+  /// Moves the tab's anchor row to [anchor] (null: the unit's top) and its
+  /// offset to [scrollOffset], which is measured from that row. One update,
+  /// so the two never disagree.
+  void setTabAnchor(int tabIndex, (int, int)? anchor,
+      {double scrollOffset = 0}) {
     if (tabIndex < 0 || tabIndex >= state.length) return;
     final tab = state[tabIndex];
-    if (tab.landingPageIndex == null && tab.landingEntryIndex == null) return;
+    if (tab.anchor == anchor && tab.scrollOffset == scrollOffset) return;
     updateTab(
       tabIndex,
-      tab.copyWith(landingPageIndex: null, landingEntryIndex: null),
+      tab.copyWith(
+        anchorPageIndex: anchor?.$1,
+        anchorEntryIndex: anchor?.$2,
+        scrollOffset: scrollOffset,
+      ),
     );
   }
 
@@ -337,10 +338,10 @@ final openTabFromSearchResultProvider =
         sinhalaName: (node != null && node.sinhalaName.isNotEmpty)
             ? node.sinhalaName
             : result.title,
-        // Land on the matched row, not on the sutta's first line — the whole
-        // unit renders either way, so this is scroll position and nothing more.
-        landingPageIndex: result.pageIndex,
-        landingEntryIndex: result.entryIndex,
+        // Anchored at the matched row: it opens there, and nothing above it is
+        // built until the reader scrolls up.
+        anchorPageIndex: result.pageIndex,
+        anchorEntryIndex: result.entryIndex,
         layout: layout,
       ),
     );
@@ -357,9 +358,9 @@ final openTabFromSearchResultProvider =
 /// breadcrumb widget and deep links. Callers pass [isPortraitMode] (derived
 /// from BuildContext) since providers can't access context.
 ///
-/// [pageIndex]/[entryStart] optionally name a landing row inside the unit —
-/// used by deep links carrying an entry-level position (`?e=<page>.<entry>`).
-/// They never decide *which* unit opens; that is always [nodeKey]'s own.
+/// [pageIndex]/[entryStart] optionally name the row to anchor at — used by
+/// deep links carrying an entry-level position (`?e=<page>.<entry>`). They
+/// never decide *which* unit opens; that is always [nodeKey]'s own.
 ///
 /// Returns the new tab index, or -1 if the node is not in the tree.
 ///
@@ -384,10 +385,10 @@ final openTabFromNodeKeyProvider = Provider<
         nodeKey: nodeKey,
         paliName: node.paliName,
         sinhalaName: node.sinhalaName,
-        landingPageIndex: pageIndex,
+        anchorPageIndex: pageIndex,
         // A page override with no entry means "start of that page" — never
         // the node's own entry, which pairs with the node's page.
-        landingEntryIndex: pageIndex == null ? null : (entryStart ?? 0),
+        anchorEntryIndex: pageIndex == null ? null : (entryStart ?? 0),
         layout: layout,
       ),
     );
