@@ -90,7 +90,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
   final TextStyle actionLabel;
 
   /// Style for small inline clickable text links / affordances
-  /// (e.g. "View N more", "Show Less" inside grouped result rows).
+  /// (e.g. "View N more", "Show less" inside grouped result rows).
   final TextStyle linkLabel;
 
   // ============================================
