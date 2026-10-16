@@ -48,10 +48,14 @@ wording for one shared label, move that key into a site constant like
 ## Do not rename
 
 The technical name stays `the_wisdom_project` / `theWisdomProject`: Dart
-package, bundle and application ids, Android namespace, `BINARY_NAME` (Linux,
-Windows), `InternalName` and `OriginalFilename` in `Runner.rc`, iOS
-`CFBundleName`. A new bundle or application id is a different app to the OS,
-and the old one's data and settings stay behind.
+package, `BINARY_NAME` (Linux, Windows), `InternalName` and `OriginalFilename`
+in `Runner.rc`, iOS `CFBundleName`.
+
+The app ID (bundle and application ids, Android namespace) and `CompanyName`
+change once, before the first store release (**App ID** in
+[`first-ios-release.md`](../todo/mobile-release/first-ios-release.md)), and are
+frozen from then on. A new ID is a different app to the OS, and the old one's
+data and settings stay behind.
 
 `CompanyName` and `ProductName` in `Runner.rc` look like labels but are not:
 `path_provider` names the Windows data folder after them
