@@ -17,6 +17,7 @@ import 'dictionary_filter_flow_test.dart' as dictionary_filter;
 import 'in_page_search_test.dart' as in_page_search;
 import 'language_independence_test.dart' as language_independence;
 import 'layout_switch_test.dart' as layout_switch;
+import 'reader_panes_test.dart' as reader_panes;
 import 'scroll_restoration_test.dart' as scroll_restoration;
 import 'search_flow_integration_test.dart' as search_flow;
 import 'search_language_toggle_test.dart' as search_language_toggle;
@@ -31,6 +32,7 @@ void main() {
   in_page_search.main();
   language_independence.main();
   layout_switch.main();
+  reader_panes.main();
   scroll_restoration.main();
   search_flow.main();
   search_language_toggle.main();

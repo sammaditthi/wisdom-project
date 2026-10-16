@@ -115,8 +115,8 @@ class WebDatabaseInstaller {
   Future<QueryExecutor> open(String dbName) async {
     if (!databases.contains(dbName)) {
       // A new edition means a new `<editionId>.db`
-      // (`docs/todo/multi_edition_architecture.md`). On web it also has to be
-      // installed, which is this list plus a file to download it from.
+      // (`docs/decisions/multi_edition_architecture.md`). On web it also has
+      // to be installed, which is this list plus a file to download it from.
       throw DatabaseInstallFailure(
         DatabaseInstallFailureKind.other,
         '$dbName is not one of the databases this build installs '

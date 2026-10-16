@@ -17,6 +17,14 @@ final closeTabProvider = Provider<void Function(int)>((ref) {
     final tabs = ref.read(tabsProvider);
     final currentTabIndex = ref.read(activeTabIndexProvider);
     final isClosingActiveTab = tabIndex == currentTabIndex;
+    final isClosingTabBeforeActive = tabIndex < currentTabIndex;
+
+    // A tab before the active one shifts the active index down. Move it while
+    // the active tab still sits at its old index: the reader saves the
+    // outgoing scroll offset by that index the moment the index changes.
+    if (isClosingTabBeforeActive) {
+      ref.read(activeTabIndexProvider.notifier).state = currentTabIndex - 1;
+    }
 
     // Remove the tab
     ref.read(tabsProvider.notifier).removeTab(tabIndex);
@@ -56,10 +64,7 @@ final closeTabProvider = Provider<void Function(int)>((ref) {
         // Sync navigator to the new active tab
         ref.read(syncNavigatorToActiveTabProvider)();
       }
-    } else if (tabIndex < currentTabIndex) {
-      // If we closed a tab before the active one, adjust the active index
-      ref.read(activeTabIndexProvider.notifier).state = currentTabIndex - 1;
-
+    } else if (isClosingTabBeforeActive) {
       // Sync navigator to the adjusted active tab
       ref.read(syncNavigatorToActiveTabProvider)();
     }

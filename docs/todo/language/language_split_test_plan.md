@@ -294,7 +294,7 @@ A related but distinct workstream from the App/Content split above. This pass
 (a) tokenized 11 hardcoded UI strings so they route through `AppLocalizations`,
 and (b) corrected/improved 10 Sinhala values + added 4 new keys
 (`themeLight`, `backspace`, `searchLanguageLabel`, `clearAll`). Full record:
-`docs/done/sinhala_localization_audit.md` and `docs/done/sinhala_translation_table.md`.
+`docs/done/language/sinhala_localization_audit.md` and `docs/done/language/sinhala_translation_table.md`.
 
 | ID | What the test must prove | Status |
 |---|---|---|

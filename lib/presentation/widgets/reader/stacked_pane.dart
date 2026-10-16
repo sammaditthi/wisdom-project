@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
-import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/text_entry_theme.dart';
-import '../../../domain/entities/bjt/bjt_page.dart';
 import '../../../domain/entities/content/entry_type.dart';
 import '../../../domain/entities/reader/document_slice.dart';
 import '../../models/in_page_search_state.dart';
+import 'anchored_page_list.dart';
 import 'entry_key_registry.dart';
 import 'reader_entry_builder.dart';
 
@@ -16,17 +15,14 @@ import 'reader_entry_builder.dart';
 /// followed by its Sinhala translation (regular weight), then moves to the
 /// next index. This layout is ideal for smaller screens where side-by-side
 /// is too cramped.
-///
-/// Uses [ListView.builder] with one item per page for lazy rendering,
-/// following the same pattern as [SingleColumnPane].
 class StackedPane extends StatelessWidget {
   const StackedPane({
     super.key,
     required this.scrollController,
     required this.slice,
+    required this.anchor,
     required this.searchState,
     required this.entryKeyRegistry,
-    required this.onTapEmpty,
     this.onWordTap,
     required this.onSelectionChanged,
     required this.contextMenuBuilder,
@@ -38,6 +34,9 @@ class StackedPane extends StatelessWidget {
   /// inside the first and last of them.
   final DocumentSlice slice;
 
+  /// The row scroll offset 0 sits on; null is the unit's top.
+  final (int, int)? anchor;
+
   final InPageSearchState searchState;
 
   /// Registry for entry-level GlobalKeys. Used for layout-switch scroll
@@ -45,9 +44,6 @@ class StackedPane extends StatelessWidget {
   /// at the bottom of `_buildStackedEntries` carries the registry key for
   /// each `(absolutePageIndex, entryIndex)`.
   final EntryKeyRegistry entryKeyRegistry;
-
-  /// Called when tapping empty space (clears highlights).
-  final VoidCallback onTapEmpty;
 
   /// Called when a word is tapped (for dictionary lookup).
   final void Function(String word)? onWordTap;
@@ -60,59 +56,41 @@ class StackedPane extends StatelessWidget {
     return SelectionArea(
       onSelectionChanged: onSelectionChanged,
       contextMenuBuilder: contextMenuBuilder,
-      child: GestureDetector(
-        onTap: onTapEmpty,
-        behavior: HitTestBehavior.translucent,
-        // LayoutBuilder exposes the pane's own width so the reading column can
-        // be capped and centered on wide screens (calmer margins), while
-        // medium/small panes keep the standard uniform padding.
-        child: LayoutBuilder(
-          builder: (context, constraints) => ListView.builder(
-            controller: scrollController,
-            padding:
-                context.textEntryTheme.readingPadding(constraints.maxWidth),
-            itemCount: slice.pages.length + 1, // +1 for top spacer
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return const SizedBox(
-                    height: PaneWidthConstants.readerActionButtonGroupHeight);
-              }
-              final pageIndex = index - 1;
-              final absolutePageIndex = slice.absolutePageStart + pageIndex;
-              final page = slice.pages[pageIndex];
-              // The unit may begin and end mid-page, so both ends are trimmed.
-              final (entryStart, entryEnd) =
-                  slice.entriesOn(pageIndex, page.paliSection.entries.length);
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ReaderEntryBuilder.buildPageNumber(context, page.pageNumber),
-                  const SizedBox(height: AppFonts.pageNumberGapPx),
-                  ..._buildStackedEntries(
-                      context, page, absolutePageIndex, entryStart, entryEnd),
-                  const SizedBox(height: AppFonts.pageGapPx),
-                ],
-              );
-            },
-          ),
+      // LayoutBuilder exposes the pane's own width so the reading column can
+      // be capped and centered on wide screens (calmer margins), while
+      // medium/small panes keep the standard uniform padding.
+      child: LayoutBuilder(
+        builder: (context, constraints) => AnchoredPageList(
+          controller: scrollController,
+          slice: slice,
+          anchor: anchor,
+          padding: context.textEntryTheme.readingPadding(constraints.maxWidth),
+          rowCount: (page) => page.paliSection.entries.length,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          buildRows: _buildStackedEntries,
         ),
       ),
     );
   }
 
-  /// Builds stacked Pali/Sinhala entry widgets for a single page.
+  /// Builds stacked Pali/Sinhala entry widgets for rows
+  /// `[startEntry, endEntry)` of the page at slice-local [index].
   ///
   /// For each entry index, emits the Pali entry (heavier weight,
   /// dictionary-tappable) then the Sinhala entry (regular weight), with a
   /// small gap between them and a larger gap between pairs.
   List<Widget> _buildStackedEntries(
     BuildContext context,
-    BJTPage page,
-    int absolutePageIndex,
+    int index,
     int startEntry,
     int endEntry,
   ) {
+    final page = slice.pages[index];
+    final absolutePageIndex = slice.absolutePageStart + index;
+    // The page's first row in this unit. The anchor can split a page, so
+    // [startEntry] is not always it.
+    final (pageStart, _) =
+        slice.entriesOn(index, page.paliSection.entries.length);
     final widgets = <Widget>[];
     final currentMatch = searchState.currentMatch;
     final effectiveQuery = searchState.effectiveQuery;
@@ -136,10 +114,10 @@ class StackedPane extends StatelessWidget {
           currentMatch.languageCode == 'si';
 
       // Add extra space before title entries (heading/centered) to
-      // visually separate them from preceding content
+      // visually separate them from preceding content on the same page
       final isTitle = paliEntry.entryType == EntryType.heading ||
           paliEntry.entryType == EntryType.centered;
-      if (isTitle && i > 0) {
+      if (isTitle && entryIndex > pageStart) {
         widgets.add(const SizedBox(height: 12.0));
       }
 

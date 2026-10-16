@@ -7,7 +7,7 @@ doc can be a rule doc.
 
 **Scope: the app.** The apex static site has its own list,
 `docs/todo/web-strategy/static-site-backlog.md`. The rule both surfaces follow is
-[`../decisions/reading-units-and-grouping.md`](../decisions/reading-units-and-grouping.md).
+[`../../decisions/reading-units-and-grouping.md`](../../decisions/reading-units-and-grouping.md).
 
 ---
 

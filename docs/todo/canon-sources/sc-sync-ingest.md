@@ -3,7 +3,7 @@
 > Status: **Plan. The pieces exist; the re-sync itself doesn't.** The read-only
 > mirror, the ingest (`scripts/research_server/ingest.sh`) and the receipt beside
 > `RESEARCH_STORE` came from the first full ingest, done 2026-10-01 in
-> [research-ingestion-ops-chunking-full-corpus.md](../done/research/research-ingestion-ops-chunking-full-corpus.md).
+> [research-ingestion-ops-chunking-full-corpus.md](../../done/research/research-ingestion-ops-chunking-full-corpus.md).
 > Left: the heartbeat (Step 0) and a re-sync run. Captured 2026-07-23.
 > Scope: how the **research (RAG) corpus** stays in step with SuttaCentral, and the
 > script that re-ingests it. Sibling of [bjt-sync-regen.md](./bjt-sync-regen.md) —
@@ -55,7 +55,7 @@ Both CC0. The filename gives the **uid** (`sn15.3`, `mn10`, `pli-tv-bu-vb-np18`)
 which becomes the document's `display_name` and rides into every citation — it is the
 deep-link backbone. Basket/nikaya metadata is **derived from the uid at ingest**,
 never annotated onto the JSON. (Commentary and Sujato's notes/introductions are
-**out** — see [wisdom-project-rag-qa-design.md](./wisdom-project-rag-qa-design.md) §5.2.)
+**out** — see [wisdom-project-rag-qa-design.md](../research/wisdom-project-rag-qa-design.md) §5.2.)
 
 ---
 
@@ -115,7 +115,7 @@ though the repo moved.
 ### Step 3 — Re-ingest into a NEW store (never mutate the live one)
 
 Run the ingest (`scripts/research_server/ingest.sh` —
-see [research-ingestion-ops-chunking-full-corpus.md](../done/research/research-ingestion-ops-chunking-full-corpus.md)):
+see [research-ingestion-ops-chunking-full-corpus.md](../../done/research/research-ingestion-ops-chunking-full-corpus.md)):
 
 - Upload into a **new** File Search store, leaving the current one untouched:
   `--display-name <name>` creates it and prints its id; then `--store <id>
@@ -167,7 +167,7 @@ exactly which SuttaCentral snapshot any given store id represents.
 ## 7. Open questions
 
 - **Also affects the concordance.** bilara-data seeds the SuttaCentral side of the
-  SC↔BJT concordance (see [sutta-references-plan.md](./sutta-references-plan.md), Part B).
+  SC↔BJT concordance (see [sutta-references-plan.md](../search/sutta-references-plan.md), Part B).
   A bilara-data update could shift SC enumeration, so a re-sync may need a concordance
   re-check too — not just a re-ingest.
 - **Detecting "meaningful" change** — Sujato revises wording often; do we re-ingest on

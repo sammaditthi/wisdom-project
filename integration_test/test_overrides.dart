@@ -236,3 +236,39 @@ Future<void> openTab(
       container.read(tabsProvider).length - 1;
   await pumpForSettle(tester);
 }
+
+/// The reader's scroll view: the one vertical [CustomScrollView] on screen
+/// (the tab bar's list is horizontal).
+final readerScrollView = find.byWidgetPredicate(
+  (w) => w is CustomScrollView && w.scrollDirection == Axis.vertical,
+);
+
+/// The reader's scroll controller. Fails, saying so, when the reader is not
+/// showing text — reading a controller off an empty finder throws an opaque
+/// StateError instead.
+ScrollController readerScrollController(WidgetTester tester) {
+  expect(readerScrollView, findsOneWidget,
+      reason: 'The reader must be showing text to have a scroll view');
+  return tester.widget<CustomScrollView>(readerScrollView).controller!;
+}
+
+/// The reader row `(page, entry)`, found by its registry key, whose label is
+/// `entry_<page>_<entry>`. Matches a built row even off screen, in the list's
+/// cache area; nothing while it isn't built.
+Finder readerRow(int page, int entry) => find.byWidgetPredicate(
+      (w) => w is KeyedSubtree && '${w.key}'.endsWith(' entry_${page}_$entry]'),
+      skipOffstage: false,
+    );
+
+/// Whether the reader row `(page, entry)` is built with its top edge inside
+/// the reader's viewport.
+bool isEntryOnScreen(WidgetTester tester, int page, int entry) {
+  final viewport = tester.getRect(readerScrollView);
+  for (final element in readerRow(page, entry).evaluate()) {
+    final box = element.renderObject;
+    if (box is! RenderBox || !box.attached || !box.hasSize) return false;
+    final top = box.localToGlobal(Offset.zero).dy;
+    return top >= viewport.top - 1 && top < viewport.bottom;
+  }
+  return false;
+}

@@ -35,8 +35,8 @@ final navigateToSuttaProvider =
 
     // Build from the canonical factory, then preserve the user's display
     // preferences (layout, splitRatio) from the current tab.
-    // ReaderTab.fromNode produces scrollOffset:0 and no landing row, so the
-    // new sutta starts at its own top.
+    // ReaderTab.fromNode produces scrollOffset:0 and no anchor, so the new
+    // sutta starts at its own top.
     final baseTab = ReaderTab.fromNode(
       nodeKey: target.nodeKey,
       paliName: target.paliName,

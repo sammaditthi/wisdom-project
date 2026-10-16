@@ -5,8 +5,7 @@ import 'package:flutter/rendering.dart';
 ///
 /// Each entry is identified by (absolutePageIndex, entryIndex). When the
 /// user switches layouts, [findTopVisibleEntry] uses these keys to determine
-/// which entry is at the viewport top, allowing the parent to reset
-/// pagination to that entry.
+/// which entry is at the viewport top, so the new layout can anchor at it.
 ///
 /// Owned by [MultiPaneReaderWidget] state and passed to pane widgets.
 class EntryKeyRegistry {

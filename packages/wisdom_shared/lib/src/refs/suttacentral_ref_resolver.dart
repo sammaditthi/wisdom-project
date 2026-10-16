@@ -12,7 +12,7 @@
 /// from SuttaCentral's flat numbering (e.g. SN 12+13 share one node), so both
 /// saṁyutta titles and positions diverge — only leaf sutta titles align the two
 /// editions. The mapping is therefore authored data. Full reasoning + evidence:
-/// `docs/todo/sutta-references-plan.md` (Part B).
+/// `docs/todo/search/sutta-references-plan.md` (Part B).
 class SuttaCentralRefResolver {
   /// SuttaCentral uid (e.g. `sn15.3`) -> BJT node key (e.g. `sn-2-3-1-3`).
   final Map<String, String> _scToNode;

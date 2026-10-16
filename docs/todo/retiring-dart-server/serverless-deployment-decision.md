@@ -4,11 +4,11 @@
 > identified; all branches are reversible via existing seams. **Captured:**
 > 2026-06-28 (from a design conversation).
 > **Companions:**
-> [`wisdom-project-rag-qa-design.md`](./wisdom-project-rag-qa-design.md) (the
+> [`wisdom-project-rag-qa-design.md`](../research/wisdom-project-rag-qa-design.md) (the
 > `/ask` backend this started with),
 > [`ai-qa-and-suttacentral-reference-resolver-plan.md`](./ai-qa-and-suttacentral-reference-resolver-plan.md)
 > (Flutter integration), and
-> [`reduce-mobile-size-and-move-to-drift.md`](./retiring-dart-server/reduce-mobile-size-and-move-to-drift.md) (the
+> [`reduce-mobile-size-and-move-to-drift.md`](./reduce-mobile-size-and-move-to-drift.md) (the
 > content-DB / single-source plan that this decision leans on).
 
 > **UPDATE 2026-07-16 — the content-server hinge is dissolved; the B1/B2/B3 tree
@@ -20,7 +20,7 @@
 > The **research (RAG) server stays** — the one backend, still scale-to-zero.
 > Notes → **Firestore** (direct client). **Net: zero always-on infrastructure.**
 > Content refreshes as monthly batched rebuilds. Details:
-> [`reduce-mobile-size-and-move-to-drift.md`](./retiring-dart-server/reduce-mobile-size-and-move-to-drift.md).
+> [`reduce-mobile-size-and-move-to-drift.md`](./reduce-mobile-size-and-move-to-drift.md).
 
 ---
 
@@ -217,7 +217,7 @@ START: "I don't want to run servers"
 
 **TTS / audio / images — stay on R2, do NOT migrate onto the box.** Reinforces the
 R2 call in
-[`tipitaka-tts-implementation-plan.md`](./tipitaka-tts-implementation-plan.md); the
+[`tipitaka-tts-implementation-plan.md`](../audio/tipitaka-tts-implementation-plan.md); the
 box existing makes this *stronger*, not weaker:
 - Box = dynamic query APIs (small requests, in-process SQLite, ~zero bandwidth).
   Static media = a bandwidth+storage problem → R2's **zero egress** + edge cache

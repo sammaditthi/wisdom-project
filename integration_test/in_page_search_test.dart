@@ -243,34 +243,30 @@ void main() {
                 'wrap assertion at the end needs the last match to lie past '
                 'the 4th, which is as far as the forward steps below go');
 
-        // Record initial scroll position
-        final scrollable = find.byWidgetPredicate(
-          (w) => w is ListView && w.scrollDirection == Axis.vertical,
-        );
-        final controller = tester.widget<ListView>(scrollable).controller!;
-        final offsetAtStart = controller.offset;
+        // Every step must bring the match's row on screen. Offsets can't
+        // say that: a match too far to be built is anchored at, which moves
+        // offset 0 to it.
+        void expectCurrentMatchOnScreen(String when) {
+          final match = readSearchState(container, 0).currentMatch!;
+          expect(
+            isEntryOnScreen(tester, match.pageIndex, match.entryIndex),
+            isTrue,
+            reason: '$when, the row holding the current match '
+                '(${match.pageIndex}, ${match.entryIndex}) must be on '
+                'screen — a match index that advances while the viewport '
+                'stays put is the bug this guards',
+          );
+        }
 
         // Step through a few matches forward — verify index tracks correctly
-        // AND that the viewport actually scrolls down to follow each match.
+        // AND that the viewport follows each match.
         for (var i = 1; i <= 3; i++) {
           await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
           await pumpForSettle(tester);
           expect(readSearchState(container, 0).currentMatchIndex, i,
               reason: 'After $i next-taps, currentMatchIndex should be $i');
+          expectCurrentMatchOnScreen('After $i next-taps');
         }
-
-        // Forward scroll-behaviour assertion (regression guard):
-        // Matches of "එවං" past index 0 lie further down the page, so the
-        // viewport offset must strictly increase after 3 next-taps. The
-        // earlier version of this test only checked currentMatchIndex,
-        // which let a real "match advances but viewport stays put" bug slip.
-        final offsetAfterForward = controller.offset;
-        expect(
-          offsetAfterForward,
-          greaterThan(offsetAtStart),
-          reason: 'Stepping forward through matches must scroll the viewport '
-              'down — offset: $offsetAtStart → $offsetAfterForward',
-        );
 
         // Verify the match counter text updates in the UI
         expect(
@@ -279,21 +275,13 @@ void main() {
           reason: 'Counter should show "4 / $matchCount" after 3 next-taps',
         );
 
-        // Navigate back to match 0 — viewport must scroll up symmetrically.
+        // Navigate back to match 0 — the viewport must follow it up.
         for (var i = 0; i < 3; i++) {
           await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
           await pumpForSettle(tester);
         }
         expect(readSearchState(container, 0).currentMatchIndex, 0);
-
-        // Back scroll-behaviour assertion: offset must shrink back toward 0.
-        final offsetAfterBack = controller.offset;
-        expect(
-          offsetAfterBack,
-          lessThan(offsetAfterForward),
-          reason: 'Stepping back through matches must scroll the viewport up '
-              '— offset: $offsetAfterForward → $offsetAfterBack',
-        );
+        expectCurrentMatchOnScreen('Back at the first match');
 
         // Wrap to the LAST match (previous from 0 → last match at end of sutta)
         await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
@@ -304,28 +292,9 @@ void main() {
             reason: 'Previous from 0 should wrap to last match');
 
         // The last match sits near the end of the sutta, far below anything
-        // the ListView has built. There is no pagination to expand any more —
-        // the whole unit is the list, and the entry holding the match is
-        // simply not laid out yet — so the bounded retry inside
-        // _scrollToCurrentMatch is the entire mechanism this asserts on.
-        //
-        // Give it time to wait for ListView.builder to build the target, then
-        // run Scrollable.ensureVisible.
-        await pumpForSettle(tester, const Duration(seconds: 1));
-
-        // Measured against the furthest point the *stepwise* walk reached,
-        // not against the start: the last match lies past every match those
-        // three taps visited, so beating `offsetAtStart` is satisfied by any
-        // small forward nudge and proves nothing about reaching the end.
-        final offsetAtLast = controller.offset;
-        expect(
-          offsetAtLast,
-          greaterThan(offsetAfterForward),
-          reason: 'Wrapping to the last match must scroll the viewport past '
-              'everything stepping forward reached — offset: '
-              '$offsetAfterForward (match 4) → $offsetAtLast (match '
-              '$matchCount)',
-        );
+        // built so far, so the reader anchors at its row rather than laying
+        // out every row in between.
+        expectCurrentMatchOnScreen('After wrapping to the last match');
 
         // Match counter should show the last position
         expect(

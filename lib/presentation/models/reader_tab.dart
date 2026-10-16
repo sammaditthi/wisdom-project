@@ -40,14 +40,11 @@ class ReaderTab with _$ReaderTab {
     /// with no content.
     String? nodeKey,
 
-    /// A landing position inside the unit — the row an FTS hit or a
-    /// `?e=<page>.<entry>` link named, as a document coordinate.
-    ///
-    /// **Scroll position only.** The unit always comes from [nodeKey]; this
-    /// says where inside it to stop, and the reader clears it the moment it
-    /// lands. Null for every other way a tab opens.
-    int? landingPageIndex,
-    int? landingEntryIndex,
+    /// The row scroll offset 0 sits on, as a document coordinate: what a
+    /// search hit or a `?e=` link named, or where the reader re-anchored.
+    /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
+    int? anchorPageIndex,
+    int? anchorEntryIndex,
 
     /// Pali name of the node for reference
     String? paliName,
@@ -74,8 +71,8 @@ class ReaderTab with _$ReaderTab {
     /// Represents the proportion of width for the left (Pali) pane
     @Default(0.5) double splitRatio,
 
-    /// Last known scroll offset (in pixels) for this tab.
-    /// Persisted to disk so a reload resumes at the same reading position.
+    /// Last known scroll offset in pixels, measured from the anchor row
+    /// (negative above it). Persisted so a reload resumes where reading stopped.
     @Default(0.0) double scrollOffset,
   }) = _ReaderTab;
 
@@ -83,29 +80,32 @@ class ReaderTab with _$ReaderTab {
   factory ReaderTab.fromJson(Map<String, dynamic> json) =>
       _$ReaderTabFromJson(json);
 
-  /// Creates a tab reading [nodeKey]'s unit.
-  ///
-  /// [landingPageIndex]/[landingEntryIndex] only say where to stop scrolling
-  /// inside that unit; they never widen or move it.
+  /// Creates a tab reading [nodeKey]'s unit, anchored at
+  /// [anchorPageIndex]/[anchorEntryIndex] when given.
   factory ReaderTab.fromNode({
     required String nodeKey,
     required String paliName,
     required String sinhalaName,
-    int? landingPageIndex,
-    int? landingEntryIndex,
+    int? anchorPageIndex,
+    int? anchorEntryIndex,
     ReaderLayout layout = ReaderLayout.paliOnly,
   }) {
     return ReaderTab(
       label: truncateGraphemes(paliName, 20),
       fullName: '$paliName / $sinhalaName',
       nodeKey: nodeKey,
-      landingPageIndex: landingPageIndex,
-      landingEntryIndex: landingEntryIndex,
+      anchorPageIndex: anchorPageIndex,
+      anchorEntryIndex: anchorEntryIndex,
       paliName: paliName,
       sinhalaName: sinhalaName,
       layout: layout,
     );
   }
+
+  /// The anchor row as `(page, entry)`, or null for the unit's top.
+  (int, int)? get anchor => anchorPageIndex != null && anchorEntryIndex != null
+      ? (anchorPageIndex!, anchorEntryIndex!)
+      : null;
 
   /// Checks if this tab's node is a commentary (atthakatha)
   bool get isCommentary =>

@@ -166,7 +166,7 @@ The badge draws its colour as **text** on a 15% tint of itself. With the shared 
 | ND | `#795548` | `#C2A89B` | 5.0 |
 | PN | `#FFC107` | `#E8C766` | 6.4 |
 
-This changes the "one shared palette" decision in `docs/done/dictionary-badges-shared-palette.md` to "one palette per brightness".
+This changes the "one shared palette" decision in `docs/done/dictionary/dictionary-badges-shared-palette.md` to "one palette per brightness".
 
 The edition badge in search results uses `tertiary` at 30% over the panel. In dark that comes out as a soft mint `#4B604F`, with its label (`onPrimaryContainer`) at 6.2:1. That works as is.
 
@@ -227,7 +227,7 @@ These aren't applied, and each is independent.
 
 1. **Badge labels in light are low contrast.** On their own 15% tint over white: VRI 1.9, PN 1.5, BUS 2.4, DPD 2.7, CR 3.0, MS 3.1. Deeper tones of the same hues pass AA: for example VRI `#9A4F00` 4.8, PN `#765A00` 5.2, BUS `#276B2B` 5.2.
 2. **`outline` is very soft** at 1.5:1. That's fine for dividers, but low for the in-page search field's border. Fix the field locally if it feels lost.
-3. **`shadow`:** `docs/done/light_theme_m3_alignment_plan.md` says `#3A2510`, but the code has `#2A2318`. Align one with the other.
+3. **`shadow`:** `docs/done/theme/light_theme_m3_alignment_plan.md` says `#3A2510`, but the code has `#2A2318`. Align one with the other.
 
 ## Rollout
 

@@ -104,8 +104,8 @@ void main() {
       final tabs = container.read(tabsProvider);
       expect(tabs.length, equals(1));
       expect(tabs[0].nodeKey, equals('dn-1'));
-      expect(tabs[0].landingPageIndex, equals(3));
-      expect(tabs[0].landingEntryIndex, equals(2));
+      expect(tabs[0].anchorPageIndex, equals(3));
+      expect(tabs[0].anchorEntryIndex, equals(2));
     });
 
     test('should set active tab index to new tab', () async {
@@ -193,8 +193,8 @@ void main() {
       // ASSERT
       final tabs = container.read(tabsProvider);
       expect(tabs[0].nodeKey, equals('mn-1'));
-      expect(tabs[0].landingPageIndex, equals(10));
-      expect(tabs[0].landingEntryIndex, equals(3));
+      expect(tabs[0].anchorPageIndex, equals(10));
+      expect(tabs[0].anchorEntryIndex, equals(3));
     });
   });
 
@@ -229,20 +229,20 @@ void main() {
       container.read(openTabFromNodeKeyProvider)(node.nodeKey, pageIndex: 3);
 
       final tab = container.read(tabsProvider).single;
-      expect(tab.landingPageIndex, 3);
-      expect(tab.landingEntryIndex, 0,
+      expect(tab.anchorPageIndex, 3);
+      expect(tab.anchorEntryIndex, 0,
           reason: 'The top of the named page — not the node own entry, '
               '${node.entryIndexInPage}, which belongs to the node own page');
     });
 
-    test('no page override leaves the tab with no landing at all', () {
+    test('no page override leaves the tab with no anchor at all', () {
       // A tree tap or a bare `/tipitaka/<key>` link. The unit renders from its
       // own first row, so there is nothing to scroll to and nothing to spend.
       container.read(openTabFromNodeKeyProvider)(node.nodeKey);
 
       final tab = container.read(tabsProvider).single;
-      expect(tab.landingPageIndex, isNull);
-      expect(tab.landingEntryIndex, isNull);
+      expect(tab.anchorPageIndex, isNull);
+      expect(tab.anchorEntryIndex, isNull);
     });
 
     test('an entry override is kept as given', () {
@@ -253,8 +253,8 @@ void main() {
       );
 
       final tab = container.read(tabsProvider).single;
-      expect(tab.landingPageIndex, 3);
-      expect(tab.landingEntryIndex, 2);
+      expect(tab.anchorPageIndex, 3);
+      expect(tab.anchorEntryIndex, 2);
     });
 
     test('an entry without a page is discarded, not kept', () {
@@ -267,9 +267,9 @@ void main() {
       container.read(openTabFromNodeKeyProvider)(node.nodeKey, entryStart: 2);
 
       final tab = container.read(tabsProvider).single;
-      expect(tab.landingPageIndex, isNull);
-      expect(tab.landingEntryIndex, isNull,
-          reason: 'Half a coordinate is not a landing');
+      expect(tab.anchorPageIndex, isNull);
+      expect(tab.anchorEntryIndex, isNull,
+          reason: 'Half a coordinate is not an anchor');
     });
 
     test('a key the tree does not hold opens nothing', () {
@@ -394,6 +394,37 @@ void main() {
       expect(container.read(tabsProvider).length, equals(2));
       // The active tab content should still be sn-1
       expect(container.read(activeNodeKeyProvider), equals('sn-1'));
+    });
+
+    test(
+        'closing tab before active: the index change still finds the active '
+        'tab at its old index', () {
+      // The reader saves the outgoing tab's scroll offset when the index
+      // changes, addressed by the old index. If the tab were removed first,
+      // that index would hold the tab to the right, and the save would
+      // overwrite that tab's position.
+      final notifier = container.read(tabsProvider.notifier);
+      notifier.addTab(_createTestReaderTab(nodeKey: 'dn-1'));
+      notifier.addTab(_createTestReaderTab(nodeKey: 'mn-1'));
+      notifier.addTab(_createTestReaderTab(nodeKey: 'sn-1'));
+      container.read(activeTabIndexProvider.notifier).state = 1;
+
+      String? tabAtOldIndex;
+      container.listen<int>(activeTabIndexProvider, (previous, next) {
+        if (previous != null && previous >= 0) {
+          tabAtOldIndex = container.read(tabsProvider)[previous].nodeKey;
+        }
+      });
+
+      // ACT - Close dn-1, left of the active mn-1
+      container.read(closeTabProvider)(0);
+
+      // ASSERT
+      expect(tabAtOldIndex, equals('mn-1'),
+          reason: 'When the index moves, the old index must still be the '
+              'active tab');
+      expect(container.read(activeTabIndexProvider), equals(0));
+      expect(container.read(activeNodeKeyProvider), equals('mn-1'));
     });
 
     test('closing tab after active should not change activeTabIndex', () {

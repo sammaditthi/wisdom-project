@@ -1,7 +1,6 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart' show SelectedContent;
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart' show HardwareKeyboard;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_fonts.dart';
@@ -12,37 +11,24 @@ import '../../models/in_page_search_state.dart';
 import '../../providers/tab_provider.dart'
     show activeSplitRatioProvider, updateActiveTabSplitRatioProvider;
 import '../common/resizable_divider.dart';
+import 'anchored_page_list.dart';
 import 'entry_key_registry.dart';
 import 'reader_entry_builder.dart';
 
-/// Side-by-side Pali/Sinhala reader.
+/// Side-by-side Pali/Sinhala reader: one lazy list of pair rows, each
+/// `Row(Pali cell, gap, Sinhala cell)`, so every row lines up its own pair.
 ///
-/// Each column has its own [SelectionArea] so a drag-select stays within
-/// the column it started in. Pair alignment is restored by
-/// [_PairHeightSync]: each side reports its rendered height; the shorter
-/// side pads to match.
-///
-/// **The one pane Flutter cannot make lazy for us.** Per-column selection
-/// forces two independent [Column]s inside one scroll view, and there is no
-/// lazy Column — so this builds a growing prefix of the slice ([_renderedPages])
-/// instead of all of it. Without that, tapping a container in side-by-side
-/// builds its whole subtree at once: `ap-pat` is 497 pages and ~4,000 entry
-/// pairs, each an [_AlignedEntry] carrying a GlobalKey, a ValueNotifier and a
-/// post-frame measure.
-///
-/// [SliverCrossAxisGroup] is the primitive that would make this properly lazy
-/// — two SliverLists sharing one scroll offset — but [SelectionArea] is a box
-/// widget and cannot wrap an individual sliver, so it would cost the
-/// per-column selection boundary. Not worth that trade for a window.
+/// One [SelectionArea] covers the whole list, so a drag can cross the anchor
+/// row. A [_ColumnGate] on each cell keeps a selection inside the column the
+/// press landed in.
 class DualColumnPane extends ConsumerStatefulWidget {
   const DualColumnPane({
     super.key,
     required this.scrollController,
     required this.slice,
+    required this.anchor,
     required this.searchState,
-    required this.revealTarget,
     required this.entryKeyRegistry,
-    required this.onTapEmpty,
     this.onWordTap,
     required this.onSelectionChanged,
     required this.contextMenuBuilder,
@@ -54,24 +40,14 @@ class DualColumnPane extends ConsumerStatefulWidget {
   /// inside the first and last of them.
   final DocumentSlice slice;
 
+  /// The row scroll offset 0 sits on; null is the unit's top.
+  final (int, int)? anchor;
+
   final InPageSearchState searchState;
 
-  /// The `(absolutePageIndex, entryIndex)` the reader is currently trying to
-  /// reveal, or null.
-  ///
-  /// The window has to be told: a landing row, a search match and a
-  /// layout-switch sync all reach for an entry's GlobalKey, and that key only
-  /// exists once its page is built. The lazy panes need none of this — every
-  /// page is already an item in their `ListView`, so stepping the viewport
-  /// reaches it. Here there is nothing to step toward.
-  final (int, int)? revealTarget;
-
-  /// Registry for entry-level GlobalKeys. Used for layout-switch scroll
-  /// sync AND in-page-search scroll-to-match. The registry key wraps the
-  /// LEFT side only — `_PairHeightSync` keeps both sides on the same y,
-  /// so scrolling to the left side reveals either-side matches.
+  /// Registry for entry-level GlobalKeys, one per pair row. Used for
+  /// layout-switch scroll sync AND in-page-search scroll-to-match.
   final EntryKeyRegistry entryKeyRegistry;
-  final VoidCallback onTapEmpty;
   final void Function(String word)? onWordTap;
   final void Function(SelectedContent?) onSelectionChanged;
   final Widget Function(BuildContext, SelectableRegionState) contextMenuBuilder;
@@ -81,334 +57,137 @@ class DualColumnPane extends ConsumerStatefulWidget {
 }
 
 class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
-  late final _PairHeightSync _heightSync;
-
-  /// Budget for the opening window, and for each growth step, counted in entry
-  /// pairs rather than pages: pages carry anywhere from one entry to dozens,
-  /// and the entry is what costs.
-  static const _initialEntryBudget = 60;
-  static const _growthEntryBudget = 40;
-
-  /// Grow once the viewport comes within this of the end of what is built.
-  static const _growthTriggerPx = 400.0;
-
-  /// How many of `widget.slice.pages` are built, counting from the first.
-  /// Only ever grows for a given slice; a new slice starts over.
-  int _renderedPages = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _heightSync = _PairHeightSync();
-    _renderedPages = _pagesCovering(0, _initialEntryBudget);
-    _extendToReveal();
-    widget.scrollController.addListener(_onScroll);
-  }
-
-  @override
-  void didUpdateWidget(DualColumnPane old) {
-    super.didUpdateWidget(old);
-    if (!identical(old.scrollController, widget.scrollController)) {
-      old.scrollController.removeListener(_onScroll);
-      widget.scrollController.addListener(_onScroll);
-    }
-    if (!identical(old.slice, widget.slice)) {
-      // A new unit opens at its own window, then heights are dropped for
-      // entries no longer rendered; persisted entries keep theirs to avoid
-      // re-measure churn.
-      _renderedPages = _pagesCovering(0, _initialEntryBudget);
-      _heightSync.prune(_liveIdSet());
-    }
-    _extendToReveal();
-    // Both assignments above land before the build that follows, so neither
-    // needs a setState.
-  }
-
-  Set<(int, int)> _liveIdSet() {
-    final live = <(int, int)>{};
-    final slice = widget.slice;
-    for (var p = 0; p < _renderedPages; p++) {
-      final absPage = slice.absolutePageStart + p;
-      final (start, end) =
-          slice.entriesOn(p, slice.pages[p].paliSection.entries.length);
-      for (var e = start; e < end; e++) {
-        live.add((absPage, e));
-      }
-    }
-    return live;
-  }
-
-  /// How many pages from [fromPage] it takes to cover [entryBudget] entries.
-  /// Zero only when [fromPage] is already past the end.
-  int _pagesCovering(int fromPage, int entryBudget) {
-    final slice = widget.slice;
-    var pages = 0;
-    var entries = 0;
-    while (fromPage + pages < slice.pages.length && entries < entryBudget) {
-      final local = fromPage + pages;
-      final (start, end) =
-          slice.entriesOn(local, slice.pages[local].paliSection.entries.length);
-      entries += end - start;
-      pages++;
-    }
-    return pages;
-  }
-
-  void _grow() {
-    final added = _pagesCovering(_renderedPages, _growthEntryBudget);
-    if (added == 0) return;
-    setState(() => _renderedPages += added);
-  }
-
-  void _onScroll() {
-    if (_renderedPages >= widget.slice.pages.length) return;
-    if (!widget.scrollController.hasClients) return;
-    final position = widget.scrollController.position;
-    if (position.maxScrollExtent - position.pixels > _growthTriggerPx) return;
-    _grow();
-  }
-
-  /// The opening window is sized in entries, so on a tall viewport it can
-  /// still come up short — and then there is nothing to scroll and [_onScroll]
-  /// never fires. Grow until the content overflows or the unit runs out.
-  void _fillViewport() {
-    if (!mounted) return;
-    if (_renderedPages >= widget.slice.pages.length) return;
-    if (!widget.scrollController.hasClients) return;
-    if (widget.scrollController.position.maxScrollExtent > 0) return;
-    _grow();
-  }
-
-  /// Opens the window far enough to hold [DualColumnPane.revealTarget].
-  ///
-  /// This is the same cost the pagination it replaced paid — that expanded
-  /// `pageEnd` to the target page and built just as much. A target outside
-  /// this slice is ignored rather than coordinated away: the reader's last
-  /// reveal outlives the unit it was aimed at, and a stale one must not drag
-  /// the new unit's window open.
-  void _extendToReveal() {
-    final target = widget.revealTarget;
-    if (target == null) return;
-    final localPage = target.$1 - widget.slice.absolutePageStart;
-    if (localPage < _renderedPages || localPage >= widget.slice.pages.length) {
-      return;
-    }
-    _renderedPages = localPage + 1;
-  }
-
-  @override
-  void dispose() {
-    widget.scrollController.removeListener(_onScroll);
-    _heightSync.dispose();
-    super.dispose();
-  }
+  /// The column of the last press, read by every cell's gate.
+  final _ActiveColumn _activeColumn = _ActiveColumn();
 
   @override
   Widget build(BuildContext context) {
     final isTabletOrDesktop = ResponsiveUtils.isTabletOrDesktop(context);
+    final dividerWidth =
+        isTabletOrDesktop ? PaneWidthConstants.dividerWidth : 24.0;
 
-    if (_renderedPages < widget.slice.pages.length) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _fillViewport());
-    }
+    return Stack(
+      children: [
+        SelectionArea(
+          onSelectionChanged: widget.onSelectionChanged,
+          contextMenuBuilder: widget.contextMenuBuilder,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              // Past the paired measure the leftover becomes equal margins
+              // instead of more column.
+              final padding = context.textEntryTheme
+                  .readingPadding(constraints.maxWidth, columns: 2);
+              final availableWidth =
+                  constraints.maxWidth - padding.horizontal - dividerWidth;
+              final columns = _Columns(availableWidth, dividerWidth);
 
-    // Build sides ONCE per parent build. These references are captured by
-    // the inner Consumer's closure — across drag frames the Consumer hands
-    // back the same Widget instance to each SizedBox's `child` slot, so
-    // Flutter's element diff keeps the entry subtree mounted and only
-    // re-lays out the changed widths. No `_buildColumnEntries` re-run, no
-    // GlobalKey reattachment, no `_AlignedEntry` state loss.
-    final leftSide = _buildSideContent(context, isLeft: true);
-    final rightSide = _buildSideContent(context, isLeft: false);
-
-    return GestureDetector(
-      onTap: widget.onTapEmpty,
-      behavior: HitTestBehavior.translucent,
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            controller: widget.scrollController,
-            // LayoutBuilder outside the Padding, because the padding now
-            // depends on the pane width: past the paired measure the leftover
-            // becomes equal margins instead of more column. Below it this is
-            // the uniform 24 it always was.
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final padding = context.textEntryTheme
-                    .readingPadding(constraints.maxWidth, columns: 2);
-                final dividerWidth =
-                    isTabletOrDesktop ? PaneWidthConstants.dividerWidth : 24.0;
-                final availableWidth =
-                    constraints.maxWidth - padding.horizontal - dividerWidth;
-
-                return Padding(
+              return Listener(
+                // Runs before the selection sees the press. A shift-click
+                // keeps the column, so it extends the selection already there.
+                onPointerDown: (event) {
+                  if (HardwareKeyboard.instance.isShiftPressed) return;
+                  final ratio = ref.read(activeSplitRatioProvider);
+                  final seam =
+                      padding.left + availableWidth * ratio + dividerWidth / 2;
+                  _activeColumn.value = event.localPosition.dx < seam ? 0 : 1;
+                },
+                child: AnchoredPageList(
+                  controller: widget.scrollController,
+                  slice: widget.slice,
+                  anchor: widget.anchor,
                   padding: padding,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                          height:
-                              PaneWidthConstants.readerActionButtonGroupHeight),
-                      // Watch splitRatio scoped to just the Row so drag
-                      // frames don't rebuild the parent or the side trees.
-                      Consumer(
-                        builder: (context, ref, _) {
-                          final splitRatio =
-                              ref.watch(activeSplitRatioProvider);
-                          final leftWidth = availableWidth * splitRatio;
-                          final rightWidth = availableWidth * (1 - splitRatio);
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(width: leftWidth, child: leftSide),
-                              SizedBox(width: dividerWidth),
-                              SizedBox(width: rightWidth, child: rightSide),
-                            ],
-                          );
-                        },
-                      ),
-                    ],
+                  rowCount: (page) => page.paliSection.entries.length,
+                  buildPageNumber: (context, number) => columns.row(
+                    ReaderEntryBuilder.buildPageNumber(context, number),
+                    ReaderEntryBuilder.buildPageNumber(context, number),
                   ),
-                );
-              },
-            ),
-          ),
-          if (isTabletOrDesktop)
-            // Overlay also watches splitRatio in its own Consumer — it's a
-            // tiny widget, cheap to rebuild on drag.
-            Consumer(
-              builder: (context, ref, _) {
-                final splitRatio = ref.watch(activeSplitRatioProvider);
-                return _buildDividerOverlay(context, ref, splitRatio);
-              },
-            ),
-        ],
-      ),
-    );
-  }
-
-  /// One column: SelectionArea wrapped in a RepaintBoundary so paint in
-  /// one column doesn't dirty the other.
-  Widget _buildSideContent(BuildContext context, {required bool isLeft}) {
-    return RepaintBoundary(
-      child: SelectionArea(
-        onSelectionChanged: widget.onSelectionChanged,
-        contextMenuBuilder: widget.contextMenuBuilder,
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: isLeft ? 0 : 12.0,
-            right: isLeft ? 12.0 : 0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: _buildColumnEntries(context, isLeft: isLeft),
+                  buildRows: (context, index, start, end) =>
+                      _buildRows(context, index, start, end, columns),
+                ),
+              );
+            },
           ),
         ),
-      ),
+        if (isTabletOrDesktop)
+          // Watches splitRatio in its own Consumer — a tiny widget, cheap to
+          // rebuild on drag.
+          Consumer(
+            builder: (context, ref, _) {
+              final splitRatio = ref.watch(activeSplitRatioProvider);
+              return _buildDividerOverlay(context, ref, splitRatio);
+            },
+          ),
+      ],
     );
   }
 
-  List<Widget> _buildColumnEntries(
-    BuildContext context, {
-    required bool isLeft,
-  }) {
+  List<Widget> _buildRows(
+    BuildContext context,
+    int index,
+    int start,
+    int end,
+    _Columns columns,
+  ) {
     final slice = widget.slice;
-    final pages = slice.pages;
+    final page = slice.pages[index];
+    final absolutePageIndex = slice.absolutePageStart + index;
     final searchState = widget.searchState;
     final currentMatch = searchState.currentMatch;
     final effectiveQuery = searchState.effectiveQuery;
     final hasQuery = searchState.hasActiveQuery;
 
-    final widgets = <Widget>[];
-
-    // Bounded by the window, not `pages.length` — see the class doc.
-    for (var pageIndex = 0; pageIndex < _renderedPages; pageIndex++) {
-      final page = pages[pageIndex];
-      final absolutePageIndex = slice.absolutePageStart + pageIndex;
-      // The unit may begin and end mid-page, so both ends are trimmed.
-      final (startEntry, endEntry) =
-          slice.entriesOn(pageIndex, page.paliSection.entries.length);
-
-      // Page number row — same on both sides, no sync needed.
-      widgets.add(ReaderEntryBuilder.buildPageNumber(context, page.pageNumber));
-      widgets.add(const SizedBox(height: AppFonts.pageNumberGapPx));
-
-      for (var i = 0; i < endEntry - startEntry; i++) {
-        final entryIndex = i + startEntry;
-        final paliEntry = page.paliSection.entries[entryIndex];
-        final sinhalaEntry = entryIndex < page.sinhalaSection.entries.length
-            ? page.sinhalaSection.entries[entryIndex]
-            : null;
-
-        final isPaliCurrentMatch = currentMatch != null &&
-            currentMatch.pageIndex == absolutePageIndex &&
-            currentMatch.entryIndex == entryIndex &&
-            currentMatch.languageCode == 'pi';
-        final isSinhalaCurrentMatch = currentMatch != null &&
-            currentMatch.pageIndex == absolutePageIndex &&
-            currentMatch.entryIndex == entryIndex &&
-            currentMatch.languageCode == 'si';
-
-        final Widget innerEntry;
-        if (isLeft) {
-          final paliHasMatch = hasQuery &&
-              searchState.hasMatchInEntry(absolutePageIndex, entryIndex, 'pi');
-          innerEntry = ReaderEntryBuilder.buildEntry(
-            context,
-            paliEntry,
-            enableDictionaryLookup: true,
-            inPageSearchQuery: paliHasMatch ? effectiveQuery : null,
-            currentMatchIndexInEntry:
-                isPaliCurrentMatch ? currentMatch.matchIndexInEntry : null,
-            onWordTap: widget.onWordTap,
-          );
-        } else if (sinhalaEntry != null) {
-          final sinhalaHasMatch = hasQuery &&
-              searchState.hasMatchInEntry(absolutePageIndex, entryIndex, 'si');
-          innerEntry = ReaderEntryBuilder.buildEntry(
-            context,
-            sinhalaEntry,
-            enableDictionaryLookup: false,
-            inPageSearchQuery: sinhalaHasMatch ? effectiveQuery : null,
-            currentMatchIndexInEntry:
-                isSinhalaCurrentMatch ? currentMatch.matchIndexInEntry : null,
-            onWordTap: widget.onWordTap,
-          );
-        } else {
-          innerEntry = const SizedBox.shrink();
-        }
-
-        final id = (absolutePageIndex, entryIndex);
-
-        Widget side = _AlignedEntry(
-          key: ValueKey((absolutePageIndex, entryIndex, isLeft)),
-          id: id,
-          isLeft: isLeft,
-          sync: _heightSync,
-          child: innerEntry,
-        );
-
-        Widget row = Padding(
-          padding: const EdgeInsets.only(bottom: AppFonts.entryGapPx),
-          child: side,
-        );
-
-        // Registry key on LEFT only — duplicate GlobalKeys would crash.
-        // Both sides share the same y after height-sync converges, so the
-        // left-side key is sufficient for scroll-to-match on either side.
-        if (isLeft) {
-          row = KeyedSubtree(
-            key: widget.entryKeyRegistry.keyFor(absolutePageIndex, entryIndex),
-            child: row,
-          );
-        }
-
-        widgets.add(row);
-      }
-
-      widgets.add(const SizedBox(height: AppFonts.pageGapPx));
+    // One cell's entry, with its in-page search highlight.
+    Widget entry(int entryIndex, String language) {
+      final isPali = language == 'pi';
+      final section = isPali ? page.paliSection : page.sinhalaSection;
+      final isCurrentMatch = currentMatch != null &&
+          currentMatch.pageIndex == absolutePageIndex &&
+          currentMatch.entryIndex == entryIndex &&
+          currentMatch.languageCode == language;
+      return ReaderEntryBuilder.buildEntry(
+        context,
+        section.entries[entryIndex],
+        enableDictionaryLookup: isPali,
+        inPageSearchQuery: hasQuery &&
+                searchState.hasMatchInEntry(
+                    absolutePageIndex, entryIndex, language)
+            ? effectiveQuery
+            : null,
+        currentMatchIndexInEntry:
+            isCurrentMatch ? currentMatch.matchIndexInEntry : null,
+        onWordTap: widget.onWordTap,
+      );
     }
 
-    return widgets;
+    return [
+      for (var entryIndex = start; entryIndex < end; entryIndex++)
+        KeyedSubtree(
+          key: widget.entryKeyRegistry.keyFor(absolutePageIndex, entryIndex),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: AppFonts.entryGapPx),
+            child: columns.row(
+              Padding(
+                padding: const EdgeInsets.only(right: 12.0),
+                child: _GatedCell(
+                  column: 0,
+                  active: _activeColumn,
+                  child: entry(entryIndex, 'pi'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0),
+                child: entryIndex < page.sinhalaSection.entries.length
+                    ? _GatedCell(
+                        column: 1,
+                        active: _activeColumn,
+                        child: entry(entryIndex, 'si'),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
+          ),
+        ),
+    ];
   }
 
   Widget _buildDividerOverlay(
@@ -421,29 +200,17 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
           // leave the handle sitting well left of the seam it drags.
           final padding = context.textEntryTheme
               .readingPadding(constraints.maxWidth, columns: 2);
-          // Must be the *same* width the content divides. The content splits
-          // what is left after the divider is taken out — it is a third Row
-          // child, not part of either column — so the ratio is against that,
-          // not against the full content box.
+          // Must be the *same* width the rows divide: the divider is each
+          // row's middle child, not part of either column, so the ratio is
+          // against what is left after it.
           final availableWidth = constraints.maxWidth -
               padding.horizontal -
               PaneWidthConstants.dividerWidth;
-          // The gap's own left edge, which is where the handle starts. No
-          // centring term: `ResizableDivider` sizes itself from this same
-          // constant, so landing its left edge on the gap's left edge fills the
-          // gap exactly.
-          //
-          // Both of those were wrong here and were cancelling: dividing the full
-          // content box pushed the handle `dividerWidth * splitRatio` right,
-          // while a `- dividerWidth / 2` centring term pulled it back a flat
-          // half. Net `dividerWidth * (splitRatio - 0.5)` — exact at 50/50,
-          // which is why it read as correct, and 2px off at the 0.25/0.75
-          // clamps. Fixing either alone is worse than fixing neither: it breaks
-          // the centre, where the handle spends most of its life.
-          //
-          // Only reached when `isTabletOrDesktop`, the same branch where the
-          // content's divider is this constant rather than the 24 a phone uses,
-          // so there is no second value to keep in step.
+          // The gap's own left edge, which is where the handle starts.
+          // `ResizableDivider` sizes itself from the same constant, so landing
+          // its left edge on the gap's left edge fills the gap exactly. Only
+          // reached when `isTabletOrDesktop`, the same branch where the rows'
+          // gap is this constant rather than the 24 a phone uses.
           final dividerLeft = padding.left + (availableWidth * splitRatio);
 
           return Padding(
@@ -470,137 +237,127 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
   }
 }
 
-// =============================================================================
-// Per-pair height sync
-// =============================================================================
+/// The two column widths a pair row splits its width into.
+class _Columns {
+  const _Columns(this.availableWidth, this.dividerWidth);
 
-/// Per-(pair, side) [ValueNotifier]s for bottom-pad. Each [_AlignedEntry]
-/// listens to its own notifier via [ValueListenableBuilder], so a height
-/// report rebuilds only the affected Padding — no parent setState, no
-/// cascade across siblings.
-class _PairHeightSync {
-  final Map<(int, int), double> _leftH = {};
-  final Map<(int, int), double> _rightH = {};
-  final Map<(int, int, bool), ValueNotifier<double>> _pads = {};
+  final double availableWidth;
+  final double dividerWidth;
 
-  ValueNotifier<double> padNotifierFor((int, int) id, bool isLeft) {
-    final key = (id.$1, id.$2, isLeft);
-    return _pads.putIfAbsent(
-      key,
-      () => ValueNotifier<double>(_computePad(id, isLeft)),
-    );
-  }
-
-  double _computePad((int, int) id, bool isLeft) {
-    final l = _leftH[id] ?? 0;
-    final r = _rightH[id] ?? 0;
-    final mine = isLeft ? l : r;
-    return math.max(l, r) - mine;
-  }
-
-  void report((int, int) id, bool isLeft, double height) {
-    final map = isLeft ? _leftH : _rightH;
-    if (map[id] == height) return;
-    map[id] = height;
-    final l = _leftH[id] ?? 0;
-    final r = _rightH[id] ?? 0;
-    final maxH = math.max(l, r);
-    _pads[(id.$1, id.$2, true)]?.value = maxH - l;
-    _pads[(id.$1, id.$2, false)]?.value = maxH - r;
-  }
-
-  /// Drops stale ids. Notifiers aren't disposed here — listeners may still
-  /// be attached to soon-to-unmount widgets; orphaned notifiers GC after
-  /// listeners detach. ValueNotifier holds no resources beyond its
-  /// listener list, so this is leak-free.
-  void prune(Set<(int, int)> live) {
-    _leftH.removeWhere((k, _) => !live.contains(k));
-    _rightH.removeWhere((k, _) => !live.contains(k));
-    _pads.removeWhere((k, _) => !live.contains((k.$1, k.$2)));
-  }
-
-  void dispose() {
-    for (final n in _pads.values) {
-      n.dispose();
-    }
-    _pads.clear();
-    _leftH.clear();
-    _rightH.clear();
-  }
+  /// A row of [left] and [right] at the split ratio. Each row watches the
+  /// ratio itself, so a divider drag re-lays only the built rows and never
+  /// rebuilds the cells.
+  Widget row(Widget left, Widget right) => Consumer(
+        builder: (context, ref, _) {
+          final ratio = ref.watch(activeSplitRatioProvider);
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: availableWidth * ratio, child: left),
+              SizedBox(width: dividerWidth),
+              SizedBox(width: availableWidth * (1 - ratio), child: right),
+            ],
+          );
+        },
+      );
 }
 
-/// Wraps one entry, measures its height, and pads the bottom to match
-/// its partner.
-///
-/// Initial-frame caveat: both sides start at `pad = 0` until the first
-/// postframe measurement runs. One-frame transient on first paint.
-class _AlignedEntry extends StatefulWidget {
-  const _AlignedEntry({
-    super.key,
-    required this.id,
-    required this.isLeft,
-    required this.sync,
+/// Which column the last press landed in: 0 Pali, 1 Sinhala, null none yet.
+class _ActiveColumn {
+  int? value;
+}
+
+/// One cell of a pair row, with a [_ColumnGate] it owns.
+class _GatedCell extends StatefulWidget {
+  const _GatedCell({
+    required this.column,
+    required this.active,
     required this.child,
   });
 
-  final (int, int) id;
-  final bool isLeft;
-  final _PairHeightSync sync;
+  final int column;
+  final _ActiveColumn active;
   final Widget child;
 
   @override
-  State<_AlignedEntry> createState() => _AlignedEntryState();
+  State<_GatedCell> createState() => _GatedCellState();
 }
 
-class _AlignedEntryState extends State<_AlignedEntry> {
-  final _measureKey = GlobalKey();
+class _GatedCellState extends State<_GatedCell> {
+  late final _ColumnGate _gate = _ColumnGate(widget.column, widget.active);
 
   @override
-  void initState() {
-    super.initState();
-    // SizeChangedLayoutNotifier doesn't fire on first layout — bootstrap.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _measureAndReport();
-    });
-  }
-
-  void _measureAndReport() {
-    if (!mounted) return;
-    final ctx = _measureKey.currentContext;
-    if (ctx == null) return;
-    final box = ctx.findRenderObject();
-    if (box is! RenderBox || !box.hasSize) return;
-    widget.sync.report(widget.id, widget.isLeft, box.size.height);
+  void didUpdateWidget(_GatedCell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _gate
+      ..column = widget.column
+      ..active = widget.active;
   }
 
   @override
-  Widget build(BuildContext context) {
-    final padNotifier = widget.sync.padNotifierFor(widget.id, widget.isLeft);
+  void dispose() {
+    _gate.dispose();
+    super.dispose();
+  }
 
-    // NotificationListener MUST be the ancestor of SizeChangedLayoutNotifier
-    // — SCN dispatches up from its own context, so a listener placed inside
-    // it never fires and width-change re-measurement silently breaks.
-    return ValueListenableBuilder<double>(
-      valueListenable: padNotifier,
-      child: NotificationListener<SizeChangedLayoutNotification>(
-        onNotification: (_) {
-          // Defer — notification dispatches mid-layout; mutating a
-          // notifier during layout is unsafe.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) _measureAndReport();
-          });
-          return true;
+  @override
+  Widget build(BuildContext context) =>
+      SelectionContainer(delegate: _gate, child: widget.child);
+}
+
+/// Keeps a selection in one column.
+///
+/// In the active column, events pass through. In the other column the cell
+/// holds no selection and only says where the pointer lies, so the scroll
+/// view's selection walks past it. A gate per cell rather than an ordering:
+/// the scroll view puts its own selection container between the
+/// [SelectionArea] and the rows, so nothing above it ever sees the cells.
+class _ColumnGate extends StaticSelectionContainerDelegate {
+  _ColumnGate(this.column, this.active);
+
+  int column;
+  _ActiveColumn active;
+
+  Rect get _rect => MatrixUtils.transformRect(
+      getTransformTo(null), Offset.zero & containerSize);
+
+  @override
+  SelectionResult dispatchSelectionEvent(SelectionEvent event) {
+    final owner = active.value;
+    if (event is ClearSelectionEvent || owner == null || owner == column) {
+      return super.dispatchSelectionEvent(event);
+    }
+    if (event is SelectAllSelectionEvent) {
+      // An empty selection at the top-left: after select-all the scroll
+      // view's selection container expects its first and last child to hold
+      // one (an assert in debug, a null error in release).
+      final start = _rect.topLeft;
+      super.dispatchSelectionEvent(const ClearSelectionEvent());
+      super.dispatchSelectionEvent(
+          SelectionEdgeUpdateEvent.forStart(globalPosition: start));
+      super.dispatchSelectionEvent(
+          SelectionEdgeUpdateEvent.forEnd(globalPosition: start));
+      return SelectionResult.none;
+    }
+    if (value.hasSelection) {
+      super.dispatchSelectionEvent(const ClearSelectionEvent());
+    }
+    return switch (event) {
+      SelectionEdgeUpdateEvent(:final globalPosition) => hasSize
+          ? SelectionUtils.getResultBasedOnRect(_rect, globalPosition)
+          : SelectionResult.next,
+      GranularlyExtendSelectionEvent(:final forward) =>
+        forward ? SelectionResult.next : SelectionResult.previous,
+      DirectionallyExtendSelectionEvent(:final direction) =>
+        switch (direction) {
+          SelectionExtendDirection.forward ||
+          SelectionExtendDirection.nextLine =>
+            SelectionResult.next,
+          SelectionExtendDirection.backward ||
+          SelectionExtendDirection.previousLine =>
+            SelectionResult.previous,
         },
-        child: SizeChangedLayoutNotifier(
-          child: KeyedSubtree(key: _measureKey, child: widget.child),
-        ),
-      ),
-      builder: (context, pad, child) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: pad),
-          child: child,
-        );
-      },
-    );
+      _ => SelectionResult.none,
+    };
   }
 }

@@ -23,7 +23,7 @@ Delete `DarkThemeColors` and `WarmThemeColors`. They are only referenced from `a
 ```dart
 /// Warm dark palette (V4): warm near-black ground, off-white text, sand-gold
 /// accent. Neutral fills for selection; colour only in marks and highlights.
-/// Design and contrast table: docs/todo/dark-theme/warm-dark-theme.md
+/// Design and contrast table: docs/todo/theme/warm-dark-theme.md
 class WarmDarkThemeColors {
   // ============================================
   // Background & Surface (higher = lighter)

@@ -139,7 +139,7 @@ final currentBJTDocumentProvider = Provider<AsyncValue<BJTDocument?>>((ref) {
 /// The unit's span cut out of the loaded document — the pages the panes build.
 ///
 /// This is the whole of what replaced `pageStart`/`pageEnd`: the reader is
-/// handed a finite list once, and `ListView.builder` keeps it lazy for free.
+/// handed a finite list once, and `AnchoredPageList` builds it lazily.
 /// Null while either half is still loading, or when the tab has no unit.
 final activeDocumentSliceProvider = Provider<DocumentSlice?>((ref) {
   final unit = ref.watch(activeReaderUnitProvider).valueOrNull;
@@ -148,18 +148,10 @@ final activeDocumentSliceProvider = Provider<DocumentSlice?>((ref) {
   return DocumentSlice.of(document, unit.range);
 });
 
-/// Where the active tab should land when its content first renders.
-///
-/// The row a search hit or a `?e=` link named; null otherwise, and the unit
-/// opens at its own top. Only consulted while the tab's own `scrollOffset` is
-/// still 0: once the reader has moved, where they left off outranks where they
-/// arrived.
-final activeLandingEntryProvider = Provider<(int, int)?>((ref) {
-  final tab = ref.watch(activeTabProvider);
-  final page = tab?.landingPageIndex;
-  final entry = tab?.landingEntryIndex;
-  return page != null && entry != null ? (page, entry) : null;
-});
+/// The active tab's anchor row — where scroll offset 0 sits — or null for
+/// the unit's top.
+final activeAnchorProvider =
+    Provider<(int, int)?>((ref) => ref.watch(activeTabProvider)?.anchor);
 
 // Note: Reader layout is now per-tab, stored in ReaderTab.layout
 // Access via activeReaderLayoutProvider in tab_provider.dart

@@ -4,8 +4,8 @@
 > **Source:** Full-project performance code review (static, traced through `lib/`),
 > plus an interaction-jank investigation addendum (2026-06-05).
 > **Related:**
-> - `docs/done/perf-fts-snippet-text-loading.md` — full plan for **#2** (per-hit JSON reload).
-> - `docs/todo/perf-search_label_and_tree_lookup_followups.md` — the old item **#4**
+> - `docs/done/performance/perf-fts-snippet-text-loading.md` — full plan for **#2** (per-hit JSON reload).
+> - `docs/todo/performance/perf-search_label_and_tree_lookup_followups.md` — the old item **#4**
 >   (`_buildNodeMap` rebuilt per search) now lives there as its item 2.
 
 All findings are based on actual code paths. Each item lists where it lives, how it
@@ -18,7 +18,7 @@ hurts, the fix, the expected gain, effort, and blast-radius on existing flows.
 | # | Issue | Effort | Impact to flows |
 |---|---|---|---|
 | 1 | Tree navigator full re-render on every expand / select / language change | Medium | Low |
-| 2 | — *moved to `docs/done/perf-fts-snippet-text-loading.md` (own plan, shipped)* | — | — |
+| 2 | — *moved to `docs/done/performance/perf-fts-snippet-text-loading.md` (own plan, shipped)* | — | — |
 | 3 | All JSON parsing runs on the UI isolate (tree.json 4.18 MB; every sutta) | Medium | None |
 | 4 | — *moved to `perf-search_label_and_tree_lookup_followups.md` (item 2)* | — | — |
 | 5 | Search widgets watch the entire `searchStateProvider` | Low–Medium | None |
@@ -59,7 +59,7 @@ Tipitaka has thousands of nodes.
 
 This was `TextSearchRepositoryImpl._loadTextForMatch` re-reading & re-parsing the whole
 sutta JSON for every FTS hit. It now has a dedicated implementation plan in
-`docs/done/perf-fts-snippet-text-loading.md`, which covers both the native/client fix
+`docs/done/performance/perf-fts-snippet-text-loading.md`, which covers both the native/client fix
 (group-by-file + parse-once + LRU + optional isolate) and the remote/web server path.
 Tracked there to keep the detailed plan in one place.
 
@@ -85,7 +85,7 @@ same way in `BJTDocumentLocalDataSourceImpl.loadDocument`.
 
 This was `TextSearchRepositoryImpl._buildNodeMap` being rebuilt on every search call.
 It is the **same issue** as item 2 (🔴) in
-`docs/todo/perf-search_label_and_tree_lookup_followups.md`, which now carries the full fix:
+`docs/todo/performance/perf-search_label_and_tree_lookup_followups.md`, which now carries the full fix:
 reuse the data layer's **existing** cached index via `NavigationTreeRepository.getNodeByKey`
 instead of rebuilding `_buildNodeMap`. Tracked there to avoid two sources of truth.
 

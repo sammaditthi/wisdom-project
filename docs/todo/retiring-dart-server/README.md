@@ -13,6 +13,7 @@ The research (RAG) server stays as the one scale-to-zero backend; notes → Fire
   Drift. Now the keystone; the top banner carries the decisions and the current
   step, and **What the Drift/wasm spike changed** carries what moved after the
   spike.
+- **`serverless-deployment-decision.md`** — hinge now dissolved (banner at top).
 
 ## Order of operations
 
@@ -57,8 +58,7 @@ The research (RAG) server stays as the one scale-to-zero backend; notes → Fire
 
 ## Related (outside this folder)
 
-- `../serverless-deployment-decision.md` — hinge now dissolved (banner at top).
-- `../../done/client-server-architecture-for-web.md` — the server being retired.
+- `../../done/retiring-dart-server/client-server-architecture-for-web.md` — the server being retired.
 - `../../done/retiring-dart-server/move-web-onto-drift.md` — web reads the same
   databases in the browser, with no server; done 2026-09-23. It also carries how
   a rebuilt database reaches a browser that already has the old one: the version

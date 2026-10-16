@@ -66,20 +66,12 @@ void main() {
     // The listener under test lives in `multi_pane_reader_widget.dart` at
     // the `ref.listen<ReaderLayout>(activeReaderLayoutProvider, ...)`
     // block. It runs `findTopVisibleEntry` against `EntryKeyRegistry`,
-    // then reveals that same entry once the new layout has laid out.
+    // then anchors the tab at that entry, so the new layout opens on it.
     //
-    // It used to write the captured entry into the tab's pagination and
-    // reset the scroll to 0, which is what the old version of this test
-    // read back. A unit has no pagination now — the whole of it is the
-    // list — so the reveal *is* the mechanism, and the scroll offset is
-    // where it can be seen.
-    //
-    // Every assertion is relative, because no absolute pixel is meaningful
-    // here: what a layout puts *above* the first entry (the sutta's title
-    // block) differs per layout, so even a switch made at the very top
-    // settles at a small non-zero offset — the first entry pulled to the
-    // top, with the title scrolled off above it. That offset is the
-    // reference the rest of the test compares against.
+    // The scroll offset can't show where the viewport sits: it is measured
+    // from the anchor, which every switch moves. `extentBefore` — how much
+    // of the unit is above the viewport — can, and a switch made at the very
+    // top is the reference the rest of the test compares against.
     //
     // Each phase checks two things, because neither is enough alone: WHICH
     // entry ended up at the top (the identity the listener carries across the
@@ -87,13 +79,12 @@ void main() {
     // and not merely mounted somewhere off screen).
     //
     // Story this test tells:
-    //   1. Switch at the top → the top-of-unit reference offset.
-    //   2. Scroll → switch. The same entry must be at the top again, and the
-    //      offset must land well below the reference — that entry is pages
-    //      into the unit however the new layout spaces it.
+    //   1. Switch at the top → the top-of-unit reference.
+    //   2. Scroll → switch. The same entry must be at the top again, with
+    //      pages of the unit above it however the new layout spaces them.
     //   3. Cycle on with NO further scrolling. Still that entry.
     //   4. Scroll back to the top, then switch. The unit's first entry again,
-    //      back at the reference offset — which is what proves the listener
+    //      back at the reference — which is what proves the listener
     //      re-reads the viewport on every switch rather than freezing on its
     //      first capture.
     //
@@ -109,14 +100,7 @@ void main() {
         final tab = tabFromNode(container, 'dn-1-1');
         await openTab(tester, container, tab);
 
-        // The reader pane uses a single vertical ListView; the horizontal
-        // ListView in TabBarWidget is excluded by `scrollDirection`.
-        final scrollable = find.byWidgetPredicate(
-          (w) => w is ListView && w.scrollDirection == Axis.vertical,
-        );
-        expect(scrollable, findsOneWidget,
-            reason: 'Reader pane should expose a vertical ListView');
-        final controller = tester.widget<ListView>(scrollable).controller!;
+        final controller = readerScrollController(tester);
 
         // Pre-condition: a freshly opened tab defaults to paliOnly.
         expect(
@@ -125,14 +109,11 @@ void main() {
           reason: 'New tab should default to paliOnly',
         );
 
-        // Waits for the reveal to come to rest instead of pumping a fixed
-        // number of settles. `_ensureEntryVisible` retries across frames
-        // (bounded at 10) and `pumpForSettle` swallows its own timeout, so a
-        // count cannot tell "the reveal landed" from "it is still moving" —
-        // and the difference between those is a half-scrolled offset that the
-        // assertions below would read back as the answer. An offset that
-        // survives a whole settle unchanged is the finished signal; one that
-        // never does fails here, with the number in the message.
+        // Waits for the switch to come to rest instead of pumping a fixed
+        // number of settles. `pumpForSettle` swallows its own timeout, so a
+        // count cannot tell "it landed" from "it is still moving". An offset
+        // that survives a whole settle unchanged is the finished signal; one
+        // that never does fails here, with the number in the message.
         Future<void> settleUntilStill() async {
           for (var attempt = 0; attempt < 12; attempt++) {
             final before = controller.offset;
@@ -146,12 +127,12 @@ void main() {
         // Helper — drive the layout provider, wait for the reveal, then read
         // back the resulting state. Returns a record so each assertion can
         // quote the actual values in its `reason:` string for clean failures.
-        Future<({double offset, ReaderLayout layout, (int, int)? top})>
+        Future<({double before, ReaderLayout layout, (int, int)? top})>
             switchTo(ReaderLayout layout) async {
           container.read(updateActiveTabLayoutProvider)(layout);
           await settleUntilStill();
           return (
-            offset: controller.offset,
+            before: controller.position.extentBefore,
             layout: container.read(tabsProvider)[0].layout,
             top: topVisibleEntry(tester, controller),
           );
@@ -161,7 +142,7 @@ void main() {
 
         // paliOnly → sideBySide with no scrolling. The top-visible entry is
         // the unit's first, so this is what "a switch made at the top"
-        // settles at — near zero, but not necessarily zero.
+        // settles at.
         final atTop = await switchTo(ReaderLayout.sideBySide);
         expect(atTop.layout, ReaderLayout.sideBySide);
         expect(atTop.top, isNotNull,
@@ -206,19 +187,18 @@ void main() {
                 'position to lose and phases 2-3 prove nothing');
 
         // sideBySide → stacked. The listener captures sideBySide's top
-        // entry and reveals it in stacked, where it lands at a different
-        // pixel offset — but never at the top, because entries precede it.
+        // entry and anchors stacked at it — never at the top, because
+        // entries precede it.
         final posA = await switchTo(ReaderLayout.stacked);
         expect(posA.layout, ReaderLayout.stacked);
         expect(
-          posA.offset,
-          greaterThan(atTop.offset),
+          posA.before,
+          greaterThan(atTop.before),
           reason: 'The entry at the top of sideBySide is pages into the '
-              'unit, so revealing it in stacked must leave the viewport '
-              'well below where a top-of-unit switch lands — offset '
-              '${posA.offset} vs reference ${atTop.offset}. Falling back '
-              'to the reference is the old behaviour: the switch reset to '
-              'the top and lost the reading position',
+              'unit, so stacked must open on it with the unit above it — '
+              '${posA.before}px above vs reference ${atTop.before}. Falling '
+              'back to the reference is the old behaviour: the switch reset '
+              'to the top and lost the reading position',
         );
         expect(
           posA.top,
@@ -237,11 +217,11 @@ void main() {
         final posASurvived = await switchTo(ReaderLayout.sinhalaOnly);
         expect(posASurvived.layout, ReaderLayout.sinhalaOnly);
         expect(
-          posASurvived.offset,
-          greaterThan(atTop.offset),
+          posASurvived.before,
+          greaterThan(atTop.before),
           reason: 'stacked → sinhalaOnly with no re-scroll must keep the '
-              'reading position — offset ${posASurvived.offset} vs '
-              'reference ${atTop.offset}',
+              'reading position — ${posASurvived.before}px above vs '
+              'reference ${atTop.before}',
         );
         expect(
           posASurvived.top,
@@ -254,28 +234,30 @@ void main() {
 
         // Scroll back to the very top inside sinhalaOnly. The next switch
         // must now capture the unit's *first* entry — a listener that
-        // cached its first capture would still be holding phase 2's.
-        controller.jumpTo(0);
+        // cached its first capture would still be holding phase 2's. Above
+        // the anchor the top is an estimate until those pages are built, so
+        // one jump to it can stop short: jump until nothing is left above.
+        for (var i = 0; i < 20 && controller.position.extentBefore > 0; i++) {
+          controller.jumpTo(controller.position.minScrollExtent);
+          await tester.pump();
+        }
         await pumpForSettle(tester, const Duration(seconds: 1));
+        expect(controller.position.extentBefore, 0,
+            reason: 'Phase 4 needs the viewport at the very top of the unit');
 
-        // Deliberately back into sideBySide, the layout phase 1 measured.
-        // Comparing across layouts would not settle anything here: entry
-        // heights differ per layout (sinhalaOnly runs about twice as tall),
-        // so a listener frozen on phase 2's capture could still land at a
-        // smaller number in a shorter layout and pass a `lessThan`. Revealing
-        // the same entry in the same layout is a fixed offset, so this
-        // compares like with like.
+        // Deliberately back into sideBySide, the layout phase 1 measured,
+        // so this compares like with like.
         final posB = await switchTo(ReaderLayout.sideBySide);
         expect(posB.layout, ReaderLayout.sideBySide);
         expect(
-          posB.offset,
-          closeTo(atTop.offset, 1.0),
+          posB.before,
+          closeTo(atTop.before, 1.0),
           reason: 'After scrolling back to the top, the switch must come back '
-              'up with it: revealing the unit\'s first entry in sideBySide is '
-              'where phase 1 landed, ${atTop.offset}. An offset of '
-              '${posB.offset} means the listener reused an earlier capture '
-              '(phase 2 left it at ${posASurvived.offset}) instead of '
-              're-reading the viewport',
+              'up with it: the unit\'s first entry in sideBySide is where '
+              'phase 1 landed, ${atTop.before}px above. ${posB.before}px '
+              'means the listener reused an earlier capture (phase 2 left '
+              '${posASurvived.before}px above) instead of re-reading the '
+              'viewport',
         );
         expect(
           posB.top,
@@ -411,49 +393,37 @@ void main() {
     );
 
     // ---------------------------------------------------------------
-    // Test: in-page search match scroll past cacheExtent works after a
+    // Test: in-page search reaches a match past cacheExtent after a
     // layout switch.
     //
-    // Reproduces the bug fixed by `_stepViewportToward` in
-    // `multi_pane_reader_widget.dart`. The repro path:
+    // The repro path:
     //
     //   1. Search "සීල" in sideBySide → 10 matches across dn-1-1.
     //   2. Navigate to the 5th match (mid-sutta).
-    //   3. Close search, switch to stacked. The layout listener captures
-    //      the top-visible entry and reveals it again once stacked has
-    //      laid out. Recompute drops matches (search hidden).
+    //   3. Close search, switch to stacked. The layout listener anchors
+    //      stacked at the top-visible entry. Recompute drops matches
+    //      (search hidden).
     //   4. Reopen search. `openSearch` recomputes, currentMatchIndex
-    //      = 0, and the search-state listener scrolls back to match[0]
-    //      near the top of the unit.
+    //      = 0, and the search-state listener brings match[0] back.
     //   5. Step forward through matches. Matches several pages down are
-    //      inside the rendered unit but *outside* ListView.builder's
-    //      default ~250px cacheExtent → keys aren't mounted →
-    //      ensureVisible silently fails after bounded retries → scroll
-    //      stops at the cula-sila entry while currentMatchIndex keeps
-    //      advancing. User reported: "scrolls down until චුල්ලසීල
+    //      inside the unit but *outside* the built rows. The bug: the
+    //      scroll stopped at the cula-sila entry while currentMatchIndex
+    //      kept advancing. User reported: "scrolls down until චුල්ලසීල
     //      නිට්ඨිතං and doesnt scroll any further".
     //
-    // Load-bearing assertion: the offset delta after 5 next-taps must
-    // exceed one viewport height. Without the fix, ensureVisible never
-    // builds the target page → delta ≈ one entry-height (~200–400px),
-    // well below viewport. With the fix, `_stepViewportToward` pushes
-    // the controller forward in viewport-sized steps until ListView
-    // builds the target slab, then ensureVisible animates the rest.
-    //
-    // Tying the threshold to `viewportDimension` keeps the assertion
-    // robust to entry-height variations across builds — the bug is
-    // about not scrolling FAR ENOUGH, not about not scrolling at all.
+    // Load-bearing assertion: after 5 next-taps, match[5]'s row is on
+    // screen. A row that isn't built is anchored at, so this holds however
+    // far the match is.
     // ---------------------------------------------------------------
     testWidgets(
       'in-page search scrolls past cacheExtent after a layout switch',
       (tester) async {
         // Constrain the test view to a mobile-portrait size. On macOS the
         // default integration-test viewport is large enough that the entire
-        // dn-1-1 "සීල" match range fits in ListView.builder's cacheExtent,
-        // which masks case (b) entirely (every key stays mounted, the bug
-        // can't manifest). A mobile viewport puts page 6 well outside the
-        // ~250 px cacheExtent from match[0]'s rendered position — the
-        // dimensions case (b) is born for.
+        // dn-1-1 "සීල" match range fits in the list's cacheExtent, which
+        // masks the bug entirely (every key stays mounted). A mobile viewport
+        // puts page 6 well outside the ~250 px cacheExtent from match[0]'s
+        // rendered position.
         tester.view.physicalSize = const Size(414, 896);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.reset);
@@ -501,9 +471,8 @@ void main() {
         container.read(inPageSearchStatesProvider.notifier).closeSearch();
         await pumpForSettle(tester);
 
-        // Switch to stacked. Listener captures the top entry and reveals
-        // it again once the new layout has laid out. Matches dropped
-        // (search hidden).
+        // Switch to stacked. Listener captures the top entry and anchors
+        // stacked at it. Matches dropped (search hidden).
         container.read(updateActiveTabLayoutProvider)(ReaderLayout.stacked);
         await pumpForSettle(tester, const Duration(seconds: 1));
 
@@ -516,7 +485,7 @@ void main() {
 
         // Reopen search. openSearch sees retained query + empty matches
         // → recomputes against stacked → currentMatchIndex = 0 → search
-        // state listener fires _scrollToCurrentMatch, which reveals
+        // state listener fires _scrollToCurrentMatch, which brings
         // match[0] back near the top of the unit.
         container.read(inPageSearchStatesProvider.notifier).openSearch();
         await pumpForSettle(tester);
@@ -533,24 +502,10 @@ void main() {
           reason: 'Reopen recompute resets currentMatchIndex to 0',
         );
 
-        // Capture viewport + offset right after the auto-scroll to
-        // match[0]. This is our baseline — match[0] sits ~30% from top.
-        final scrollable = find.byWidgetPredicate(
-          (w) => w is ListView && w.scrollDirection == Axis.vertical,
-        );
-        expect(scrollable, findsOneWidget,
-            reason: 'The reader pane must expose exactly one vertical '
-                'ListView — reading a controller off a finder that matched '
-                'nothing throws a StateError with nothing to read');
-        final controller = tester.widget<ListView>(scrollable).controller!;
-        final offsetAtFirstMatch = controller.offset;
-        final viewport = controller.position.viewportDimension;
-
-        // The precondition this used to guard went out with pagination: a
-        // match could once sit past the loaded page range, so the test had
-        // to prove it was stepping toward an entry that was in range but
-        // unbuilt rather than one the reader had not paginated to yet. The
-        // whole unit is now the list, so unbuilt is the only case there is.
+        final first = readSearchState(container, 0).currentMatch!;
+        expect(isEntryOnScreen(tester, first.pageIndex, first.entryIndex),
+            isTrue,
+            reason: 'Reopening search must bring match[0] on screen');
 
         // Step forward 5 times — reaches match[5] (page 6 entry 4 si,
         // "මජ්ඣිමසීලය"). This is several pages below match[0]'s position
@@ -565,21 +520,15 @@ void main() {
           reason: '5 next-taps should advance currentMatchIndex from 0 to 5',
         );
 
-        // Load-bearing assertion (see test header). Without
-        // _stepViewportToward, scroll stops at the cula-sila entry
-        // (~one entry-height past match[0], well under viewport).
-        final offsetAfterAdvance = controller.offset;
-        final delta = offsetAfterAdvance - offsetAtFirstMatch;
+        // Load-bearing assertion (see test header).
+        final fifth = readSearchState(container, 0).currentMatch!;
         expect(
-          delta,
-          greaterThan(viewport),
-          reason: 'After 5 next-taps past cacheExtent, scroll offset '
-              'must advance by more than one viewport height '
-              '($viewport px). Got delta $delta '
-              '($offsetAtFirstMatch → $offsetAfterAdvance). '
-              'A small delta means _ensureEntryVisible gave up '
-              'before pushing ListView to build the match\'s page — '
-              'the case (b) bug.',
+          isEntryOnScreen(tester, fifth.pageIndex, fifth.entryIndex),
+          isTrue,
+          reason: 'After 5 next-taps past cacheExtent, match[5]\'s row '
+              '(${fifth.pageIndex}, ${fifth.entryIndex}) must be on screen. '
+              'Off screen means the reveal gave up before reaching the '
+              'match — the scroll stopped while the index advanced.',
         );
       },
     );

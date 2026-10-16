@@ -50,7 +50,7 @@
 >   *writes* as well as reads. The spike found a different blocker instead (the
 >   WAL header flag) and three live bugs in this repo: see **What the
 >   Drift/wasm spike changed** below.
-> - Companion: [`serverless-deployment-decision.md`](../serverless-deployment-decision.md)
+> - Companion: [`serverless-deployment-decision.md`](serverless-deployment-decision.md)
 >   — now largely moot (zero always-on infra; the research server is the only backend).
 
 ## Goal
@@ -782,7 +782,7 @@ CREATE TABLE bjt_content (
      will derive ids from absolute coordinates instead.
 
    **Unrelated TODO, moved out 2026-09-14:** one entry point for every test path
-   is its own plan now — [`test-all-and-release-all.md`](../../done/test-all-and-release-all.md).
+   is its own plan now — [`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md).
 2. **Prove the speed win (primary goal) — DONE 2026-09-11. GO.** Snippets 13–586×,
    reader p50 45× with one slice in 1,411 a quarter-millisecond slower than
    today. Numbers and method in **What the measurements said**;
@@ -1082,9 +1082,9 @@ CREATE TABLE bjt_content (
      repaired with `sqlite3`, or left half-written by a failed generator run)
      would leave existing installs on their old copy. The check belongs to
      `scripts/app/test.sh`'s "shipped databases" row in
-     [`test-all-and-release-all.md`](../../done/test-all-and-release-all.md).
+     [`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md).
    - **`validate-release.sh` is not taught the manifest.** It is being
-     retired ([`test-all-and-release-all.md`](../../done/test-all-and-release-all.md));
+     retired ([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md));
      one comment line there says the omission is deliberate.
 
    **Done by hand first:** deleted the old copies in
@@ -1378,7 +1378,7 @@ CREATE TABLE bjt_content (
 ### What the snippet path lost at step 8
 
 The interim memo-cache fix
-([`perf-fts-snippet-text-loading.md`](../../done/perf-fts-snippet-text-loading.md),
+([`perf-fts-snippet-text-loading.md`](../../done/performance/perf-fts-snippet-text-loading.md),
 shipped 2026-06-19) was deliberately isolated, so repointing it was a two-method
 deletion rather than a rewrite: `_fileJsonCache`, `_loadFileJson` and
 `_extractEntryText` went, the call-site shape (`matchedText ?? <load> ?? ''`,
@@ -1526,5 +1526,5 @@ through Drift. It goes with the server; do not repoint it at `bjt_content`.
   plan: web reads these databases in the browser, and how a rebuilt DB reaches
   a browser that already has the old one (answered: with the build).
 - `docs/general/how_search_works.md` — the search pipeline (Step 5 reads JSON).
-- [`perf-fts-snippet-text-loading.md`](../../done/perf-fts-snippet-text-loading.md)
+- [`perf-fts-snippet-text-loading.md`](../../done/performance/perf-fts-snippet-text-loading.md)
   — the shipped memo-cache fix this migration tears down.

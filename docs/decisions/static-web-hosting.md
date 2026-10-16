@@ -15,7 +15,7 @@
 > | open work on the site | [`../todo/web-strategy/static-site-backlog.md`](../todo/web-strategy/static-site-backlog.md) |
 > | the grouping rule | [`reading-units-and-grouping.md`](./reading-units-and-grouping.md) |
 > | URL grammar, in-app link receiving | [`../todo/web-strategy/deep-linking-and-shareable-urls.md`](../todo/web-strategy/deep-linking-and-shareable-urls.md) |
-> | backends | [`../todo/serverless-deployment-decision.md`](../todo/serverless-deployment-decision.md) |
+> | backends | [`../todo/retiring-dart-server/serverless-deployment-decision.md`](../todo/retiring-dart-server/serverless-deployment-decision.md) |
 > | how the site was built | `docs/done/web/` (incl. the demoted Jaspr analysis) |
 >
 > **Corpus counts are owned by

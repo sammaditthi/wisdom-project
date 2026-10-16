@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
+import 'package:the_wisdom_project/presentation/providers/tab_lifecycle_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 
@@ -76,14 +77,7 @@ void main() {
             reason: 'Tab A reads the dn-1 file');
 
         // STEP 1: Scroll Tab A to 300 using the controller
-        // SingleColumnPane uses ListView.builder (vertical); TabBarWidget uses horizontal ListView
-        final scrollableA = find.byWidgetPredicate(
-          (widget) =>
-              widget is ListView && widget.scrollDirection == Axis.vertical,
-        );
-        expect(scrollableA, findsOneWidget,
-            reason: 'Should find vertical ListView for content');
-        tester.widget<ListView>(scrollableA).controller!.jumpTo(300);
+        readerScrollController(tester).jumpTo(300);
         await pumpForSettle(tester);
 
         // STEP 2: Tap Tab B to switch (simulating real user action).
@@ -106,12 +100,7 @@ void main() {
                 'the document — the path a same-file pair would skip');
 
         // STEP 3: Scroll Tab B to 600
-        final scrollableB = find.byWidgetPredicate(
-          (widget) =>
-              widget is ListView && widget.scrollDirection == Axis.vertical,
-        );
-        expect(scrollableB, findsOneWidget);
-        tester.widget<ListView>(scrollableB).controller!.jumpTo(600);
+        readerScrollController(tester).jumpTo(600);
         await pumpForSettle(tester);
 
         // STEP 4: Tap Tab A to switch back (simulating real user action)
@@ -190,13 +179,7 @@ void main() {
         await pumpForSettle(tester);
 
         // Scroll Tab A down
-        final scrollable = find.byWidgetPredicate(
-          (widget) =>
-              widget is ListView && widget.scrollDirection == Axis.vertical,
-        );
-        expect(scrollable, findsOneWidget,
-            reason: 'Tab A text must be on screen to scroll it');
-        tester.widget<ListView>(scrollable).controller!.jumpTo(500);
+        readerScrollController(tester).jumpTo(500);
         await pumpForSettle(tester);
 
         // STEP 4: Close Tab A (tap close button on Tab A)
@@ -216,6 +199,41 @@ void main() {
         expect(tabBScrollPosition, 0.0,
             reason:
                 'Tab B should NOT inherit Tab A\'s scroll position after Tab A is closed');
+      },
+    );
+
+    testWidgets(
+      'closing a tab left of the active one keeps every other tab\'s position',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        // [A, B, C]. Closing A shifts B and C down an index while B stays
+        // active, so the reader's save on the index change must still land
+        // on B — not on whichever tab now sits at B's old index, which is C.
+        for (final nodeKey in ['dn-1-1', 'dn-1-2', 'dn-1-3']) {
+          await openTab(tester, container, tabFromNode(container, nodeKey));
+        }
+        container.read(switchTabProvider)(1);
+        await pumpForSettle(tester);
+
+        // C's own place, set after the switch away from it, which saved C.
+        writeScrollOffset(container, 2, 900);
+        readerScrollController(tester).jumpTo(400);
+        await pumpForSettle(tester);
+
+        // ACT: close A
+        container.read(closeTabProvider)(0);
+        await pumpForSettle(tester);
+
+        // ASSERT
+        final tabs = container.read(tabsProvider);
+        expect(tabs.map((t) => t.nodeKey), ['dn-1-2', 'dn-1-3']);
+        expect(container.read(activeTabIndexProvider), 0,
+            reason: 'B stays active, one index down');
+        expect(tabs[1].scrollOffset, 900,
+            reason: 'C must keep its own position, not take B\'s');
+        expect(tabs[0].scrollOffset, 400,
+            reason: 'B\'s position is saved to B');
       },
     );
 
@@ -269,13 +287,7 @@ void main() {
         await pumpForSettle(tester);
 
         // Scroll and save position
-        final scrollable = find.byWidgetPredicate(
-          (widget) =>
-              widget is ListView && widget.scrollDirection == Axis.vertical,
-        );
-        expect(scrollable, findsOneWidget,
-            reason: 'The tab text must be on screen to scroll it');
-        tester.widget<ListView>(scrollable).controller!.jumpTo(250);
+        readerScrollController(tester).jumpTo(250);
         await pumpForSettle(tester);
         writeScrollOffset(container, 0, 250.0);
 

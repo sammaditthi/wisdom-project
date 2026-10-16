@@ -14,7 +14,7 @@ The Wisdom Project - a Tipitaka and commentary browsing app with parallel Pali/S
 - **Immutability**: All entities use Freezed → regenerate with `dart run build_runner build --delete-conflicting-outputs`
 - **Error Handling**: `Either<Failure, T>` return types throughout
 - **Text Formatting**: Markers `**bold**`, `__underline__`, `{footnote}` in content
-- **Multi-Edition**: Architecture supports multiple content sources (BJT, SuttaCentral) - see `docs/multi_edition_architecture.md`
+- **Multi-Edition**: Architecture supports multiple content sources (BJT, SuttaCentral) - see `docs/decisions/multi_edition_architecture.md`
 
 ## Code Style
 - **Always use `const`**: Use `const` for constructors, variables, and collections when values are compile-time constants. Avoids `prefer_const_constructors` and `prefer_const_declarations` lint warnings.

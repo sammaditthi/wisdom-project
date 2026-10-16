@@ -9,7 +9,7 @@
 > **build tool** (`tools/suttacentral_map/`) that grows the seed to
 > all suttas. Per-step state is in the Build-order
 > section; concordance evidence in
-> [`sutta-references-plan.md`](../sutta-references-plan.md) (Part B).
+> [`sutta-references-plan.md`](../search/sutta-references-plan.md) (Part B).
 > **Captured:** 2026-06-27.
 > **Companion to** [`wisdom-project-rag-qa-design.md`](./wisdom-project-rag-qa-design.md)
 > (the upstream NotebookLM-style RAG design). That doc decides *what* the AI
@@ -302,7 +302,7 @@ where saṁyuttas are numbered 1–56 continuously. Our BJT tree is **nested**:
 (Sagāthā, Nidāna, Khandha, Saḷāyatana, Mahā) — with saṁyuttas nested underneath,
 **plus a vagga level inside each saṁyutta**, and BJT **bundles SN 12+13 into one
 node** so the saṁyutta positions shift (both proven in
-[`sutta-references-plan.md`](../sutta-references-plan.md), Part B):
+[`sutta-references-plan.md`](../search/sutta-references-plan.md), Part B):
 
 ```
 sn15.3   →   sn-2-3-1-3      (leaf-title-confirmed: අස්සුසුත්තං / Assu)
@@ -351,7 +351,7 @@ String? resolveToNodeKey(String uid);
 
 ### B.4 Building the concordance (`tools/suttacentral_map/`)
 
-Moved to [`sutta-references-plan.md`](../sutta-references-plan.md), Part B
+Moved to [`sutta-references-plan.md`](../search/sutta-references-plan.md), Part B
 (2026-10-11).
 
 ### B.5 Slots this fills that already exist
@@ -547,7 +547,7 @@ Net: chat → `shared_preferences`; resolver → in-memory JSON map; hybrid (lat
 | Provider chain | `lib/presentation/providers/search_provider.dart` |
 | `Either`/`Failure` | `lib/domain/entities/failure.dart` |
 | Client-side history (shared_prefs, not SQLite) | `lib/data/repositories/recent_searches_repository_impl.dart` |
-| Cross-edition concordance (proven) | `tools/mahamevnawa_map/build_map.py`, `docs/todo/mahamevnawa-link-mapping.md` |
+| Cross-edition concordance (proven) | `tools/mahamevnawa_map/build_map.py`, `docs/todo/canon-sources/mahamevnawa-link-mapping.md` |
 | Cross-edition alignment slot | `lib/domain/entities/content/entry.dart` (`segmentId`) |
 | Search result → navigation | `lib/domain/entities/search/search_result.dart` (`nodeKey`) |
 | Routing target for deep-links | `docs/todo/web-strategy/deep-linking-and-shareable-urls.md` (`/tipitaka/<nodeKey>`) |

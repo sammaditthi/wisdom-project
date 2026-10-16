@@ -30,14 +30,11 @@ mixin _$ReaderTab {
   /// with no content.
   String? get nodeKey => throw _privateConstructorUsedError;
 
-  /// A landing position inside the unit — the row an FTS hit or a
-  /// `?e=<page>.<entry>` link named, as a document coordinate.
-  ///
-  /// **Scroll position only.** The unit always comes from [nodeKey]; this
-  /// says where inside it to stop, and the reader clears it the moment it
-  /// lands. Null for every other way a tab opens.
-  int? get landingPageIndex => throw _privateConstructorUsedError;
-  int? get landingEntryIndex => throw _privateConstructorUsedError;
+  /// The row scroll offset 0 sits on, as a document coordinate: what a
+  /// search hit or a `?e=` link named, or where the reader re-anchored.
+  /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
+  int? get anchorPageIndex => throw _privateConstructorUsedError;
+  int? get anchorEntryIndex => throw _privateConstructorUsedError;
 
   /// Pali name of the node for reference
   String? get paliName => throw _privateConstructorUsedError;
@@ -64,8 +61,8 @@ mixin _$ReaderTab {
   /// Represents the proportion of width for the left (Pali) pane
   double get splitRatio => throw _privateConstructorUsedError;
 
-  /// Last known scroll offset (in pixels) for this tab.
-  /// Persisted to disk so a reload resumes at the same reading position.
+  /// Last known scroll offset in pixels, measured from the anchor row
+  /// (negative above it). Persisted so a reload resumes where reading stopped.
   double get scrollOffset => throw _privateConstructorUsedError;
 
   /// Serializes this ReaderTab to a JSON map.
@@ -87,8 +84,8 @@ abstract class $ReaderTabCopyWith<$Res> {
       {String label,
       String fullName,
       String? nodeKey,
-      int? landingPageIndex,
-      int? landingEntryIndex,
+      int? anchorPageIndex,
+      int? anchorEntryIndex,
       String? paliName,
       String? sinhalaName,
       String? textId,
@@ -116,8 +113,8 @@ class _$ReaderTabCopyWithImpl<$Res, $Val extends ReaderTab>
     Object? label = null,
     Object? fullName = null,
     Object? nodeKey = freezed,
-    Object? landingPageIndex = freezed,
-    Object? landingEntryIndex = freezed,
+    Object? anchorPageIndex = freezed,
+    Object? anchorEntryIndex = freezed,
     Object? paliName = freezed,
     Object? sinhalaName = freezed,
     Object? textId = freezed,
@@ -139,13 +136,13 @@ class _$ReaderTabCopyWithImpl<$Res, $Val extends ReaderTab>
           ? _value.nodeKey
           : nodeKey // ignore: cast_nullable_to_non_nullable
               as String?,
-      landingPageIndex: freezed == landingPageIndex
-          ? _value.landingPageIndex
-          : landingPageIndex // ignore: cast_nullable_to_non_nullable
+      anchorPageIndex: freezed == anchorPageIndex
+          ? _value.anchorPageIndex
+          : anchorPageIndex // ignore: cast_nullable_to_non_nullable
               as int?,
-      landingEntryIndex: freezed == landingEntryIndex
-          ? _value.landingEntryIndex
-          : landingEntryIndex // ignore: cast_nullable_to_non_nullable
+      anchorEntryIndex: freezed == anchorEntryIndex
+          ? _value.anchorEntryIndex
+          : anchorEntryIndex // ignore: cast_nullable_to_non_nullable
               as int?,
       paliName: freezed == paliName
           ? _value.paliName
@@ -191,8 +188,8 @@ abstract class _$$ReaderTabImplCopyWith<$Res>
       {String label,
       String fullName,
       String? nodeKey,
-      int? landingPageIndex,
-      int? landingEntryIndex,
+      int? anchorPageIndex,
+      int? anchorEntryIndex,
       String? paliName,
       String? sinhalaName,
       String? textId,
@@ -218,8 +215,8 @@ class __$$ReaderTabImplCopyWithImpl<$Res>
     Object? label = null,
     Object? fullName = null,
     Object? nodeKey = freezed,
-    Object? landingPageIndex = freezed,
-    Object? landingEntryIndex = freezed,
+    Object? anchorPageIndex = freezed,
+    Object? anchorEntryIndex = freezed,
     Object? paliName = freezed,
     Object? sinhalaName = freezed,
     Object? textId = freezed,
@@ -241,13 +238,13 @@ class __$$ReaderTabImplCopyWithImpl<$Res>
           ? _value.nodeKey
           : nodeKey // ignore: cast_nullable_to_non_nullable
               as String?,
-      landingPageIndex: freezed == landingPageIndex
-          ? _value.landingPageIndex
-          : landingPageIndex // ignore: cast_nullable_to_non_nullable
+      anchorPageIndex: freezed == anchorPageIndex
+          ? _value.anchorPageIndex
+          : anchorPageIndex // ignore: cast_nullable_to_non_nullable
               as int?,
-      landingEntryIndex: freezed == landingEntryIndex
-          ? _value.landingEntryIndex
-          : landingEntryIndex // ignore: cast_nullable_to_non_nullable
+      anchorEntryIndex: freezed == anchorEntryIndex
+          ? _value.anchorEntryIndex
+          : anchorEntryIndex // ignore: cast_nullable_to_non_nullable
               as int?,
       paliName: freezed == paliName
           ? _value.paliName
@@ -288,8 +285,8 @@ class _$ReaderTabImpl extends _ReaderTab {
       {required this.label,
       required this.fullName,
       this.nodeKey,
-      this.landingPageIndex,
-      this.landingEntryIndex,
+      this.anchorPageIndex,
+      this.anchorEntryIndex,
       this.paliName,
       this.sinhalaName,
       this.textId,
@@ -318,16 +315,13 @@ class _$ReaderTabImpl extends _ReaderTab {
   @override
   final String? nodeKey;
 
-  /// A landing position inside the unit — the row an FTS hit or a
-  /// `?e=<page>.<entry>` link named, as a document coordinate.
-  ///
-  /// **Scroll position only.** The unit always comes from [nodeKey]; this
-  /// says where inside it to stop, and the reader clears it the moment it
-  /// lands. Null for every other way a tab opens.
+  /// The row scroll offset 0 sits on, as a document coordinate: what a
+  /// search hit or a `?e=` link named, or where the reader re-anchored.
+  /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
   @override
-  final int? landingPageIndex;
+  final int? anchorPageIndex;
   @override
-  final int? landingEntryIndex;
+  final int? anchorEntryIndex;
 
   /// Pali name of the node for reference
   @override
@@ -373,15 +367,15 @@ class _$ReaderTabImpl extends _ReaderTab {
   @JsonKey()
   final double splitRatio;
 
-  /// Last known scroll offset (in pixels) for this tab.
-  /// Persisted to disk so a reload resumes at the same reading position.
+  /// Last known scroll offset in pixels, measured from the anchor row
+  /// (negative above it). Persisted so a reload resumes where reading stopped.
   @override
   @JsonKey()
   final double scrollOffset;
 
   @override
   String toString() {
-    return 'ReaderTab(label: $label, fullName: $fullName, nodeKey: $nodeKey, landingPageIndex: $landingPageIndex, landingEntryIndex: $landingEntryIndex, paliName: $paliName, sinhalaName: $sinhalaName, textId: $textId, panes: $panes, layout: $layout, splitRatio: $splitRatio, scrollOffset: $scrollOffset)';
+    return 'ReaderTab(label: $label, fullName: $fullName, nodeKey: $nodeKey, anchorPageIndex: $anchorPageIndex, anchorEntryIndex: $anchorEntryIndex, paliName: $paliName, sinhalaName: $sinhalaName, textId: $textId, panes: $panes, layout: $layout, splitRatio: $splitRatio, scrollOffset: $scrollOffset)';
   }
 
   @override
@@ -393,10 +387,10 @@ class _$ReaderTabImpl extends _ReaderTab {
             (identical(other.fullName, fullName) ||
                 other.fullName == fullName) &&
             (identical(other.nodeKey, nodeKey) || other.nodeKey == nodeKey) &&
-            (identical(other.landingPageIndex, landingPageIndex) ||
-                other.landingPageIndex == landingPageIndex) &&
-            (identical(other.landingEntryIndex, landingEntryIndex) ||
-                other.landingEntryIndex == landingEntryIndex) &&
+            (identical(other.anchorPageIndex, anchorPageIndex) ||
+                other.anchorPageIndex == anchorPageIndex) &&
+            (identical(other.anchorEntryIndex, anchorEntryIndex) ||
+                other.anchorEntryIndex == anchorEntryIndex) &&
             (identical(other.paliName, paliName) ||
                 other.paliName == paliName) &&
             (identical(other.sinhalaName, sinhalaName) ||
@@ -417,8 +411,8 @@ class _$ReaderTabImpl extends _ReaderTab {
       label,
       fullName,
       nodeKey,
-      landingPageIndex,
-      landingEntryIndex,
+      anchorPageIndex,
+      anchorEntryIndex,
       paliName,
       sinhalaName,
       textId,
@@ -448,8 +442,8 @@ abstract class _ReaderTab extends ReaderTab {
       {required final String label,
       required final String fullName,
       final String? nodeKey,
-      final int? landingPageIndex,
-      final int? landingEntryIndex,
+      final int? anchorPageIndex,
+      final int? anchorEntryIndex,
       final String? paliName,
       final String? sinhalaName,
       final String? textId,
@@ -475,16 +469,13 @@ abstract class _ReaderTab extends ReaderTab {
   @override
   String? get nodeKey;
 
-  /// A landing position inside the unit — the row an FTS hit or a
-  /// `?e=<page>.<entry>` link named, as a document coordinate.
-  ///
-  /// **Scroll position only.** The unit always comes from [nodeKey]; this
-  /// says where inside it to stop, and the reader clears it the moment it
-  /// lands. Null for every other way a tab opens.
+  /// The row scroll offset 0 sits on, as a document coordinate: what a
+  /// search hit or a `?e=` link named, or where the reader re-anchored.
+  /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
   @override
-  int? get landingPageIndex;
+  int? get anchorPageIndex;
   @override
-  int? get landingEntryIndex;
+  int? get anchorEntryIndex;
 
   /// Pali name of the node for reference
   @override
@@ -517,8 +508,8 @@ abstract class _ReaderTab extends ReaderTab {
   @override
   double get splitRatio;
 
-  /// Last known scroll offset (in pixels) for this tab.
-  /// Persisted to disk so a reload resumes at the same reading position.
+  /// Last known scroll offset in pixels, measured from the anchor row
+  /// (negative above it). Persisted so a reload resumes where reading stopped.
   @override
   double get scrollOffset;
 
