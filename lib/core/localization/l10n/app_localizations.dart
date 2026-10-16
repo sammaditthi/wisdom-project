@@ -107,7 +107,7 @@ abstract class AppLocalizations {
   /// Title for the tree navigation screen
   ///
   /// In en, this message translates to:
-  /// **'Tipitaka Navigator'**
+  /// **'Tipitaka navigator'**
   String get treeNavigatorTitle;
 
   /// Title for the reading screen
@@ -119,31 +119,31 @@ abstract class AppLocalizations {
   /// Tooltip for the app bar menu button while the navigator is hidden
   ///
   /// In en, this message translates to:
-  /// **'Show Navigator'**
+  /// **'Show navigator'**
   String get showNavigator;
 
   /// Tooltip for the app bar menu button while the navigator shows
   ///
   /// In en, this message translates to:
-  /// **'Hide Navigator'**
+  /// **'Hide navigator'**
   String get hideNavigator;
 
   /// Label for Pali-only reader layout
   ///
   /// In en, this message translates to:
-  /// **'Pali Only'**
+  /// **'Pali only'**
   String get layoutPaliOnly;
 
   /// Label for Sinhala-only reader layout
   ///
   /// In en, this message translates to:
-  /// **'Sinhala Only'**
+  /// **'Sinhala only'**
   String get layoutSinhalaOnly;
 
   /// Label for side-by-side reader layout showing both Pali and Sinhala horizontally
   ///
   /// In en, this message translates to:
-  /// **'Side by Side'**
+  /// **'Side by side'**
   String get layoutSideBySide;
 
   /// Label for stacked reader layout showing Pali and Sinhala in alternating paragraphs
@@ -203,13 +203,13 @@ abstract class AppLocalizations {
   /// Button label to expand all tree nodes
   ///
   /// In en, this message translates to:
-  /// **'Expand All'**
+  /// **'Expand all'**
   String get expandAll;
 
   /// Button label to collapse all tree nodes
   ///
   /// In en, this message translates to:
-  /// **'Collapse All'**
+  /// **'Collapse all'**
   String get collapseAll;
 
   /// Label for settings menu
@@ -233,19 +233,19 @@ abstract class AppLocalizations {
   /// Label for the app/UI language setting (pure localization of interface labels)
   ///
   /// In en, this message translates to:
-  /// **'App Language'**
+  /// **'App language'**
   String get appLanguage;
 
   /// Label for the content language setting — which text/translation is shown for data labels (tree, breadcrumbs, search, dialogs, tabs)
   ///
   /// In en, this message translates to:
-  /// **'Content Language'**
+  /// **'Content language'**
   String get contentLanguage;
 
   /// Section header for the Pali letter (conjunct) display switches in the settings menu
   ///
   /// In en, this message translates to:
-  /// **'Pali Letters'**
+  /// **'Pali letters'**
   String get paliLetters;
 
   /// Switch 3 — toggles standard ligatures (rakaransaya, yansaya, repaya and the common conjunct pairs) for Pali text. Default on.
@@ -281,7 +281,7 @@ abstract class AppLocalizations {
   /// Label for font size setting
   ///
   /// In en, this message translates to:
-  /// **'Font Size'**
+  /// **'Font size'**
   String get fontSize;
 
   /// Label for small font size option
@@ -305,7 +305,7 @@ abstract class AppLocalizations {
   /// Label for extra large font size option
   ///
   /// In en, this message translates to:
-  /// **'Extra Large'**
+  /// **'Extra large'**
   String get fontSizeExtraLarge;
 
   /// Button label to close a dialog or screen
@@ -329,7 +329,7 @@ abstract class AppLocalizations {
   /// Title for the refine search dialog
   ///
   /// In en, this message translates to:
-  /// **'Refine Search'**
+  /// **'Refine search'**
   String get refineSearch;
 
   /// Label for the refine button/chip
@@ -377,7 +377,7 @@ abstract class AppLocalizations {
   /// Search results tab + section header: matches in the body content of texts
   ///
   /// In en, this message translates to:
-  /// **'Full text'**
+  /// **'Full Text'**
   String get searchTabFullText;
 
   /// Search results tab + section header: dictionary definition matches
@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// Collapse link that hides the expanded secondary matches again
   ///
   /// In en, this message translates to:
-  /// **'Show Less'**
+  /// **'Show less'**
   String get showLess;
 
   /// Button in a Top results section header that opens that section's own tab
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// Label for the action that clears all recent searches
   ///
   /// In en, this message translates to:
-  /// **'Clear All'**
+  /// **'Clear all'**
   String get clearAll;
 
   /// Label for 'All' scope chip (no filter)
@@ -635,7 +635,7 @@ abstract class AppLocalizations {
   /// Label for button to navigate to root text (sutta) from commentary
   ///
   /// In en, this message translates to:
-  /// **'Root Text'**
+  /// **'Root text'**
   String get rootText;
 
   /// Tooltip for button to scroll to the beginning of the sutta when opened mid-document from FTS
@@ -701,7 +701,7 @@ abstract class AppLocalizations {
   /// Title for the refine dictionaries dialog
   ///
   /// In en, this message translates to:
-  /// **'Refine Dictionaries'**
+  /// **'Refine dictionaries'**
   String get dictRefineTitle;
 
   /// Section label in the refine dictionaries dialog

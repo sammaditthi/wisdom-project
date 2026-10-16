@@ -129,7 +129,7 @@ extension SearchTestHelpers on WidgetTester {
 
   // ---- UI interactions ----
 
-  /// Switch to a result tab by its display name (e.g., "Titles", "Full text").
+  /// Switch to a result tab by its display name (e.g., "Titles", "Full Text").
   Future<void> switchToTab(String tabName) async {
     await tap(find.text(tabName));
     await pumpForSettle(this);

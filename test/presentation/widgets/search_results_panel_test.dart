@@ -270,7 +270,7 @@ void main() {
 
     // ── "View N more" in a full-text group ──────────────────────────────
 
-    testWidgets('"View 2 more" shows the hidden matches and "Show Less"',
+    testWidgets('"View 2 more" shows the hidden matches and "Show less"',
         (tester) async {
       // Three matches in one sutta: one primary row and two hidden ones.
       SearchResult match(int entryIndex) => SearchResult(
@@ -303,7 +303,7 @@ void main() {
       await tester.tap(find.text('View 2 more'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Show Less'), findsOneWidget);
+      expect(find.text('Show less'), findsOneWidget);
       expect(find.byType(SecondaryMatchTile), findsNWidgets(2));
     });
 

@@ -30,9 +30,9 @@ void main() {
       // "Navigation Language" was split into two independent axes:
       // App Language (UI chrome) and Content Language (text labels).
       expect(find.text('Theme'), findsOneWidget);
-      expect(find.text('Font Size'), findsOneWidget);
-      expect(find.text('App Language'), findsOneWidget);
-      expect(find.text('Content Language'), findsOneWidget);
+      expect(find.text('Font size'), findsOneWidget);
+      expect(find.text('App language'), findsOneWidget);
+      expect(find.text('Content language'), findsOneWidget);
 
       // Verify theme options. Dark/Warm are temporarily commented out
       // in `_ThemeSelector` until light/dark theming is reworked, so only
