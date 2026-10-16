@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../domain/entities/dictionary/dictionary_filter_operations.dart';
 import '../../../domain/entities/dictionary/dictionary_info.dart';
 import '../../providers/overlay_stack_provider.dart';
@@ -204,10 +205,8 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
                 onPressed: () => _commitSelection({}),
                 child: Text(
                   l10n.clear,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.primary,
-                  ),
+                  style: context.typography.actionLabel
+                      .copyWith(color: theme.colorScheme.primary),
                 ),
               ),
           ],

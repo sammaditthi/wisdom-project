@@ -127,6 +127,10 @@ abstract class AppFonts {
   /// Font size for page numbers and counts
   static const double pageNumberFontSize = 12.0;
 
+  /// Font size for search-result titles. A step under base: Sinhala glyphs
+  /// run larger than Latin at the same size, so base looked oversized.
+  static const double resultTitleFontSize = 15.0;
+
   // ============================================
   // Spacing Em Multipliers
   // ============================================
@@ -208,4 +212,5 @@ class ScaledFontSizes {
   double get tab => AppFonts.tabFontSize * scale;
   double get tree => AppFonts.treeFontSize * scale;
   double get pageNumber => AppFonts.pageNumberFontSize * scale;
+  double get resultTitle => AppFonts.resultTitleFontSize * scale;
 }

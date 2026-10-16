@@ -11,7 +11,7 @@ import 'app_fonts.dart';
 /// Usage:
 /// ```dart
 /// Text('BJT', style: context.typography.badgeLabel)
-/// Text('Results', style: context.typography.sectionHeader)
+/// Text(label.toUpperCase(), style: context.typography.sectionHeaderFor(label))
 /// ```
 @immutable
 class AppTypography extends ThemeExtension<AppTypography> {
@@ -25,6 +25,13 @@ class AppTypography extends ThemeExtension<AppTypography> {
   /// Style for section headers (uppercase, letter-spaced)
   /// Example: "RECENT SEARCHES"
   final TextStyle sectionHeader;
+
+  /// [sectionHeader] for [label]: letter-spaced only where the script has
+  /// case. Sinhala has none, and spacing out its letters isn't native to it.
+  TextStyle sectionHeaderFor(String label) =>
+      label.toUpperCase() != label.toLowerCase()
+          ? sectionHeader
+          : sectionHeader.copyWith(letterSpacing: 0);
 
   /// Style for count badges in tabs
   final TextStyle countBadge;
@@ -208,7 +215,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
       resultTitle: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.base,
+        fontSize: scaledFonts.resultTitle,
         fontWeight: FontWeight.w500,
         color: colorScheme.onSurface,
         height: AppFonts.uiLineHeight,
@@ -252,7 +259,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
       linkLabel: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.badge,
+        fontSize: scaledFonts.label,
         fontWeight: FontWeight.w500,
         color: colorScheme.onSurfaceVariant,
         height: AppFonts.uiLineHeight,

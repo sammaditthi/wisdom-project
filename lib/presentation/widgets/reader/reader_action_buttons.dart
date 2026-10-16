@@ -584,6 +584,8 @@ class _LayoutGlyph extends StatelessWidget {
       style: context.typography.segmentedButtonLabel.copyWith(
         color: color,
         fontWeight: FontWeight.w700,
+        // Fixed like the 20px icons it sits among, which
+        // don't follow the font-size setting either.
         fontSize: 14,
       ),
     );

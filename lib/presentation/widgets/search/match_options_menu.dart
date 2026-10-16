@@ -262,7 +262,7 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       child: Text(
         text.toUpperCase(),
-        style: context.typography.sectionHeader,
+        style: context.typography.sectionHeaderFor(text),
       ),
     );
   }

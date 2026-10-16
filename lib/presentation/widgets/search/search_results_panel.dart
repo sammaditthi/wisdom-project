@@ -437,7 +437,7 @@ class _SectionHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 label.toUpperCase(),
-                style: context.typography.sectionHeader,
+                style: context.typography.sectionHeaderFor(label),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
