@@ -296,6 +296,12 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
+  String get previousSutta => 'පෙර';
+
+  @override
+  String get nextSutta => 'ඊළඟ';
+
+  @override
   String get findInPage => 'පිටුවේ සොයන්න';
 
   @override

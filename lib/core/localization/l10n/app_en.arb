@@ -143,7 +143,7 @@
 
   "layout": "Layout",
   "@layout": {
-    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
+    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later), and the reader's layout picker (toolbar tooltip, scrolled-menu row)"
   },
 
   "hideNavigationBar": "Hide navigation bar",
@@ -487,6 +487,16 @@
         "type": "String"
       }
     }
+  },
+
+  "previousSutta": "Previous",
+  "@previousSutta": {
+    "description": "Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu"
+  },
+
+  "nextSutta": "Next",
+  "@nextSutta": {
+    "description": "Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu"
   },
 
   "findInPage": "Find in page",
@@ -908,10 +918,10 @@
 
   "share": "Share",
   "@share": {
-    "description": "Reader button (and FAB item) that opens the share menu"
+    "description": "Reader toolbar button (and scrolled-menu row) that opens the share menu"
   },
   "openAsWebPage": "Open as web page",
   "@openAsWebPage": {
-    "description": "App on the web only: reader button that opens the text being read on the static web site, in a new tab"
+    "description": "App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab"
   }
 }

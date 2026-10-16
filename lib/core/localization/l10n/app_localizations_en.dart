@@ -296,6 +296,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get previousSutta => 'Previous';
+
+  @override
+  String get nextSutta => 'Next';
+
+  @override
   String get findInPage => 'Find in page';
 
   @override

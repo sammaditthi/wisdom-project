@@ -185,6 +185,10 @@
 
   "goToSutta": "වෙත යන්න: {name}",
 
+  "previousSutta": "පෙර",
+
+  "nextSutta": "ඊළඟ",
+
   "findInPage": "පිටුවේ සොයන්න",
 
   "noInPageMatches": "0 / 0",

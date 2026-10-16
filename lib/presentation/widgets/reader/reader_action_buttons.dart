@@ -1,325 +1,401 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/utils/responsive_utils.dart';
 import '../../models/reader_layout.dart';
-import '../../providers/parallel_text_provider.dart';
-import '../../utils/content_icons.dart';
-import '../../providers/tab_provider.dart'
-    show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
-import 'reader_link_actions.dart';
+import '../../providers/overlay_stack_provider.dart';
+import 'reader_actions.dart';
 
-/// Where one of the group's step buttons goes, and what to call it.
-///
-/// The icon is the slot's, not the target's — a direction is a property of
-/// which side of the pill you are on — so a caller supplies only the
-/// destination.
-typedef ReaderStepTarget = ({String tooltip, VoidCallback onTap});
+// The two presenters of the reader's actions (see `reader_actions.dart`):
+// the toolbar at the top of a sutta, and the menu behind the FAB once scrolled.
 
-/// Mode 1: Horizontal pill of icon buttons shown at top-right when the user
-/// hasn't scrolled past the first viewport.
-///
-/// Contains up to 4 reading buttons (commentary toggle, search, previous,
-/// next), then after a hairline Share and, on the web, Open as web page.
-/// Buttons are conditionally included based on context; a step button is
-/// omitted when there is no leaf that way.
-class ReaderActionButtonGroup extends ConsumerWidget {
+/// Width of the menus that open from the right-hand end — the toolbar's Share
+/// menu and the scrolled menu — fixed so they line up with their button's
+/// right edge.
+const double _endMenuWidth = 280;
+
+/// How long the mouse rests on a submenu row before it opens. Flutter's
+/// default opens at once, so a click straight after would close it again.
+const Duration _submenuHoverDelay = Duration(milliseconds: 300);
+
+/// Mode 1: every reader action in one pill, at top-right while the user is at
+/// the start of the unit. Layout and Share open menus.
+class ReaderActionToolbar extends ConsumerWidget {
   final VoidCallback onSearchTap;
   final ReaderStepTarget? previous;
   final ReaderStepTarget? next;
 
-  const ReaderActionButtonGroup({
+  /// False while the toolbar is faded out; an open menu then closes.
+  final bool visible;
+
+  const ReaderActionToolbar({
     super.key,
     required this.onSearchTap,
     this.previous,
     this.next,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final targetNode = ref.watch(parallelTextNodeProvider);
-    final isCommentary = ref.watch(isCommentaryProvider);
-    final l10n = AppLocalizations.of(context);
-
-    return Material(
-      elevation: 1,
-      borderRadius: BorderRadius.circular(24),
-      color: colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Commentary/Root text toggle — hidden when no parallel text
-            if (targetNode != null)
-              _ActionIconButton(
-                icon: contentIcon(
-                  isCommentary: !isCommentary,
-                  colorScheme: colorScheme,
-                ).icon,
-                tooltip: isCommentary ? l10n.rootText : l10n.commentary,
-                onTap: () => ref.read(openParallelTextProvider)(
-                  isPortraitMode:
-                      ResponsiveUtils.shouldDefaultToSingleColumn(context),
-                ),
-              ),
-            // In-page search
-            _ActionIconButton(
-              icon: Icons.search,
-              tooltip: l10n.findInPage,
-              onTap: onSearchTap,
-            ),
-            // Step to the sutta on either side of this unit
-            if (previous case final target?)
-              _ActionIconButton(
-                icon: Icons.skip_previous,
-                tooltip: target.tooltip,
-                onTap: target.onTap,
-              ),
-            if (next case final target?)
-              _ActionIconButton(
-                icon: Icons.skip_next,
-                tooltip: target.tooltip,
-                onTap: target.onTap,
-              ),
-            // Outward actions: last, and set apart from the reading actions
-            Container(
-              width: 1,
-              height: 24,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              color: colorScheme.outlineVariant,
-            ),
-            Builder(
-              builder: (buttonContext) => _ActionIconButton(
-                icon: Icons.adaptive.share,
-                tooltip: l10n.share,
-                onTap: () =>
-                    showShareMenu(context, ref, globalRectOf(buttonContext)),
-              ),
-            ),
-            if (kIsWeb)
-              _ActionIconButton(
-                icon: Icons.open_in_new,
-                tooltip: l10n.openAsWebPage,
-                onTap: () => openAsWebPage(context, ref),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Floating pill showing the layout selector (P / P+S / P|S / S).
-/// Shown at top-right when the user is at the sutta beginning.
-/// Matches the visual style of [ReaderActionButtonGroup] — no outlines.
-class ReaderLayoutPill extends ConsumerWidget {
-  const ReaderLayoutPill({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final currentLayout = ref.watch(activeReaderLayoutProvider);
-    return Material(
-      elevation: 1,
-      borderRadius: BorderRadius.circular(24),
-      color: colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final layout in ReaderLayout.values)
-              _LayoutOptionButton(
-                layout: layout,
-                tooltip: _tooltipFor(context, layout),
-                isSelected: currentLayout == layout,
-                onTap: () => ref.read(updateActiveTabLayoutProvider)(layout),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Mode 2: Expandable FAB at bottom-right shown when the user has scrolled
-/// past one viewport height.
-///
-/// Collapsed: single pill with a menu icon.
-/// Expanded: vertical column of labeled action items above the trigger.
-///
-/// Pass [visible] = false when the FAB is faded out so it auto-collapses.
-class ReaderExpandableFab extends ConsumerStatefulWidget {
-  final VoidCallback onSearchTap;
-  final VoidCallback onScrollTap;
-  final bool visible;
-
-  const ReaderExpandableFab({
-    super.key,
-    required this.onSearchTap,
-    required this.onScrollTap,
     this.visible = true,
   });
 
   @override
-  ConsumerState<ReaderExpandableFab> createState() =>
-      _ReaderExpandableFabState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final actions = buildReaderActions(
+      context,
+      ref,
+      onSearch: onSearchTap,
+      previous: previous,
+      next: next,
+    );
+
+    return Material(
+      elevation: 1,
+      borderRadius: BorderRadius.circular(24),
+      color: colorScheme.surfaceContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (i, action) in actions.indexed) ...[
+              if (i > 0 && action.group != actions[i - 1].group)
+                Container(
+                  width: 1,
+                  height: 24,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  color: colorScheme.outlineVariant,
+                ),
+              switch (action) {
+                ReaderLayoutChoice choice =>
+                  _LayoutMenuButton(choice: choice, visible: visible),
+                ReaderCommand command => _ActionIconButton(
+                    icon: command.icon,
+                    tooltip: command.tooltip ?? command.label,
+                    onTap: command.onSelected,
+                  ),
+                ReaderActionMenu menu =>
+                  _ActionMenuButton(menu: menu, visible: visible),
+              },
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _ReaderExpandableFabState extends ConsumerState<ReaderExpandableFab> {
-  bool _isExpanded = false;
+/// Mode 2: a FAB at bottom-right, shown once the user has scrolled past one
+/// viewport. It opens one menu with the toolbar's groups, plus Go to beginning.
+class ReaderActionMenuFab extends ConsumerWidget {
+  final VoidCallback onSearchTap;
+  final VoidCallback onScrollTap;
+  final ReaderStepTarget? previous;
+  final ReaderStepTarget? next;
+
+  /// False while the FAB is faded out; an open menu then closes.
+  final bool visible;
+
+  const ReaderActionMenuFab({
+    super.key,
+    required this.onSearchTap,
+    required this.onScrollTap,
+    this.previous,
+    this.next,
+    this.visible = true,
+  });
 
   @override
-  void didUpdateWidget(ReaderExpandableFab oldWidget) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final actions = buildReaderActions(
+      context,
+      ref,
+      onSearch: onSearchTap,
+      previous: previous,
+      next: next,
+      onScrollToBeginning: onScrollTap,
+    );
+
+    return _ReaderMenuAnchor(
+      overlayId: 'reader-actions-menu',
+      visible: visible,
+      endAligned: true,
+      gap: 12,
+      menuChildren: [
+        for (final (i, action) in actions.indexed) ...[
+          if (i > 0 && action.group != actions[i - 1].group)
+            const Divider(height: 9),
+          switch (action) {
+            ReaderLayoutChoice choice => _LayoutSubmenu(choice: choice),
+            ReaderCommand command => _CommandMenuItem(command: command),
+            ReaderActionMenu menu => SubmenuButton(
+                hoverOpenDelay: _submenuHoverDelay,
+                leadingIcon: _MenuIcon(
+                  child: Icon(menu.icon, size: 20, color: colorScheme.primary),
+                ),
+                menuChildren: [
+                  for (final item in menu.items)
+                    _CommandMenuItem(command: item),
+                ],
+                child: _MenuLabel(menu.label),
+              ),
+          },
+        ],
+      ],
+      builder: (context, controller, focusNode) {
+        final isOpen = controller.isOpen;
+        return Material(
+          elevation: isOpen ? 4 : 2,
+          borderRadius: BorderRadius.circular(16),
+          color: colorScheme.surfaceContainer,
+          child: InkWell(
+            focusNode: focusNode,
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => isOpen ? controller.close() : controller.open(),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: AnimatedRotation(
+                turns: isOpen ? 0.25 : 0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                child: Icon(
+                  isOpen ? Icons.close : Icons.more_vert,
+                  size: 24,
+                  color: colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// A [MenuAnchor] for the reader's actions. ESC closes it before anything
+/// under it, and it closes when its presenter fades out.
+///
+/// [endAligned] lines the menu's right edge up with the button's, at
+/// [_endMenuWidth]; otherwise the menu starts at the button's left edge.
+/// The menu opens below the button, or above it where there is no room below.
+class _ReaderMenuAnchor extends ConsumerStatefulWidget {
+  final String overlayId;
+  final bool visible;
+  final bool endAligned;
+  final double gap;
+  final List<Widget> menuChildren;
+  final Widget Function(
+    BuildContext context,
+    MenuController controller,
+    FocusNode focusNode,
+  ) builder;
+
+  const _ReaderMenuAnchor({
+    required this.overlayId,
+    required this.visible,
+    required this.menuChildren,
+    required this.builder,
+    this.endAligned = false,
+    this.gap = 4,
+  });
+
+  @override
+  ConsumerState<_ReaderMenuAnchor> createState() => _ReaderMenuAnchorState();
+}
+
+class _ReaderMenuAnchorState extends ConsumerState<_ReaderMenuAnchor> {
+  final _controller = MenuController();
+  // Lets the arrow keys move from the button into the menu.
+  final _buttonFocusNode = FocusNode(debugLabel: 'ReaderMenuAnchor');
+
+  // Captured in initState: dispose() can't use `ref`.
+  late final OverlayStackNotifier _overlayStack;
+
+  @override
+  void initState() {
+    super.initState();
+    _overlayStack = ref.read(overlayStackProvider.notifier);
+  }
+
+  @override
+  void didUpdateWidget(_ReaderMenuAnchor oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Auto-collapse when the FAB becomes invisible
-    if (!widget.visible && oldWidget.visible && _isExpanded) {
-      setState(() => _isExpanded = false);
+    // Closing updates the overlay stack, which can't change mid-build.
+    if (oldWidget.visible && !widget.visible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _controller.close();
+      });
     }
   }
 
-  void _collapse() {
-    setState(() => _isExpanded = false);
+  @override
+  void dispose() {
+    // A menu closed because its button went away doesn't call onClose, and
+    // Riverpod forbids changing a provider while the tree is torn down.
+    final stack = _overlayStack;
+    final id = widget.overlayId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (stack.mounted) stack.remove(id);
+    });
+    _buttonFocusNode.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return MenuAnchor(
+      controller: _controller,
+      childFocusNode: _buttonFocusNode,
+      alignmentOffset: widget.endAligned
+          ? Offset(-_endMenuWidth, widget.gap)
+          : Offset(0, widget.gap),
+      style: widget.endAligned
+          ? const MenuStyle(alignment: AlignmentDirectional.bottomEnd)
+          : null,
+      onOpen: () => _overlayStack.push(
+        DismissibleOverlay(id: widget.overlayId, dismiss: _controller.close),
+      ),
+      onClose: () => _overlayStack.remove(widget.overlayId),
+      // A sized box, not MenuStyle's sizes: compact density (desktop, web)
+      // shrinks a menu's minimum width, which would undo the alignment.
+      menuChildren: widget.endAligned
+          ? [
+              SizedBox(
+                width: _endMenuWidth,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: widget.menuChildren,
+                ),
+              ),
+            ]
+          : widget.menuChildren,
+      builder: (context, controller, _) =>
+          widget.builder(context, controller, _buttonFocusNode),
+    );
+  }
+}
+
+/// The toolbar's Layout ▾: the current layout's glyph, opening the four.
+class _LayoutMenuButton extends StatelessWidget {
+  final ReaderLayoutChoice choice;
+  final bool visible;
+
+  const _LayoutMenuButton({required this.choice, required this.visible});
+
+  @override
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final targetNode = ref.watch(parallelTextNodeProvider);
-    final isCommentary = ref.watch(isCommentaryProvider);
-    final currentLayout = ref.watch(activeReaderLayoutProvider);
     final l10n = AppLocalizations.of(context);
 
-    return TapRegion(
-      // Collapse when the user taps outside the FAB
-      onTapOutside: (_) {
-        if (_isExpanded) _collapse();
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          // Expanded action items — animated size for smooth expand/collapse
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.bottomCenter,
-            child: _isExpanded
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      // Layout selector — per-tab setting
-                      _FabLayoutSelector(
-                        currentLayout: currentLayout,
-                        onLayoutChanged: (layout) {
-                          ref.read(updateActiveTabLayoutProvider)(layout);
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      // Divider between layout and actions
-                      SizedBox(
-                        width: 120,
-                        child: Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: colorScheme.outlineVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // Commentary/Root text toggle
-                      if (targetNode != null) ...[
-                        _FabActionItem(
-                          icon: contentIcon(
-                            isCommentary: !isCommentary,
-                            colorScheme: colorScheme,
-                          ).icon,
-                          label: isCommentary ? l10n.rootText : l10n.commentary,
-                          onTap: () {
-                            _collapse();
-                            ref.read(openParallelTextProvider)(
-                              isPortraitMode:
-                                  ResponsiveUtils.shouldDefaultToSingleColumn(
-                                      context),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                      // In-page search
-                      _FabActionItem(
-                        icon: Icons.search,
-                        label: l10n.findInPage,
-                        onTap: () {
-                          _collapse();
-                          widget.onSearchTap();
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      // Scroll to beginning
-                      _FabActionItem(
-                        icon: Icons.vertical_align_top,
-                        label: l10n.scrollToBeginning,
-                        onTap: () {
-                          _collapse();
-                          widget.onScrollTap();
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      Builder(
-                        builder: (itemContext) => _FabActionItem(
-                          icon: Icons.adaptive.share,
-                          label: l10n.share,
-                          onTap: () {
-                            // Measured first: collapsing removes the item.
-                            final anchor = globalRectOf(itemContext);
-                            _collapse();
-                            showShareMenu(context, ref, anchor);
-                          },
-                        ),
-                      ),
-                      if (kIsWeb) ...[
-                        const SizedBox(height: 8),
-                        _FabActionItem(
-                          icon: Icons.open_in_new,
-                          label: l10n.openAsWebPage,
-                          onTap: () {
-                            _collapse();
-                            openAsWebPage(context, ref);
-                          },
-                        ),
-                      ],
-                      const SizedBox(height: 12),
-                    ],
-                  )
-                : const SizedBox.shrink(),
-          ),
-          // FAB trigger button
-          Material(
-            elevation: _isExpanded ? 4 : 2,
-            borderRadius: BorderRadius.circular(16),
-            color: colorScheme.surfaceContainer,
+    return _ReaderMenuAnchor(
+      overlayId: 'reader-layout-menu',
+      visible: visible,
+      menuChildren: [
+        for (final layout in ReaderLayout.values)
+          _LayoutMenuItem(layout: layout, choice: choice),
+      ],
+      builder: (context, controller, focusNode) {
+        final isOpen = controller.isOpen;
+        final color =
+            isOpen ? colorScheme.onSecondaryContainer : colorScheme.primary;
+        return Tooltip(
+          message: l10n.layout,
+          child: Material(
+            color: isOpen ? colorScheme.secondaryContainer : Colors.transparent,
+            borderRadius: BorderRadius.circular(22),
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => setState(() => _isExpanded = !_isExpanded),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: AnimatedRotation(
-                  turns: _isExpanded ? 0.25 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOutCubic,
-                  child: Icon(
-                    _isExpanded ? Icons.close : Icons.more_vert,
-                    size: 24,
-                    color: colorScheme.primary,
+              focusNode: focusNode,
+              borderRadius: BorderRadius.circular(22),
+              onTap: () => isOpen ? controller.close() : controller.open(),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 12, end: 6),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _LayoutGlyph(layout: choice.current, color: color),
+                      const SizedBox(width: 2),
+                      Icon(
+                        isOpen ? Icons.expand_less : Icons.expand_more,
+                        size: 16,
+                        color: color,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The toolbar's button for an [ReaderActionMenu] (Share): its icon, opening
+/// its items.
+class _ActionMenuButton extends StatelessWidget {
+  final ReaderActionMenu menu;
+  final bool visible;
+
+  const _ActionMenuButton({required this.menu, required this.visible});
+
+  @override
+  Widget build(BuildContext context) {
+    return _ReaderMenuAnchor(
+      overlayId: 'reader-share-menu',
+      visible: visible,
+      endAligned: true,
+      menuChildren: [
+        for (final item in menu.items) _CommandMenuItem(command: item),
+      ],
+      builder: (context, controller, focusNode) => _ActionIconButton(
+        icon: menu.icon,
+        tooltip: menu.label,
+        highlighted: controller.isOpen,
+        focusNode: focusNode,
+        onTap: () => controller.isOpen ? controller.close() : controller.open(),
+      ),
+    );
+  }
+}
+
+/// The scrolled menu's Layout ›, naming the current layout.
+class _LayoutSubmenu extends StatelessWidget {
+  final ReaderLayoutChoice choice;
+
+  const _LayoutSubmenu({required this.choice});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final typography = context.typography;
+    return SubmenuButton(
+      hoverOpenDelay: _submenuHoverDelay,
+      leadingIcon: _MenuIcon(
+        child: _LayoutGlyph(layout: choice.current, color: colorScheme.primary),
+      ),
+      menuChildren: [
+        for (final layout in ReaderLayout.values)
+          _LayoutMenuItem(layout: layout, choice: choice),
+      ],
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context).layout,
+              style: typography.listRowTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            _layoutLabel(context, choice.current),
+            style: typography.menuSectionLabel,
+            maxLines: 1,
           ),
         ],
       ),
@@ -327,18 +403,119 @@ class _ReaderExpandableFabState extends ConsumerState<ReaderExpandableFab> {
   }
 }
 
-/// Individual icon button used inside [ReaderActionButtonGroup].
-/// No background — the parent Material provides the shared surface.
-/// Uses ConstrainedBox to meet the 44x44 minimum accessible touch target.
+/// One layout in a layout menu, with a check on the current one.
+class _LayoutMenuItem extends StatelessWidget {
+  final ReaderLayout layout;
+  final ReaderLayoutChoice choice;
+
+  const _LayoutMenuItem({required this.layout, required this.choice});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final rowStyle = context.typography.listRowTitle;
+    final isSelected = layout == choice.current;
+
+    return MenuItemButton(
+      onPressed: () => choice.onChanged(layout),
+      style: MenuItemButton.styleFrom(
+        backgroundColor:
+            isSelected ? colorScheme.surfaceContainerHighest : null,
+      ),
+      leadingIcon: _MenuIcon(
+        child: _LayoutGlyph(layout: layout, color: colorScheme.primary),
+      ),
+      trailingIcon: isSelected
+          ? Icon(Icons.check, size: 18, color: colorScheme.primary)
+          : null,
+      child: Semantics(
+        selected: isSelected,
+        child: Text(
+          _layoutLabel(context, layout),
+          style: isSelected
+              ? rowStyle.copyWith(fontWeight: FontWeight.w600)
+              : rowStyle,
+        ),
+      ),
+    );
+  }
+}
+
+/// A [ReaderCommand] as a menu row, with its caption above the label if any.
+class _CommandMenuItem extends StatelessWidget {
+  final ReaderCommand command;
+
+  const _CommandMenuItem({required this.command});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final caption = command.caption;
+
+    return MenuItemButton(
+      onPressed: command.onSelected,
+      leadingIcon: _MenuIcon(
+        child: Icon(command.icon, size: 20, color: colorScheme.primary),
+      ),
+      child: caption == null
+          ? _MenuLabel(command.label)
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(caption, style: context.typography.menuSectionLabel),
+                _MenuLabel(command.label),
+              ],
+            ),
+    );
+  }
+}
+
+/// A menu row's text, on one line.
+class _MenuLabel extends StatelessWidget {
+  final String text;
+
+  const _MenuLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: context.typography.listRowTitle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+/// Lines up menu-row glyphs of different widths (icons, "P", "S").
+class _MenuIcon extends StatelessWidget {
+  final Widget child;
+
+  const _MenuIcon({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(width: 24, child: Center(child: child));
+  }
+}
+
+/// Icon button inside the toolbar. No background of its own — the pill
+/// provides the surface — except [highlighted] while its menu is open.
+/// ConstrainedBox keeps the 44x44 minimum touch target.
 class _ActionIconButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
+  final bool highlighted;
+  final FocusNode? focusNode;
 
   const _ActionIconButton({
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.highlighted = false,
+    this.focusNode,
   });
 
   @override
@@ -346,18 +523,26 @@ class _ActionIconButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip,
-      child: InkWell(
+      child: Material(
+        color:
+            highlighted ? colorScheme.secondaryContainer : Colors.transparent,
         borderRadius: BorderRadius.circular(22),
-        onTap: onTap,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: 44,
-            minHeight: 44,
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: colorScheme.primary,
+        child: InkWell(
+          focusNode: focusNode,
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: highlighted
+                  ? colorScheme.onSecondaryContainer
+                  : colorScheme.primary,
+            ),
           ),
         ),
       ),
@@ -365,8 +550,8 @@ class _ActionIconButton extends StatelessWidget {
   }
 }
 
-/// Returns the localized tooltip for a given [ReaderLayout].
-String _tooltipFor(BuildContext context, ReaderLayout layout) {
+/// The localized name of [layout].
+String _layoutLabel(BuildContext context, ReaderLayout layout) {
   final l10n = AppLocalizations.of(context);
   return switch (layout) {
     ReaderLayout.paliOnly => l10n.layoutPaliOnly,
@@ -376,148 +561,30 @@ String _tooltipFor(BuildContext context, ReaderLayout layout) {
   };
 }
 
-/// Maps each [ReaderLayout] to an icon (for dual-language modes) or `null`
-/// (for single-language modes that use a text label instead).
+/// Icons for the two-language layouts; the single-language ones show their
+/// letter instead.
 const _layoutIcons = {
   ReaderLayout.sideBySide: Icons.vertical_split,
   ReaderLayout.stacked: Icons.horizontal_split,
 };
 
-/// Individual layout option button used inside [ReaderLayoutPill] and
-/// [_FabLayoutSelector]. Shows an icon or a text label depending on the layout.
-/// Selected state is indicated by primary color + bold weight.
-class _LayoutOptionButton extends StatelessWidget {
+/// [layout]'s icon, or its letter (P, S) for a single-language layout.
+class _LayoutGlyph extends StatelessWidget {
   final ReaderLayout layout;
-  final String tooltip;
-  final bool isSelected;
-  final VoidCallback onTap;
+  final Color color;
 
-  const _LayoutOptionButton({
-    required this.layout,
-    required this.tooltip,
-    required this.isSelected,
-    required this.onTap,
-  });
+  const _LayoutGlyph({required this.layout, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final segmentStyle = context.typography.segmentedButtonLabel;
-    final color =
-        isSelected ? colorScheme.onSecondaryContainer : colorScheme.primary;
     final icon = _layoutIcons[layout];
-
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: isSelected ? colorScheme.secondaryContainer : Colors.transparent,
-        borderRadius: BorderRadius.circular(22),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: 44,
-              minHeight: 44,
-            ),
-            child: Center(
-              child: icon != null
-                  ? Icon(icon, size: 20, color: color)
-                  : Text(
-                      layout.shortLabel,
-                      style: segmentStyle.copyWith(
-                        color: color,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                    ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Layout selector shown inside the expanded [ReaderExpandableFab].
-/// Matches the outline-free style of [ReaderLayoutPill].
-class _FabLayoutSelector extends StatelessWidget {
-  final ReaderLayout currentLayout;
-  final ValueChanged<ReaderLayout> onLayoutChanged;
-
-  const _FabLayoutSelector({
-    required this.currentLayout,
-    required this.onLayoutChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      elevation: 2,
-      borderRadius: BorderRadius.circular(20),
-      color: colorScheme.surfaceContainer,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final layout in ReaderLayout.values)
-              _LayoutOptionButton(
-                layout: layout,
-                tooltip: _tooltipFor(context, layout),
-                isSelected: currentLayout == layout,
-                onTap: () => onLayoutChanged(layout),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Labeled action item used in the expanded [ReaderExpandableFab] menu.
-class _FabActionItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _FabActionItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Material(
-      elevation: 2,
-      borderRadius: BorderRadius.circular(20),
-      color: colorScheme.surfaceContainer,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 20,
-                color: colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: context.typography.actionLabel.copyWith(
-                  color: colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
+    if (icon != null) return Icon(icon, size: 20, color: color);
+    return Text(
+      layout.shortLabel,
+      style: context.typography.segmentedButtonLabel.copyWith(
+        color: color,
+        fontWeight: FontWeight.w700,
+        fontSize: 14,
       ),
     );
   }

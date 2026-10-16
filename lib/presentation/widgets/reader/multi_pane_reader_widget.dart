@@ -36,6 +36,7 @@ import 'stacked_pane.dart';
 import 'reader_selection_handler.dart';
 import 'in_page_search_bar.dart';
 import 'reader_action_buttons.dart';
+import 'reader_actions.dart' show ReaderStepTarget;
 import '../dictionary/dictionary_bottom_sheet.dart';
 import '../common/app_emblem.dart';
 import '../common/status_message_view.dart';
@@ -215,17 +216,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     _anchorAt(null);
   }
 
-  /// One step slot of the action pill, or null when the corpus ends that way.
-  ///
-  /// Both directions name their destination with the same string: the icon
-  /// says which way, so the tooltip only has to say where.
-  ReaderStepTarget? _stepTarget(BuildContext context, TipitakaTreeNode? leaf) =>
-      leaf == null
-          ? null
-          : (
-              tooltip: AppLocalizations.of(context).goToSutta(leaf.paliName),
-              onTap: () => _navigateToSutta(leaf),
-            );
+  /// One step action, or null when the corpus ends that way.
+  ReaderStepTarget? _stepTarget(TipitakaTreeNode? leaf) => leaf == null
+      ? null
+      : (name: leaf.paliName, onTap: () => _navigateToSutta(leaf));
 
   /// Restores the active tab's saved offset, measured from its anchor row.
   /// Call from a post-frame callback, once the content has rebuilt.
@@ -478,8 +472,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
             // Stable key so the Stack matches this child by identity. Without
             // it, inserting this child shifts the keyless Positioned wrappers
             // below by one slot, and the FAB's (opacity-1) AnimatedOpacity
-            // element gets reused to render the Mode 1 pills for a frame —
-            // making the top pills flash in on every open.
+            // element gets reused to render the Mode 1 toolbar for a frame —
+            // making the top toolbar flash in on every open.
             key: const ValueKey('in-page-search-bar'),
             top: 8,
             right: 16,
@@ -495,8 +489,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
               ),
             ),
           ),
-        // Mode 1: Floating pills at top-right when at the unit's beginning.
-        // Layout selector pill + action button pill in a row.
+        // Mode 1: the action toolbar at top-right when at the unit's beginning.
         // IgnorePointer disables taps on the invisible widget.
         if (hasContent)
           Positioned(
@@ -505,12 +498,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
             // search-bar key note above).
             key: const ValueKey('reader-actions-top'),
             top: 12,
-            // Bounded on both sides, and a Wrap rather than a Row: with every
-            // action button the two pills want 429px (473px on the web), which
-            // is more than a phone has to give. They drop to a second
-            // line there and stay on one anywhere wider, so no control is
-            // hidden and nothing overflows. `alignment: end` keeps both lines
-            // against the right edge, where the Row left them.
+            // Bounded on both sides so the toolbar gets the width it may use.
             left: 16,
             right: 16,
             child: IgnorePointer(
@@ -521,26 +509,22 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
                 // symmetrically with no brief "neither visible" gap.
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOutCubic,
-                child: Wrap(
-                  alignment: WrapAlignment.end,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    const ReaderLayoutPill(),
-                    ReaderActionButtonGroup(
-                      onSearchTap: () => ref
-                          .read(inPageSearchStatesProvider.notifier)
-                          .openSearch(),
-                      previous: _stepTarget(context, previousNode),
-                      next: _stepTarget(context, nextNode),
-                    ),
-                  ],
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: ReaderActionToolbar(
+                    visible: showMode1,
+                    onSearchTap: () => ref
+                        .read(inPageSearchStatesProvider.notifier)
+                        .openSearch(),
+                    previous: _stepTarget(previousNode),
+                    next: _stepTarget(nextNode),
+                  ),
                 ),
               ),
             ),
           ),
-        // Mode 2: Expandable FAB at bottom-right (scrolled down)
-        // Contains layout selector + action buttons when expanded.
+        // Mode 2: FAB at bottom-right (scrolled down), opening the actions
+        // menu.
         if (hasContent)
           Positioned(
             // Keyed so reconciliation pins this to the Mode 2 (FAB) element —
@@ -558,12 +542,14 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
                   offset: showMode2 ? Offset.zero : const Offset(0, 0.3),
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOutCubic,
-                  child: ReaderExpandableFab(
+                  child: ReaderActionMenuFab(
                     visible: showMode2,
                     onSearchTap: () => ref
                         .read(inPageSearchStatesProvider.notifier)
                         .openSearch(),
                     onScrollTap: _scrollToBeginning,
+                    previous: _stepTarget(previousNode),
+                    next: _stepTarget(nextNode),
                   ),
                 ),
               ),

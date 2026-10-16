@@ -266,7 +266,7 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later), and the reader's layout picker (toolbar tooltip, scrolled-menu row)
   ///
   /// In en, this message translates to:
   /// **'Layout'**
@@ -649,6 +649,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to: {name}'**
   String goToSutta(String name);
+
+  /// Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousSutta;
+
+  /// Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextSutta;
 
   /// Placeholder text for the in-page search text field
   ///
@@ -1130,13 +1142,13 @@ abstract class AppLocalizations {
   /// **'More options'**
   String get moreOptions;
 
-  /// Reader button (and FAB item) that opens the share menu
+  /// Reader toolbar button (and scrolled-menu row) that opens the share menu
   ///
   /// In en, this message translates to:
   /// **'Share'**
   String get share;
 
-  /// App on the web only: reader button that opens the text being read on the static web site, in a new tab
+  /// App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab
   ///
   /// In en, this message translates to:
   /// **'Open as web page'**
