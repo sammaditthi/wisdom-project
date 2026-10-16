@@ -26,12 +26,31 @@ class AppTypography extends ThemeExtension<AppTypography> {
   /// Example: "RECENT SEARCHES"
   final TextStyle sectionHeader;
 
-  /// [sectionHeader] for [label]: letter-spaced only where the script has
-  /// case. Sinhala has none, and spacing out its letters isn't native to it.
+  /// [sectionHeader] for scripts without case (Sinhala): no capitals to lift
+  /// it, so a size up to stand as tall as Latin caps, and small-label spacing
+  /// instead of the wide caps spacing.
+  final TextStyle sectionHeaderCaseless;
+
+  /// Letter spacing for labels in scripts without case (Sinhala): Material 3's
+  /// small-label value. Latin labels keep their own.
+  static const double _caselessLetterSpacing = 0.5;
+
+  /// Whether [text]'s script has upper and lower case. Sinhala has none.
+  static bool _hasCase(String text) => text.toUpperCase() != text.toLowerCase();
+
+  /// The section-header style for [label], picked by whether its script has
+  /// case.
   TextStyle sectionHeaderFor(String label) =>
-      label.toUpperCase() != label.toLowerCase()
-          ? sectionHeader
-          : sectionHeader.copyWith(letterSpacing: 0);
+      _hasCase(label) ? sectionHeader : sectionHeaderCaseless;
+
+  /// The tab style for [label]: Sinhala gets small-label spacing, Latin is
+  /// left as is.
+  TextStyle tabLabelFor(String label, {required bool active}) {
+    final style = active ? tabLabelActive : tabLabelInactive;
+    return _hasCase(label)
+        ? style
+        : style.copyWith(letterSpacing: _caselessLetterSpacing);
+  }
 
   /// Style for count badges in tabs
   final TextStyle countBadge;
@@ -140,6 +159,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
   const AppTypography({
     required this.badgeLabel,
     required this.sectionHeader,
+    required this.sectionHeaderCaseless,
     required this.countBadge,
     required this.chipLabel,
     required this.resultTitle,
@@ -172,6 +192,15 @@ class AppTypography extends ThemeExtension<AppTypography> {
     double fontScale = 1.0,
   }) {
     final scaledFonts = AppFonts.scaled(fontScale);
+    final sectionHeader = TextStyle(
+      fontFamily: AppFonts.ui,
+      fontFamilyFallback: AppFonts.uiFallback,
+      fontSize: scaledFonts.label,
+      fontWeight: FontWeight.w600,
+      color: colorScheme.onSurface,
+      letterSpacing: 1.2,
+      height: AppFonts.uiLineHeight,
+    );
 
     return AppTypography(
       // Labels & Badges
@@ -183,14 +212,11 @@ class AppTypography extends ThemeExtension<AppTypography> {
         color: colorScheme.onPrimaryContainer,
         height: AppFonts.uiLineHeight,
       ),
-      sectionHeader: TextStyle(
-        fontFamily: AppFonts.ui,
-        fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.label,
-        fontWeight: FontWeight.w600,
-        color: colorScheme.onSurface,
-        letterSpacing: 1.2,
-        height: AppFonts.uiLineHeight,
+      sectionHeader: sectionHeader,
+      // Sinhala at 14px stands as tall as Latin caps at 12px.
+      sectionHeaderCaseless: sectionHeader.copyWith(
+        fontSize: scaledFonts.tree,
+        letterSpacing: _caselessLetterSpacing,
       ),
       countBadge: TextStyle(
         fontFamily: AppFonts.ui,
@@ -403,6 +429,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
   ThemeExtension<AppTypography> copyWith({
     TextStyle? badgeLabel,
     TextStyle? sectionHeader,
+    TextStyle? sectionHeaderCaseless,
     TextStyle? countBadge,
     TextStyle? chipLabel,
     TextStyle? resultTitle,
@@ -428,6 +455,8 @@ class AppTypography extends ThemeExtension<AppTypography> {
     return AppTypography(
       badgeLabel: badgeLabel ?? this.badgeLabel,
       sectionHeader: sectionHeader ?? this.sectionHeader,
+      sectionHeaderCaseless:
+          sectionHeaderCaseless ?? this.sectionHeaderCaseless,
       countBadge: countBadge ?? this.countBadge,
       chipLabel: chipLabel ?? this.chipLabel,
       resultTitle: resultTitle ?? this.resultTitle,
@@ -463,6 +492,8 @@ class AppTypography extends ThemeExtension<AppTypography> {
     return AppTypography(
       badgeLabel: TextStyle.lerp(badgeLabel, other.badgeLabel, t)!,
       sectionHeader: TextStyle.lerp(sectionHeader, other.sectionHeader, t)!,
+      sectionHeaderCaseless: TextStyle.lerp(
+          sectionHeaderCaseless, other.sectionHeaderCaseless, t)!,
       countBadge: TextStyle.lerp(countBadge, other.countBadge, t)!,
       chipLabel: TextStyle.lerp(chipLabel, other.chipLabel, t)!,
       resultTitle: TextStyle.lerp(resultTitle, other.resultTitle, t)!,
