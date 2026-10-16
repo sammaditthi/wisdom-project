@@ -236,7 +236,10 @@ Still open:
   each in its own `try` that throws `DatabaseInstallFailure(download, …)`;
   leave `sink.write` and `sink.close` to `_asFailure`, so a full disk stays
   `outOfSpace`. Step 4.2 of the installer tests can then check the kind.
-- AASA / assetlinks on **both** origins.
+- AASA / assetlinks on **both** origins. Both name the app's ID (AASA as
+  `<Team ID>.<bundle id>`), so they wait on **App ID** in
+  [`first-ios-release.md`](../mobile-release/first-ios-release.md);
+  assetlinks also needs the Android release key's SHA-256 fingerprint.
 - Research Worker CORS must include the app's prod origin (dev's is in
   `research_server/wrangler.jsonc`).
 - **Links between the two products.** Site → app is built on sutta and chapter

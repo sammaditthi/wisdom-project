@@ -27,6 +27,27 @@ Section 2 was its step 10.
     `the_wisdom_project`.
   - macOS, same fix: `PRODUCT_NAME` in `macos/Runner/Configs/AppInfo.xcconfig`
     is `the_wisdom_project` and shows in the menu bar.
+- **App ID.** Choose it before the first store upload: neither store lets an
+  app change it afterwards. Today it is `lk.tipitaka.theWisdomProject` (iOS,
+  macOS) and `lk.tipitaka.the_wisdom_project` (Android, Linux), a
+  `flutter create` leftover built on tipitaka.lk's domain, which their own
+  iOS app uses (`lk.tipitaka.ios`). Use our domain reversed, the same on every
+  platform, e.g. `net.sammaditthi.app`.
+  - Change it now, while it costs nothing: no one has the app installed. After
+    the first release it is frozen (**Do not rename** in
+    [`product-names-checklist.md`](../../General/product-names-checklist.md)).
+  - iOS: `PRODUCT_BUNDLE_IDENTIFIER` in `ios/Runner.xcodeproj/project.pbxproj`,
+    for the app and `.RunnerTests`. macOS: the same key in `AppInfo.xcconfig`,
+    and `.RunnerTests` in `macos/Runner.xcodeproj/project.pbxproj`. Android:
+    **App ID** in the Android doc.
+  - In the same pass, the other places that still say `lk.tipitaka`:
+    `APPLICATION_ID` in `linux/CMakeLists.txt`, `CompanyName` and the copyright
+    in `windows/runner/Runner.rc`, `PRODUCT_COPYRIGHT` in `AppInfo.xcconfig`.
+  - On this Mac the app then starts fresh: its sandbox folder is named after
+    the ID (`~/Library/Containers/<id>/`), so the database copy and settings
+    start over.
+  - Register the ID in the Apple developer account. The deep-link files name
+    it (AASA in [`web-release.md`](../web-strategy/web-release.md)).
 - **App icons** are still the Flutter logo on Android, iOS and macOS. The
   web app's icons come from `assets/icons/app_logo.png`: the
   disc as is, and a maskable version with the disc inside the safe zone on

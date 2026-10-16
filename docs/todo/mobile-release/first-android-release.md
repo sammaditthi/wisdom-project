@@ -18,6 +18,11 @@ numbers match.
   (`android/app/build.gradle`).
 - **App name.** `android:label` in `android/app/src/main/AndroidManifest.xml`
   is `the_wisdom_project`. Which name to use: **App names** in the iOS doc.
+- **App ID.** `applicationId` and `namespace` in `android/app/build.gradle`
+  are `lk.tipitaka.the_wisdom_project`. Change both to the ID chosen under
+  **App ID** in the iOS doc, and the `package` line of `MainActivity.kt`
+  (move the file to the matching folder under `android/app/src/main/kotlin/`).
+  Play never lets a published app change its ID.
 
 ## 2. Check on a real device
 
