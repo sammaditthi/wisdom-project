@@ -622,21 +622,20 @@ class _SearchResultsTabBarState extends State<_SearchResultsTabBar>
     final isSelected = resultType == widget.selectedResultType;
     // Null while counts load: no badge.
     final count = widget.countByResultType[resultType];
+    final label =
+        searchResultTypeLabel(resultType, AppLocalizations.of(context));
 
     return Tab(
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            searchResultTypeLabel(resultType, AppLocalizations.of(context)),
-            style: (isSelected
-                    ? typography.tabLabelActive
-                    : typography.tabLabelInactive)
-                .copyWith(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
+            label,
+            style: typography.tabLabelFor(label, active: isSelected).copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
           ),
           if (resultType != SearchResultType.topResults && count != null)
             Padding(

@@ -98,10 +98,10 @@ void main() {
         );
 
         // ================================================================
-        // STEP 2: Switch to "Full text" tab, tap first result
+        // STEP 2: Switch to "Full Text" tab, tap first result
         //         → FTS highlight set for tab 0, 1 tab open
         // ================================================================
-        await tester.tap(find.text('Full text'));
+        await tester.tap(find.text('Full Text'));
         await pumpForSettle(tester);
         await tester.waitForSearchResults();
 

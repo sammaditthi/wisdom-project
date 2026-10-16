@@ -155,7 +155,7 @@ class RecentSearchOverlay extends ConsumerWidget {
   }
 }
 
-/// "Clear All" action in the recent-searches header.
+/// "Clear all" action in the recent-searches header.
 ///
 /// Idle: muted `linkLabel` color (onSurfaceVariant) — reads as quiet helper text.
 /// Hover: pill-shaped highlight + label recolored to `primary` so it reads

@@ -12,22 +12,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Sammaditthi';
 
   @override
-  String get treeNavigatorTitle => 'Tipitaka Navigator';
+  String get treeNavigatorTitle => 'Tipitaka navigator';
 
   @override
   String get readerTitle => 'Reader';
 
   @override
-  String get showNavigator => 'Show Navigator';
+  String get showNavigator => 'Show navigator';
 
   @override
-  String get hideNavigator => 'Hide Navigator';
+  String get hideNavigator => 'Hide navigator';
 
   @override
-  String get layoutPaliOnly => 'Pali Only';
+  String get layoutPaliOnly => 'Pali only';
 
   @override
-  String get layoutSinhalaOnly => 'Sinhala Only';
+  String get layoutSinhalaOnly => 'Sinhala only';
 
   @override
   String currentLayout(String name) {
@@ -35,7 +35,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get layoutSideBySide => 'Side by Side';
+  String get layoutSideBySide => 'Side by side';
 
   @override
   String get layoutStacked => 'Stacked';
@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noResultsFound => 'No results found';
 
   @override
-  String get expandAll => 'Expand All';
+  String get expandAll => 'Expand all';
 
   @override
-  String get collapseAll => 'Collapse All';
+  String get collapseAll => 'Collapse all';
 
   @override
   String get settings => 'Settings';
@@ -81,13 +81,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeLight => 'Light';
 
   @override
-  String get appLanguage => 'App Language';
+  String get appLanguage => 'App language';
 
   @override
-  String get contentLanguage => 'Content Language';
+  String get contentLanguage => 'Content language';
 
   @override
-  String get paliLetters => 'Pali Letters';
+  String get paliLetters => 'Pali letters';
 
   @override
   String get paliStandardLigatures => 'Standard ligatures';
@@ -108,7 +108,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hideNavigationBar => 'Hide navigation bar';
 
   @override
-  String get fontSize => 'Font Size';
+  String get fontSize => 'Font size';
 
   @override
   String get fontSizeSmall => 'Small';
@@ -120,7 +120,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fontSizeLarge => 'Large';
 
   @override
-  String get fontSizeExtraLarge => 'Extra Large';
+  String get fontSizeExtraLarge => 'Extra large';
 
   @override
   String get close => 'Close';
@@ -132,7 +132,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get isExactMatchToggle => 'Exact word match';
 
   @override
-  String get refineSearch => 'Refine Search';
+  String get refineSearch => 'Refine search';
 
   @override
   String get refine => 'Refine';
@@ -156,7 +156,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchTabTitles => 'Titles';
 
   @override
-  String get searchTabFullText => 'Full text';
+  String get searchTabFullText => 'Full Text';
 
   @override
   String get searchTabDefinitions => 'Definitions';
@@ -176,7 +176,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get showLess => 'Show Less';
+  String get showLess => 'Show less';
 
   @override
   String get seeAll => 'See all';
@@ -193,7 +193,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clear => 'Clear';
 
   @override
-  String get clearAll => 'Clear All';
+  String get clearAll => 'Clear all';
 
   @override
   String get scopeAll => 'All';
@@ -293,7 +293,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commentary => 'Commentary';
 
   @override
-  String get rootText => 'Root Text';
+  String get rootText => 'Root text';
 
   @override
   String get scrollToBeginning => 'Go to beginning';
@@ -334,7 +334,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dictFilterEnglish => 'English';
 
   @override
-  String get dictRefineTitle => 'Refine Dictionaries';
+  String get dictRefineTitle => 'Refine dictionaries';
 
   @override
   String get dictRefineSectionLabel => 'DICTIONARIES';

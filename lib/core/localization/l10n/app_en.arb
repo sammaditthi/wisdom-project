@@ -6,7 +6,7 @@
     "description": "The title of the application"
   },
 
-  "treeNavigatorTitle": "Tipitaka Navigator",
+  "treeNavigatorTitle": "Tipitaka navigator",
   "@treeNavigatorTitle": {
     "description": "Title for the tree navigation screen"
   },
@@ -16,22 +16,22 @@
     "description": "Title for the reading screen"
   },
 
-  "showNavigator": "Show Navigator",
+  "showNavigator": "Show navigator",
   "@showNavigator": {
     "description": "Tooltip for the app bar menu button while the navigator is hidden"
   },
 
-  "hideNavigator": "Hide Navigator",
+  "hideNavigator": "Hide navigator",
   "@hideNavigator": {
     "description": "Tooltip for the app bar menu button while the navigator shows"
   },
 
-  "layoutPaliOnly": "Pali Only",
+  "layoutPaliOnly": "Pali only",
   "@layoutPaliOnly": {
     "description": "Label for Pali-only reader layout"
   },
 
-  "layoutSinhalaOnly": "Sinhala Only",
+  "layoutSinhalaOnly": "Sinhala only",
   "@layoutSinhalaOnly": {
     "description": "Label for Sinhala-only reader layout"
   },
@@ -46,7 +46,7 @@
     }
   },
 
-  "layoutSideBySide": "Side by Side",
+  "layoutSideBySide": "Side by side",
   "@layoutSideBySide": {
     "description": "Label for side-by-side reader layout showing both Pali and Sinhala horizontally"
   },
@@ -96,12 +96,12 @@
     "description": "Message shown when search returns no results"
   },
 
-  "expandAll": "Expand All",
+  "expandAll": "Expand all",
   "@expandAll": {
     "description": "Button label to expand all tree nodes"
   },
 
-  "collapseAll": "Collapse All",
+  "collapseAll": "Collapse all",
   "@collapseAll": {
     "description": "Button label to collapse all tree nodes"
   },
@@ -121,17 +121,17 @@
     "description": "Label for the light theme option in the theme selector"
   },
 
-  "appLanguage": "App Language",
+  "appLanguage": "App language",
   "@appLanguage": {
     "description": "Label for the app/UI language setting (pure localization of interface labels)"
   },
 
-  "contentLanguage": "Content Language",
+  "contentLanguage": "Content language",
   "@contentLanguage": {
     "description": "Label for the content language setting — which text/translation is shown for data labels (tree, breadcrumbs, search, dialogs, tabs)"
   },
 
-  "paliLetters": "Pali Letters",
+  "paliLetters": "Pali letters",
   "@paliLetters": {
     "description": "Section header for the Pali letter (conjunct) display switches in the settings menu"
   },
@@ -166,7 +166,7 @@
     "description": "Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Saved across restarts."
   },
 
-  "fontSize": "Font Size",
+  "fontSize": "Font size",
   "@fontSize": {
     "description": "Label for font size setting"
   },
@@ -186,7 +186,7 @@
     "description": "Label for large font size option"
   },
 
-  "fontSizeExtraLarge": "Extra Large",
+  "fontSizeExtraLarge": "Extra large",
   "@fontSizeExtraLarge": {
     "description": "Label for extra large font size option"
   },
@@ -206,7 +206,7 @@
     "description": "Tooltip for toggle button that switches between prefix matching and exact word matching in search"
   },
 
-  "refineSearch": "Refine Search",
+  "refineSearch": "Refine search",
   "@refineSearch": {
     "description": "Title for the refine search dialog"
   },
@@ -246,7 +246,7 @@
     "description": "Search results tab + section header: matches in sutta/section/commentary titles"
   },
 
-  "searchTabFullText": "Full text",
+  "searchTabFullText": "Full Text",
   "@searchTabFullText": {
     "description": "Search results tab + section header: matches in the body content of texts"
   },
@@ -281,7 +281,7 @@
     }
   },
 
-  "showLess": "Show Less",
+  "showLess": "Show less",
   "@showLess": {
     "description": "Collapse link that hides the expanded secondary matches again"
   },
@@ -314,7 +314,7 @@
     "description": "Button label to clear selections"
   },
 
-  "clearAll": "Clear All",
+  "clearAll": "Clear all",
   "@clearAll": {
     "description": "Label for the action that clears all recent searches"
   },
@@ -484,7 +484,7 @@
     "description": "Label for button to navigate to commentary (atthakatha) of current text"
   },
 
-  "rootText": "Root Text",
+  "rootText": "Root text",
   "@rootText": {
     "description": "Label for button to navigate to root text (sutta) from commentary"
   },
@@ -554,7 +554,7 @@
     "description": "Label for English dictionary filter chip"
   },
 
-  "dictRefineTitle": "Refine Dictionaries",
+  "dictRefineTitle": "Refine dictionaries",
   "@dictRefineTitle": {
     "description": "Title for the refine dictionaries dialog"
   },

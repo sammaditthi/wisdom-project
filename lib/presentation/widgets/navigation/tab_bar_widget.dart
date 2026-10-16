@@ -505,9 +505,8 @@ class _TabItem extends ConsumerWidget {
                   message: displayLabel,
                   child: Text(
                     displayLabel,
-                    style: isActive
-                        ? context.typography.tabLabelActive
-                        : context.typography.tabLabelInactive,
+                    style: context.typography
+                        .tabLabelFor(displayLabel, active: isActive),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),

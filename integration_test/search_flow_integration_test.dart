@@ -253,7 +253,7 @@ void main() {
         await tester.toggleExactMatch();
 
         // Switch to Full text tab to see FTS results.
-        await tester.switchToTab('Full text');
+        await tester.switchToTab('Full Text');
 
         // Verify HighlightedFtsSearchText widgets are rendered (highlighting).
         expect(find.byType(HighlightedFtsSearchText), findsWidgets);
@@ -369,7 +369,7 @@ void main() {
         await tester.switchToTab('Titles');
         expect(find.text('Enter a valid search query'), findsOneWidget);
 
-        await tester.switchToTab('Full text');
+        await tester.switchToTab('Full Text');
         expect(find.text('Enter a valid search query'), findsOneWidget);
 
         await tester.switchToTab('Definitions');
@@ -390,7 +390,7 @@ void main() {
         expect(find.text('No titles found'), findsOneWidget);
 
         // Switch to Full text tab → "No full text found"
-        await tester.switchToTab('Full text');
+        await tester.switchToTab('Full Text');
         expect(find.text('No full text found'), findsOneWidget);
 
         // Switch to Definitions tab → "No definitions found"
@@ -591,7 +591,7 @@ void main() {
         await tester.searchFor('මහාසති');
 
         // Switch to Full text tab to load full results.
-        await tester.switchToTab('Full text');
+        await tester.switchToTab('Full Text');
         await tester.waitForSearchResults();
 
         // Read FTS results from provider.
@@ -631,7 +631,7 @@ void main() {
         await tester.searchFor('මහා');
 
         // Full text tab — "Viewing 50 out of 29770 results"
-        await tester.switchToTab('Full text');
+        await tester.switchToTab('Full Text');
         await tester.dragUntilVisible(
           find.textContaining('Viewing 50 out of'),
           find.byType(ListView).last,
@@ -732,7 +732,7 @@ void main() {
         (tester) async {
           await tester.pumpSearchApp(prefs);
           await tester.searchFor(golden.key);
-          await tester.switchToTab('Full text');
+          await tester.switchToTab('Full Text');
           await tester.waitForSearchResults();
 
           final results = tester.getSearchState().fullResults.value;
