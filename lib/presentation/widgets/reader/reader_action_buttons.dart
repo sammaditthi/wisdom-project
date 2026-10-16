@@ -425,6 +425,8 @@ class _LayoutOptionButton extends StatelessWidget {
                   ? Icon(icon, size: 20, color: color)
                   : Text(
                       layout.shortLabel,
+                      // Fixed like the 20px icons it sits among, which
+                      // don't follow the font-size setting either.
                       style: segmentStyle.copyWith(
                         color: color,
                         fontWeight: FontWeight.w700,

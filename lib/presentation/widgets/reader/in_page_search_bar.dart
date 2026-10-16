@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../providers/in_page_search_focus_provider.dart';
 import '../../providers/in_page_search_provider.dart';
 import '../../providers/singlish_preview_provider.dart';
@@ -90,6 +91,7 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
     final singlishPreview =
         ref.watch(singlishPreviewProvider(searchState.rawQuery));
     final colorScheme = Theme.of(context).colorScheme;
+    final typography = context.typography;
     final l10n = AppLocalizations.of(context);
 
     return Material(
@@ -119,16 +121,12 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
                       child: TextField(
                         controller: _controller,
                         focusNode: _focusNode,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: colorScheme.onSurface,
-                        ),
+                        // The result-row styles: a compact bar, a step
+                        // under the main search field.
+                        style: typography.resultMatchedText,
                         decoration: InputDecoration(
                           hintText: l10n.findInPage,
-                          hintStyle: TextStyle(
-                            fontSize: 14,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                          hintStyle: typography.resultSubtitle,
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -196,10 +194,7 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
                   searchState.hasMatches
                       ? '${searchState.currentMatchIndex + 1} / ${searchState.matchCount}'
                       : l10n.noInPageMatches,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  style: typography.menuSectionLabel,
                 ),
               ),
 

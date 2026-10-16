@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_typography.dart';
+
 /// "[සති]": the Sinhala that typed Singlish converts to, shown beside the
 /// query. Takes at most 45% of [fieldWidth], so the typed text always stays
 /// visible, and ends in an ellipsis when cut.
@@ -31,7 +33,7 @@ class SinglishPreview extends StatelessWidget {
           maxLines: 1,
           softWrap: false,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(fontSize: 14, color: colorScheme.onSurface),
+          style: context.typography.resultMatchedText,
         ),
       ),
     );

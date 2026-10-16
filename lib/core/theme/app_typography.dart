@@ -208,7 +208,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
       resultTitle: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.base,
+        fontSize: scaledFonts.resultTitle,
         fontWeight: FontWeight.w500,
         color: colorScheme.onSurface,
         height: AppFonts.uiLineHeight,
@@ -252,7 +252,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
       linkLabel: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.badge,
+        fontSize: scaledFonts.label,
         fontWeight: FontWeight.w500,
         color: colorScheme.onSurfaceVariant,
         height: AppFonts.uiLineHeight,

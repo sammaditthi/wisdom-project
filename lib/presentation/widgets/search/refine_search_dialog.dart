@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/pali_letter_options.dart';
 import '../../../domain/entities/content/content_language.dart';
 import '../../../domain/entities/navigation/tipitaka_tree_node.dart';
@@ -324,10 +325,8 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
                 },
                 child: Text(
                   l10n.clear,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.primary,
-                  ),
+                  style: context.typography.actionLabel
+                      .copyWith(color: theme.colorScheme.primary),
                 ),
               ),
           ],

@@ -426,6 +426,10 @@ class _SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onSeeAll = this.onSeeAll;
+    final style = context.typography.sectionHeader;
+    // Caps and tracking only where the script has case. Sinhala has none,
+    // and spacing out its letters isn't native to it.
+    final hasCase = label.toUpperCase() != label.toLowerCase();
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 4, 8, 0),
@@ -437,7 +441,7 @@ class _SectionHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 label.toUpperCase(),
-                style: context.typography.sectionHeader,
+                style: hasCase ? style : style.copyWith(letterSpacing: 0),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
