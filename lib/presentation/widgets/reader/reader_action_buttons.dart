@@ -261,9 +261,14 @@ class _LayoutSubmenu extends StatelessWidget {
       leadingIcon: _MenuIcon(
         child: _LayoutGlyph(layout: choice.current, color: colorScheme.primary),
       ),
+      // Stays open after a pick, so layouts can be tried one after another.
       menuChildren: [
         for (final layout in ReaderLayout.values)
-          _LayoutMenuItem(layout: layout, choice: choice),
+          _LayoutMenuItem(
+            layout: layout,
+            choice: choice,
+            closeOnActivate: false,
+          ),
       ],
       child: Row(
         children: [
@@ -291,8 +296,13 @@ class _LayoutSubmenu extends StatelessWidget {
 class _LayoutMenuItem extends StatelessWidget {
   final ReaderLayout layout;
   final ReaderLayoutChoice choice;
+  final bool closeOnActivate;
 
-  const _LayoutMenuItem({required this.layout, required this.choice});
+  const _LayoutMenuItem({
+    required this.layout,
+    required this.choice,
+    this.closeOnActivate = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -302,6 +312,7 @@ class _LayoutMenuItem extends StatelessWidget {
 
     return MenuItemButton(
       onPressed: () => choice.onChanged(layout),
+      closeOnActivate: closeOnActivate,
       style: MenuItemButton.styleFrom(
         backgroundColor:
             isSelected ? AppMenuTheme.selectedRowColor(colorScheme) : null,

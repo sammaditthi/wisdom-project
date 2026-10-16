@@ -102,6 +102,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layout => 'Layout';
 
   @override
+  String get appLayout => 'App layout';
+
+  @override
   String get hideNavigationBar => 'Hide navigation bar';
 
   @override

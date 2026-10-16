@@ -511,13 +511,19 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
                 curve: Curves.easeOutCubic,
                 child: Align(
                   alignment: Alignment.topRight,
-                  child: ReaderActionToolbar(
-                    visible: showMode1,
-                    onSearchTap: () => ref
-                        .read(inPageSearchStatesProvider.notifier)
-                        .openSearch(),
-                    previous: _stepTarget(previousNode),
-                    next: _stepTarget(nextNode),
+                  // Shrinks the toolbar a little on the narrowest phones
+                  // rather than letting it overflow.
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.topRight,
+                    child: ReaderActionToolbar(
+                      visible: showMode1,
+                      onSearchTap: () => ref
+                          .read(inPageSearchStatesProvider.notifier)
+                          .openSearch(),
+                      previous: _stepTarget(previousNode),
+                      next: _stepTarget(nextNode),
+                    ),
                   ),
                 ),
               ),

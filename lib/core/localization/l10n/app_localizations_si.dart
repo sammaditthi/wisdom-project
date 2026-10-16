@@ -102,6 +102,9 @@ class AppLocalizationsSi extends AppLocalizations {
   String get layout => 'පිරිසැලසුම';
 
   @override
+  String get appLayout => 'යෙදුම';
+
+  @override
   String get hideNavigationBar => 'ප්‍රධාන සංචාලකය සඟවන්න';
 
   @override

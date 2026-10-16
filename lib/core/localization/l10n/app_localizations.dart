@@ -272,11 +272,17 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later), and the reader's layout picker (toolbar tooltip, scrolled-menu row)
+  /// The reader's layout picker (how Pali and Sinhala are arranged): its row in the scrolled actions menu
   ///
   /// In en, this message translates to:
   /// **'Layout'**
   String get layout;
+
+  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  ///
+  /// In en, this message translates to:
+  /// **'App layout'**
+  String get appLayout;
 
   /// Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Saved across restarts.
   ///

@@ -27,7 +27,7 @@ Design: [Reader toolbar merge canvas](https://claude.ai/artifact/4W4A57wzXDm2dXL
 
 ## Interaction changes (decided 2026-10-16)
 
-1. **Layout takes two taps.** Accepted, because more choices will join these menus.
+1. **Layout takes two taps.** Accepted, because more choices will join these menus. In the scrolled menu the Layout submenu stays open after a pick, as the old FAB did, so layouts can be tried one after another.
 2. **Previous / Next are in the scrolled menu too**, named by destination. Same navigation as the toolbar's buttons.
 3. **Share replaces the boards' ⋯.** Share sits in the toolbar and opens its own menu: Copy link today, Share via and more as they arrive. Copy link stays two taps, as today, on every platform.
 4. **Open as web page moves into the Share menu** (web only, as before). As its own button it would widen the pill past a 360px phone browser. It is not sharing, which is why it was its own button (2026-10-05); one row wins.
@@ -76,9 +76,11 @@ Same action as today: web only, `openAsWebPage` → `UrlLauncherUtils.launchInAp
 Already in the ARB files: `layout`, `layoutPaliOnly` / `layoutSinhalaOnly` / `layoutSideBySide` / `layoutStacked`, `findInPage`, `commentary`, `rootText`, `goToSutta`, `scrollToBeginning`, `share`, `copyLink`, `openAsWebPage`.
 New: `previousSutta` / `nextSutta` ("Previous" / "Next") for the FAB captions, and `currentLayout` ("Layout: {name}"), in `app_en.arb` and `app_si.arb`.
 
-## Later, not part of this
+"Layout" meant two things, so the Settings section got its own key, `appLayout` ("App layout" / "යෙදුම", decided 2026-10-16), and `layout` ("Layout" / "පිරිසැලසුම") is the reader's alone.
 
-- Very narrow phones. The pill is about 300px wide: it fits a 360px-wide phone with 16px gutters, but not a 320px one (iPhone SE, first generation).
+## Narrow phones
+
+The pill is about 300px wide: it fits a 360px-wide phone with 16px gutters. Below that (a 320px iPhone SE, first generation, or Android at a large display size) a `FittedBox` scales it down a little instead of letting it overflow, so the touch targets shrink from 44px to about 42px.
 
 ## Tests
 

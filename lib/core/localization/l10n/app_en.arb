@@ -153,7 +153,12 @@
 
   "layout": "Layout",
   "@layout": {
-    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later), and the reader's layout picker (toolbar tooltip, scrolled-menu row)"
+    "description": "The reader's layout picker (how Pali and Sinhala are arranged): its row in the scrolled actions menu"
+  },
+
+  "appLayout": "App layout",
+  "@appLayout": {
+    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
   },
 
   "hideNavigationBar": "Hide navigation bar",
