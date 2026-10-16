@@ -213,9 +213,8 @@ class AppTypography extends ThemeExtension<AppTypography> {
         height: AppFonts.uiLineHeight,
       ),
       sectionHeader: sectionHeader,
-      // Sinhala at 14px stands as tall as Latin caps at 12px.
       sectionHeaderCaseless: sectionHeader.copyWith(
-        fontSize: scaledFonts.tree,
+        fontSize: scaledFonts.sectionHeaderCaseless,
         letterSpacing: _caselessLetterSpacing,
       ),
       countBadge: TextStyle(

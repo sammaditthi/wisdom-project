@@ -115,6 +115,10 @@ abstract class AppFonts {
   /// Font size for small labels
   static const double labelFontSize = 12.0;
 
+  /// Font size for section headers in scripts without case (Sinhala): larger
+  /// than [labelFontSize] so they stand as tall as Latin caps.
+  static const double sectionHeaderCaselessFontSize = 14.0;
+
   /// Font size for filter chip text
   static const double chipFontSize = 13.0;
 
@@ -208,6 +212,8 @@ class ScaledFontSizes {
   double get base => AppFonts.baseFontSize * scale;
   double get badge => AppFonts.badgeFontSize * scale;
   double get label => AppFonts.labelFontSize * scale;
+  double get sectionHeaderCaseless =>
+      AppFonts.sectionHeaderCaselessFontSize * scale;
   double get chip => AppFonts.chipFontSize * scale;
   double get tab => AppFonts.tabFontSize * scale;
   double get tree => AppFonts.treeFontSize * scale;
