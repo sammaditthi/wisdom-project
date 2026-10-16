@@ -33,11 +33,8 @@ class AppTypography extends ThemeExtension<AppTypography> {
   // Chips
   // ============================================
 
-  /// Style for unselected filter chips
+  /// Style for filter chip labels, selected or not
   final TextStyle chipLabel;
-
-  /// Style for selected filter chips
-  final TextStyle chipLabelSelected;
 
   // ============================================
   // List Items
@@ -138,7 +135,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
     required this.sectionHeader,
     required this.countBadge,
     required this.chipLabel,
-    required this.chipLabelSelected,
     required this.resultTitle,
     required this.resultSubtitle,
     required this.resultMatchedText,
@@ -205,14 +201,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
         fontSize: scaledFonts.chip,
         fontWeight: AppFonts.bodyWeight,
         color: colorScheme.onSurfaceVariant,
-        height: AppFonts.uiLineHeight,
-      ),
-      chipLabelSelected: TextStyle(
-        fontFamily: AppFonts.ui,
-        fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.chip,
-        fontWeight: FontWeight.w600,
-        color: colorScheme.onSecondary,
         height: AppFonts.uiLineHeight,
       ),
 
@@ -410,7 +398,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
     TextStyle? sectionHeader,
     TextStyle? countBadge,
     TextStyle? chipLabel,
-    TextStyle? chipLabelSelected,
     TextStyle? resultTitle,
     TextStyle? resultSubtitle,
     TextStyle? resultMatchedText,
@@ -436,7 +423,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
       sectionHeader: sectionHeader ?? this.sectionHeader,
       countBadge: countBadge ?? this.countBadge,
       chipLabel: chipLabel ?? this.chipLabel,
-      chipLabelSelected: chipLabelSelected ?? this.chipLabelSelected,
       resultTitle: resultTitle ?? this.resultTitle,
       resultSubtitle: resultSubtitle ?? this.resultSubtitle,
       resultMatchedText: resultMatchedText ?? this.resultMatchedText,
@@ -472,8 +458,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
       sectionHeader: TextStyle.lerp(sectionHeader, other.sectionHeader, t)!,
       countBadge: TextStyle.lerp(countBadge, other.countBadge, t)!,
       chipLabel: TextStyle.lerp(chipLabel, other.chipLabel, t)!,
-      chipLabelSelected:
-          TextStyle.lerp(chipLabelSelected, other.chipLabelSelected, t)!,
       resultTitle: TextStyle.lerp(resultTitle, other.resultTitle, t)!,
       resultSubtitle: TextStyle.lerp(resultSubtitle, other.resultSubtitle, t)!,
       resultMatchedText:

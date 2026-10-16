@@ -59,7 +59,9 @@ class PillChip extends StatelessWidget {
       backgroundColor: background,
       // Also colours the text and icon, over the text style's own colour.
       foregroundColor: foreground,
-      textStyle: selected ? typography.chipLabelSelected : typography.chipLabel,
+      // One weight in both states: a bolder label is wider, so the chip
+      // would grow on tap and shove its neighbours along the row.
+      textStyle: typography.chipLabel,
       shape: shape,
       side: BorderSide(color: border),
       padding: padding,
