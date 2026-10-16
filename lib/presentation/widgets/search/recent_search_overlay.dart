@@ -140,7 +140,7 @@ class RecentSearchOverlay extends ConsumerWidget {
           Expanded(
             child: Text(
               title,
-              style: context.typography.sectionHeader,
+              style: context.typography.sectionHeaderFor(title),
               overflow: TextOverflow.ellipsis,
             ),
           ),

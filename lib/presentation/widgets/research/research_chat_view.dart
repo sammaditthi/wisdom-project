@@ -505,7 +505,8 @@ class _MessageTurn extends StatelessWidget {
               Text(
                 l10n.navResearch.toUpperCase(),
                 // Same muted section-header treatment as the panel's RECENT.
-                style: context.typography.sectionHeader
+                style: context.typography
+                    .sectionHeaderFor(l10n.navResearch)
                     .copyWith(color: colors.onSurfaceVariant),
               ),
               // Which model answered — quiet provenance for the curious.

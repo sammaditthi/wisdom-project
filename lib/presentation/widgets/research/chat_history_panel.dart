@@ -52,7 +52,8 @@ class ChatHistoryPanel extends ConsumerWidget {
             l10n.researchRecent.toUpperCase(),
             // The shared section-header token, muted to sit back like a
             // sidebar label rather than a content heading.
-            style: context.typography.sectionHeader
+            style: context.typography
+                .sectionHeaderFor(l10n.researchRecent)
                 .copyWith(color: colors.onSurfaceVariant),
           ),
         ),
