@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
+import '../../../core/theme/app_menu_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../models/reader_layout.dart';
-import '../../providers/overlay_stack_provider.dart';
+import '../common/dismissible_menu_anchor.dart';
 import 'reader_actions.dart';
 
 // The two presenters of the reader's actions (see `reader_actions.dart`):
@@ -68,8 +69,8 @@ class ReaderActionToolbar extends ConsumerWidget {
               switch (action) {
                 ReaderLayoutChoice choice =>
                   _LayoutMenuButton(choice: choice, visible: visible),
-                ReaderCommand command => _ActionIconButton(
-                    icon: command.icon,
+                ReaderCommand command => _ToolbarButton.icon(
+                    command.icon,
                     tooltip: command.tooltip ?? command.label,
                     onTap: command.onSelected,
                   ),
@@ -116,26 +117,25 @@ class ReaderActionMenuFab extends ConsumerWidget {
       onScrollToBeginning: onScrollTap,
     );
 
-    return _ReaderMenuAnchor(
+    return DismissibleMenuAnchor(
       overlayId: 'reader-actions-menu',
       visible: visible,
-      endAligned: true,
+      endAlignedWidth: _endMenuWidth,
       gap: 12,
       menuChildren: [
         for (final (i, action) in actions.indexed) ...[
           if (i > 0 && action.group != actions[i - 1].group)
-            const Divider(height: 9),
+            const Divider(height: AppMenuTheme.dividerHeight),
           switch (action) {
             ReaderLayoutChoice choice => _LayoutSubmenu(choice: choice),
-            ReaderCommand command => _CommandMenuItem(command: command),
+            ReaderCommand command => _MenuRow.command(command),
             ReaderActionMenu menu => SubmenuButton(
                 hoverOpenDelay: _submenuHoverDelay,
                 leadingIcon: _MenuIcon(
                   child: Icon(menu.icon, size: 20, color: colorScheme.primary),
                 ),
                 menuChildren: [
-                  for (final item in menu.items)
-                    _CommandMenuItem(command: item),
+                  for (final item in menu.items) _MenuRow.item(item),
                 ],
                 child: _MenuLabel(menu.label),
               ),
@@ -151,7 +151,7 @@ class ReaderActionMenuFab extends ConsumerWidget {
           child: InkWell(
             focusNode: focusNode,
             borderRadius: BorderRadius.circular(16),
-            onTap: () => isOpen ? controller.close() : controller.open(),
+            onTap: controller.toggle,
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: AnimatedRotation(
@@ -172,110 +172,6 @@ class ReaderActionMenuFab extends ConsumerWidget {
   }
 }
 
-/// A [MenuAnchor] for the reader's actions. ESC closes it before anything
-/// under it, and it closes when its presenter fades out.
-///
-/// [endAligned] lines the menu's right edge up with the button's, at
-/// [_endMenuWidth]; otherwise the menu starts at the button's left edge.
-/// The menu opens below the button, or above it where there is no room below.
-class _ReaderMenuAnchor extends ConsumerStatefulWidget {
-  final String overlayId;
-  final bool visible;
-  final bool endAligned;
-  final double gap;
-  final List<Widget> menuChildren;
-  final Widget Function(
-    BuildContext context,
-    MenuController controller,
-    FocusNode focusNode,
-  ) builder;
-
-  const _ReaderMenuAnchor({
-    required this.overlayId,
-    required this.visible,
-    required this.menuChildren,
-    required this.builder,
-    this.endAligned = false,
-    this.gap = 4,
-  });
-
-  @override
-  ConsumerState<_ReaderMenuAnchor> createState() => _ReaderMenuAnchorState();
-}
-
-class _ReaderMenuAnchorState extends ConsumerState<_ReaderMenuAnchor> {
-  final _controller = MenuController();
-  // Lets the arrow keys move from the button into the menu.
-  final _buttonFocusNode = FocusNode(debugLabel: 'ReaderMenuAnchor');
-
-  // Captured in initState: dispose() can't use `ref`.
-  late final OverlayStackNotifier _overlayStack;
-
-  @override
-  void initState() {
-    super.initState();
-    _overlayStack = ref.read(overlayStackProvider.notifier);
-  }
-
-  @override
-  void didUpdateWidget(_ReaderMenuAnchor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Closing updates the overlay stack, which can't change mid-build.
-    if (oldWidget.visible && !widget.visible) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _controller.close();
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    // A menu closed because its button went away doesn't call onClose, and
-    // Riverpod forbids changing a provider while the tree is torn down.
-    final stack = _overlayStack;
-    final id = widget.overlayId;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (stack.mounted) stack.remove(id);
-    });
-    _buttonFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MenuAnchor(
-      controller: _controller,
-      childFocusNode: _buttonFocusNode,
-      alignmentOffset: widget.endAligned
-          ? Offset(-_endMenuWidth, widget.gap)
-          : Offset(0, widget.gap),
-      style: widget.endAligned
-          ? const MenuStyle(alignment: AlignmentDirectional.bottomEnd)
-          : null,
-      onOpen: () => _overlayStack.push(
-        DismissibleOverlay(id: widget.overlayId, dismiss: _controller.close),
-      ),
-      onClose: () => _overlayStack.remove(widget.overlayId),
-      // A sized box, not MenuStyle's sizes: compact density (desktop, web)
-      // shrinks a menu's minimum width, which would undo the alignment.
-      menuChildren: widget.endAligned
-          ? [
-              SizedBox(
-                width: _endMenuWidth,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: widget.menuChildren,
-                ),
-              ),
-            ]
-          : widget.menuChildren,
-      builder: (context, controller, _) =>
-          widget.builder(context, controller, _buttonFocusNode),
-    );
-  }
-}
-
 /// The toolbar's Layout ▾: the current layout's glyph, opening the four.
 class _LayoutMenuButton extends StatelessWidget {
   final ReaderLayoutChoice choice;
@@ -285,10 +181,9 @@ class _LayoutMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
 
-    return _ReaderMenuAnchor(
+    return DismissibleMenuAnchor(
       overlayId: 'reader-layout-menu',
       visible: visible,
       menuChildren: [
@@ -297,36 +192,24 @@ class _LayoutMenuButton extends StatelessWidget {
       ],
       builder: (context, controller, focusNode) {
         final isOpen = controller.isOpen;
-        final color =
-            isOpen ? colorScheme.onSecondaryContainer : colorScheme.primary;
-        return Tooltip(
-          message: l10n.layout,
-          child: Material(
-            color: isOpen ? colorScheme.secondaryContainer : Colors.transparent,
-            borderRadius: BorderRadius.circular(22),
-            child: InkWell(
-              focusNode: focusNode,
-              borderRadius: BorderRadius.circular(22),
-              onTap: () => isOpen ? controller.close() : controller.open(),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 44),
-                child: Padding(
-                  padding: const EdgeInsetsDirectional.only(start: 12, end: 6),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _LayoutGlyph(layout: choice.current, color: color),
-                      const SizedBox(width: 2),
-                      Icon(
-                        isOpen ? Icons.expand_less : Icons.expand_more,
-                        size: 16,
-                        color: color,
-                      ),
-                    ],
-                  ),
-                ),
+        return _ToolbarButton(
+          tooltip: l10n.currentLayout(_layoutLabel(context, choice.current)),
+          onTap: controller.toggle,
+          highlighted: isOpen,
+          expanded: isOpen,
+          focusNode: focusNode,
+          padding: const EdgeInsetsDirectional.only(start: 12, end: 6),
+          content: (color) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _LayoutGlyph(layout: choice.current, color: color),
+              const SizedBox(width: 2),
+              Icon(
+                isOpen ? Icons.expand_less : Icons.expand_more,
+                size: 16,
+                color: color,
               ),
-            ),
+            ],
           ),
         );
       },
@@ -344,19 +227,20 @@ class _ActionMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ReaderMenuAnchor(
+    return DismissibleMenuAnchor(
       overlayId: 'reader-share-menu',
       visible: visible,
-      endAligned: true,
+      endAlignedWidth: _endMenuWidth,
       menuChildren: [
-        for (final item in menu.items) _CommandMenuItem(command: item),
+        for (final item in menu.items) _MenuRow.item(item),
       ],
-      builder: (context, controller, focusNode) => _ActionIconButton(
-        icon: menu.icon,
+      builder: (context, controller, focusNode) => _ToolbarButton.icon(
+        menu.icon,
         tooltip: menu.label,
+        onTap: controller.toggle,
         highlighted: controller.isOpen,
+        expanded: controller.isOpen,
         focusNode: focusNode,
-        onTap: () => controller.isOpen ? controller.close() : controller.open(),
       ),
     );
   }
@@ -420,7 +304,7 @@ class _LayoutMenuItem extends StatelessWidget {
       onPressed: () => choice.onChanged(layout),
       style: MenuItemButton.styleFrom(
         backgroundColor:
-            isSelected ? colorScheme.surfaceContainerHighest : null,
+            isSelected ? AppMenuTheme.selectedRowColor(colorScheme) : null,
       ),
       leadingIcon: _MenuIcon(
         child: _LayoutGlyph(layout: layout, color: colorScheme.primary),
@@ -428,8 +312,10 @@ class _LayoutMenuItem extends StatelessWidget {
       trailingIcon: isSelected
           ? Icon(Icons.check, size: 18, color: colorScheme.primary)
           : null,
+      // Read out as one choice of four, like a radio group.
       child: Semantics(
-        selected: isSelected,
+        checked: isSelected,
+        inMutuallyExclusiveGroup: true,
         child: Text(
           _layoutLabel(context, layout),
           style: isSelected
@@ -441,30 +327,49 @@ class _LayoutMenuItem extends StatelessWidget {
   }
 }
 
-/// A [ReaderCommand] as a menu row, with its caption above the label if any.
-class _CommandMenuItem extends StatelessWidget {
-  final ReaderCommand command;
+/// A menu row: icon and label, with an optional caption above the label.
+class _MenuRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String? caption;
+  final VoidCallback onSelected;
 
-  const _CommandMenuItem({required this.command});
+  const _MenuRow({
+    required this.icon,
+    required this.label,
+    required this.onSelected,
+    this.caption,
+  });
+
+  _MenuRow.command(ReaderCommand command)
+      : this(
+          icon: command.icon,
+          label: command.label,
+          caption: command.caption,
+          onSelected: command.onSelected,
+        );
+
+  _MenuRow.item(ReaderMenuItem item)
+      : this(icon: item.icon, label: item.label, onSelected: item.onSelected);
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final caption = command.caption;
+    final caption = this.caption;
 
     return MenuItemButton(
-      onPressed: command.onSelected,
+      onPressed: onSelected,
       leadingIcon: _MenuIcon(
-        child: Icon(command.icon, size: 20, color: colorScheme.primary),
+        child: Icon(icon, size: 20, color: colorScheme.primary),
       ),
       child: caption == null
-          ? _MenuLabel(command.label)
+          ? _MenuLabel(label)
           : Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(caption, style: context.typography.menuSectionLabel),
-                _MenuLabel(command.label),
+                _MenuLabel(label),
               ],
             ),
     );
@@ -500,48 +405,74 @@ class _MenuIcon extends StatelessWidget {
   }
 }
 
-/// Icon button inside the toolbar. No background of its own — the pill
-/// provides the surface — except [highlighted] while its menu is open.
-/// ConstrainedBox keeps the 44x44 minimum touch target.
-class _ActionIconButton extends StatelessWidget {
-  final IconData icon;
+/// A button inside the toolbar. No background of its own — the pill provides
+/// the surface — except [highlighted] while its menu is open. The 44x44
+/// minimum keeps the touch target.
+class _ToolbarButton extends StatelessWidget {
   final String tooltip;
   final VoidCallback onTap;
+
+  /// What the button shows, drawn in the foreground colour it is given.
+  final Widget Function(Color foreground) content;
+  final EdgeInsetsGeometry padding;
   final bool highlighted;
+
+  /// Whether its menu is open; null for a button without a menu.
+  final bool? expanded;
   final FocusNode? focusNode;
 
-  const _ActionIconButton({
-    required this.icon,
+  const _ToolbarButton({
     required this.tooltip,
     required this.onTap,
+    required this.content,
+    this.padding = EdgeInsets.zero,
     this.highlighted = false,
+    this.expanded,
     this.focusNode,
   });
+
+  _ToolbarButton.icon(
+    IconData icon, {
+    required String tooltip,
+    required VoidCallback onTap,
+    bool highlighted = false,
+    bool? expanded,
+    FocusNode? focusNode,
+  }) : this(
+          tooltip: tooltip,
+          onTap: onTap,
+          highlighted: highlighted,
+          expanded: expanded,
+          focusNode: focusNode,
+          content: (color) => Icon(icon, size: 20, color: color),
+        );
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color:
-            highlighted ? colorScheme.secondaryContainer : Colors.transparent,
-        borderRadius: BorderRadius.circular(22),
-        child: InkWell(
-          focusNode: focusNode,
+    return Semantics(
+      button: true,
+      expanded: expanded,
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color:
+              highlighted ? colorScheme.secondaryContainer : Colors.transparent,
           borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: 44,
-              minHeight: 44,
-            ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: highlighted
-                  ? colorScheme.onSecondaryContainer
-                  : colorScheme.primary,
+          child: InkWell(
+            focusNode: focusNode,
+            borderRadius: BorderRadius.circular(22),
+            onTap: onTap,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+              child: Padding(
+                padding: padding,
+                child: content(
+                  highlighted
+                      ? colorScheme.onSecondaryContainer
+                      : colorScheme.primary,
+                ),
+              ),
             ),
           ),
         ),

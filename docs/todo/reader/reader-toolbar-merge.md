@@ -46,8 +46,9 @@ New `widgets/reader/reader_actions.dart`:
 
 - **`ReaderActionToolbar`** (top): the pill. Every group inline; Share is a `MenuAnchor` button.
 - **`ReaderActionMenuFab`** (scrolled): the FAB and one menu holding every group.
-- Both use `MenuAnchor` / `MenuItemButton` / `SubmenuButton`, as `match_options_menu.dart` already does. Keyboard navigation, focus, outside-tap and Esc close, and screen-reader roles come with it. In the FAB, Layout › and Share › are `SubmenuButton`s.
-- An open menu closes when its presenter hides (scrolling across the first viewport, find opening) via `MenuController.close()`, replacing the old FAB's `visible` auto-collapse. An outside tap (a tab switch is one) and Esc close it too; each menu sits on the overlay stack while open, as `match_options_menu.dart`'s does.
+- Both use `MenuAnchor` / `MenuItemButton` / `SubmenuButton`. Keyboard navigation, focus, outside-tap and Esc close, and screen-reader roles come with it. In the FAB, Layout › and Share › are `SubmenuButton`s.
+- Every menu goes through `DismissibleMenuAnchor` (`widgets/common/`), which the search match-options menu now uses too: it puts the menu on the overlay stack while open and closes it when its button fades out. Every menu takes its look from `AppMenuTheme` (`core/theme/`), set as `ThemeData.menuTheme`: 12px corners, a 1px outline, the same selected-row tint and divider height.
+- An open menu closes when its presenter hides (scrolling across the first viewport, find opening), replacing the old FAB's `visible` auto-collapse. An outside tap (a tab switch is one) and Esc close it too.
 - The Share menu and the scrolled menu are a fixed 280px wide, right-aligned with their button. The width is a `SizedBox`, not `MenuStyle` sizes: compact density (desktop, web) shrinks a menu's minimum width, which put them 8px off.
 - Submenus open after the mouse rests 300ms. Flutter's default opens on hover at once, so a click straight after closed the submenu again.
 - Extract the layout glyph (`_layoutIcons` + `shortLabel`) into one small widget, used by the Layout ▾ button and the menu rows.
@@ -62,6 +63,10 @@ Today `showShareMenu` opens a popup under a measured rect, because the FAB item 
 
 `ReaderStepTarget` carries the destination's name instead of a finished tooltip: `({String name, VoidCallback onTap})`. Toolbar tooltip = `goToSutta(name)`, as today; FAB row = caption + name.
 
+### Screen readers
+
+Layout ▾ is labelled with the current layout (`currentLayout`: "Layout: Stacked"), since the button itself shows only P, S or an icon. Layout ▾ and Share report whether their menu is open, and a layout row reads as one choice of four.
+
 ### Open as web page
 
 Same action as today: web only, `openAsWebPage` → `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on the web. It now sits in the Share menu, and its `kIsWeb` check moves into the builder.
@@ -69,7 +74,7 @@ Same action as today: web only, `openAsWebPage` → `UrlLauncherUtils.launchInAp
 ### Strings
 
 Already in the ARB files: `layout`, `layoutPaliOnly` / `layoutSinhalaOnly` / `layoutSideBySide` / `layoutStacked`, `findInPage`, `commentary`, `rootText`, `goToSutta`, `scrollToBeginning`, `share`, `copyLink`, `openAsWebPage`.
-New: `previousSutta` / `nextSutta` ("Previous" / "Next") for the FAB captions, in `app_en.arb` and `app_si.arb`.
+New: `previousSutta` / `nextSutta` ("Previous" / "Next") for the FAB captions, and `currentLayout` ("Layout: {name}"), in `app_en.arb` and `app_si.arb`.
 
 ## Later, not part of this
 

@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Sinhala Only'**
   String get layoutSinhalaOnly;
 
+  /// Tooltip and screen-reader label of the reader toolbar's layout button, naming the current layout (e.g. Layout: Stacked)
+  ///
+  /// In en, this message translates to:
+  /// **'Layout: {name}'**
+  String currentLayout(String name);
+
   /// Label for side-by-side reader layout showing both Pali and Sinhala horizontally
   ///
   /// In en, this message translates to:

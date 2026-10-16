@@ -30,6 +30,11 @@ class AppLocalizationsSi extends AppLocalizations {
   String get layoutSinhalaOnly => 'සිංහල පමණයි';
 
   @override
+  String currentLayout(String name) {
+    return 'පිරිසැලසුම: $name';
+  }
+
+  @override
   String get layoutSideBySide => 'දෙකම';
 
   @override

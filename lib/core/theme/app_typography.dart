@@ -66,7 +66,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
   // ============================================
 
   /// Style for the text label of an action button shown next to an icon
-  /// (e.g. reader toolbar: Bookmark, Share). Color is left to the call site
+  /// (e.g. the refine dialogs' Clear). Color is left to the call site
   /// since it usually wants the theme's primary color.
   final TextStyle actionLabel;
 

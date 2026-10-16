@@ -36,6 +36,16 @@
     "description": "Label for Sinhala-only reader layout"
   },
 
+  "currentLayout": "Layout: {name}",
+  "@currentLayout": {
+    "description": "Tooltip and screen-reader label of the reader toolbar's layout button, naming the current layout (e.g. Layout: Stacked)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "layoutSideBySide": "Side by Side",
   "@layoutSideBySide": {
     "description": "Label for side-by-side reader layout showing both Pali and Sinhala horizontally"

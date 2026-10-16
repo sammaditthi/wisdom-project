@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/utils/responsive_utils.dart';
@@ -8,7 +9,6 @@ import '../../models/reader_layout.dart';
 import '../../providers/parallel_text_provider.dart';
 import '../../providers/tab_provider.dart'
     show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
-import '../../utils/content_icons.dart';
 import 'reader_link_actions.dart';
 
 /// Where one of the step actions goes, named by the sutta it steps to.
@@ -62,11 +62,18 @@ class ReaderLayoutChoice extends ReaderAction {
   }) : super(ReaderActionGroup.view);
 }
 
+/// One row in a [ReaderActionMenu].
+typedef ReaderMenuItem = ({
+  IconData icon,
+  String label,
+  VoidCallback onSelected,
+});
+
 /// An action that opens a menu of further commands (Share).
 class ReaderActionMenu extends ReaderAction {
   final IconData icon;
   final String label;
-  final List<ReaderCommand> items;
+  final List<ReaderMenuItem> items;
 
   const ReaderActionMenu({
     required ReaderActionGroup group,
@@ -90,7 +97,6 @@ List<ReaderAction> buildReaderActions(
   VoidCallback? onScrollToBeginning,
 }) {
   final l10n = AppLocalizations.of(context);
-  final colorScheme = Theme.of(context).colorScheme;
   final targetNode = ref.watch(parallelTextNodeProvider);
   final isCommentary = ref.watch(isCommentaryProvider);
   final currentLayout = ref.watch(activeReaderLayoutProvider);
@@ -120,8 +126,8 @@ List<ReaderAction> buildReaderActions(
     if (targetNode != null)
       ReaderCommand(
         group: ReaderActionGroup.reading,
-        icon: contentIcon(isCommentary: !isCommentary, colorScheme: colorScheme)
-            .icon,
+        // The tree's icon for a text, in both directions.
+        icon: Symbols.description_sharp,
         label: isCommentary ? l10n.rootText : l10n.commentary,
         onSelected: () => ref.read(openParallelTextProvider)(
           isPortraitMode: ResponsiveUtils.shouldDefaultToSingleColumn(context),
@@ -142,15 +148,13 @@ List<ReaderAction> buildReaderActions(
       icon: Icons.adaptive.share,
       label: l10n.share,
       items: [
-        ReaderCommand(
-          group: ReaderActionGroup.outward,
+        (
           icon: Icons.content_copy,
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
         ),
         if (kIsWeb)
-          ReaderCommand(
-            group: ReaderActionGroup.outward,
+          (
             icon: Icons.open_in_new,
             label: l10n.openAsWebPage,
             onSelected: () => openAsWebPage(context, ref),
