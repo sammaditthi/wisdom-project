@@ -262,8 +262,8 @@ one without the other.
 
 **`og:image` is its own raster**, `assets/og-card.png` — 1200×630, the logo at
 440px padded out with the site's own page background, cut by `make_emblem.sh`
-beside the emblem and committed like it. That retires the last reason the
-toolbar emblem was kept at 200px, so **B1 is now unopposed**.
+beside the emblem and committed like it. That retired the last reason the
+toolbar emblem was kept at 200px, which B1 then re-cut.
 
 `og:image:width` / `:height` deliberately omitted: they save a scraper one fetch
 per URL ever shared, and cost the card's dimensions being written in Dart as
@@ -372,122 +372,70 @@ Sized but unscoped — decide the derivation before estimating it.
 
 # Part B — Size
 
-## B1. Re-cut `emblem.png` ✅ **shipped 2026-10-17**, and drawn larger
+## B1. Re-cut the emblem ✅ **shipped 2026-10-17**, and drawn larger
 
-> **What landed.** The emblem is drawn at **36px**, up from 28: the height of
-> the bar's buttons, picked from screenshots of the real bar at 28, 36, 40 and
-> 44px. It ships as three copies cut 1:1 for 1×, 2× and 3× screens, and
-> `srcset` picks one. Measured 2026-10-17:
->
-> | | before | after |
-> |---|---|---|
-> | file | one 200×200 PNG, 47,115 B | `emblem.png` 36px 2,787 B · `@2x` 72px 8,383 B · `@3x` 108px 16,298 B |
-> | first visit, 1× / 2× / 3× screen | 47,115 B on all three | **−44 / −39 / −31 KB** |
->
-> - Cut by `assets/icons/make_icons.sh`, beside the app's emblems, from the
->   same master with the same resize. `make_emblem.sh` keeps only the og-card.
-> - One `?v=` token for the three copies (`SiteAssets.emblems`), as for the
->   fonts: one script cuts them together. `emblemSize` in `site_assets.dart`
->   sizes both the `<img>` and `.home img`.
-> - The 8px it takes from the trail moved the trail's breakpoints by the method
->   documented on them in `stylesheet.dart`: 55/43/28rem, the layout fold 37rem;
->   the pill stays at 65rem. Checked in headless Chrome on 80 deep-trail reading
->   pages just above each step: no more pages dip under the 45px floor than
->   before (3/6/1/2 against 4/7/2/2).
-> - `srcset` is now read by `check_links.dart`, C1's link scan and `deploy.sh`'s
->   `?v=` check, and `deploy.sh` requires all three copies.
->
-> The text below is the case as it was made, kept.
+The toolbar emblem was one 200×200 PNG, 47,115 B, drawn at 28px: the heaviest
+thing a first visit fetched after a font, before first paint, on the slow
+connections this site exists for. Nothing else needed it that large once the
+OG card became its own file (A5).
 
-`assets/emblem.png` is a 200×200 RGBA PNG rendered at 28×28 in every toolbar
-(`render/site_chrome.dart:69`). At 47,115 bytes it is the heaviest single thing
-a first-time visitor downloads apart from a font — **2.9× the entire
-stylesheet**, to paint a 28px mark.
+It is now drawn at **36px**, picked from screenshots of the real bar at 28, 36,
+40 and 44px (the buttons beside it are 34px), from three copies cut 1:1 for 1×,
+2× and 3× screens; `srcset` picks one. Measured 2026-10-17:
 
-**The 200px size is already a reasoned decision, and this argues against it.**
-`assets/make_emblem.sh` documents two reasons for not re-cutting to ~84px: the
-bytes are paid once and cached site-wide, and P5's OG card wants a raster larger
-than the toolbar does. Both are true; neither survives closely:
-
-- *Paid once* is exactly the first-paint request. On the slow connections this
-  site exists for, 47 KB before first paint is the worst-placed 47 KB on the
-  site — and it isn't shared with anything, because…
-- *The OG card needs its own file anyway.* OG images want ~1200×630; a 200×200
-  square is the wrong shape and too small regardless. A5 will cut a dedicated
-  raster, so the toolbar mark is not subsidising it.
-
-**Action:** re-cut to 56×56 (2× for a 28px mark), expect ~4–6 KB, commit the
-output — in which script, see below. If A5 wants an OG raster, add it as a second file.
-Build-size gain is trivial; **first-paint gain is ~40 KB**, the largest available.
-
-**Where to cut it (2026-10-17).** `make_emblem.sh` needs `sips`, which is
-macOS-only. Since 2026-10-14 `assets/icons/make_icons.sh` (Pillow, any OS) cuts
-the app's small emblems and the favicon the site already uses, so the toolbar
-mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
-
-## B2. Move the toolbar SVG icons into the stylesheet ✅ **shipped 2026-10-17**
-
-> **What landed.** Every icon is an empty `aria-hidden` `<span>`, painted by a
-> `mask` in `site.css`. `render/site_icons.dart` holds each shape once; the
-> markup emits `SiteIcon.markup` and the stylesheet walks `siteIcons` for the
-> `data:` URLs, so a class cannot be renamed on one side only. Full builds
-> before and after, 2026-10-17, brotli quality 11, shipped with B1:
->
-> | | before | after |
-> |---|---|---|
-> | inline `<svg>` bytes | 2,641 B on every reading page | **0** |
-> | build | 435.8 MB | **418.6 MB** (−17.2 MB) |
-> | median reading page (`an-5-1-5-3`) | 27,692 raw · 4,141 brotli | 25,809 raw · 3,833 brotli |
-> | brotli per reading page, 300 sampled | — | **−293 B** median (256–331), 7% |
-> | `site.css` brotli, fetched once | 3,181 B | 3,699 B (+518) |
->
-> **Less than the ~24 MB below**, which was the SVG bytes alone: the spans and
-> B1's `srcset` give back ~760 B a reading page.
->
-> Checked in headless Chromium against a build from before the change, at 390,
-> 700, 1100 and 1280px and 1×–3×, with the ⋮ open, hover, focus, the selected
-> layout, JS off, 200% zoom and the search dialog: no pixel differs by more than
-> 15/255.
->
-> - **Forced colours.** A masked background is repainted as the page and
->   vanishes (confirmed). `forced-color-adjust: preserve-parent-color` paints it
->   in its parent's forced text colour, as the UA does for an inline SVG, and
->   matches the old bar exactly; `none` comes first as the fallback where that
->   value is unknown. Not tested in Firefox.
-> - **Print.** `print-color-adjust: exact` keeps the icons when a browser prints
->   without backgrounds, its default. Checked by printing to PDF.
-> - **CSP.** C2's policy as drafted blocks every mask (19 violations on a
->   reading page); with `img-src 'self' data:` there are none. C2 is amended.
-> - **Guarded** by a wiring test: every icon span a page emits has a mask in
->   `site.css`, every mask is used, and no page carries an `<svg>`.
->
-> The text below is the case as it was made, kept.
-
-Six icons are emitted verbatim into the pages (measured 2026-10-17, full
-build — before the app link's book icon was removed the same day, which took
-2 × 287 B off every page that carries the link):
-
-| glyph | where | on a reading page |
+| | before | after |
 |---|---|---|
-| `_iconFrame` + the side-by-side and stacked marks | `render/reading_layouts.dart` | 4 (the bar, and the ⋮ menu's copy) |
-| `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 (the pill, and the ⋮ menu's copy) |
-| `_upGlyph`, `_moreGlyph` | `render/site_chrome.dart` | 1 each |
-| `_searchGlyph`, `_closeGlyph` | `render/search_dialog.dart` | 1 each, on every page |
+| file | one 200px PNG, 47,115 B | `emblem.png` 36px 2,787 B · `@2x` 72px 8,370 B · `@3x` 108px 16,255 B |
+| first visit, 1× / 2× / 3× screen | 47,115 B on all three | **−44 / −39 / −31 KB** |
 
-That's **2,641 B on every reading page**, 400–1,793 B on a TOC page and 400 B
-on `/` — about 24 MB of that build, 5.6% of its HTML, for shapes that never
-change. Declaring them once in `site.css` as `mask-image` data URIs moves them
-into the one file every visitor already caches.
+- Cut by `assets/icons/make_icons.sh` beside the app's emblems, from the same
+  master with the same resize. `make_emblem.sh` keeps only the og-card.
+- One `?v=` token for the three copies (`SiteAssets.emblems`), as for the
+  fonts: one script cuts them together. `emblemSize` in `site_assets.dart`
+  sizes both the `<img>` and `.home img`; `make_icons.sh` repeats the 36.
+- Its extra 8px moved the trail's breakpoints by the method documented on them
+  in `stylesheet.dart`; only the pill's crossed a rem, 68 → 69rem.
+- `srcset` is read by `check_links.dart`, C1's link scan and `deploy.sh`'s
+  `?v=` check, and `deploy.sh` requires all three copies.
 
-This is the only item that improves **both** numbers meaningfully: ~24 MB off
-the build, and **~370 B brotli** (~400 B gzip) off every reading page. The wire
-figure is far below the raw one because the ⋮ copies compress against the bar's
-(B6).
+## B2. The toolbar icons are drawn from the stylesheet ✅ **shipped 2026-10-17**
 
-Watch the details — `currentColor` stroke becomes `background-color` under
-`mask-image`, and the icons must stay invisible to assistive tech exactly as
-`aria-hidden="true"` makes them today. A masked background is not an inline
-SVG in forced-colors mode or in print; check both.
+Inline SVG put the same shapes on every page, 2,641 B of every reading page.
+Each icon is now an empty `aria-hidden` `<span>`, painted by a CSS `mask` in
+`site.css`, which a reader downloads once. `render/site_icons.dart` holds each
+icon's shape and size once; the markup emits `SiteIcon.markup` and the
+stylesheet walks `siteIcons`, so a class cannot be renamed on one side only. A
+wiring test checks that every icon span a page emits has a mask, every mask is
+used, and no page carries an `<svg>`.
+
+Full builds before and after, 2026-10-17, brotli quality 11, with B1 and while
+the app link still had its book icon:
+
+| | before | after |
+|---|---|---|
+| inline `<svg>` bytes | 2,641 B on every reading page | **0** |
+| build | 435.8 MB | **418.6 MB** (−17.2 MB) |
+| median reading page (`an-5-1-5-3`) | 27,692 raw · 4,141 brotli | 25,809 raw · 3,833 brotli |
+| brotli per reading page, 300 sampled | — | **−293 B** median (256–331), 7% |
+| `site.css` brotli, fetched once | 3,181 B | 3,699 B (+518) |
+
+The spans and B1's `srcset` give back ~760 B of the SVG bytes a reading page.
+
+A mask is not an inline SVG in three places, each handled in `_writeIcons`:
+
+- **Forced colours** repaint a masked background as the page, and the icon
+  vanishes. `forced-color-adjust: preserve-parent-color` paints it in its
+  parent's forced text colour, as the UA does for an SVG; `none` is the
+  fallback where that value is unknown. Checked in Chromium, not in Firefox.
+- **Print** drops backgrounds by default; `print-color-adjust: exact` keeps the
+  icons. Checked by printing to PDF.
+- **CSP**: `default-src 'self'` alone blocks every mask (19 violations on a
+  reading page), so C2's policy carries `img-src 'self' data:`.
+
+Checked in headless Chromium against a build from before the change, at 390,
+700, 1100 and 1280px and 1×–3×, with the ⋮ open, hover, focus, the selected
+layout, JS off, 200% zoom and the search dialog: no pixel differs by more than
+15/255.
 
 Per-page repeated chrome for context, measured over a 400-page random sample
 (pre-search-dialog):
@@ -1093,7 +1041,7 @@ it.~~ ✅ **both done 2026-08-19**, in one pass as planned.
 Steps 2, 3, 5, 6 and 7 — **A3** sitemap + robots, **A2** description, **A4**
 canonical, **A5** OG, **A6** JSON-LD — ✅ **all done 2026-08-22**, in one pass —
 build plan P5. They were ranked apart, and shipping them apart would have been
-the mistake B1+B2 are paired to avoid: every one of them edits the shared
+the mistake B1 and B2 were paired to avoid: every one of them edits the shared
 `<head>`, so each would have invalidated every page's content hash and paid the
 full push again. One deploy, not five.
 
@@ -1131,8 +1079,8 @@ clause on `hasPreamble`.
 **C12 the breadcrumb scroll and web text at 100%** is parity with the app, not
 a fix: one change, whenever it is wanted.
 
-The build stays above 400 MB after all of it (436 MB on 2026-10-17, less B2's
-~24 MB; B1 is ~40 KB and does not show), because **the corpus is the corpus** — **365 MB of the 394 MB
+The build stays above 400 MB after all of it (418.6 MB on 2026-10-17, with B1
+and B2), because **the corpus is the corpus** — **365 MB of the 394 MB
 2026-08-09 build was Sinhala and Pali text** at 3 UTF-8 bytes per character, and
 no amount of markup work touches that. The page-count reduction in
 `reading-units-and-grouping.md` is the only change that moves the total
