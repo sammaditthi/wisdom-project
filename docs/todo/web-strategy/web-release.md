@@ -48,7 +48,7 @@ Ranked. Only the first is a must.
 | | item | why |
 |---|---|---|
 | **must** | **C9 — HTML validator over a full build** | The last unshipped verification. Every page comes off one template, so a markup defect ships to the crawler on all of them. Cheap now, a full re-push later. |
-| should | **C1 — asset-wiring tests** | The one failure that is silent at build time and unrecallable for a year. `/assets/*` is a wildcard `immutable` rule; an asset linked without a `?v=` is cached on readers' disks and no purge reaches it. |
+| ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
 | should | **B2 + B1 in one deploy** | Toolbar SVGs into the stylesheet, re-cut the emblem. Both edit shared chrome, so shipping them apart pays the full push twice. Do them before the first prod push or well after it, never between. |
 | should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
 | optional | A9 font preload, A8 heading duplication | Small, measure first. |
@@ -60,13 +60,16 @@ All five are specified in [`static-site-backlog.md`](./static-site-backlog.md).
 ## 2. Verify the build
 
 **Lifted from the archived site plan §11**, which was the only live procedure in
-it. `deploy.sh` already enforces the first three; the rest is by hand.
+it. `deploy.sh` already enforces the automatic list; the rest is by hand.
 
 **Automatic, in `deploy.sh` — a release forbids `--root` and `--skip-build`
 both, so what ships is always the whole corpus and always checked:**
 
 - the baked origin matches the deploy target, and every canonical names it
 - `robots.txt` carries the matching `Sitemap:` line
+- every `/assets/` and `/fonts/` link carries a `?v=` — both are cached
+  `immutable` for a year, so a link without one is stale on readers' disks
+  with no way to purge it (backlog C1)
 - `check_links.dart` — every internal reference and every `#fragment` resolves,
   case-exact, no duplicate ids; it fails on zero links or zero fragments, so a
   pattern that stops matching cannot pass by checking nothing

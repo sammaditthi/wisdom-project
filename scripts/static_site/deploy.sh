@@ -479,6 +479,23 @@ if ! grep -qF "Sitemap: $BAKED_ORIGIN/sitemap.xml" "$OUT/robots.txt"; then
   exit 1
 fi
 
+# Every asset link carries its ?v= (backlog C1). /assets/* and /fonts/* are
+# cached immutable for a year, so a link without one stays stale on readers'
+# disks for that year and no purge reaches it. asset_wiring_test.dart checks
+# the hashes on a subtree; this checks every page that ships. Only text after a
+# quote or `(` is a link: the stylesheet's header comment names assets/ too.
+UNVERSIONED=$(LC_ALL=C grep -rhoE \
+  "[\"'(](https?://[^/\"']+)?(\.\.)?/(assets|fonts)/[^\"'()<>[:space:]]+" \
+  "$OUT" --include='*.html' --include='*.css' | grep -vF '?v=' \
+  | sed -E "s/^[\"'(]//" | sort -u || true)
+if [ -n "$UNVERSIONED" ]; then
+  echo "error: asset links without a ?v= content hash:" >&2
+  printf '%s\n' "$UNVERSIONED" | head -5 | sed 's/^/       /' >&2
+  echo "       Link them through SiteAssets (render/site_assets.dart)." >&2
+  echo "       Nothing uploaded." >&2
+  exit 1
+fi
+
 # Every check above asks whether one named file is there. This one asks whether
 # the site's own cross-references land: each internal href/src/url()/data-* and
 # each sitemap <loc> against the files on disk, and each #fragment against the
