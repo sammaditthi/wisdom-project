@@ -98,12 +98,12 @@ free.
   `<style>` in `lib/` or `bin/`, and neither pattern in any built file. Every
   page carries one `<link rel="stylesheet">` and nothing else. Inline CSS is not
   a lever here because there is none.
-- **Zero inline JS.** ⚠ *Both source docs claimed "zero JS" outright; that is no
-  longer true.* Every page now carries a `<script src>` for the search
-  dialog. What survives is the stronger property: **no inline script, no inline
-  event handlers, no `eval`** — `site.js` builds result rows with
-  `createElement`/`textContent`. That is what keeps the strict CSP in Part C
-  available with no refactor.
+- **One inline script, no inline handlers, no `eval`.** Every page carries a
+  `<script src>` for `site.js`, and reading pages one inline `layoutScript`
+  (added 2026-10-17: a deferred script applied the saved layout after first
+  paint, and the page jumped). It is byte-identical on every page, so the
+  strict CSP in Part C needs one hash for it. `site.js` builds result rows with
+  `createElement`/`textContent`.
 - **The `<title>` grammar** — `<leaf> — <vagga> — <collection>`
   (`page_template.dart:476`, built by `_titleText` at `:486`). This is doing
   nearly all the keyword work on the
@@ -402,13 +402,14 @@ mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
 
 ## B2. Move the toolbar SVG icons into the stylesheet — ~24 MB
 
-Seven icons are emitted verbatim into the pages (measured 2026-10-17, full
-build):
+Six icons are emitted verbatim into the pages (measured 2026-10-17, full
+build — before the app link's book icon was removed the same day, which took
+2 × 287 B off every page that carries the link):
 
 | glyph | where | on a reading page |
 |---|---|---|
 | `_iconFrame` + the side-by-side and stacked marks | `render/reading_layouts.dart` | 4 (the bar, and the ⋮ menu's copy) |
-| `_bookGlyph`, `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 each (the pill, and the ⋮ menu's copy) |
+| `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 (the pill, and the ⋮ menu's copy) |
 | `_upGlyph`, `_moreGlyph` | `render/site_chrome.dart` | 1 each |
 | `_searchGlyph`, `_closeGlyph` | `render/search_dialog.dart` | 1 each, on every page |
 
@@ -612,13 +613,14 @@ own change to deploy and verify — not something to fold into a caching diff.
 
 `_headers` is now the file where one goes, and the site already qualifies for a
 strict policy **with no refactor**. Verified on the full build: zero `<form>`,
-zero inline event handlers, zero inline `<script>`, zero `style=` attributes,
-and `site.js` builds result rows with `createElement`/`textContent` and calls no
-`eval`.
+zero inline event handlers, zero `style=` attributes, and `site.js` builds
+result rows with `createElement`/`textContent` and calls no `eval`. The one
+inline `<script>` is `layoutScript` (2026-10-17), the same bytes on every page:
+allow it by hash, computed by the build from the constant rather than pasted.
 
 ```
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<layoutScript>'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 ```
 
 `/*` overlaps the two `Cache-Control` rules, which is safe: the merge hazard is
@@ -897,24 +899,19 @@ because both move the toolbar's breakpoints, so they are measured once.
   ⚠️ notes saying a `rem` in a media query is a different width: at 100% it is
   16px everywhere. The search field's `1.12rem` iOS-zoom workaround becomes
   `1rem`.
-- Comments that state the 90% sizes (14.4px, 15.84px, 12.24px) in
+- Comments that state the 90% sizes (14.4px, 15.84px) in
   `stylesheet.dart`, the dump script's `_paneWeights` note, and the
   `proseColumnMaxWidth` test in `app_typography_test.dart`.
 
-**The breakpoints move**, because the toolbar's text grows from 12.24px to
-13.6px. Measured 2026-10-14 in headless Chrome: every built page's real trail in
-the real toolbar, the 45px readability floor scaled to 50px, and the shift added
-to today's values, as was done for the ⋮:
+**The breakpoints move**, because the toolbar's text grows by 1/0.9: the trail
+from 14.4px to 16px (it is 1em since 2026-10-17) and the pill's label from
+12.6px to 14px. Measure them in headless Chrome: every built page's real trail in
+the real toolbar, the readability floor scaled with the text, and the shift
+added to today's values (`stylesheet.dart`), as was done for the ⋮.
 
-| | Today | At 100% |
-|---|---|---|
-| `_layoutsFoldWidth` | 36rem | 38rem |
-| `_appPillMinWidth` | 65rem | 69rem |
-| `_trailKeepThree` / `One` / `None` | 54 / 42 / 28rem | 58 / 45 / 30rem |
-
-These are for the trail that shrinks. C12 deletes the last row. Once the trail
-scrolls, the other two answer a different question (how much room the page's
-name needs), so measure them again at 100% after the scroll is in.
+C12 deletes `_trailKeepThree` / `One` / `None`. Once the trail scrolls,
+`_layoutsFoldWidth` and `_appPillMinWidth` answer a different question (how much
+room the page's name needs), so measure those at 100% after the scroll is in.
 
 ---
 

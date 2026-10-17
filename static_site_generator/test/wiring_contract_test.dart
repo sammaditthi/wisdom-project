@@ -137,8 +137,8 @@ void main() {
 
     test('layout ids and tokens are each unique', () {
       // Ids: duplicates are invalid HTML and every label binds to the first.
-      // Tokens: P4 resolves `?layout=` by matching on `token`, so a repeat
-      // would make one layout unreachable from a shared link.
+      // Tokens: `layoutScript` resolves `?layout=` by matching on `token`, so a
+      // repeat would make one layout unreachable from a shared link.
       expect(readingLayouts.map((layout) => layout.id).toSet(),
           hasLength(readingLayouts.length));
       expect(readingLayouts.map((layout) => layout.token).toSet(),
@@ -179,7 +179,7 @@ void main() {
       };
 
       // A chapter page carrying a mixed slice emits nearly the whole set at
-      // once — both languages (col-heads), a Pali-only row (no-si) and a
+      // once — a row with both languages, a Pali-only row (no-si) and a
       // Sinhala-only row (no-pali). The two it cannot show belong to pages that
       // are missing something, so two more renders join it below: `.nav`, which
       // only a container page carries and which the side-by-side width override
@@ -364,7 +364,7 @@ void main() {
 
     test('a chapter named after its group offers the run one cross-link', () {
       // The two views. A reader on the bare URL asked for the run and gets one
-      // `අට්ඨකථා`; a reader on a fragment asked for one sutta and gets that
+      // `අට්ඨකථාව`; a reader on a fragment asked for one sutta and gets that
       // sutta's. Both sets are in the DOM on every such page and the stylesheet
       // picks, so this asserts the markup half — that the two are separately
       // addressable at all. The rules that hide each one are asserted by
@@ -491,35 +491,11 @@ void main() {
         ]),
       });
 
-      final contentRows = _rowClassesIn(html)
-          .where((classes) => classes != 'col-heads')
-          .toList();
-
-      expect(contentRows, ['', 'no-si', 'no-pali'],
+      // Every `.row` is a text row: there is no caption row to skip.
+      expect(_rowClassesIn(html), ['', 'no-si', 'no-pali'],
           reason: 'A row with one side missing must render with the class that '
               'lets a single-language layout skip it; only a both-sides-empty '
               'row is dropped.');
-    });
-
-    test('column captions are withheld when a language is wholly absent', () {
-      // `FIGURES.readablePagesWithoutSinhala` readable pages — every one in
-      // the ap-pat* files — carry no Sinhala at all. Under the baked
-      // side-by-side default they widened to two columns and printed "සිංහල"
-      // over blank space.
-      final paliOnly = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි'))]),
-      });
-      expect(_classNamesIn(paliOnly), isNot(contains('col-heads')));
-
-      // Symmetric even though no readable page in the corpus lacks Pali —
-      // nothing guarantees that after a re-sync from upstream tipitaka.lk.
-      final sinhalaOnly = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [_row(sinhala: _entry('සිංහල'))]),
-      });
-      expect(_classNamesIn(sinhalaOnly), isNot(contains('col-heads')));
-
-      final both = _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()});
-      expect(_classNamesIn(both), contains('col-heads'));
     });
 
     test('heading depths are contiguous from h2 and rank both languages', () {
@@ -1450,7 +1426,7 @@ List<String> _rulesSelectingOn(String css, Pattern marker) {
 }
 
 /// The class list of each `.row`, in document order, with the leading `row`
-/// stripped — `['col-heads', '', 'no-si']`.
+/// stripped — `['', 'no-si']`.
 List<String> _rowClassesIn(String html) => RegExp(r'<div class="row([^"]*)"')
     .allMatches(html)
     .map((match) => match.group(1)!.trim())

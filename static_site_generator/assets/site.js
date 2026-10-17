@@ -1,29 +1,30 @@
-/* The only JavaScript on the site.
+/* The site's only script file.
  *
- * Three jobs, one file, because more files would be more requests for ~4 KB:
- *   1. the reading layout carried in `?layout=` and remembered afterwards;
- *   2. "read in the app" following the page's `#`;
- *   3. the search dialog.
+ * Two jobs, one file, because more files would be more requests for ~4 KB:
+ *   1. "read in the app" following the page's `#`;
+ *   2. the search dialog.
+ *
+ * The reading layout is not here: `?layout=` and the remembered choice are
+ * applied by `layoutScript` (`lib/render/reading_layouts.dart`), inline after
+ * the radios, because a deferred script runs only after the page has painted.
  *
  * A committed source the build copies, like the fonts and the emblem — there is
  * no bundler and no transpiler in this pipeline (D9). So: no modules, no
  * optional chaining, nothing that needs a build step to reach an old phone.
  *
- * Nothing here is required for a page to work. With JS off the layout falls
- * back to the one baked `checked` in the HTML and the search button never
- * appears. That is the zero-JS baseline (C8), and it is why this file may fail
- * silently but must never throw before the layout code has run.
+ * Nothing here is required for a page to work. With JS off the search button
+ * never appears. That is the zero-JS baseline (C8), and it is why this file may
+ * fail silently.
  *
  * ## It spells no string and no URL of its own
  *
  * Every label and every path arrives on a `data-` attribute the generator
- * wrote. This file therefore holds no Sinhala, no `/tipitaka/`, and no layout
- * token — because a copy of any of those here is a copy that drifts from the
- * Dart the day someone edits one and not the other, and nothing would fail to
- * say so. The one contract it does rely on is the *field order* of an index
- * row, named in the KEY/PALI/SINHALA/PARENT/CHAPTER/MARKED constants below —
- * get that wrong and search returns plausible results pointing at the wrong
- * sutta.
+ * wrote. This file therefore holds no Sinhala and no `/tipitaka/` — because
+ * a copy of either here is a copy that drifts from the Dart the day someone
+ * edits one and not the other, and nothing would fail to say so. The one
+ * contract it does rely on is the *field order* of an index row, named in the
+ * KEY/PALI/SINHALA/PARENT/CHAPTER/MARKED constants below — get that wrong and
+ * search returns plausible results pointing at the wrong sutta.
  *
  * Nothing needs bumping when it changes. The build stamps `?v=` on this file
  * and on the index with one hash of *both*, so no cache can hold an old one of
@@ -34,81 +35,7 @@
   'use strict';
 
   /* ===================================================================== *
-   * 1 · Reading layout                                                    *
-   * ===================================================================== */
-
-  /* The radios ARE the state. `?layout=` and localStorage both resolve by
-   * checking one of them, so there is no second copy of "which layout is on"
-   * to drift from what the CSS is actually matching.
-   *
-   * Matching is on the radio's `value`, which the generator writes from
-   * `ReadingLayout.token` — the app's `ReaderLayout` enum name, and the locked
-   * grammar for `?layout=` in shareable links. Reading it off the DOM is what
-   * keeps this file from carrying a second table of layout names.
-   */
-  var STORAGE_KEY = 'wisdom.layout';
-  var radios = document.querySelectorAll('input[name="layout"]');
-
-  function applyLayout(token) {
-    if (!token) return false;
-    for (var i = 0; i < radios.length; i++) {
-      if (radios[i].value === token) {
-        radios[i].checked = true;
-        return true;
-      }
-    }
-    return false; /* Lenient by contract: an unknown token leaves the page on
-                   * its baked default rather than blanking the text. A link
-                   * from a future build must never render an empty page. */
-  }
-
-  /* localStorage throws in Safari private mode and wherever a reader has
-   * turned site data off. A remembered layout is a convenience; losing the
-   * whole script — search included — over it is not a trade worth making.
-   */
-  function remembered() {
-    try {
-      return window.localStorage.getItem(STORAGE_KEY);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function remember(token) {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, token);
-    } catch (e) {
-      /* ignored */
-    }
-  }
-
-  if (radios.length) {
-    /* The URL wins over the remembered choice: a shared link is someone saying
-     * "read it like this", and honouring a local preference instead would make
-     * one link show two different pages to two people.
-     */
-    var fromUrl = null;
-    try {
-      fromUrl = new URLSearchParams(window.location.search).get('layout');
-    } catch (e) {
-      fromUrl = null;
-    }
-
-    if (applyLayout(fromUrl)) {
-      remember(fromUrl);
-    } else {
-      applyLayout(remembered());
-    }
-
-    for (var r = 0; r < radios.length; r++) {
-      radios[r].addEventListener('change', function () {
-        if (this.checked) remember(this.value);
-      });
-    }
-  }
-
-  /* ===================================================================== *
-   * 2 · Read in the app                                                   *
+   * 1 · Read in the app                                                   *
    * ===================================================================== */
 
   /* The generator writes each link to this page on the app's host; only the
@@ -152,7 +79,7 @@
   }
 
   /* ===================================================================== *
-   * 3 · Search                                                            *
+   * 2 · Search                                                            *
    * ===================================================================== */
 
   var trigger = document.getElementById('search-open');

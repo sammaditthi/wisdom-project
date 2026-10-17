@@ -1,7 +1,7 @@
 /// The search dialog: a trigger in the toolbar and a `<dialog>` at the end of
 /// the body. The script that drives it is `site.js`, which the shell emits —
-/// see `document_shell.dart`, and note it is not a *search* script: it owns
-/// `?layout=` too.
+/// see `document_shell.dart`, and note it is not only a *search* script: it
+/// drives the app link too.
 ///
 /// Mirrors: lib/presentation/widgets/search/search_bar.dart — the app's search
 /// field. The *strings* are shared with it; the mechanism is not, because the

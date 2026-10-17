@@ -302,14 +302,7 @@ String _layoutGroup(SiteBuild build) {
 String _appLink(String url, SiteBuild build, {bool pill = false}) =>
     '<a class="app-link${pill ? ' app-pill' : ''}" href="$url" '
     'target="_blank" rel="noopener">'
-    '$_bookGlyph<span>${build.strings.html('readInApp')}</span>$_newTabGlyph</a>';
-
-const String _bookGlyph = '<svg class="app-icon" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="1.6" '
-    'stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/>'
-    '<path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>'
-    '</svg>';
+    '<span>${build.strings.html('readInApp')}</span>$_newTabGlyph</a>';
 
 /// The ↗ that says the link opens a new tab.
 const String _newTabGlyph = '<svg class="new-tab-icon" viewBox="0 0 24 24" '
