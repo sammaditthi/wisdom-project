@@ -3,6 +3,8 @@ import 'dart:isolate';
 
 import 'package:html/parser.dart';
 
+import 'src/cli.dart';
+
 /// Parses every built page as a browser does and fails on any HTML5 parse
 /// error: an unclosed or misnested element, a stray end tag, a duplicate
 /// attribute, a `<head>` closed early by something that does not belong in it.
@@ -14,13 +16,13 @@ import 'package:html/parser.dart';
 ///     dart run static_site_generator/tool/check_markup.dart
 ///     dart run static_site_generator/tool/check_markup.dart --build <dir>
 Future<void> main(List<String> args) async {
-  final options = _parseArgs(args);
+  final options = parseArgs(args, const {'--build'});
   if (options == null) {
     exitCode = 1;
     return;
   }
 
-  final rootPath = _normalize(options.build ?? '$_packageRoot/build');
+  final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
     stderr.writeln('no build directory at $rootPath. Generate one first, or '
         'pass --build <dir>.');
@@ -36,6 +38,12 @@ Future<void> main(List<String> args) async {
       .where((p) => p.endsWith('.html'))
       .toList()
     ..sort();
+  if (pages.isEmpty) {
+    stdout.writeln('\nFAIL — found no .html files at all, so nothing was '
+        'checked. Treated as a failure.');
+    exitCode = 1;
+    return;
+  }
 
   // Round-robin, so each worker gets a share of the corpus's few huge pages.
   final workers =
@@ -56,12 +64,6 @@ Future<void> main(List<String> args) async {
   }
 
   stdout.writeln('pages   ${pages.length} parsed');
-  if (pages.isEmpty) {
-    stdout.writeln('\nFAIL — found no .html files at all, so nothing was '
-        'checked. Treated as a failure.');
-    exitCode = 1;
-    return;
-  }
   if (byMessage.isEmpty) {
     stdout.writeln('\nPASS — every page parses with no HTML5 parse errors.');
     return;
@@ -78,20 +80,21 @@ Future<void> main(List<String> args) async {
     final onPages = byMessage[message]!;
     final first = (onPages.keys.toList()..sort()).first;
     stdout.writeln('\n$message');
-    stdout.writeln(
-        '  on ${onPages.length} page${onPages.length == 1 ? '' : 's'}, '
+    stdout.writeln('  on ${_count(onPages.length, 'page')}, '
         'first $first:${onPages[first]}');
   }
   final rest = messages.length - _maxMessagesShown;
-  if (rest > 0) stdout.writeln('\n… and $rest more kinds');
+  if (rest > 0) stdout.writeln('\n… and ${_count(rest, 'more kind')}');
 
   final pagesHit = byMessage.values.expand((p) => p.keys).toSet().length;
-  stdout.writeln('\nFAIL — ${messages.length} kinds of parse error, on '
-      '$pagesHit of ${pages.length} pages.');
+  stdout.writeln('\nFAIL — ${_count(messages.length, 'kind')} of parse error, '
+      'on $pagesHit of ${pages.length} pages.');
   exitCode = 1;
 }
 
 const int _maxMessagesShown = 10;
+
+String _count(int n, String noun) => '$n $noun${n == 1 ? '' : 's'}';
 
 class _ParseError {
   const _ParseError(this.page, this.at, this.message);
@@ -113,37 +116,4 @@ List<_ParseError> _parse(String rootPath, List<String> pages) {
     }
   }
   return errors;
-}
-
-/// Read off `Platform.script`, as `check_links.dart` does, so the default
-/// build directory is the package's own whatever the working directory.
-final String _packageRoot = File.fromUri(Platform.script).parent.parent.path;
-
-/// Null after printing why the arguments were refused. An unknown flag is
-/// refused rather than ignored, so a typo cannot pass the gate over the default
-/// build.
-({String? build})? _parseArgs(List<String> args) {
-  String? build;
-  for (var i = 0; i < args.length; i++) {
-    final arg = args[i];
-    if (arg.startsWith('--build=')) {
-      build = arg.substring('--build='.length);
-    } else if (arg == '--build' && i + 1 < args.length) {
-      build = args[++i];
-    } else {
-      stderr.writeln(arg == '--build'
-          ? '--build needs a value.'
-          : 'unknown option: $arg\nknown options: --build');
-      return null;
-    }
-  }
-  return (build: build);
-}
-
-String _normalize(String path) {
-  var absolute = Directory(path).absolute.path;
-  while (absolute.length > 1 && absolute.endsWith(Platform.pathSeparator)) {
-    absolute = absolute.substring(0, absolute.length - 1);
-  }
-  return absolute;
 }

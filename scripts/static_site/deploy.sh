@@ -568,24 +568,18 @@ fi
 # costly case: the parser closes <head> there, the canonical after it lands in
 # <body>, and Google ignores it while the grep checks above still pass.
 #
-# Release and dry runs only: dev is noindex, and a dry run is how a build gets
-# checked before release day. Partial builds too, unlike check_links — whether
-# markup parses does not depend on having the whole corpus. Run from the
-# package so `dart run` resolves its parser even when --skip-tests skipped
-# test.sh's `pub get`.
-if [ "$TARGET" = "prod" ] || [ "$DRY_RUN" = true ]; then
-  echo "Checking markup..."
-  if ! (cd static_site_generator &&
-      dart run tool/check_markup.dart --build "$WISDOM_ROOT/$OUT"); then
-    echo "error: the build's HTML does not parse cleanly (report above)." >&2
-    echo "       Nothing uploaded." >&2
-    exit 1
-  fi
-  echo ""
-else
-  echo "Checking markup... skipped on a dev deploy; --prod and --dry-run run it."
-  echo ""
+# Every deploy, partial builds too: unlike check_links, whether markup parses
+# does not depend on having the whole corpus, and it takes seconds beside the
+# build. It needs package:html, which test.sh's `pub get` resolves; `dart run`
+# does not fetch it, so after a pull that adds it, --skip-tests needs a
+# `dart pub get` in static_site_generator/ first.
+echo "Checking markup..."
+if ! dart run static_site_generator/tool/check_markup.dart --build "$OUT"; then
+  echo "error: the markup check failed (report above)." >&2
+  echo "       Nothing uploaded." >&2
+  exit 1
 fi
+echo ""
 
 echo "target     $TARGET"
 echo "account    $ACCOUNT_LINE"

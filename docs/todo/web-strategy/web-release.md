@@ -43,11 +43,11 @@ accounts**.
 
 ## 1. Before the release build
 
-Ranked. Only the first is a must.
+Ranked. Nothing left on it is a must.
 
 | | item | why |
 |---|---|---|
-| ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh` on `--prod` and `--dry-run` (§2). |
+| ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh`, on every deploy (§2). |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
 | should | **B2 + B1 in one deploy** | Toolbar SVGs into the stylesheet, re-cut the emblem. Both edit shared chrome, so shipping them apart pays the full push twice. Do them before the first prod push or well after it, never between. |
 | should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
@@ -75,7 +75,7 @@ both, so what ships is always the whole corpus and always checked:**
   pattern that stops matching cannot pass by checking nothing
 - `check_markup.dart` — every page parses with no HTML5 parse error, so no
   unclosed or misnested element and no `<head>` closed early ahead of its
-  canonical (backlog C9). Runs on `--prod` and `--dry-run`; a dev upload skips it
+  canonical (backlog C9). Runs on every deploy, partial builds included
 
 **By hand, once:**
 

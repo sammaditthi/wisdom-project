@@ -787,8 +787,8 @@ carry it and the first one. The costly case it covers is a stray element in
 `<head>`: the parser closes `<head>` there, the canonical after it lands in
 `<body>` where Google ignores it, and the grep checks in `deploy.sh` still pass.
 
-- **Where:** `deploy.sh`, right after the link check, on `--prod` and on
-  `--dry-run`, partial builds included. A dev upload skips it — dev is noindex.
+- **Where:** `deploy.sh`, right after the link check, on every deploy, partial
+  builds included.
 - **By hand:** `dart run static_site_generator/tool/check_markup.dart
   [--build <dir>]`, or `./scripts/static_site/deploy.sh --dry-run`.
 - **No filter file.** The full build had zero parse errors when it shipped.

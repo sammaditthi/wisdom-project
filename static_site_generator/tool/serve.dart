@@ -5,6 +5,8 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import 'package:static_site_generator/render/landing_page.dart';
 import 'package:static_site_generator/render/site_headers.dart';
 
+import 'src/cli.dart';
+
 /// Previews the generated site the way Cloudflare Pages will serve it.
 ///
 ///     dart run static_site_generator/tool/serve.dart
@@ -256,11 +258,6 @@ void _writeHtml(HttpRequest request, String body) {
 void _log(HttpRequest request, int status) =>
     stdout.writeln('${status.toString().padRight(4)}${request.uri.path}');
 
-/// Directory holding this package, so `build/` resolves whether the tool is run
-/// from the repo root or from inside `static_site_generator/`. Read off
-/// `Platform.script` for the same reason `bin/generate.dart` does.
-final String _packageRoot = File.fromUri(Platform.script).parent.parent.path;
-
 class _Options {
   final String directory;
   final int port;
@@ -320,7 +317,7 @@ class _Options {
     }
 
     return _Options(
-      directory: values['--dir'] ?? '$_packageRoot/build',
+      directory: values['--dir'] ?? '$packageRoot/build',
       port: port,
       showHelp: showHelp,
     );
