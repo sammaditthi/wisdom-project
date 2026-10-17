@@ -16,7 +16,7 @@ enum ReaderLayout {
   /// (Pali paragraph followed by its Sinhala translation, repeating)
   stacked;
 
-  /// Short label for compact UI controls (e.g. floating pills).
+  /// Short label for compact UI controls (the reader toolbar's Layout button).
   /// Displayed as text for [paliOnly] and [sinhalaOnly]; [sideBySide] and
   /// [stacked] use icons instead but labels are kept for completeness.
   String get shortLabel => switch (this) {

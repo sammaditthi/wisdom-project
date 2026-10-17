@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart' show ScrollMetrics;
 
 /// Quick return for the reader toolbar: reading on hides it, a deliberate
-/// scroll back brings it back (`docs/todo/reader/reader-toolbar-auto-hide.md`).
+/// scroll back brings it back (`docs/done/reader/reader-toolbar-auto-hide.md`).
 ///
 /// [userScrolled] takes only the reader's own scrolling, [scrolledTo] every
 /// scroll. Each call returns whether [shown] changed.

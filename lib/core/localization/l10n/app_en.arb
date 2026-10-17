@@ -918,7 +918,7 @@
 
   "share": "Share",
   "@share": {
-    "description": "Reader toolbar button (and scrolled-menu row) that opens the share menu"
+    "description": "Reader toolbar button that opens the share menu"
   },
   "openAsWebPage": "Open as web page",
   "@openAsWebPage": {

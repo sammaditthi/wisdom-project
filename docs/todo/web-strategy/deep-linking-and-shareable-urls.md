@@ -57,7 +57,7 @@
 
 | | |
 |---|---|
-| **Entry point** | **Share** (`Icons.adaptive.share`), last in the reader's action toolbar after a hairline divider (`docs/todo/reader/reader-toolbar-merge.md`, 2026-10-16). The toolbar is the reader's only one since the FAB went (`docs/todo/reader/reader-toolbar-auto-hide.md`, 2026-10-17). Nothing new in the `AppBar`. Code: `widgets/reader/reader_link_actions.dart`. |
+| **Entry point** | **Share** (`Icons.adaptive.share`), last in the reader's action toolbar after a hairline divider (`docs/done/reader/reader-toolbar-merge.md`, 2026-10-16). The toolbar is the reader's only one since the FAB went (`docs/done/reader/reader-toolbar-auto-hide.md`, 2026-10-17). Nothing new in the `AppBar`. Code: `widgets/reader/reader_link_actions.dart`. |
 | **Share** | Opens a menu holding **Copy link**, which copies and shows a `linkCopied` SnackBar, and on the web **Open as web page**. The same menu at every width, on every platform. An extra tap, accepted 2026-10-05 because the menu is where sharing grows (see below). |
 | **Open as web page** | In the Share menu since 2026-10-16. It is not sharing, which is why it was its own button until then; as one it would have widened the merged toolbar past a phone browser. Web only: inside a native app it has no use (decided 2026-10-05, re-confirmed 2026-10-16). `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on web. Static is BJT-only, so it must hide for a non-BJT tab; every tab is BJT today, so there is no check yet. |
 | **`MenuAnchor`** | The toolbar's Share is a `MenuAnchor`, so the menu lives with its button. (Until 2026-10-16 one `showMenu` popup served the pill and the FAB, because the old FAB's item vanished as the FAB closed.) |

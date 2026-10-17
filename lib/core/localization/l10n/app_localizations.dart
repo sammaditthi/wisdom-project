@@ -1136,7 +1136,7 @@ abstract class AppLocalizations {
   /// **'More options'**
   String get moreOptions;
 
-  /// Reader toolbar button (and scrolled-menu row) that opens the share menu
+  /// Reader toolbar button that opens the share menu
   ///
   /// In en, this message translates to:
   /// **'Share'**

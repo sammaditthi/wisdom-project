@@ -244,8 +244,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // The new sutta has no anchor and offset 0.
     ref.read(navigateToSuttaProvider)(target);
     // When its text is already loaded the scroll view stays, and nothing else
-    // moves it or re-reads Mode 1/2 after the new layout. The jump must not
-    // measure the old layout, whose offset 0 may have pages above it.
+    // moves it or re-reads the scroll state after the new layout. The jump
+    // must not measure the old layout, whose offset 0 may have pages above it.
     _anchorAt(null);
   }
 

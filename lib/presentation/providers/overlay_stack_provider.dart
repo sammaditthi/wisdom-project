@@ -62,8 +62,8 @@ class OverlayStackNotifier extends StateNotifier<List<DismissibleOverlay>> {
 }
 
 /// Global LIFO stack of dismissible overlays. Drives the ESC keyboard
-/// shortcut and is kept in sync with the underlying visibility providers by
-/// `OverlayStackSync`.
+/// shortcut and the reader's system Back, and is kept in sync with the
+/// underlying visibility providers by `OverlayStackSync`.
 final overlayStackProvider =
     StateNotifierProvider<OverlayStackNotifier, List<DismissibleOverlay>>(
   (ref) => OverlayStackNotifier(),

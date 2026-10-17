@@ -1,6 +1,6 @@
 # Focus mode — design
 
-Started 2026-10-14. **Focus mode dropped 2026-10-17**, never built: the reader toolbar now hides while reading ([`reader-toolbar-auto-hide.md`](../../todo/reader/reader-toolbar-auto-hide.md)), and that plan's step 2 hides the rest of the chrome on phones. "Hide navigation bar" stays as shipped.
+Started 2026-10-14. **Focus mode dropped 2026-10-17**, never built: the reader toolbar now hides while reading ([`reader-toolbar-auto-hide.md`](reader-toolbar-auto-hide.md)), and [`phone-chrome-auto-hide.md`](../../todo/reader/phone-chrome-auto-hide.md) plans hiding the rest of the chrome on phones. "Hide navigation bar" stays as shipped.
 
 **Goal (was):** a way to read with nothing on screen but the text.
 

@@ -12,6 +12,7 @@ import '../widgets/common/resizable_divider.dart';
 import '../widgets/navigation/breadcrumb_widget.dart';
 import '../providers/app_section_provider.dart';
 import '../providers/navigator_visibility_provider.dart';
+import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
 import '../providers/tab_provider.dart';
 import '../providers/search_provider.dart';
@@ -129,14 +130,21 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     // would keep the previous tab's tint).
     final scrolledUnder = ref.watch(readerScrolledUnderProvider);
     final colorScheme = Theme.of(context).colorScheme;
+    final isOverlayOpen = ref.watch(
+      overlayStackProvider.select((stack) => stack.isNotEmpty),
+    );
 
     return PopScope(
-      // System back closes search: search mode on phones, or the panel under
-      // the box on tablets. Not while another section shows: back is that
-      // section's.
-      canPop: !isReaderShowing || !(isSearchMode || isSearchPanelVisible),
+      // System back closes what Esc would (a menu, the dictionary, find in
+      // page), then search: search mode on phones, or the panel under the box
+      // on tablets. Not while another section shows: back is that section's.
+      canPop: !isReaderShowing ||
+          !(isOverlayOpen || isSearchMode || isSearchPanelVisible),
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) _closeSearchPanel();
+        if (didPop) return;
+        if (!ref.read(overlayStackProvider.notifier).dismissTop()) {
+          _closeSearchPanel();
+        }
       },
       child: Scaffold(
         appBar: AppBar(

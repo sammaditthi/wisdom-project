@@ -141,6 +141,7 @@ class _LayoutMenuButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final primary = Theme.of(context).colorScheme.primary;
     final current = ref.watch(activeReaderLayoutProvider);
 
     return DismissibleMenuAnchor(
@@ -148,9 +149,10 @@ class _LayoutMenuButton extends ConsumerWidget {
       visible: visible,
       menuChildren: [
         for (final layout in ReaderLayout.values)
-          _LayoutMenuItem(
-            layout: layout,
-            isSelected: layout == current,
+          _MenuRow(
+            icon: _LayoutGlyph(layout: layout, color: primary),
+            label: _layoutLabel(context, layout),
+            selected: layout == current,
             onSelected: () => ref.read(updateActiveTabLayoutProvider)(layout),
           ),
       ],
@@ -159,8 +161,7 @@ class _LayoutMenuButton extends ConsumerWidget {
         return _ToolbarButton(
           tooltip: l10n.currentLayout(_layoutLabel(context, current)),
           onTap: controller.toggle,
-          highlighted: isOpen,
-          expanded: isOpen,
+          menuOpen: isOpen,
           focusNode: focusNode,
           padding: const EdgeInsetsDirectional.only(start: 12, end: 6),
           content: (color) => Row(
@@ -190,6 +191,7 @@ class _ShareMenuButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final primary = Theme.of(context).colorScheme.primary;
 
     return DismissibleMenuAnchor(
       overlayId: 'reader-share-menu',
@@ -197,13 +199,13 @@ class _ShareMenuButton extends ConsumerWidget {
       endAlignedWidth: _endMenuWidth,
       menuChildren: [
         _MenuRow(
-          icon: Icons.content_copy,
+          icon: Icon(Icons.content_copy, size: 20, color: primary),
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
         ),
         if (kIsWeb)
           _MenuRow(
-            icon: Icons.open_in_new,
+            icon: Icon(Icons.open_in_new, size: 20, color: primary),
             label: l10n.openAsWebPage,
             onSelected: () => openAsWebPage(context, ref),
           ),
@@ -212,104 +214,66 @@ class _ShareMenuButton extends ConsumerWidget {
         Icons.adaptive.share,
         tooltip: l10n.share,
         onTap: controller.toggle,
-        highlighted: controller.isOpen,
-        expanded: controller.isOpen,
+        menuOpen: controller.isOpen,
         focusNode: focusNode,
       ),
     );
   }
 }
 
-/// One layout in the Layout ▾ menu, with a check on the current one.
-class _LayoutMenuItem extends StatelessWidget {
-  final ReaderLayout layout;
-  final bool isSelected;
+/// A menu row: a glyph and a one-line label. With [selected] set, the row is
+/// one choice of a set, checked when true.
+class _MenuRow extends StatelessWidget {
+  final Widget icon;
+  final String label;
   final VoidCallback onSelected;
+  final bool? selected;
 
-  const _LayoutMenuItem({
-    required this.layout,
-    required this.isSelected,
+  const _MenuRow({
+    required this.icon,
+    required this.label,
     required this.onSelected,
+    this.selected,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final rowStyle = context.typography.listRowTitle;
+    final isSelected = selected ?? false;
 
     return MenuItemButton(
       onPressed: onSelected,
-      style: MenuItemButton.styleFrom(
-        backgroundColor:
-            isSelected ? AppMenuTheme.selectedRowColor(colorScheme) : null,
-      ),
-      leadingIcon: _MenuIcon(
-        child: _LayoutGlyph(layout: layout, color: colorScheme.primary),
-      ),
+      style: isSelected
+          ? MenuItemButton.styleFrom(
+              backgroundColor: AppMenuTheme.selectedRowColor(colorScheme),
+            )
+          : null,
+      // Lines up glyphs of different widths (icons, "P", "S").
+      leadingIcon: SizedBox(width: 24, child: Center(child: icon)),
       trailingIcon: isSelected
           ? Icon(Icons.check, size: 18, color: colorScheme.primary)
           : null,
-      // Read out as one choice of four, like a radio group.
+      // A choice is read out like a radio button.
       child: Semantics(
-        checked: isSelected,
-        inMutuallyExclusiveGroup: true,
+        checked: selected,
+        inMutuallyExclusiveGroup: selected == null ? null : true,
         child: Text(
-          _layoutLabel(context, layout),
+          label,
           style: isSelected
               ? rowStyle.copyWith(fontWeight: FontWeight.w600)
               : rowStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
   }
 }
 
-/// A menu row: icon and a one-line label.
-class _MenuRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onSelected;
-
-  const _MenuRow({
-    required this.icon,
-    required this.label,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return MenuItemButton(
-      onPressed: onSelected,
-      leadingIcon: _MenuIcon(
-        child: Icon(icon, size: 20, color: colorScheme.primary),
-      ),
-      child: Text(
-        label,
-        style: context.typography.listRowTitle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-}
-
-/// Lines up menu-row glyphs of different widths (icons, "P", "S").
-class _MenuIcon extends StatelessWidget {
-  final Widget child;
-
-  const _MenuIcon({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(width: 24, child: Center(child: child));
-  }
-}
-
 /// A button inside the toolbar. No background of its own — the pill provides
-/// the surface — except [highlighted] while its menu is open. The 44x44
-/// minimum keeps the touch target.
+/// the surface — except while its menu is open. The 44x44 minimum keeps the
+/// touch target.
 class _ToolbarButton extends StatelessWidget {
   final String tooltip;
   final VoidCallback onTap;
@@ -317,10 +281,9 @@ class _ToolbarButton extends StatelessWidget {
   /// What the button shows, drawn in the foreground colour it is given.
   final Widget Function(Color foreground) content;
   final EdgeInsetsGeometry padding;
-  final bool highlighted;
 
   /// Whether its menu is open; null for a button without a menu.
-  final bool? expanded;
+  final bool? menuOpen;
   final FocusNode? focusNode;
 
   const _ToolbarButton({
@@ -328,8 +291,7 @@ class _ToolbarButton extends StatelessWidget {
     required this.onTap,
     required this.content,
     this.padding = EdgeInsets.zero,
-    this.highlighted = false,
-    this.expanded,
+    this.menuOpen,
     this.focusNode,
   });
 
@@ -337,14 +299,12 @@ class _ToolbarButton extends StatelessWidget {
     IconData icon, {
     required String tooltip,
     required VoidCallback onTap,
-    bool highlighted = false,
-    bool? expanded,
+    bool? menuOpen,
     FocusNode? focusNode,
   }) : this(
           tooltip: tooltip,
           onTap: onTap,
-          highlighted: highlighted,
-          expanded: expanded,
+          menuOpen: menuOpen,
           focusNode: focusNode,
           content: (color) => Icon(icon, size: 20, color: color),
         );
@@ -352,9 +312,10 @@ class _ToolbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final highlighted = menuOpen ?? false;
     return Semantics(
       button: true,
-      expanded: expanded,
+      expanded: menuOpen,
       child: Tooltip(
         message: tooltip,
         child: Material(
@@ -420,13 +381,7 @@ class _LayoutGlyph extends StatelessWidget {
     if (icon != null) return Icon(icon, size: 20, color: color);
     return Text(
       layout.shortLabel,
-      style: context.typography.segmentedButtonLabel.copyWith(
-        color: color,
-        fontWeight: FontWeight.w700,
-        // Fixed like the 20px icons it sits among, which
-        // don't follow the font-size setting either.
-        fontSize: 14,
-      ),
+      style: context.typography.layoutGlyph.copyWith(color: color),
     );
   }
 }

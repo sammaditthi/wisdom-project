@@ -1,6 +1,6 @@
 # Reader toolbar auto-hide — plan
 
-Started 2026-10-17. Built 2026-10-17 on branch `feat/reader-toolbar-auto-hide`; not yet tried in the app.
+Started 2026-10-17. Built 2026-10-17 on branch `feat/reader-toolbar-auto-hide`. Tried by hand with a mouse wheel and a trackpad on macOS; phones deferred.
 Design: [Reader toolbar · ways back canvas](https://claude.ai/artifact/1qPRDahEtzfvDJdDqtpwsw), the "Step 1" row. The rows above it are the options considered.
 
 **Goal:** one toolbar and no FAB. The toolbar gets out of the way while the reader reads and comes back when they scroll up.
@@ -14,7 +14,7 @@ Design: [Reader toolbar · ways back canvas](https://claude.ai/artifact/1qPRDahE
 3. **Revealing needs room.** Readers scroll back to re-read and to compare Pali with Sinhala, so any upward pixel is not enough: it takes upward travel past a threshold.
 4. **Go to beginning joins the toolbar**, beside Find: like Layout and Find it acts on the page. It shows once the reader is more than a screen into the sutta.
 5. **The planned focus mode is dropped** (it was never built). "Hide navigation bar" stays as shipped.
-6. **Step 2 comes later**, phones only: see below.
+6. **Step 2 comes later**, phones only: [`phone-chrome-auto-hide.md`](../../todo/reader/phone-chrome-auto-hide.md).
 7. **Nothing freezes the rule.** An open menu closes when the toolbar hides. A freeze on a text selection or the dictionary sheet would leave the toolbar stuck hidden: on desktop a selection lasts until the next click, and the sheet stays open while reading.
 8. **Keyboard scrolling never moves the toolbar.** Flutter runs Page Up/Down, Space and the arrows as an animated jump, reported like a search jump (no user scroll direction). No code needed.
 9. **No shared action list.** With the FAB gone the toolbar is the only reader of `reader_actions.dart`, so the toolbar lists its own buttons.
@@ -36,7 +36,7 @@ Known cost: shown mid-sutta, the toolbar covers the top of the text (about 64px)
 **Hides** on a user scroll down mid-unit: past the top (`extentBefore > 60`, the threshold used today) and not at the end (`extentAfter >= 1`).
 
 **Shows**
-- After upward user travel past a threshold. Start at 100px (three to four lines at body size) and tune on a phone, a trackpad and a mouse wheel. Only a move down resets the count, not a pause: a mouse-wheel notch reports start, move, stop, so a reset on stop would never let a wheel past one notch.
+- After upward user travel past a threshold: 100px (three to four lines at body size). Right with a mouse wheel and a trackpad; not yet checked on a phone. Only a move down resets the count, not a pause: a mouse-wheel notch reports start, move, stop, so a reset on stop would never let a wheel past one notch.
 - At the top (`extentBefore <= 60`) and the end (`extentAfter < 1`), however the reader got there. Both turn it on rather than show it only while there: otherwise scrolling up one line from the end would hide it. A bounce past the end (iOS, macOS) is not a scroll down.
 - After opening a sutta, Previous / Next, a tab switch, returning to the Reader section and closing find.
 
@@ -50,6 +50,7 @@ Known cost: shown mid-sutta, the toolbar covers the top of the text (about 64px)
 **Pinned visible** while `MediaQuery.accessibleNavigation` is on. Android turns off its own hide-on-scroll under TalkBack for the same reason.
 **Motion:** the existing 200ms fade plus a short slide up (-0.3 of its height). No change to the toolbar's position.
 **Focus:** a hidden toolbar takes no keyboard focus, so Tab cannot land on an invisible button.
+**Back** (Android) closes an open menu first, like Esc. Flutter's menus don't take Back themselves, so it left the app. `ReaderScreen`'s `PopScope` asks the Esc overlay stack first, so Back also closes the dictionary and find in page, then search.
 
 ## Go to beginning
 
@@ -108,35 +109,23 @@ The rules above in one plain Dart class, fed `ScrollMetrics` and deltas, so step
 - `docs/todo/web-strategy/deep-linking-and-shareable-urls.md` § B: the Entry point and `MenuAnchor` rows still name the scrolled menu's Share ›.
 - `focus-mode.md`: focus mode dropped; keep the shipped "Hide navigation bar" record, and move it to `docs/done/reader/`.
 
-## Step 2 (later, phones only)
-
-Everything is shown at the top. While reading, the app bar, tab bar, bottom nav and toolbar hide together, and they return together on the same scroll-up rule. Reader section only. Desktop keeps the step 1 rule.
-
-- **Overlays that slide, not collapsing heights** (decided). The cost is insets:
-  - content padding at the top and bottom equal to the chrome;
-  - the toolbar and find bar positions;
-  - anchor landings (search hit, deep link, restore) offset by the visible chrome, since `AnchoredPageList` puts the anchor row at the very top of the viewport.
-- Keep the status bar and home indicator areas reserved and painted in the page colour.
-- One provider, watched by `AppShell` (bottom nav), `ReaderScreen` (app bar, tabs) and the reader widget. It holds step 1's class. Flip on state changes only, never per pixel.
-- **"Phone" means `shortestSide < 600`**, not `isMobile` (width < 768). A landscape phone is wider than 768 but has the least height, and it needs this most.
-- `SliverAppBar(floating, snap)` does not fit: the app bar and tabs sit outside the reader's scroll view, which is a centre-keyed `CustomScrollView`.
-
 ## Tests
 
 - **Deleted** (decided 2026-10-17), as they test widgets that no longer exist: `test/presentation/widgets/reader/reader_action_button_group_test.dart`, `test/presentation/widgets/reader/reader_expandable_fab_test.dart`.
 - **Rewritten** (2026-10-17): `integration_test/sutta_step_navigation_test.dart` reached Go to beginning through the FAB. Previous test 1 now taps it in the toolbar, and test 8 covers a controller jump keeping the toolbar, a mouse-wheel scroll down hiding it, no reveal under the threshold, a reveal past it over two notches, Go to beginning only past the first screen, and not added as the toolbar fades out. User scrolling is a mouse-wheel `TestPointer.scroll`: a controller jump never toggles the toolbar.
+- **Added** after the branch review (2026-10-17): `test/presentation/widgets/reader/toolbar_auto_hide_test.dart`, the class's rules (not hidden at the top or the end, a move down resets the count, the end stays on while scrolling back up); `integration_test/search_mode_test.dart` step 14, system Back closing the Share menu and not the app. That file's navigator tooltip pattern was also fixed: it failed at step 1 on main since the sentence-case change.
 
 Still worth covering (for the test writer):
-- `ToolbarAutoHide` on its own: not hidden at the top or the end; a move down resets the count; the end stays on while scrolling back up.
 - The reader: anchoring and restores never toggle it; it shows on opening, Previous / Next, a tab switch, a return to Reader and closing find; an open menu closes when the toolbar hides; pinned while `accessibleNavigation` is on.
 - The toolbar: Copy link; Open as web page only on the web; Previous / Next absent at the corpus edge.
 
 ## Done when
 
 - [x] No FAB on any platform, and no `reader_actions.dart`.
-- [ ] The toolbar hides on scrolling down, returns past the threshold, and shows at the top and the end.
-- [ ] Search jumps, anchoring, restores and keyboard scrolling never toggle it.
+- [x] The toolbar hides on scrolling down, returns past the threshold, and shows at the top and the end. By hand with a mouse wheel and a trackpad; test 8.
+- [x] Search jumps, anchoring, restores and keyboard scrolling never toggle it. Traced in the branch review; test 8 covers a controller jump.
 - [x] Go to beginning shows only past the first screen and works.
-- [ ] Every action behaves as before; a menu closes when the toolbar hides, on find, a tab switch, an outside tap and Esc.
-- [ ] Threshold tuned on a phone, a trackpad and a mouse wheel.
+- [ ] Every action behaves as before; a menu closes when the toolbar hides, on find, a tab switch, an outside tap, Esc and Back. Back is covered by `search_mode_test` step 14; the rest not checked one by one.
+- [x] Threshold right with a trackpad and a mouse wheel.
+- [ ] **Deferred:** the threshold on a phone.
 - [x] `reader-toolbar-merge.md`, the deep-linking doc § B and `focus-mode.md` updated.
