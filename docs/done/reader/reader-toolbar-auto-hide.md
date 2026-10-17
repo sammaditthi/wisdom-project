@@ -115,9 +115,11 @@ The rules above in one plain Dart class, fed `ScrollMetrics` and deltas, so step
 - **Rewritten** (2026-10-17): `integration_test/sutta_step_navigation_test.dart` reached Go to beginning through the FAB. Previous test 1 now taps it in the toolbar, and test 8 covers a controller jump keeping the toolbar, a mouse-wheel scroll down hiding it, no reveal under the threshold, a reveal past it over two notches, Go to beginning only past the first screen, and not added as the toolbar fades out. User scrolling is a mouse-wheel `TestPointer.scroll`: a controller jump never toggles the toolbar.
 - **Added** after the branch review (2026-10-17): `test/presentation/widgets/reader/toolbar_auto_hide_test.dart`, the class's rules (not hidden at the top or the end, a move down resets the count, the end stays on while scrolling back up); `integration_test/search_mode_test.dart` step 14, system Back closing the Share menu and not the app. That file's navigator tooltip pattern was also fixed: it failed at step 1 on main since the sentence-case change.
 
-Still worth covering (for the test writer):
-- The reader: anchoring and restores never toggle it; it shows on opening, Previous / Next, a tab switch, a return to Reader and closing find; an open menu closes when the toolbar hides; pinned while `accessibleNavigation` is on.
-- The toolbar: Copy link; Open as web page only on the web; Previous / Next absent at the corpus edge.
+Still worth covering (for the test writer). The toolbar's menus and what brings it back are in the integration test backlog, [`integration-test-followups.md`](../../todo/testing/integration-test-followups.md) §5. Not there:
+- Anchoring and restores never toggle it (test 8 covers only a controller jump).
+- An open menu closes when the toolbar hides.
+- Pinned while `accessibleNavigation` is on.
+- Open as web page only on the web.
 
 ## Done when
 
