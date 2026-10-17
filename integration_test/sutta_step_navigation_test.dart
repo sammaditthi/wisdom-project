@@ -322,6 +322,13 @@ void main() {
       '8. Scrolling: reading on hides the toolbar, scrolling back past the '
       'threshold brings it back with Go to beginning',
       (tester) async {
+        // No screen reader, which pins the toolbar. On web `testWidgets`
+        // turns semantics on, and the browser then reports one.
+        tester.platformDispatcher.accessibilityFeaturesTestValue =
+            const FakeAccessibilityFeatures();
+        addTearDown(
+            tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
+
         final container = await pumpReaderApp(tester);
 
         // Open බ්රහ්මජාලසුත්තං (dn-1-1) at its beginning. The unit runs to
