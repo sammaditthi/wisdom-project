@@ -1,5 +1,6 @@
 import '../domain/theme_tokens.dart';
 import 'reading_layouts.dart';
+import 'site_icons.dart';
 import 'web_fonts.dart';
 
 /// Builds `assets/site.css` from the app's exported theme tokens.
@@ -38,6 +39,7 @@ String buildStylesheet(ThemeTokens tokens, {required String fontVersion}) {
   _writePageChrome(css, tokens);
   _writeEntryStyles(css, tokens);
   _writeLayouts(css, tokens);
+  _writeIcons(css);
   _writeToolbarNav(css);
   _writeToolbarApp(css);
   _writeSearch(css);
@@ -784,6 +786,36 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln();
 }
 
+/// Every icon in [siteIcons]: one shared rule, then each one's mask.
+///
+/// `currentColor` paints it, so a lit layout button or a hovered link colours
+/// its icon as the inline SVG's stroke did. Forced colours and print treat a
+/// background differently from an SVG; the last four declarations undo that.
+void _writeIcons(StringBuffer css) {
+  css.writeln(
+      '/* Icons: a mask each, in the text colour (site_icons.dart). */');
+  css.writeln('${siteIcons.map((icon) => '.${icon.maskClass}').join(', ')} {');
+  css.writeln('  display: inline-block;');
+  css.writeln('  flex: none;');
+  css.writeln('  background-color: currentColor;');
+  // Prefixed for Chrome before 120 and Safari before 15.4.
+  css.writeln('  -webkit-mask: var(--icon) center / contain no-repeat;');
+  css.writeln('  mask: var(--icon) center / contain no-repeat;');
+  // Forced colours repaint a background as the page behind it, which hides
+  // the icon. `preserve-parent-color` paints it in its parent's forced text
+  // colour, as the UA does for an inline SVG. `none` is the fallback where
+  // that value is unknown: the icon keeps the page's own colours.
+  css.writeln('  forced-color-adjust: none;');
+  css.writeln('  forced-color-adjust: preserve-parent-color;');
+  css.writeln('  -webkit-print-color-adjust: exact;');
+  css.writeln('  print-color-adjust: exact;');
+  css.writeln('}');
+  for (final icon in siteIcons) {
+    css.writeln('.${icon.maskClass} { --icon: url("${icon.maskUrl}"); }');
+  }
+  css.writeln();
+}
+
 /// The bar's navigation half: the trail, the emblem that opens it, and the up
 /// button pinned beyond its right edge.
 ///
@@ -946,7 +978,7 @@ void _writeToolbarNav(StringBuffer css) {
   // Three declarations serve one of the two and are harmless on the other:
   // `text-decoration` for the anchor, which sits outside `.breadcrumb` and so
   // keeps the UA underline; `padding` and `cursor` for the button's UA
-  // defaults. Neither needs a font reset — both hold an SVG and no text.
+  // defaults. Neither needs a font reset — both hold an icon and no text.
   css.writeln('.up, .search-trigger, .more-trigger {');
   css.writeln('  display: flex;');
   css.writeln('  flex: none;');

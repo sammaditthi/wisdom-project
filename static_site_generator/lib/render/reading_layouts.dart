@@ -15,6 +15,8 @@
 /// the HTML is.
 library;
 
+import 'site_icons.dart';
+
 /// One button of the reading-layout switcher, and the radio behind it.
 typedef ReadingLayout = ({
   /// DOM id, referenced by every selector in the layout CSS.
@@ -30,7 +32,7 @@ typedef ReadingLayout = ({
   /// Sighted readers get [glyph]; this is what is announced.
   String labelKey,
 
-  /// What the button shows: a letter, or an inline SVG.
+  /// What the button shows: a letter, or an icon's [SiteIcon.markup].
   String glyph,
 });
 
@@ -52,7 +54,9 @@ const String stackedLayoutId = 'L-stack';
 /// plan's §7 sketch suggested "පාළි / සිංහල / පාළි + සිංහල / තට්ටු"; those were
 /// never in the app, and two names for one control is how the two surfaces
 /// start to drift.
-const List<ReadingLayout> readingLayouts = [
+///
+/// `final`, not `const`: an icon's markup is a getter.
+final List<ReadingLayout> readingLayouts = [
   (
     id: paliOnlyLayoutId,
     token: 'paliOnly',
@@ -69,13 +73,13 @@ const List<ReadingLayout> readingLayouts = [
     id: sideBySideLayoutId,
     token: 'sideBySide',
     labelKey: 'layoutSideBySide',
-    glyph: '$_iconFrame<line x1="12" y1="4" x2="12" y2="20"/></svg>',
+    glyph: sideBySideIcon.markup,
   ),
   (
     id: stackedLayoutId,
     token: 'stacked',
     labelKey: 'layoutStacked',
-    glyph: '$_iconFrame<line x1="3" y1="12" x2="21" y2="12"/></svg>',
+    glyph: stackedIcon.markup,
   ),
 ];
 
@@ -96,11 +100,3 @@ const String defaultLayoutId = sideBySideLayoutId;
 /// button is the one that lights. A control that says the page is in a layout
 /// it is not in is worse than one option fewer.
 const String narrowFallbackLayoutId = stackedLayoutId;
-
-/// The shared opening of both layout icons: a page outline, split by one line.
-/// Inline SVG rather than a font or an image — it is ~90 bytes, needs no extra
-/// request, and inherits `currentColor` so the checked state needs no second
-/// asset.
-const String _iconFrame = '<svg class="layout-icon" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">'
-    '<rect x="3" y="4" width="18" height="16" rx="1.5"/>';
