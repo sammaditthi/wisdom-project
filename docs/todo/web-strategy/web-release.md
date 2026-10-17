@@ -49,7 +49,7 @@ Ranked. Only the first is a must.
 |---|---|---|
 | **must** | **C9 — HTML validator over a full build** | The last unshipped verification. Every page comes off one template, so a markup defect ships to the crawler on all of them. Cheap now, a full re-push later. |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
-| should | **B2 + B1 in one deploy** | Toolbar SVGs into the stylesheet, re-cut the emblem. Both edit shared chrome, so shipping them apart pays the full push twice. Do them before the first prod push or well after it, never between. |
+| ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. C2's policy now needs `img-src 'self' data:` (backlog C2). |
 | should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
 | optional | A9 font preload, A8 heading duplication | Small, measure first. |
 

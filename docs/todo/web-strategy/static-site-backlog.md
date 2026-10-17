@@ -372,7 +372,32 @@ Sized but unscoped — decide the derivation before estimating it.
 
 # Part B — Size
 
-## B1. Re-cut `emblem.png` — 47 KB → ~5 KB
+## B1. Re-cut `emblem.png` ✅ **shipped 2026-10-17**, and drawn larger
+
+> **What landed.** The emblem is drawn at **36px**, up from 28: the height of
+> the bar's buttons, picked from screenshots of the real bar at 28, 36, 40 and
+> 44px. It ships as three copies cut 1:1 for 1×, 2× and 3× screens, and
+> `srcset` picks one. Measured 2026-10-17:
+>
+> | | before | after |
+> |---|---|---|
+> | file | one 200×200 PNG, 47,115 B | `emblem.png` 36px 2,787 B · `@2x` 72px 8,383 B · `@3x` 108px 16,298 B |
+> | first visit, 1× / 2× / 3× screen | 47,115 B on all three | **−44 / −39 / −31 KB** |
+>
+> - Cut by `assets/icons/make_icons.sh`, beside the app's emblems, from the
+>   same master with the same resize. `make_emblem.sh` keeps only the og-card.
+> - One `?v=` token for the three copies (`SiteAssets.emblems`), as for the
+>   fonts: one script cuts them together. `emblemSize` in `site_assets.dart`
+>   sizes both the `<img>` and `.home img`.
+> - The 8px it takes from the trail moved the trail's breakpoints by the method
+>   documented on them in `stylesheet.dart`: 55/43/28rem, the layout fold 37rem;
+>   the pill stays at 65rem. Checked in headless Chrome on 80 deep-trail reading
+>   pages just above each step: no more pages dip under the 45px floor than
+>   before (3/6/1/2 against 4/7/2/2).
+> - `srcset` is now read by `check_links.dart`, C1's link scan and `deploy.sh`'s
+>   `?v=` check, and `deploy.sh` requires all three copies.
+>
+> The text below is the case as it was made, kept.
 
 `assets/emblem.png` is a 200×200 RGBA PNG rendered at 28×28 in every toolbar
 (`render/site_chrome.dart:69`). At 47,115 bytes it is the heaviest single thing
@@ -400,7 +425,43 @@ macOS-only. Since 2026-10-14 `assets/icons/make_icons.sh` (Pillow, any OS) cuts
 the app's small emblems and the favicon the site already uses, so the toolbar
 mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
 
-## B2. Move the toolbar SVG icons into the stylesheet — ~24 MB
+## B2. Move the toolbar SVG icons into the stylesheet ✅ **shipped 2026-10-17**
+
+> **What landed.** Every icon is an empty `aria-hidden` `<span>`, painted by a
+> `mask` in `site.css`. `render/site_icons.dart` holds each shape once; the
+> markup emits `SiteIcon.markup` and the stylesheet walks `siteIcons` for the
+> `data:` URLs, so a class cannot be renamed on one side only. Full builds
+> before and after, 2026-10-17, brotli quality 11, shipped with B1:
+>
+> | | before | after |
+> |---|---|---|
+> | inline `<svg>` bytes | 2,641 B on every reading page | **0** |
+> | build | 435.8 MB | **418.6 MB** (−17.2 MB) |
+> | median reading page (`an-5-1-5-3`) | 27,692 raw · 4,141 brotli | 25,809 raw · 3,833 brotli |
+> | brotli per reading page, 300 sampled | — | **−293 B** median (256–331), 7% |
+> | `site.css` brotli, fetched once | 3,181 B | 3,699 B (+518) |
+>
+> **Less than the ~24 MB below**, which was the SVG bytes alone: the spans and
+> B1's `srcset` give back ~760 B a reading page.
+>
+> Checked in headless Chromium against a build from before the change, at 390,
+> 700, 1100 and 1280px and 1×–3×, with the ⋮ open, hover, focus, the selected
+> layout, JS off, 200% zoom and the search dialog: no pixel differs by more than
+> 15/255.
+>
+> - **Forced colours.** A masked background is repainted as the page and
+>   vanishes (confirmed). `forced-color-adjust: preserve-parent-color` paints it
+>   in its parent's forced text colour, as the UA does for an inline SVG, and
+>   matches the old bar exactly; `none` comes first as the fallback where that
+>   value is unknown. Not tested in Firefox.
+> - **Print.** `print-color-adjust: exact` keeps the icons when a browser prints
+>   without backgrounds, its default. Checked by printing to PDF.
+> - **CSP.** C2's policy as drafted blocks every mask (19 violations on a
+>   reading page); with `img-src 'self' data:` there are none. C2 is amended.
+> - **Guarded** by a wiring test: every icon span a page emits has a mask in
+>   `site.css`, every mask is used, and no page carries an `<svg>`.
+>
+> The text below is the case as it was made, kept.
 
 > **Re-measured 2026-10-17** on a full build. The 2026-08-15 figure was 575 B a
 > page for three icons; the search dialog, the ⋮ menu and the "read in the app"
@@ -658,8 +719,12 @@ and `site.js` builds result rows with `createElement`/`textContent` and calls no
 
 ```
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 ```
+
+`img-src 'self' data:` since B2 (2026-10-17): the toolbar icons are `data:`
+masks in `site.css`, and `default-src 'self'` alone blocks every one of them —
+measured in Chrome, not assumed.
 
 `/*` overlaps the two `Cache-Control` rules, which is safe: the merge hazard is
 per header *name*, and this is a different one.
@@ -1063,11 +1128,10 @@ What is left, re-ranked:
 
 1. ~~**C1 the asset-wiring tests** — before the next asset change, not after.~~
    ✅ **done 2026-10-17**, ahead of step 2 as planned.
-2. **B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.* Each is
-   a shared-chrome edit that invalidates every page's hash; shipping them
-   separately pays the full push twice. Together: ~24 MB off the build, ~370 B
-   brotli off every reading page, ~40 KB off first paint. **B1 is unopposed now** — the OG card is
-   its own file, so the emblem's 200px is subsidising nothing.
+2. ~~**B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.*~~
+   ✅ **done 2026-10-17**, together as planned: −17.2 MB off the build, −293 B
+   brotli off every reading page, 31–44 KB off a first visit, and the emblem
+   drawn at 36px. See B1 and B2 for the measurements.
 3. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
    every item below it cheaper to ship. Spec in
    [`web-release.md`](./web-release.md) §5.
