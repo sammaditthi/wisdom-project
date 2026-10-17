@@ -347,12 +347,13 @@ void main() {
 
         // ACT: a jump, as a search hit or a restore makes. Not the reader's
         // own scrolling, so the toolbar stays.
-        controller.jumpTo(vpDim);
+        controller.jumpTo(vpDim * 2);
         await tester.pump();
         expect(toolbar, findsOneWidget,
             reason: 'A programmatic jump must not hide the toolbar');
         expect(goToBeginning, findsOneWidget,
-            reason: 'Mid-sutta the toolbar offers Go to beginning');
+            reason: 'More than a screen down, the toolbar offers Go to '
+                'beginning');
 
         // ACT: the reader reads on, with the mouse wheel.
         await _wheel(tester, 300);
@@ -382,6 +383,17 @@ void main() {
             reason: 'At the beginning Go to beginning has nothing to do');
         expect(toolbar, findsOneWidget,
             reason: 'At the beginning the toolbar shows');
+
+        // ACT: from the top, read on by less than a screen.
+        await _wheel(tester, vpDim / 2);
+
+        // ASSERT: the toolbar hides, and Go to beginning is not added as it
+        // leaves.
+        expect(toolbar, findsNothing,
+            reason: 'Scrolling down past the top hides the toolbar');
+        expect(find.byIcon(Icons.vertical_align_top), findsNothing,
+            reason: 'Less than a screen down, Go to beginning must not join '
+                'the toolbar while it fades out');
       },
     );
   });

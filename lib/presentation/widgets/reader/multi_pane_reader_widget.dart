@@ -66,8 +66,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   // Shared with all pane widgets.
   final EntryKeyRegistry _entryKeyRegistry = EntryKeyRegistry();
 
-  // Tracks whether the user has scrolled away from the top: mid-unit, where
-  // the toolbar offers Go to beginning.
+  // Whether the reader is more than a screen into the unit, where the toolbar
+  // offers Go to beginning. A screen rather than the toolbar's top zone: on a
+  // scroll down the toolbar has faded out before the button joins it, and
+  // nearer the top it isn't needed.
   // Updated in _onScroll; only calls setState when the value actually changes.
   bool _isScrolledDown = false;
 
@@ -135,8 +137,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     }
   }
 
-  /// Syncs what follows the scroll position, however it moved: mid-unit or
-  /// not, the toolbar's top and end rule ([ToolbarAutoHide.scrolledTo]), and
+  /// Syncs what follows the scroll position, however it moved: a screen down
+  /// or not, the toolbar's top and end rule ([ToolbarAutoHide.scrolledTo]), and
   /// the app bar's "scrolled under" tint ([readerScrolledUnderProvider]).
   ///
   /// All read `extentBefore`, never `pixels`: offset 0 is the anchor row,
@@ -149,7 +151,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     final position = _scrollController.position;
     final extentBefore = position.extentBefore;
 
-    final scrolledDown = extentBefore > ToolbarAutoHide.topZone;
+    final scrolledDown = extentBefore > position.viewportDimension;
     final toolbarChanged = _toolbarAutoHide.scrolledTo(position);
     if (scrolledDown != _isScrolledDown || toolbarChanged) {
       setState(() => _isScrolledDown = scrolledDown);
