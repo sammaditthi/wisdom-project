@@ -61,15 +61,19 @@ const String upLabel = 'ඉහළ';
 /// that stops being a link on one page is the odder behaviour, and the
 /// alternative costs a branch through every caller to save one anchor.
 ///
-/// The emblem's URL arrives from [SiteAssets] rather than being written here:
-/// it carries a hash of the image, which only the build that read the bytes can
-/// know.
+/// The emblem's URLs arrive from [SiteAssets] rather than being written here:
+/// they carry a hash of the images, which only the build that read the bytes
+/// can know. `src` is the 1× copy; `srcset` offers the denser ones.
 String homeLink(SiteBuild build) {
   final label = build.strings.html(homeLabelKey);
+  final emblems = build.assets.emblems;
+  final srcset = [
+    for (var i = 1; i < emblems.length; i++) '${emblems[i]} ${i + 1}x',
+  ].join(', ');
   return '<a class="home" href="/" '
       'title="$label">'
-      '<img src="${build.assets.emblem}" width="28" height="28" '
-      'alt="$label"></a>';
+      '<img src="${emblems.first}" srcset="$srcset" '
+      'width="$emblemSize" height="$emblemSize" alt="$label"></a>';
 }
 
 /// The trail: home, the ancestors, and the page itself.

@@ -1,5 +1,6 @@
 import '../domain/theme_tokens.dart';
 import 'reading_layouts.dart';
+import 'site_assets.dart';
 import 'site_icons.dart';
 import 'web_fonts.dart';
 
@@ -135,29 +136,36 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// folds into the ⋮ instead, taking 124px and its `gap` out of the bar:
 /// 573.6 − 134.8 = 438.8 → **28rem**.
 ///
+/// ## B1's larger emblem moved them by 8px
+///
+/// The emblem went from 28px to 36px: 8px more of the trail that never gives
+/// way, so the same method again. 861.6 → 869.6 → **55rem**, 669.6 → 677.6 →
+/// **43rem**, the fold 573.6 → 581.6 → **37rem**; 438.8 → 446.8 still rounds
+/// to **28rem**.
+///
 /// ## What it costs on a phone
 ///
 /// A tap: the layout buttons are in the ⋮ menu. In return the trail gets ~214px
-/// at 390px; emblem 28 and the leaf's 14px of padding leave ~172px for the
+/// at 390px; emblem 36 and the leaf's 14px of padding leave ~164px for the
 /// page's own name against a 126px median.
 ///
 /// [_trailKeepThree] no longer coincides with [_twoColumnMinWidth], as it did
 /// at 48rem through P3. That was arithmetic, not sharing — the two answer
 /// different questions, and this is the first of them to move.
-const String _trailKeepThree = '54rem';
-const String _trailKeepOne = '42rem';
+const String _trailKeepThree = '55rem';
+const String _trailKeepOne = '43rem';
 const String _trailKeepNone = '28rem';
 
 /// At and below this the layout group moves into the ⋮ menu — where the trail
 /// would otherwise drop its last ancestor. See [_trailKeepThree].
-const String _layoutsFoldWidth = '36rem';
+const String _layoutsFoldWidth = '37rem';
 
 /// From here up the bar shows the "read in the app" pill; below it, a ⋮ menu.
 ///
 /// Set so the trail never has less room with the pill than it had with the ⋮
 /// at [_trailKeepThree]. Measured in Chrome: the pill is 187.4px, so hairline,
-/// pill and two `gap`s pin 210px where the ⋮ pinned 46.8. 861.6 + 163.2 =
-/// 1024.8px, rounded up to the next whole rem (16px in a media query).
+/// pill and two `gap`s pin 210px where the ⋮ pinned 46.8. 869.6 + 163.2 =
+/// 1032.8px, rounded up to the next whole rem (16px in a media query).
 const String _appPillMinWidth = '65rem';
 
 /// Height of the sticky reader toolbar.
@@ -870,7 +878,7 @@ void _writeToolbarNav(StringBuffer css) {
   // The vertical padding is slack for `overflow: hidden`. `line-height: 1` sets
   // the box to the em, and Sinhala ink runs taller than its em, so without this
   // each segment would shave the marks off its own text. 6px keeps the box at
-  // ~24px, still under the 28px emblem, so the bar's height is untouched.
+  // ~24px, still under the 36px emblem, so the bar's height is untouched.
   css.writeln('.breadcrumb > :not(.home) {');
   css.writeln('  position: relative;');
   css.writeln('  min-width: 0;');
@@ -920,7 +928,8 @@ void _writeToolbarNav(StringBuffer css) {
   // `.breadcrumb`'s padding box and clipped by its `overflow: hidden`.
   css.writeln('.home:focus-visible '
       '{ ${_focusRing()} border-radius: 8px; }');
-  css.writeln('.home img { display: block; width: 28px; height: 28px; }');
+  css.writeln('.home img '
+      '{ display: block; width: ${emblemSize}px; height: ${emblemSize}px; }');
   css.writeln();
   // Where compressing stops paying and dropping starts. Derivation and the
   // measurements behind each width are on [_trailKeepThree] and its two

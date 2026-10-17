@@ -346,9 +346,9 @@ fi
 # to index anything. Every value below comes from the build, so a mismatch is
 # always a bug in the build.
 
-# The four committed inputs (make_emblem.sh's rasters, make_icons.sh's favicon,
-# site.js by hand). The generator only warns about a missing one —
-# sitegen.dart's _readPackageAsset — and a warning in a 10,000-page build
+# The committed inputs (make_emblem.sh's card, make_icons.sh's three emblem
+# copies and favicon, site.js by hand). The generator only warns about a missing
+# one — sitegen.dart's _readPackageAsset — and a warning in a 10,000-page build
 # scrolls past. None makes a page wrong, which is exactly why they need
 # catching here: SiteAssets emits the URL from whatever bytes it got, so an
 # absent file 404s on every page at once.
@@ -361,13 +361,15 @@ if [ ! -f "$OUT/assets/site.js" ]; then
   echo "       Restore static_site_generator/assets/site.js. Nothing uploaded." >&2
   exit 1
 fi
-if [ ! -f "$OUT/assets/emblem.png" ]; then
-  echo "error: $OUT/assets/emblem.png is missing — the toolbar's home link" >&2
-  echo "       would show a broken image on every page. Run" >&2
-  echo "       static_site_generator/assets/make_emblem.sh and commit its" >&2
-  echo "       output. Nothing uploaded." >&2
-  exit 1
-fi
+for EMBLEM in emblem.png emblem@2x.png emblem@3x.png; do
+  if [ ! -f "$OUT/assets/$EMBLEM" ]; then
+    echo "error: $OUT/assets/$EMBLEM is missing — the toolbar's home link" >&2
+    echo "       would show a broken image on every page. Run" >&2
+    echo "       assets/icons/make_icons.sh and commit its output." >&2
+    echo "       Nothing uploaded." >&2
+    exit 1
+  fi
+done
 if [ ! -f "$OUT/assets/og-card.png" ]; then
   echo "error: $OUT/assets/og-card.png is missing — every page would point" >&2
   echo "       og:image at a 404, so every shared link previews as a bare" >&2
@@ -483,11 +485,12 @@ fi
 # cached immutable for a year, so a link without one stays stale on readers'
 # disks for that year and no purge reaches it. asset_wiring_test.dart checks
 # the hashes on a subtree; this checks every page that ships. Only text after a
-# quote or `(` is a link: the stylesheet's header comment names assets/ too.
+# quote, `(` or a srcset's `, ` is a link: the stylesheet's header comment names
+# assets/ too.
 UNVERSIONED=$(LC_ALL=C grep -rhoE \
-  "[\"'(](https?://[^/\"']+)?(\.\.)?/(assets|fonts)/[^\"'()<>[:space:]]+" \
+  "([\"'(]|, )(https?://[^/\"']+)?(\.\.)?/(assets|fonts)/[^\"'()<>[:space:]]+" \
   "$OUT" --include='*.html' --include='*.css' | grep -vF '?v=' \
-  | sed -E "s/^[\"'(]//" | sort -u || true)
+  | sed -E "s/^([\"'(]|, )//" | sort -u || true)
 if [ -n "$UNVERSIONED" ]; then
   echo "error: asset links without a ?v= content hash:" >&2
   printf '%s\n' "$UNVERSIONED" | head -5 | sed 's/^/       /' >&2

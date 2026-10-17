@@ -1,19 +1,20 @@
 #!/bin/bash
 
-# Raster derivatives for the static site.
+# The static site's link-preview card.
 # Requires: sips (ships with macOS — no install, no Python, no Node).
 #
 # Emits:
-#   emblem.png    200x200,  ~47 KB  ->  build/assets/emblem.png   (toolbar mark)
 #   og-card.png   1200x630, ~197 KB ->  build/assets/og-card.png  (link previews)
 #
-# Why derivatives and not the source. assets/icons/app_logo.png is a
-# 1024x1024, 634 KB master. The site ships one stylesheet, eight woff2 subsets
-# and no rasters at all otherwise, so shipping the master would make it the
-# single heaviest asset on the site — 13x the weight of everything else put
-# together, to paint the 28px mark at the left of the toolbar.
+# The toolbar emblem used to come from here too, as one 200px square. It is now
+# cut at 36px with 2x and 3x copies by assets/icons/make_icons.sh, beside the
+# app's emblems and from the same master (backlog B1).
 #
-# Like the fonts, these are build INPUTS: run this by hand, commit the output,
+# Why a derivative and not the source. assets/icons/app_logo.png is a
+# 1024x1024, 634 KB master, and shipping it would make it the heaviest asset on
+# the site.
+#
+# Like the fonts, this is a build INPUT: run this by hand, commit the output,
 # and the generator copies the bytes. That keeps image tooling out of the build
 # loop, which stays pure Dart (D9).
 
@@ -22,24 +23,6 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 SOURCE="../../assets/icons/app_logo.png"
-
-# --- The toolbar mark -------------------------------------------------------
-#
-# 200px is larger than the one use needs. It was first sized against a 100px
-# landing-page hero (2x for retina); that hero was withdrawn with P3's nav rail,
-# and the emblem now renders at 28px on every page instead. 256px was measured
-# too (70,801 bytes against 47,115) and buys resolution nothing on the site
-# asks for.
-#
-# It stayed at 200 for two reasons, and P5 retired one of them: the bytes are
-# paid once and cached site-wide, AND "P5's OG card wants a raster larger than
-# the bar does". The card below is its own file now — an OG image wants ~1200x630
-# and a 200px square is the wrong shape at any size — so the toolbar mark is
-# subsidising nothing, and backlog B1's case for re-cutting it to 56px is
-# unopposed. That is a shared-chrome change belonging with B2; it is not done
-# here.
-EMBLEM="emblem.png"
-EMBLEM_SIZE=200
 
 # --- The link-preview card --------------------------------------------------
 #
@@ -77,9 +60,6 @@ report() {
   echo "$1  $(sips -g pixelWidth -g pixelHeight "$1" \
     | awk '/pixel/ { printf "%s ", $2 }')px  $(wc -c < "$1" | tr -d ' ') bytes"
 }
-
-sips -Z "$EMBLEM_SIZE" "$SOURCE" --out "$EMBLEM" >/dev/null
-report "$EMBLEM"
 
 # Two passes, because sips resizes or pads in one invocation but not both: the
 # first fixes how big the mark is, the second decides how much paper is around

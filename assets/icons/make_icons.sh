@@ -9,10 +9,13 @@
 #                384px copies in 2.0x/, 3.0x/ and 4.0x/ for sharper screens.
 #   favicon.png  32px, the centre disc only (the outer ring is noise at tab
 #                size), into web/. The static site reads that same file.
+#   emblem.png   the static site's toolbar mark, drawn at 36px, into
+#                static_site_generator/assets/, with emblem@2x.png and
+#                emblem@3x.png beside it for srcset. PNG, which every browser
+#                reads.
 #
 # Run by hand and commit the output, like ../fonts/subset_fonts.sh.
-# The site's emblem.png and og-card.png come from
-# static_site_generator/assets/make_emblem.sh.
+# The site's og-card.png comes from static_site_generator/assets/make_emblem.sh.
 
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -43,6 +46,14 @@ ImageDraw.Draw(mask).ellipse((0, 0, size * 4 - 1, size * 4 - 1), fill=255)
 mask = mask.resize((size, size), Image.LANCZOS)
 disc.putalpha(Image.composite(disc.getchannel("A"), Image.new("L", (size, size), 0), mask))
 disc.resize((32, 32), Image.LANCZOS).save("../../web/favicon.png")
+
+# The site's toolbar mark, drawn 1:1 on 1x-3x screens like AppEmblem's copies.
+# 36 is emblemSize in static_site_generator/lib/render/site_assets.dart.
+for scale in (1, 2, 3):
+    suffix = "" if scale == 1 else f"@{scale}x"
+    logo.resize((36 * scale, 36 * scale), Image.LANCZOS).save(
+        f"../../static_site_generator/assets/emblem{suffix}.png", optimize=True)
 PY
 
-echo "Wrote emblem.webp, its 2.0x/ 3.0x/ 4.0x/ copies and web/favicon.png"
+echo "Wrote emblem.webp, its 2.0x/ 3.0x/ 4.0x/ copies, web/favicon.png and"
+echo "the site's emblem.png, emblem@2x.png and emblem@3x.png"

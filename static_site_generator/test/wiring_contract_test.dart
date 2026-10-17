@@ -715,6 +715,41 @@ void main() {
           reason: 'These rules act on ${acted.difference(emitted)}, which a '
               'reading page does not emit.');
     });
+
+    test('every icon a page emits has a mask in the stylesheet, and back', () {
+      // An icon is an empty span painted by its mask (backlog B2). A class
+      // renamed on one side only leaves a blank square on every page, and a
+      // rule that matches nothing is not an error.
+      final pages = [
+        _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()}),
+        _render(_tocPage),
+        LandingPage(roots: _tree.roots, build: _build).render(),
+      ];
+      final masked = _classesOfRulesDeclaring(css, '--icon: url("data:');
+      final painted = _classesOfRulesDeclaring(css, 'mask: var(--icon)');
+      expect(masked, isNotEmpty, reason: 'No icon has a mask at all.');
+      expect(painted, containsAll(masked),
+          reason: 'Masks with no rule to paint them: '
+              '${masked.difference(painted)}.');
+
+      final emitted = <String>{};
+      for (final html in pages) {
+        expect(html, isNot(contains('<svg')),
+            reason: 'An icon went back to inline SVG on every page.');
+        for (final match
+            in RegExp(r'<span class="([^"]*-icon[^"]*)"([^>]*)>(.*?)</span>')
+                .allMatches(html)) {
+          final classes = match.group(1)!.split(' ').toSet();
+          expect(classes.intersection(masked), isNotEmpty,
+              reason: '<span class="${match.group(1)}"> has no mask.');
+          expect(match.group(2), ' aria-hidden="true"');
+          expect(match.group(3), isEmpty);
+          emitted.addAll(classes);
+        }
+      }
+      expect(emitted, containsAll(masked),
+          reason: 'Masks no page uses: ${masked.difference(emitted)}.');
+    });
   });
 
   // The same class of bug as the stylesheet contract above, in the other
@@ -910,7 +945,11 @@ void main() {
         String css = 'a{}',
         String script = 's',
         String searchIndex = '[]',
-        List<int> emblem = const [1],
+        List<List<int>> emblems = const [
+          [1],
+          [4],
+          [5],
+        ],
         List<int> ogCard = const [2],
         List<int> favicon = const [3],
       }) =>
@@ -918,7 +957,7 @@ void main() {
             css: css,
             script: script,
             searchIndex: searchIndex,
-            emblem: emblem,
+            emblems: emblems,
             ogCard: ogCard,
             favicon: favicon,
           );
@@ -939,7 +978,15 @@ void main() {
       // fresh script can pair with a cached index.
       expect(moved(assetsWith(script: 't')), {'script', 'searchIndex'});
       expect(moved(assetsWith(searchIndex: '[1]')), {'script', 'searchIndex'});
-      expect(moved(assetsWith(emblem: const [9])), {'emblem'});
+      // One token for the three copies, as for the fonts: they are cut
+      // together, so any one of them moving moves all three.
+      expect(
+          moved(assetsWith(emblems: const [
+            [1],
+            [9],
+            [5],
+          ])),
+          {'emblems[0]', 'emblems[1]', 'emblems[2]'});
       expect(moved(assetsWith(ogCard: const [9])), {'ogCard'});
       expect(moved(assetsWith(favicon: const [9])), {'favicon'});
     });
@@ -950,7 +997,7 @@ void main() {
             css: '',
             script: script,
             searchIndex: searchIndex,
-            emblem: const [],
+            emblems: const [],
             ogCard: const [],
             favicon: const [],
           );
@@ -1158,7 +1205,11 @@ const SiteAssets _assets = SiteAssets(
   stylesheet: '/assets/site.css?v=test',
   script: '/assets/site.js?v=test',
   searchIndex: '/assets/search-index.json?v=test',
-  emblem: '/assets/emblem.png?v=test',
+  emblems: [
+    '/assets/emblem.png?v=test',
+    '/assets/emblem@2x.png?v=test',
+    '/assets/emblem@3x.png?v=test',
+  ],
   ogCard: '/assets/og-card.png?v=test',
   favicon: '/assets/favicon.png?v=test',
 );
@@ -1448,6 +1499,19 @@ List<String> _rulesSelectingOn(String css, Pattern marker) {
   }
   return selectors;
 }
+
+/// Every class in the selector of a rule whose body contains [declaration].
+///
+/// Exact here for the same reasons as [_rulesSelectingOn]: comments are
+/// stripped, and no rule's body holds a brace.
+Set<String> _classesOfRulesDeclaring(String css, String declaration) => {
+      for (final rule in RegExp(r'([^{}]*)\{([^{}]*)\}')
+          .allMatches(css.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')))
+        if (rule.group(2)!.contains(declaration))
+          ...RegExp(r'\.([\w-]+)')
+              .allMatches(rule.group(1)!)
+              .map((match) => match.group(1)!),
+    };
 
 /// The class list of each `.row`, in document order, with the leading `row`
 /// stripped — `['col-heads', '', 'no-si']`.

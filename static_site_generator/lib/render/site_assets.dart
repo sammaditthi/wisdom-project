@@ -6,17 +6,17 @@
 /// is what makes each URL change when its bytes do — computed by the build,
 /// with nothing for anyone to remember.
 ///
-/// Seven files, six tokens:
+/// Nine files, six tokens:
 ///
-/// | file                | token                                     |
-/// |---------------------|-------------------------------------------|
-/// | `site.css`          | hash of the CSS                           |
-/// | `site.js`           | hash of the script **and** the index      |
-/// | `search-index.json` | the same hash                             |
-/// | `emblem.png`        | hash of the image                         |
-/// | `og-card.png`       | hash of the image                         |
-/// | `favicon.png`       | hash of the image                         |
-/// | `fonts/*.woff2`     | one hash of all eight faces, in the CSS   |
+/// | file                       | token                                   |
+/// |----------------------------|-----------------------------------------|
+/// | `site.css`                 | hash of the CSS                         |
+/// | `site.js`                  | hash of the script **and** the index    |
+/// | `search-index.json`        | the same hash                           |
+/// | `emblem.png`, `@2x`, `@3x` | one hash of all three copies            |
+/// | `og-card.png`              | hash of the image                       |
+/// | `favicon.png`              | hash of the image                       |
+/// | `fonts/*.woff2`            | one hash of all eight faces, in the CSS |
 ///
 /// ## Why not a hand-bumped token
 ///
@@ -61,7 +61,8 @@
 /// and the class it matches ship together or the page renders broken, and that
 /// is a question about the CSS alone. The fonts share one token because
 /// `subset_fonts.sh` regenerates all eight together, and eight tokens would be
-/// eight answers to one question.
+/// eight answers to one question; the emblem's copies share one because
+/// `make_icons.sh` cuts all three together.
 ///
 /// ## What it costs
 ///
@@ -91,35 +92,39 @@ const String assetsOutputDir = 'assets';
 /// URLs above are built from. **Paths, not URLs**: each URL carries a query
 /// string that no file on disk ever will.
 ///
-/// All six here rather than beside the code that generates each one, because
-/// the caching rule has to name the directory they share and deriving that from
-/// one of them would make the other five look independent of it.
+/// All here rather than beside the code that generates each one, because the
+/// caching rule has to name the directory they share and deriving that from one
+/// of them would make the others look independent of it. The emblem's copies
+/// are under [emblemFileNames].
 const String stylesheetOutputPath = '$assetsOutputDir/site.css';
 const String siteScriptOutputPath = '$assetsOutputDir/$siteScriptFileName';
 const String searchIndexOutputPath = '$assetsOutputDir/search-index.json';
-const String emblemOutputPath = '$assetsOutputDir/$emblemFileName';
 const String ogCardOutputPath = '$assetsOutputDir/$ogCardFileName';
 const String faviconOutputPath = '$assetsOutputDir/$faviconFileName';
 
 /// The site's one script, under the generator's `assets/` and the output's.
 const String siteScriptFileName = 'site.js';
 
-/// A committed 200×200 derivative of `assets/icons/app_logo.png`, produced by
-/// `static_site_generator/assets/make_emblem.sh` — see that script for why the
-/// 634 KB source is never shipped.
-///
-/// Named separately from its output path because it is a file the build
-/// *copies*: the name is read from the generator's own `assets/` as well as
-/// written to the output's.
-const String emblemFileName = 'emblem.png';
+/// The toolbar emblem's width and height in CSS pixels.
+const int emblemSize = 36;
 
-/// A committed 1200×630 link-preview card, from the same script and the same
-/// source as [emblemFileName].
+/// The toolbar emblem at [emblemSize] for 1×, 2× and 3× screens, in that order:
+/// committed copies of `assets/icons/app_logo.png`, cut by
+/// `assets/icons/make_icons.sh`, each drawn 1:1 on its screen.
+///
+/// File names, not paths: the build reads each from the generator's own
+/// `assets/` and writes it to the output's [assetsOutputDir].
+const List<String> emblemFileNames = [
+  'emblem.png',
+  'emblem@2x.png',
+  'emblem@3x.png',
+];
+
+/// A committed 1200×630 link-preview card, from
+/// `static_site_generator/assets/make_emblem.sh` and the emblem's master.
 ///
 /// Its own file rather than a second use of the emblem: an OG image wants
-/// 1.91:1 at ~1200px, so a 200px square is the wrong shape at any size. That is
-/// also what frees the emblem to be re-cut (backlog B1) — it was kept large
-/// partly to serve this, and no longer serves it.
+/// 1.91:1 at ~1200px, so a square is the wrong shape at any size.
 ///
 /// The only asset here that no page's *rendering* depends on. It is fetched by
 /// link scrapers, so a missing one costs a bare URL in a WhatsApp message
@@ -146,8 +151,8 @@ class SiteAssets {
   /// `/assets/search-index.json?v=<the same hash>`.
   final String searchIndex;
 
-  /// `/assets/emblem.png?v=<hash of the image>`.
-  final String emblem;
+  /// `/assets/<copy>?v=<one hash of all three>`, in [emblemFileNames] order.
+  final List<String> emblems;
 
   /// `/assets/og-card.png?v=<hash of the image>`.
   ///
@@ -164,14 +169,14 @@ class SiteAssets {
     required this.stylesheet,
     required this.script,
     required this.searchIndex,
-    required this.emblem,
+    required this.emblems,
     required this.ogCard,
     required this.favicon,
   });
 
   /// Derives every URL from the bytes that will be written.
   ///
-  /// [script], [emblem], [ogCard] and [favicon] are files the build *copies*
+  /// [script], [emblems], [ogCard] and [favicon] are files the build *copies*
   /// rather than generates, and any of them can be absent — the case
   /// `SiteGenerator` already warns about. An absent one arrives here empty: the
   /// URL is still emitted and still 404s, exactly as before, and the build
@@ -184,22 +189,23 @@ class SiteAssets {
     required String css,
     required String script,
     required String searchIndex,
-    required List<int> emblem,
+    required List<List<int>> emblems,
     required List<int> ogCard,
     required List<int> favicon,
   }) {
     final searchVersion = contentHash('$script$_nul$searchIndex');
+    final emblemVersion = _hashOfAll(emblems);
     return SiteAssets(
       stylesheet: '/$stylesheetOutputPath?v=${contentHash(css)}',
       script: '/$siteScriptOutputPath?v=$searchVersion',
       searchIndex: '/$searchIndexOutputPath?v=$searchVersion',
-      emblem: '/$emblemOutputPath?v=${contentHashOfBytes(emblem)}',
-      // Its own token, not the emblem's, even though one script writes both
-      // from one source. The fonts share a token because `subset_fonts.sh`
-      // regenerates all eight together and eight answers to one question is
-      // eight chances to disagree; these two are re-cut independently — B1
-      // moves the emblem and leaves the card exactly as it is — so a shared
-      // token would change a URL whose bytes did not.
+      emblems: [
+        for (final name in emblemFileNames)
+          '/$assetsOutputDir/$name?v=$emblemVersion',
+      ],
+      // Its own token, not the emblem's, though both are cut from one master:
+      // different scripts re-cut them independently, so a shared token would
+      // change a URL whose bytes did not.
       ogCard: '/$ogCardOutputPath?v=${contentHashOfBytes(ogCard)}',
       favicon: '/$faviconOutputPath?v=${contentHashOfBytes(favicon)}',
     );
@@ -217,8 +223,11 @@ class SiteAssets {
 /// already a loud warning in `SiteGenerator._readFonts`; leaving it out of the
 /// token as well means the build that ships seven faces and the build that
 /// ships eight do not claim to be the same fonts.
-String fontsVersion(Iterable<List<int>> faces) =>
-    contentHash(faces.map(contentHashOfBytes).join(_nul));
+String fontsVersion(Iterable<List<int>> faces) => _hashOfAll(faces);
+
+/// One token for files regenerated together: a hash of their hashes.
+String _hashOfAll(Iterable<List<int>> files) =>
+    contentHash(files.map(contentHashOfBytes).join(_nul));
 
 /// Separator between two hashed inputs, so bytes cannot migrate across the
 /// join and hash the same. Neither UTF-8 JSON, JavaScript source, nor a hex
