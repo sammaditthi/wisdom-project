@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
+import '../../../core/theme/app_menu_theme.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../providers/overlay_stack_provider.dart';
 import '../../providers/search_provider.dart';
 import '../../providers/search_state.dart';
+import '../common/dismissible_menu_anchor.dart';
 import '../common/pill_chip.dart';
 
 /// How the words of a multi-word query sit together.
@@ -35,44 +36,11 @@ final _severalWords = RegExp(r'\s\S');
 
 /// "Starts with ▾" in the filter row. Its label names the current match
 /// options; tapping it opens the menu that changes them.
-class MatchOptionsButton extends ConsumerStatefulWidget {
+class MatchOptionsButton extends ConsumerWidget {
   const MatchOptionsButton({super.key});
 
   @override
-  ConsumerState<MatchOptionsButton> createState() => _MatchOptionsButtonState();
-}
-
-class _MatchOptionsButtonState extends ConsumerState<MatchOptionsButton> {
-  static const _overlayId = 'match-options-menu';
-
-  final _menuController = MenuController();
-  // Lets the arrow keys move from the button into the menu.
-  final _buttonFocusNode = FocusNode(debugLabel: 'MatchOptionsButton');
-
-  // Captured in initState: dispose() can't use `ref`.
-  late final OverlayStackNotifier _overlayStack;
-
-  @override
-  void initState() {
-    super.initState();
-    _overlayStack = ref.read(overlayStackProvider.notifier);
-  }
-
-  @override
-  void dispose() {
-    // A menu closed because its button went away doesn't call onClose.
-    // Riverpod forbids changing a provider while the tree is torn down, so
-    // drop the entry once this frame ends.
-    final stack = _overlayStack;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (stack.mounted) stack.remove(_overlayId);
-    });
-    _buttonFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final label = ref.watch(searchStateProvider.select(_labelOf));
@@ -85,35 +53,16 @@ class _MatchOptionsButtonState extends ConsumerState<MatchOptionsButton> {
       _Placement.near => '$match · ${l10n.matchNearShort(label.distance!)}',
     };
 
-    return MenuAnchor(
-      controller: _menuController,
-      childFocusNode: _buttonFocusNode,
-      alignmentOffset: const Offset(0, 4),
-      // On the ESC stack while open, so ESC closes the menu and not the
-      // results panel under it.
-      onOpen: () => _overlayStack.push(
-        DismissibleOverlay(id: _overlayId, dismiss: _menuController.close),
-      ),
-      onClose: () => _overlayStack.remove(_overlayId),
-      style: MenuStyle(
-        backgroundColor: WidgetStatePropertyAll(colors.surface),
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 8),
-        ),
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: colors.outline),
-          ),
-        ),
-      ),
+    // On the ESC stack while open, so ESC closes the menu and not the
+    // results panel under it.
+    return DismissibleMenuAnchor(
+      overlayId: 'match-options-menu',
       menuChildren: const [_MatchMenu()],
-      builder: (context, controller, child) => Tooltip(
+      builder: (context, controller, focusNode) => Tooltip(
         message: l10n.matchOptions,
         child: TextButton(
-          focusNode: _buttonFocusNode,
-          onPressed: () =>
-              controller.isOpen ? controller.close() : controller.open(),
+          focusNode: focusNode,
+          onPressed: controller.toggle,
           style: PillChip.styleOf(
             context,
             selected: false,
@@ -193,7 +142,7 @@ class _MatchMenu extends ConsumerWidget {
           tooltip: l10n.matchWholeWordHint,
         ),
         if (options.severalWords) ...[
-          const Divider(height: 13),
+          const Divider(height: AppMenuTheme.dividerHeight),
           _SectionLabel(l10n.matchHowWordsSit),
           _MatchOption<_Placement>(
             value: _Placement.phrase,
@@ -228,7 +177,7 @@ class _MatchMenu extends ConsumerWidget {
             onChanged: (distance) => setNear(distance: distance),
           ),
         ],
-        const Divider(height: 13),
+        const Divider(height: AppMenuTheme.dividerHeight),
         MenuItemButton(
           closeOnActivate: false,
           onPressed: isDefault
@@ -300,7 +249,8 @@ class _MatchOption<T> extends StatelessWidget {
         onChanged: (_) => onSelected(value),
         closeOnActivate: false,
         style: MenuItemButton.styleFrom(
-          backgroundColor: selected ? colors.surfaceContainerLow : null,
+          backgroundColor:
+              selected ? AppMenuTheme.selectedRowColor(colors) : null,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         child: SizedBox(

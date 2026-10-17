@@ -299,5 +299,4 @@ String _layoutGroup(SiteBuild build) {
 String _appLink(String url, SiteBuild build, {bool pill = false}) =>
     '<a class="app-link${pill ? ' app-pill' : ''}" href="$url" '
     'target="_blank" rel="noopener">'
-    '${appIcon.markup}<span>${build.strings.html('readInApp')}</span>'
-    '${newTabIcon.markup}</a>';
+    '<span>${build.strings.html('readInApp')}</span>${newTabIcon.markup}</a>';

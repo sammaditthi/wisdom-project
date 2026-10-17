@@ -43,11 +43,11 @@ accounts**.
 
 ## 1. Before the release build
 
-Ranked. Only the first is a must.
+Ranked. Nothing left on it is a must.
 
 | | item | why |
 |---|---|---|
-| **must** | **C9 — HTML validator over a full build** | The last unshipped verification. Every page comes off one template, so a markup defect ships to the crawler on all of them. Cheap now, a full re-push later. |
+| ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh`, on every deploy (§2). |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
 | ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. C2's policy now needs `img-src 'self' data:` (backlog C2). |
 | should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
@@ -73,6 +73,9 @@ both, so what ships is always the whole corpus and always checked:**
 - `check_links.dart` — every internal reference and every `#fragment` resolves,
   case-exact, no duplicate ids; it fails on zero links or zero fragments, so a
   pattern that stops matching cannot pass by checking nothing
+- `check_markup.dart` — every page parses with no HTML5 parse error, so no
+  unclosed or misnested element and no `<head>` closed early ahead of its
+  canonical (backlog C9). Runs on every deploy, partial builds included
 
 **By hand, once:**
 
@@ -155,7 +158,7 @@ don't re-derive it:
 | job | runs |
 |---|---|
 | every push / PR | `scripts/test_all.sh --quick` |
-| release | `scripts/static_site/deploy.sh --prod --yes` — full `static_site/test.sh`, build, `check_links.dart`, the HTML validator once it exists, upload |
+| release | `scripts/static_site/deploy.sh --prod --yes` — full `static_site/test.sh`, build, `check_links.dart`, `check_markup.dart`, upload |
 | integration (optional, macOS runner) | build the databases (`tools/`), then `scripts/app/test.sh` |
 
 The push/PR job is the half that catches the silent failures. Build it first,

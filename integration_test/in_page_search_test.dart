@@ -22,13 +22,13 @@ void main() {
     /// Opens the in-page search bar.
     ///
     /// In production this is wired to the [Icons.search] button in
-    /// [ReaderActionButtonGroup], but that button is gated on the reader
-    /// having visible content AND not being scrolled down AND not being past
-    /// the sutta beginning — all wrapped in an [IgnorePointer] /
-    /// [AnimatedOpacity] pair. Under integration-test timing (cold-load,
-    /// content fetched off the bundle, opacity animation) the icon is not
-    /// reliably hit-testable on the first frame after [openTab] settles,
-    /// which made [find.byIcon(Icons.search)] flake with "0 widgets".
+    /// [ReaderActionToolbar], but that button is gated on the reader
+    /// having visible content AND the toolbar not being hidden by scrolling
+    /// — all wrapped in an [IgnorePointer] / [AnimatedOpacity] pair. Under
+    /// integration-test timing (cold-load, content fetched off the bundle,
+    /// opacity animation) the icon is not reliably hit-testable on the first
+    /// frame after [openTab] settles, which made [find.byIcon(Icons.search)]
+    /// flake with "0 widgets".
     ///
     /// The other integration tests (e.g. layout_switch_test) already open
     /// search by driving the notifier directly. Mirror that pattern — it's

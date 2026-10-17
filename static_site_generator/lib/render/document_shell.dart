@@ -64,8 +64,8 @@ import 'site_build.dart';
 /// `page_template` and `landing_page` each remembering to append them, which is
 /// two places to forget and one of them is the front page.
 ///
-/// The script is **not** a search script — it resolves `?layout=` too — which
-/// is why it is named and owned here rather than in `search_dialog.dart`.
+/// The script is **not** only a search script — it drives the app link too —
+/// which is why it is named and owned here rather than in `search_dialog.dart`.
 ///
 /// **Last in the body, after `</main>`.** A `<dialog>` renders in the top layer
 /// once `showModal()` runs, so its position in the DOM decides nothing visual —
@@ -203,7 +203,7 @@ String _openGraph({
   return tags.toString();
 }
 
-/// `defer` rather than `async`: the script touches the layout radios, and the
-/// two behave identically for a script this size except that `defer` guarantees
-/// the DOM is parsed, which saves a `DOMContentLoaded` listener.
+/// `defer` rather than `async`: `defer` guarantees the DOM is parsed, which
+/// saves a `DOMContentLoaded` listener. It also runs after first paint, which is
+/// why the layout is restored by the inline `layoutScript` instead.
 String siteScript(String url) => '<script src="$url" defer></script>';

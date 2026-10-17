@@ -35,8 +35,10 @@ Separate Dart package, no Flutter. Builds the public HTML Tipitaka site.
 - Two builds of the same input must produce identical bytes: no timestamps, no
   build ids, no `Map` order reaching the output.
 - Every page must work with JavaScript off. `assets/site.js` is the only
-  script; it holds no Sinhala and no URLs (those arrive on `data-` attributes)
-  and never uses `innerHTML`.
+  script file, and `layoutScript` (`lib/render/reading_layouts.dart`) the only
+  inline one — it sits after the layout radios so a saved layout applies before
+  first paint. Neither holds Sinhala or URLs (those arrive on `data-`
+  attributes) or uses `innerHTML`.
 - Which leaves get their own page is **frozen**, not measured. `foldedLeafKeys`
   (`packages/wisdom_shared/lib/src/grouping/grouping_snapshot.dart`) is the
   single source; the build counts no characters to decide a page. Regenerate

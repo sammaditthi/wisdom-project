@@ -72,9 +72,9 @@ class PaneWidthConstants {
   // which adds it back, cannot drift apart.
   static const double proseColumnGutter = 16.0;
 
-  // Height reserved for the floating action button group at the top of the reader.
-  // Used as a spacer in the ListView so content doesn't hide behind it.
-  static const double readerActionButtonGroupHeight = 44.0;
+  // Height of the reader toolbar. The page list starts with a spacer this tall
+  // so the first line isn't under it.
+  static const double readerToolbarHeight = 44.0;
 }
 
 /// Sizing for the dictionary bottom sheet. Uses adaptive fractions so the

@@ -94,8 +94,8 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// none. Widest first, because each one drops what the one above it kept.
 ///
 /// ⚠️ **Same `rem` trap as [_twoColumnMinWidth].** Inside a media query `rem` is
-/// the initial 16px and ignores `html { font-size: 90% }`, so these are 816px,
-/// 624px and 528px.
+/// the initial 16px and ignores `html { font-size: 90% }`, so these are 960px,
+/// 736px and 496px.
 ///
 /// Derived, not chosen. Beside the trail the bar pins width it never gives
 /// back, and how much depends on which side of 48rem you are on: 305px above
@@ -103,13 +103,14 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// + the four layout buttons 165), and 264px below, where the side-by-side
 /// button is `display: none` and three buttons measure 124. The first step is
 /// set against 305, the other two against 264. Measured across every built page
-/// at the real 12.24px: a leaf name is 126px at the median and 162px at
-/// p75, and a page carries 5 ancestors at the median, 6 at most. An ancestor
-/// squeezed under about 45px is three Sinhala clusters and an ellipsis —
-/// present, unreadable, and standing where the page's own name should be. Each
-/// step is where the ancestors still showing stop clearing that floor. Below
-/// the last one the emblem and the leaf are the whole of what fits, and the up
-/// button is what replaces the parent link that went with them.
+/// at the trail's old 12.24px (see below): a leaf name is 126px at the median
+/// and 162px at p75, and a page carries 5 ancestors at the median, 6 at most.
+/// An ancestor squeezed under about 45px is three Sinhala clusters and an
+/// ellipsis — present, unreadable, and standing where the page's own name
+/// should be. Each step is where the ancestors still showing stop clearing that
+/// floor. Below the last one the emblem and the leaf are the whole of what
+/// fits, and the up button is what replaces the parent link that went with
+/// them.
 ///
 /// ## P4 moved all three, by exactly one control's width
 ///
@@ -136,37 +137,45 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// folds into the ⋮ instead, taking 124px and its `gap` out of the bar:
 /// 573.6 − 134.8 = 438.8 → **28rem**.
 ///
-/// ## B1's larger emblem moved them by 8px
+/// ## The trail's text at 1em moved them again (2026-10-17)
 ///
-/// The emblem went from 28px to 36px: 8px more of the trail that never gives
-/// way, so the same method again. 861.6 → 869.6 → **55rem**, 669.6 → 677.6 →
-/// **43rem**, the fold 573.6 → 581.6 → **37rem**; 438.8 → 446.8 still rounds
-/// to **28rem**.
+/// `.breadcrumb` went from 0.85em (12.24px) to the page's own UI size
+/// (14.4px). The trail scales by 14.4 / 12.24 and the pinned controls do not, so
+/// each step is its pinned width plus the scaled trail, the 28px emblem
+/// excepted: 861.6 → 946.6, 669.6 → 728.0, 438.8 → 480.2, and
+/// [_layoutsFoldWidth] 573.6 → 615.0. Scaled, not re-measured over the corpus.
+///
+/// ## The 36px emblem added 8px (2026-10-17)
+///
+/// 8px more of the trail that never gives way, so the same method again:
+/// 946.6 → 954.6 → **60rem**, 728.0 → 736.0 → **46rem**, 480.2 → 488.2 →
+/// **31rem**, and the fold 615.0 → 623.0 → **39rem**. None crosses a rem; the
+/// pill's step, which adds to the first, does.
 ///
 /// ## What it costs on a phone
 ///
 /// A tap: the layout buttons are in the ⋮ menu. In return the trail gets ~214px
-/// at 390px; emblem 36 and the leaf's 14px of padding leave ~164px for the
-/// page's own name against a 126px median.
+/// at 390px; emblem 36 and the leaf's 17px of padding leave ~161px for the
+/// page's own name against a ~148px median.
 ///
 /// [_trailKeepThree] no longer coincides with [_twoColumnMinWidth], as it did
 /// at 48rem through P3. That was arithmetic, not sharing — the two answer
 /// different questions, and this is the first of them to move.
-const String _trailKeepThree = '55rem';
-const String _trailKeepOne = '43rem';
-const String _trailKeepNone = '28rem';
+const String _trailKeepThree = '60rem';
+const String _trailKeepOne = '46rem';
+const String _trailKeepNone = '31rem';
 
 /// At and below this the layout group moves into the ⋮ menu — where the trail
 /// would otherwise drop its last ancestor. See [_trailKeepThree].
-const String _layoutsFoldWidth = '37rem';
+const String _layoutsFoldWidth = '39rem';
 
 /// From here up the bar shows the "read in the app" pill; below it, a ⋮ menu.
 ///
 /// Set so the trail never has less room with the pill than it had with the ⋮
-/// at [_trailKeepThree]. Measured in Chrome: the pill is 187.4px, so hairline,
-/// pill and two `gap`s pin 210px where the ⋮ pinned 46.8. 869.6 + 163.2 =
-/// 1032.8px, rounded up to the next whole rem (16px in a media query).
-const String _appPillMinWidth = '65rem';
+/// at [_trailKeepThree]. Measured in Chrome (2026-10-17, no book icon): the
+/// pill is 164px and pins 140px more than the ⋮. 954.6 + 140 = 1094.6px,
+/// rounded up to the next whole rem (16px in a media query).
+const String _appPillMinWidth = '69rem';
 
 /// Height of the sticky reader toolbar.
 ///
@@ -702,11 +711,6 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // breakpoint it falls back to the base single column — which is the stacked
   // layout, and so matches the app, whose seed in portrait is stacked and in
   // landscape side-by-side (`resolveSeedLayout`).
-  // `.row.col-heads`, not `.col-heads`: the base `.row { display: grid }` has
-  // the same specificity, so a bare class would be beating it on source order
-  // alone — and reordering the writers in `buildStylesheet` would then reveal
-  // the captions in every layout, with nothing to say why.
-  css.writeln('.row.col-heads { display: none; }');
   css.writeln('@media (min-width: $_twoColumnMinWidth) {');
   // Side-by-side is a real choice again at this width: put its radio back in
   // the keyboard cycle, offer the button, light it, and stop lighting stacked
@@ -730,10 +734,9 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // out across 1,788px — held off today only by a pairing decided in
   // `page_template.dart` and `landing_page.dart`, neither of which this sheet
   // can see. The link buttons are no longer among the casualties: `.toc` caps
-  // itself. The sibling rules below need no such guard, and it is `.row`,
-  // `.pali`, `.si` and `.col-heads` that would want one — a readable container
-  // page has all four, and splitting its preamble into two columns is what
-  // side-by-side is for.
+  // itself. The sibling rules below need no such guard: a readable container
+  // page has `.row`, `.pali` and `.si`, and splitting its preamble into two
+  // columns is what side-by-side is for.
   css.writeln('  #$sideBySideLayoutId:checked ~ .content:not(.nav) '
       '{ max-width: ${_num(_wideColumnRem(tokens))}rem; }');
   css.writeln('  #$sideBySideLayoutId:checked ~ .content .row {');
@@ -745,22 +748,11 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('    margin-bottom: var(--entry-gap);');
   css.writeln('  }');
   // Explicit columns so a row missing one language still puts the language it
-  // has under the right heading, instead of sliding into column 1.
+  // has on its own side, instead of sliding into column 1.
   css.writeln(
       '  #$sideBySideLayoutId:checked ~ .content .pali { grid-column: 1; }');
   css.writeln(
       '  #$sideBySideLayoutId:checked ~ .content .si { grid-column: 2; }');
-  css.writeln(
-      '  #$sideBySideLayoutId:checked ~ .content .row.col-heads { display: grid; }');
-  css.writeln('}');
-  css.writeln('.col-heads div {');
-  css.writeln('  font-family: var(--font-ui);');
-  css.writeln('  font-size: 0.7em;');
-  css.writeln('  font-weight: 600;');
-  css.writeln('  letter-spacing: 0.1em;');
-  css.writeln('  color: var(--c-on-surface-variant);');
-  css.writeln('  padding-bottom: 0.4rem;');
-  css.writeln('  border-bottom: 1px solid var(--c-outline-variant);');
   css.writeln('}');
   css.writeln();
 
@@ -864,7 +856,6 @@ void _writeToolbarNav(StringBuffer css) {
   css.writeln('  min-width: 0;');
   css.writeln('  overflow: hidden;');
   css.writeln('  font-family: var(--font-ui);');
-  css.writeln('  font-size: 0.85em;');
   css.writeln('  line-height: 1;');
   css.writeln('  color: var(--c-on-surface-variant);');
   css.writeln('}');
@@ -878,7 +869,7 @@ void _writeToolbarNav(StringBuffer css) {
   // The vertical padding is slack for `overflow: hidden`. `line-height: 1` sets
   // the box to the em, and Sinhala ink runs taller than its em, so without this
   // each segment would shave the marks off its own text. 6px keeps the box at
-  // ~24px, still under the 36px emblem, so the bar's height is untouched.
+  // ~26px, still under the 36px emblem, so the bar's height is untouched.
   css.writeln('.breadcrumb > :not(.home) {');
   css.writeln('  position: relative;');
   css.writeln('  min-width: 0;');
@@ -1032,13 +1023,12 @@ void _writeToolbarApp(StringBuffer css) {
   css.writeln('  white-space: nowrap;');
   css.writeln('  text-decoration: none;');
   css.writeln('}');
-  css.writeln('.app-icon { width: 18px; height: 18px; flex: none; }');
   css.writeln('.new-tab-icon { width: 14px; height: 14px; flex: none; }');
   // Same height as the bar's other controls; filled, as its one action.
   css.writeln('.app-pill {');
   css.writeln('  box-sizing: border-box;');
   css.writeln('  height: 34px;');
-  css.writeln('  padding: 0 0.75rem 0 0.625rem;');
+  css.writeln('  padding: 0 0.75rem;');
   css.writeln('  border-radius: 8px;');
   css.writeln('  background: var(--c-primary);');
   css.writeln('  color: var(--c-on-primary);');

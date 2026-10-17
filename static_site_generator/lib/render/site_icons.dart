@@ -70,13 +70,6 @@ const SiteIcon searchCloseIcon = SiteIcon('search-close-icon',
     paint: '$_stroke stroke-linecap="round"',
     shapes: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>');
 
-/// An open book, for "read in the app".
-const SiteIcon appIcon = SiteIcon('app-icon',
-    paint: '$_stroke stroke-linejoin="round"',
-    shapes: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 '
-        '18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 '
-        '0 1.5-1.5z"/>');
-
 /// The ↗ that says the link opens a new tab. A heavier stroke, as it is
 /// drawn smaller than the rest.
 const SiteIcon newTabIcon = SiteIcon('new-tab-icon',
@@ -96,7 +89,6 @@ const List<SiteIcon> siteIcons = [
   upIcon,
   searchIcon,
   moreIcon,
-  appIcon,
   newTabIcon,
   searchCloseIcon,
 ];

@@ -29,11 +29,10 @@
 /// ## Two claims it must never make
 ///
 /// **That a page has a translation when it does not.** `bothLanguages` is
-/// already asked once per page and already decides the column captions, the
-/// layout group and the `solo` class; this is the fourth thing hanging off that
-/// one answer, and the reason it is a parameter rather than a second scan. On
-/// the `FIGURES.readablePagesWithoutSinhala` pages the sentence stops at
-/// `පාළි පෙළ`.
+/// already asked once per page and already decides the layout group and the
+/// `solo` class; this is the third thing hanging off that one answer, and the
+/// reason it is a parameter rather than a second scan. On the
+/// `FIGURES.readablePagesWithoutSinhala` pages the sentence stops at `පාළි පෙළ`.
 ///
 /// **That a page is reading text when it is a list of links.** A nav-only
 /// container's preamble is its title and `namo tassa`; promising a translation

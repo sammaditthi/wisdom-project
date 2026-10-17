@@ -30,6 +30,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layoutSinhalaOnly => 'Sinhala only';
 
   @override
+  String currentLayout(String name) {
+    return 'Layout: $name';
+  }
+
+  @override
   String get layoutSideBySide => 'Side by side';
 
   @override
@@ -94,7 +99,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliTouching => 'Touching letters';
 
   @override
-  String get layout => 'Layout';
+  String get appLayout => 'App layout';
 
   @override
   String get hideNavigationBar => 'Hide navigation bar';

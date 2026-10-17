@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'src/cli.dart';
+
 /// Every link the built site writes, resolved against the files on disk: each
 /// internal `href`, `src`, `srcset`, `url()`, URL-shaped `data-*` and
 /// `sitemap.xml` `<loc>` against a real file, and each `#fragment` against the
@@ -16,13 +18,13 @@ import 'dart:io';
 ///     dart run static_site_generator/tool/check_links.dart
 ///     dart run static_site_generator/tool/check_links.dart --build <dir>
 void main(List<String> args) {
-  final options = _parseArgs(args, const {'--build', '--origin'});
+  final options = parseArgs(args, const {'--build', '--origin'});
   if (options == null) {
     exitCode = 1;
     return;
   }
 
-  final rootPath = _normalize(options['--build'] ?? '$_packageRoot/build');
+  final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
     stderr.writeln('no build directory at $rootPath. Generate one first, or '
         'pass --build <dir>.');
@@ -113,52 +115,6 @@ void main(List<String> args) {
 
   report.print();
   if (!report.passed) exitCode = 1;
-}
-
-/// Read off `Platform.script` — the URI of *this file* — so the default build
-/// directory is the package's own, not whatever `build/` the working directory
-/// happens to hold. `bin/generate.dart` and `tool/serve.dart` do the same.
-final String _packageRoot = File.fromUri(Platform.script).parent.parent.path;
-
-/// Accepts `--flag value` and `--flag=value`, and refuses anything else.
-///
-/// Both forms, because the sibling tools take both and the habit carries over.
-/// Refuses, because an unrecognised flag that parses as "nothing was passed"
-/// runs the gate over the default build and reports PASS — a green answer to a
-/// question nobody asked.
-Map<String, String>? _parseArgs(List<String> args, Set<String> known) {
-  final values = <String, String>{};
-  for (var i = 0; i < args.length; i++) {
-    final arg = args[i];
-    final equals = arg.indexOf('=');
-    final name = equals == -1 ? arg : arg.substring(0, equals);
-
-    if (!known.contains(name)) {
-      stderr.writeln('unknown option: $arg');
-      stderr.writeln('known options: ${(known.toList()..sort()).join(', ')}');
-      return null;
-    }
-    if (equals != -1) {
-      values[name] = arg.substring(equals + 1);
-    } else if (i + 1 < args.length) {
-      values[name] = args[++i];
-    } else {
-      stderr.writeln('$name needs a value.');
-      return null;
-    }
-  }
-  return values;
-}
-
-/// Absolute, and without the trailing slash a shell completion adds — every
-/// root-relative path in the report is cut from a full path using this as the
-/// prefix, and `build//` matches none of them.
-String _normalize(String path) {
-  var absolute = Directory(path).absolute.path;
-  while (absolute.length > 1 && absolute.endsWith(Platform.pathSeparator)) {
-    absolute = absolute.substring(0, absolute.length - 1);
-  }
-  return absolute;
 }
 
 // ---------------------------------------------------------------------------

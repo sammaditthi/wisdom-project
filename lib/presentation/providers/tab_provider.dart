@@ -246,8 +246,7 @@ final updateActiveTabLayoutProvider =
       ref.read(tabsProvider.notifier).updateTab(activeIndex, updatedTab);
     }
     // Remember this choice (per device) so newly opened tabs seed their
-    // layout from it. This is the single chokepoint both the layout pill and
-    // the FAB selector call, so persisting here covers both entry points.
+    // layout from it. Every layout switch comes through here.
     ref.read(lastReaderLayoutProvider.notifier).set(layout);
   };
 });

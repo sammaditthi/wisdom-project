@@ -348,8 +348,8 @@ class _ColumnGate extends StaticSelectionContainerDelegate {
           : SelectionResult.next,
       GranularlyExtendSelectionEvent(:final forward) =>
         forward ? SelectionResult.next : SelectionResult.previous,
-      DirectionallyExtendSelectionEvent(:final direction) =>
-        switch (direction) {
+      DirectionallyExtendSelectionEvent(:final direction) => switch (
+            direction) {
           SelectionExtendDirection.forward ||
           SelectionExtendDirection.nextLine =>
             SelectionResult.next,

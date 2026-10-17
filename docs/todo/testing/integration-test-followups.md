@@ -3,7 +3,8 @@
 **Status:** open, 2026-10-11
 1–3 are left over from the faster-waits work
 ([`../../done/testing/integration_test_performance_and_duplication.md`](../../done/testing/integration_test_performance_and_duplication.md)),
-4 from the anchor-reader plan. Each is independent.
+4 from the anchor-reader plan, 5 from the reader toolbar auto-hide review
+(2026-10-17). Each is independent.
 
 ## 1. Rename `test_overrides.dart`
 
@@ -122,3 +123,56 @@ page: `search_tab_highlight_test.dart` calls `clearForActiveTab()` directly.
 
 Catches: a `GestureDetector` back inside a `SelectionArea`, where it takes
 every click from the selection.
+
+## 5. Reader toolbar: its menus, and what brings it back
+
+From [`reader-toolbar-auto-hide.md`](../../done/reader/reader-toolbar-auto-hide.md).
+Already covered: the hide/show rule on its own
+(`toolbar_auto_hide_test.dart`), a wheel scroll hiding it and the reveal
+threshold (`sutta_step_navigation_test.dart` test 8), Back closing the Share
+menu (`search_mode_test.dart` step 14).
+
+How, for both:
+
+- One new file, `integration_test/reader_toolbar_test.dart`. Add it to
+  `all_tests.dart`.
+- Hide the toolbar with a mouse-wheel scroll down mid-sutta, as test 8's
+  `_wheel` does. A controller `jumpTo` never hides it. Move `_wheel` into
+  `test_overrides.dart` rather than copying it.
+- Use `.hitTestable()` in every check: the toolbar never leaves the tree, so a
+  plain finder passes whether it shows or not.
+- Run it alone on macOS (`caffeinate -d`), then
+  `scripts/app/web/test_chrome.sh <file>`.
+
+### 5a. The toolbar's own actions
+
+The old pill and FAB widget tests were deleted with them, and nothing
+replaced them. The layout tests switch layout through the provider, not the
+menu.
+
+- Layout menu: open it (tooltip `Layout: …`), pick another layout. Expect the
+  tab's layout to change, and on reopening, the check on the new one.
+- Share → Copy link: expect the tab's link on the clipboard (mock
+  `SystemChannels.platform`, as `pressSystemBack` does) and the "Link copied"
+  SnackBar.
+- Commentary: on a sutta that has one, the button's tooltip says Commentary;
+  tapped, the commentary opens and the tooltip says Root text.
+
+Catches: a menu row wired to the wrong action, or a lost check mark.
+
+### 5b. What brings a hidden toolbar back
+
+Each of these has its own listener in `multi_pane_reader_widget.dart`, and no
+test starts with the toolbar hidden. If one goes, the toolbar stays hidden.
+
+- Tab switch: hide it on tab A, switch to B, expect it shown. Back to A
+  (still mid-sutta): shown.
+- Find: hide it, open find (`inPageSearchStatesProvider.notifier.openSearch()`)
+  and close it. Expect it shown, mid-sutta.
+- Section: hide it, switch `selectedAppSectionProvider` to Home and back.
+  Expect it shown.
+
+Previous/Next needs no test here: it lands at the top, which shows the
+toolbar anyway.
+
+Catches: a removed or broken show listener.

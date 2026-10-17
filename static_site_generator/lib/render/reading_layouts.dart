@@ -22,10 +22,10 @@ typedef ReadingLayout = ({
   /// DOM id, referenced by every selector in the layout CSS.
   String id,
 
-  /// The app's `ReaderLayout.name`. Carried as the radio's `value` so P4's
-  /// `?layout=` handler — whose token grammar is the enum name, per the locked
-  /// shareable-link contract — can check the right radio by matching on it,
-  /// rather than needing a second table mapping tokens to ids.
+  /// The app's `ReaderLayout.name`. Carried as the radio's `value` so
+  /// [layoutScript] — `?layout=`'s token grammar is the enum name, per the
+  /// locked shareable-link contract — can check the right radio by matching on
+  /// it, rather than needing a second table mapping tokens to ids.
   String token,
 
   /// ARB key of the accessible name — the app's own label for this layout.
@@ -100,3 +100,23 @@ const String defaultLayoutId = sideBySideLayoutId;
 /// button is the one that lights. A control that says the page is in a layout
 /// it is not in is worse than one option fewer.
 const String narrowFallbackLayoutId = stackedLayoutId;
+
+/// Checks the radio for `?layout=`, else the reader's last choice, and saves
+/// each new choice. Matches on the radio's `value`, so it holds no layout names.
+///
+/// Inline, straight after the radios, so it runs before the text below them
+/// paints. In the deferred `site.js` it ran after first paint, and every page
+/// showed side-by-side for a moment before jumping to the saved layout.
+/// The page's only inline script; byte-identical on every page, so a CSP needs
+/// one hash for it. No Sinhala and no URLs, on the same terms as `site.js`.
+const String layoutScript = '<script>(function(){'
+    'var K="wisdom.layout",r=document.getElementsByName("layout");'
+    'function on(t){for(var i=0;i<r.length;i++)'
+    'if(r[i].value===t){r[i].checked=true;return true}return false}'
+    // A shared link wins over the saved choice, and becomes it.
+    'try{var u=new URLSearchParams(location.search).get("layout");'
+    'if(on(u))localStorage.setItem(K,u);else on(localStorage.getItem(K))}'
+    'catch(e){}'
+    'for(var i=0;i<r.length;i++)r[i].addEventListener("change",function(){'
+    'try{localStorage.setItem(K,this.value)}catch(e){}})'
+    '})();</script>';

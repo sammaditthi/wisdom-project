@@ -49,3 +49,8 @@ deployment*. Then fix, and deploy again.
   `~/Library/Preferences/.wrangler/logs/`.
 - Never run two deploys at once. There is no lock, and the second one wipes
   `static_site_generator/build/` while the first is uploading.
+- **Every deploy parses every page** with
+  `static_site_generator/tool/check_markup.dart` and stop on any HTML parse
+  error. Nothing to install: its parser is a dev dependency of the generator,
+  fetched by `dart pub get`. Run it alone with
+  `dart run static_site_generator/tool/check_markup.dart`.

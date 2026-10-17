@@ -5,8 +5,6 @@ const List<String> appStringKeys = [
   'layoutSinhalaOnly',
   'layoutSideBySide',
   'layoutStacked',
-  'paliLanguageLabel',
-  'sinhalaLanguageLabel',
   'searchPlaceholder',
   'searchHint',
   'noResultsFound',

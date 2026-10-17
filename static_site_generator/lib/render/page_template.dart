@@ -70,7 +70,7 @@ class PageTemplate {
     // readable TOC prints above the text, and the leaves themselves.
     // [SitePage.suttas] is `[node]` for a sutta page, the whole run for a
     // chapter and empty for a TOC, so the three kinds need no branch here — and
-    // asking the question once is what stops the caption and the switcher below
+    // asking the question once is what stops the switcher and `solo` below
     // from being two scans able to disagree.
     final bothLanguages = _hasBothLanguages([
       shown.preamble,
@@ -87,7 +87,7 @@ class PageTemplate {
     // they reserve, and the fourth — whichever hides the language the page
     // *has* — renders nothing at all: the sinhalaOnly rule hides every
     // `.row.no-si`, which on a `FIGURES.readablePagesWithoutSinhala` page is
-    // every row it has. `site.js` remembers the choice, so picking it once
+    // every row it has. [layoutScript] remembers the choice, so picking it once
     // anywhere blanked every Paṭṭhāna page a reader opened afterwards.
     // Withholding the control is what makes that state unreachable — with
     // JavaScript on or off, which a runtime guard could not manage.
@@ -142,21 +142,12 @@ class PageTemplate {
 
     switch (page.kind) {
       case PageKind.sutta:
-        body.writeln(_columnHeads(bothLanguages));
         body.writeln(_rows(slices[page.nodeKey], depths));
       case PageKind.chapter:
         body.writeln(_chapter(page, slices, shown.preamble, depths,
-            bothLanguages: bothLanguages, previous: previous, next: next));
+            previous: previous, next: next));
       case PageKind.toc:
         if (shown.preamble != null && shown.preamble!.rows.isNotEmpty) {
-          // Captions only where there is a measure to caption. On a nav-only
-          // container the preamble is the title and `namo tassa`, laid out in
-          // one column with no layout switcher to split it — a පාළි/සිංහල
-          // header there would label a pair of columns the reader cannot
-          // produce.
-          if (page.isReadable) {
-            body.writeln(_columnHeads(bothLanguages));
-          }
           body.writeln(
               '<div class="preamble">${_rows(shown.preamble, depths)}</div>');
         }
@@ -361,6 +352,9 @@ class PageTemplate {
   /// `#L-x:checked ~` rules match, so a `.row` keeps its default single column
   /// and both languages show stacked — which is the right thing for a
   /// preamble, reached without a single special case in the CSS.
+  ///
+  /// Followed by [layoutScript], which only restores a saved choice; with JS
+  /// off the baked `checked` stands.
   String _layoutRadios() {
     final buffer = StringBuffer();
     for (final layout in readingLayouts) {
@@ -369,6 +363,7 @@ class PageTemplate {
       if (layout.id == defaultLayoutId) buffer.write(' checked');
       buffer.write(' aria-label="${build.strings.html(layout.labelKey)}">');
     }
+    buffer.write(layoutScript);
     return buffer.toString();
   }
 
@@ -413,7 +408,10 @@ class PageTemplate {
       final url = linksThroughOriginMarkers(tree, node.nodeKey)
           ? '${_pageOf(build.urlFor(twinKey))}#${originId(node.nodeKey)}'
           : build.urlFor(twinKey);
-      return link(url, commentaryMarker);
+      // The noun on its own, like `rootText` below. [commentaryMarker] is the
+      // form that follows a name ("… අට්ඨකථා") and stays as the tree spells it.
+      const commentaryText = 'අට්ඨකථාව';
+      return link(url, commentaryText);
     }
 
     const rootText = 'මූල පාඨය';
@@ -557,7 +555,6 @@ class PageTemplate {
     Map<String, NodeSlice> slices,
     NodeSlice? preamble,
     Map<int, int> depths, {
-    required bool bothLanguages,
     SitePage? previous,
     SitePage? next,
   }) {
@@ -586,9 +583,6 @@ class PageTemplate {
       buffer.write('<p class="chapter-bar">'
           '<a href="${page.url}">සම්පූර්ණ පරිච්ඡේදය</a></p>');
     }
-    // After the bar, not before: in the filtered single-sutta view the bar is
-    // the page's first line, and column captions above it would caption it.
-    buffer.write(_columnHeads(bothLanguages));
     if (preamble != null && preamble.rows.isNotEmpty) {
       buffer.write('<div class="preamble">${_rows(preamble, depths)}</div>');
     }
@@ -699,41 +693,12 @@ class PageTemplate {
     return buffer.toString();
   }
 
-  /// Column captions for the side-by-side layout, hidden in the other three.
-  ///
-  /// Not decoration on this corpus specifically: Pali here is *written in
-  /// Sinhala script*, so two columns of it are the same alphabet and a reader
-  /// landing mid-page cannot tell which side is the canon and which the
-  /// translation. Every other layout either shows one language or alternates
-  /// them, so the captions would be noise — CSS shows them only under
-  /// side-by-side.
-  ///
-  /// A `.row` like any other, so it inherits the same grid and its cells line
-  /// up with the text below. `aria-hidden` because the cells themselves carry
-  /// `lang`, which is how a screen reader already announces the switch.
-  ///
-  /// The captions are the app's names for the two languages.
-  ///
-  /// **Emitted only when the page really has both languages** — see
-  /// [_hasBothLanguages], which is the same fact that decides whether the page
-  /// gets a layout switcher at all. Captioning a column that is empty from top
-  /// to bottom labels the absence rather than explaining it.
-  String _columnHeads(bool bothLanguages) {
-    if (!bothLanguages) return '';
-    return '<div class="row col-heads" aria-hidden="true">'
-        '<div class="pali">${build.strings.html('paliLanguageLabel')}</div>'
-        '<div class="si">${build.strings.html('sinhalaLanguageLabel')}</div>'
-        '</div>';
-  }
-
   /// Whether both languages actually reach the page.
   ///
   /// One question, asked once per page over every slice it renders, because
-  /// three things turn on it and they must not be able to disagree: the column
-  /// captions above, the layout switcher, and the `solo` class that carries
-  /// what the missing radios would have set. It was the captions' private scan
-  /// until it turned out the switcher needed the same answer — see [render],
-  /// which has the incident.
+  /// two things turn on it and they must not be able to disagree: the layout
+  /// switcher, and the `solo` class that carries what the missing radios would
+  /// have set. See [render], which has the incident.
   ///
   /// The `FIGURES.readablePagesWithoutSinhala` readable pages that answer *no*
   /// are all in the `ap-pat*` (Paṭṭhāna) files, which carry no Sinhala at all.

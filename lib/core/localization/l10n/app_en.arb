@@ -36,6 +36,16 @@
     "description": "Label for Sinhala-only reader layout"
   },
 
+  "currentLayout": "Layout: {name}",
+  "@currentLayout": {
+    "description": "Tooltip and screen-reader label of the reader toolbar's layout button, naming the current layout (e.g. Layout: Stacked)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "layoutSideBySide": "Side by side",
   "@layoutSideBySide": {
     "description": "Label for side-by-side reader layout showing both Pali and Sinhala horizontally"
@@ -141,9 +151,9 @@
     "description": "Switch 1 — toggles the touching join (ZWJ before hal) for remaining clusters plus long-to-short vowel shortening. Default on."
   },
 
-  "layout": "Layout",
-  "@layout": {
-    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
+  "appLayout": "App layout",
+  "@appLayout": {
+    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar)"
   },
 
   "hideNavigationBar": "Hide navigation bar",
@@ -908,10 +918,10 @@
 
   "share": "Share",
   "@share": {
-    "description": "Reader button (and FAB item) that opens the share menu"
+    "description": "Reader toolbar button that opens the share menu"
   },
   "openAsWebPage": "Open as web page",
   "@openAsWebPage": {
-    "description": "App on the web only: reader button that opens the text being read on the static web site, in a new tab"
+    "description": "App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab"
   }
 }

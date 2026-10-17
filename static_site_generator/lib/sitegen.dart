@@ -138,8 +138,8 @@ class SiteGenerator {
     final searchIndex = buildSearchIndex(plan: plan);
     final script = _readPackageAsset(
       siteScriptFileName,
-      'the site will build without search or the ?layout= handler. Every page '
-      'still works; the toolbar button stays hidden.',
+      'the site will build without search. Every page still works; the '
+      'toolbar button stays hidden.',
     );
     final emblems = [
       for (final name in emblemFileNames)

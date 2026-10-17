@@ -63,7 +63,7 @@ class SettingsMenuButton extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _MenuSectionLabel((l10n) => l10n.layout),
+                _MenuSectionLabel((l10n) => l10n.appLayout),
                 const SizedBox(height: 4),
                 _LayoutSection(),
               ],
@@ -368,7 +368,7 @@ class _ContentLanguageSelector extends ConsumerWidget {
   }
 }
 
-/// Screen-layout switches. Focus mode joins here later (docs/todo/reader/focus-mode.md).
+/// Screen-layout switches.
 class _LayoutSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {

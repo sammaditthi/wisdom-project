@@ -98,12 +98,12 @@ free.
   `<style>` in `lib/` or `bin/`, and neither pattern in any built file. Every
   page carries one `<link rel="stylesheet">` and nothing else. Inline CSS is not
   a lever here because there is none.
-- **Zero inline JS.** ⚠ *Both source docs claimed "zero JS" outright; that is no
-  longer true.* Every page now carries a `<script src>` for the search
-  dialog. What survives is the stronger property: **no inline script, no inline
-  event handlers, no `eval`** — `site.js` builds result rows with
-  `createElement`/`textContent`. That is what keeps the strict CSP in Part C
-  available with no refactor.
+- **One inline script, no inline handlers, no `eval`.** Every page carries a
+  `<script src>` for `site.js`, and reading pages one inline `layoutScript`
+  (added 2026-10-17: a deferred script applied the saved layout after first
+  paint, and the page jumped). It is byte-identical on every page, so the
+  strict CSP in Part C needs one hash for it. `site.js` builds result rows with
+  `createElement`/`textContent`.
 - **The `<title>` grammar** — `<leaf> — <vagga> — <collection>`
   (`page_template.dart:476`, built by `_titleText` at `:486`). This is doing
   nearly all the keyword work on the
@@ -463,16 +463,14 @@ mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
 >
 > The text below is the case as it was made, kept.
 
-> **Re-measured 2026-10-17** on a full build. The 2026-08-15 figure was 575 B a
-> page for three icons; the search dialog, the ⋮ menu and the "read in the app"
-> link have added four more since, and the ⋮ repeats two of them.
-
-Seven icons are emitted verbatim into the pages:
+Six icons are emitted verbatim into the pages (measured 2026-10-17, full
+build — before the app link's book icon was removed the same day, which took
+2 × 287 B off every page that carries the link):
 
 | glyph | where | on a reading page |
 |---|---|---|
 | `_iconFrame` + the side-by-side and stacked marks | `render/reading_layouts.dart` | 4 (the bar, and the ⋮ menu's copy) |
-| `_bookGlyph`, `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 each (the pill, and the ⋮ menu's copy) |
+| `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 (the pill, and the ⋮ menu's copy) |
 | `_upGlyph`, `_moreGlyph` | `render/site_chrome.dart` | 1 each |
 | `_searchGlyph`, `_closeGlyph` | `render/search_dialog.dart` | 1 each, on every page |
 
@@ -587,12 +585,6 @@ on a page, so hand-trimming it returns a fraction of its raw weight:
 | all five inline SVGs (incl. search, close) | 981 | 232 |
 | search dialog + trigger | 1,757 | 400 |
 
-⚠ **Correction to B2.** It is still worth doing for the ~8.6 MB it takes off the
-build, but "~575 B off every single page's wire payload" is a raw number; the
-wire saving is **~92 B/page, 1.4 MB corpus-wide**. Step 5 of the order repeats
-the same figure. *(Superseded 2026-10-17: with seven icons it is ~370 B brotli
-per reading page — see B2.)*
-
 **Compression Dictionary Transport** collects the whole 1,381 B without touching
 a template: page 1 is served with `Use-As-Dictionary`, the browser keeps it, and
 the next navigation sends `Available-Dictionary` so the server compresses
@@ -638,73 +630,42 @@ source carries, and a suite that runs nowhere catches nothing.
 
 ## C1. Tests for `buildSiteHeaders()` and the asset wiring ✅ **shipped 2026-10-17**
 
-> **What landed.** Three layers, each catching what the others cannot:
-> - `test/wiring_contract_test.dart`, part 4 (no corpus, runs in `--quick`):
->   no two `_headers` rules give one URL two values of a header; each
->   `SiteAssets` URL moves when its own bytes do and only then; the NUL join;
->   the font token.
-> - `test/asset_wiring_test.dart` (tagged `corpus`): runs the real generator
->   over a canon subtree and its commentary, then checks every `/assets/` and
->   `/fonts/` link in every page and the stylesheet equals the URL derived from
->   the bytes written beside it, and that every `_headers` path rule names
->   something the build wrote.
-> - `deploy.sh`: before the link check, fails on any asset link with no `?v=`
->   across the whole build that ships.
->
-> Each was checked by breaking the code it guards (a hand-written emblem link,
-> a font token over the wrong bytes, an overlapping cache rule, a rule naming a
-> missing file) and watching it fail. The text below is the reasoning, kept.
-
-**Not hygiene — the one hazard the `_headers` work introduced.** Everything else
-in Part C is a tidy-up that fails visibly. This one fails silently, on other
-people's machines, for a year. Rank it above C2.
-
-**Why it waited:** tests in this repo are written on request, not by reflex.
-
-Nothing currently tests `render/site_headers.dart` at all, and the wiring test
-hard-codes its asset URLs (`?v=test`), so the hashing in `sitegen.dart` is
-uncovered — an unhashed build would ship green. Three belong in
-`test/wiring_contract_test.dart`, which already exists to catch exactly this
-class of bug (two files that must agree with nothing connecting them):
-
-| test | catches |
-|---|---|
-| no two `_headers` rules match the same path | the comma-join hazard the whole file is shaped around — Pages merges matching rules and joins duplicate header names, so an overlap silently emits two policies in one `Cache-Control` |
-| every non-wildcard rule names a file the build writes | a renamed asset leaving a rule pointing at nothing |
-| a page's `<link rel="stylesheet">` equals `SiteAssets.forContent(...)`'s | the hashing wiring itself, which no test sees today |
-
-> **P5 widened this, 2026-08-22.** `assets/og-card.png` is a sixth asset and a
-> fifth token, added with no test — and it is the first one whose absence is
-> *invisible on the site*: a stale or unhashed stylesheet is eventually
-> noticeable, a stale link-preview card is only ever seen by a scraper. The
-> third test below is now one file further from covering what it should.
-
-Collapsing to `/assets/*` made the third of those matter more than it did.
-Five exact paths failed **safe**: an asset with no rule of its own simply kept
-the revalidating default, so forgetting one cost speed. A wildcard fails
-**unsafe** — anything that lands in that directory linked without a `?v=` is
-served `immutable` for a year, so forgetting one costs a year of a stale file on
-readers' disks. "Every asset URL comes from `SiteAssets`" went from a tidiness
-convention to the load-bearing invariant of the whole caching scheme, and
-nothing enforces it.
-
-Three properties make that worth a test rather than care:
+`/assets/*` and `/fonts/*` are cached by one wildcard `immutable` rule each, so
+"every asset URL comes from `SiteAssets`" is what the whole caching scheme rests
+on. Exact paths failed **safe**: an asset with no rule of its own kept the
+revalidating default, so forgetting one cost speed. A wildcard fails **unsafe**:
+anything in those directories linked without its `?v=` is cached on readers'
+disks for a year. Three properties make that a test rather than care:
 
 - **Purging Cloudflare's cache does not fix it.** That clears the edge, not the
   copy on a reader's disk, and no API reaches a browser cache. The only exit is
   to change the URL — i.e. add the `?v=` that was missing — which rewrites every
-  page's `<head>` and re-uploads the full ~425 MB.
+  page's `<head>` and re-uploads the whole build.
 - **You will not notice.** Hard-refresh bypasses the browser cache, so the bug
   is invisible to whoever shipped it and visible only to readers who already
   loaded the page once.
 - **It is silent at build time.** An unhashed asset produces a valid build, a
   green deploy, and a correct-looking page.
 
-The properties `SiteAssets` is supposed to hold are cheap to assert and were
-verified by hand once (2026-08-15, all passing): same inputs → same URLs;
-editing the CSS moves only the stylesheet URL; editing *either* `site.js` or the
-index moves **both** of their URLs; editing the emblem moves only the emblem;
-and the NUL join makes `("ab","c")` and `("a","bc")` hash differently.
+Three layers enforce it, each catching what the others cannot:
+
+- `test/wiring_contract_test.dart`, part 4 (no corpus, runs in `--quick`): no
+  two `_headers` rules give one URL two values of a header — Pages joins them
+  with a comma, so an overlap ships two policies in one `Cache-Control`; each
+  `SiteAssets` URL moves when its own bytes do and only then; the NUL join; the
+  font token.
+- `test/asset_wiring_test.dart` (tagged `corpus`): runs the real generator over
+  a canon subtree and its commentary, then checks every `/assets/` and
+  `/fonts/` link in every page and the stylesheet equals the URL derived from
+  the bytes written beside it, and that every `_headers` path rule names
+  something the build wrote. It derives those URLs with `SiteAssets` itself, so
+  it catches links that bypass `SiteAssets`; a bug inside it is part 4's.
+- `deploy.sh`: before the link check, fails on any asset link with no `?v=`
+  across the whole build that ships.
+
+Each was checked by breaking the code it guards and watching it fail. All three
+name `assets/` and `fonts/` explicitly: a new `immutable` directory in
+`_headers` needs adding to the test's pattern and the script's.
 
 ## C2. A Content-Security-Policy header
 
@@ -713,13 +674,14 @@ own change to deploy and verify — not something to fold into a caching diff.
 
 `_headers` is now the file where one goes, and the site already qualifies for a
 strict policy **with no refactor**. Verified on the full build: zero `<form>`,
-zero inline event handlers, zero inline `<script>`, zero `style=` attributes,
-and `site.js` builds result rows with `createElement`/`textContent` and calls no
-`eval`.
+zero inline event handlers, zero `style=` attributes, and `site.js` builds
+result rows with `createElement`/`textContent` and calls no `eval`. The one
+inline `<script>` is `layoutScript` (2026-10-17), the same bytes on every page:
+allow it by hash, computed by the build from the constant rather than pasted.
 
 ```
 /*
-  Content-Security-Policy: default-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<layoutScript>'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 ```
 
 `img-src 'self' data:` since B2 (2026-10-17): the toolbar icons are `data:`
@@ -876,21 +838,40 @@ already makes for rows. `SitePage.hasPreamble` is `!node.isLeaf` today and would
 gain that second clause. Verify by re-diffing a full build: exactly two files
 should change.
 
-## C9. HTML validator over `build/`
+## C9. HTML parse check over `build/` ✅ **shipped 2026-10-17**
 
-**Moved here 2026-09-11** from the build plan's P6, its last unshipped
-verification. Blocks nothing, but has no substitute: `check_links.dart` proves
-references resolve and the wiring contract proves markup and stylesheet agree on
-names — neither reads the markup as a *parser* does, so an unclosed or misnested
-element passes both.
+`check_links.dart` proves references resolve and the wiring contract proves
+markup and stylesheet agree on names — neither reads the markup as a *parser*
+does, so an unclosed or misnested element passed both. Every page comes off one
+template, so such a defect is never on one page; it is on all
+`FIGURES.realPages`.
 
-A Node/Java CLI job (`vnu`), and the one place worth leaving the toolchain for —
-D9 permits Node over finished bytes. It runs over the built tree, so it belongs
-beside `check_links.dart` in `deploy.sh`, not in `dart test`.
+`tool/check_markup.dart` parses every page of a build with `package:html`, the
+Dart port of html5lib (a dev dependency, pinned by `pubspec.lock`), and fails on
+any HTML5 parse error: an unclosed or misnested element, a stray end tag, a
+duplicate attribute. It reports each distinct message once, with how many pages
+carry it and the first one. The costly case it covers is a stray element in
+`<head>`: the parser closes `<head>` there, the canonical after it lands in
+`<body>` where Google ignores it, and the grep checks in `deploy.sh` still pass.
 
-**Worth doing before the site is indexed.** Every page comes off one template,
-so a markup defect is never on one page — it is on all `FIGURES.realPages`.
-Cheap now; a full re-push later.
+- **Where:** `deploy.sh`, right after the link check, on every deploy, partial
+  builds included.
+- **By hand:** `dart run static_site_generator/tool/check_markup.dart
+  [--build <dir>]`, or `./scripts/static_site/deploy.sh --dry-run`.
+- **No filter file.** The full build had zero parse errors when it shipped.
+- **Checked by breaking it:** an unclosed element added to `page_template.dart`
+  fails the dry run with the message, the page count and the first page.
+
+**Why not `vnu`**, which the plan named. Measured 2026-10-17 over a full build:
+`vnu` 26.10.12 found zero errors, and its only warnings were Sinhala text not in
+Unicode NFC on a few pages — content, not markup. A parser catches the class C9
+exists for with no new toolchain; `vnu` needs Java on the workstation and in CI.
+What it alone adds is content-model and attribute rules — which child each
+element allows, ARIA, `alt` — where a defect is an accessibility problem rather
+than a rendering or crawling one. For those, run `vnu` by hand after a template
+change that adds elements: install `vnu-jar` at a fixed version into a scratch
+folder, then `java -jar <that folder>/node_modules/vnu-jar/build/dist/vnu.jar
+--skip-non-html --errors-only static_site_generator/build`.
 
 ## C10. The app's strings came hand-copied from `app_si.arb` ✅ **shipped 2026-09-30**
 
@@ -1002,24 +983,19 @@ because both move the toolbar's breakpoints, so they are measured once.
   ⚠️ notes saying a `rem` in a media query is a different width: at 100% it is
   16px everywhere. The search field's `1.12rem` iOS-zoom workaround becomes
   `1rem`.
-- Comments that state the 90% sizes (14.4px, 15.84px, 12.24px) in
+- Comments that state the 90% sizes (14.4px, 15.84px) in
   `stylesheet.dart`, the dump script's `_paneWeights` note, and the
   `proseColumnMaxWidth` test in `app_typography_test.dart`.
 
-**The breakpoints move**, because the toolbar's text grows from 12.24px to
-13.6px. Measured 2026-10-14 in headless Chrome: every built page's real trail in
-the real toolbar, the 45px readability floor scaled to 50px, and the shift added
-to today's values, as was done for the ⋮:
+**The breakpoints move**, because the toolbar's text grows by 1/0.9: the trail
+from 14.4px to 16px (it is 1em since 2026-10-17) and the pill's label from
+12.6px to 14px. Measure them in headless Chrome: every built page's real trail in
+the real toolbar, the readability floor scaled with the text, and the shift
+added to today's values (`stylesheet.dart`), as was done for the ⋮.
 
-| | Today | At 100% |
-|---|---|---|
-| `_layoutsFoldWidth` | 36rem | 38rem |
-| `_appPillMinWidth` | 65rem | 69rem |
-| `_trailKeepThree` / `One` / `None` | 54 / 42 / 28rem | 58 / 45 / 30rem |
-
-These are for the trail that shrinks. C12 deletes the last row. Once the trail
-scrolls, the other two answer a different question (how much room the page's
-name needs), so measure them again at 100% after the scroll is in.
+C12 deletes `_trailKeepThree` / `One` / `None`. Once the trail scrolls,
+`_layoutsFoldWidth` and `_appPillMinWidth` answer a different question (how much
+room the page's name needs), so measure those at 100% after the scroll is in.
 
 ---
 
@@ -1126,22 +1102,16 @@ See A7.
 
 What is left, re-ranked:
 
-1. ~~**C1 the asset-wiring tests** — before the next asset change, not after.~~
-   ✅ **done 2026-10-17**, ahead of step 2 as planned.
-2. ~~**B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.*~~
-   ✅ **done 2026-10-17**, together as planned: −17.2 MB off the build, −293 B
-   brotli off every reading page, 31–44 KB off a first visit, and the emblem
-   drawn at 36px. See B1 and B2 for the measurements.
-3. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
+1. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
    every item below it cheaper to ship. Spec in
    [`web-release.md`](./web-release.md) §5.
-4. **C2 CSP** — its own deploy and verify.
-5. **A9 font preload, A8 heading duplication** — measure first, both are small.
-6. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
+2. **C2 CSP** — its own deploy and verify.
+3. **A9 font preload, A8 heading duplication** — measure first, both are small.
+4. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
 
-**C9 the HTML validator sits outside that ranking**, because it is release
-verification rather than an improvement: run it once over a full build before the
-first deploy, then keep it in `deploy.sh`. See [`web-release.md`](./web-release.md).
+**C9 the HTML parse check sits outside that ranking**, because it is release
+verification rather than an improvement. Shipped 2026-10-17; it runs in
+`deploy.sh`. See [`web-release.md`](./web-release.md).
 
 **Part D is not in the ranking at all.** Those are decisions waiting on a signal,
 not tasks waiting on a turn.
