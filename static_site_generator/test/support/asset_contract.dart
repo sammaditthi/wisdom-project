@@ -37,8 +37,8 @@ Map<String, String> assetUrls(SiteAssets assets) => {
 /// The path of every `/assets/` or `/fonts/` link in [source], query included,
 /// origin dropped, in document order. Only text right after a quote, a `(` or
 /// a `srcset`'s `, ` counts, so a comment that names
-/// `static_site_generator/assets/` is not a link. A stylesheet's `../fonts/…` comes back as `/fonts/…`: `site.css`
-/// sits one level down, in `assets/`.
+/// `static_site_generator/assets/` is not a link. A stylesheet's `../fonts/…`
+/// comes back as `/fonts/…`: `site.css` sits one level down, in `assets/`.
 Iterable<String> assetLinksIn(String source) => _assetLink
     .allMatches(source)
     .map((match) => match.group(1)!)

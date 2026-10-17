@@ -6,13 +6,13 @@
 /// downloaded once (backlog B2).
 library;
 
-/// One icon: the class its mask rule matches, and the SVG it is cut from.
+/// One icon: the class its rule matches, its size, and the SVG it is cut from.
 class SiteIcon {
-  /// The class `site.css` paints this icon's mask on.
+  /// The class `site.css` sizes this icon by and paints its mask on.
   final String maskClass;
 
-  /// Every class on the span: [maskClass], after a size class it shares.
-  final String classes;
+  /// Width and height in CSS pixels.
+  final int size;
 
   /// Drawn in black: a mask reads only alpha, and `currentColor` means nothing
   /// inside a `data:` URL. The span's `background-color` is the colour.
@@ -20,16 +20,15 @@ class SiteIcon {
 
   const SiteIcon(
     this.maskClass, {
+    required this.size,
     required String paint,
     required String shapes,
-    String? sizeClass,
-  })  : classes = sizeClass == null ? maskClass : '$sizeClass $maskClass',
-        svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
+  }) : svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
             '$paint>$shapes</svg>';
 
   /// Hidden from assistive tech, as the SVG was: every control that shows an
   /// icon is named by its own `title`, `aria-label` or text.
-  String get markup => '<span class="$classes" aria-hidden="true"></span>';
+  String get markup => '<span class="$maskClass" aria-hidden="true"></span>';
 
   /// [svg] as a `data:` URL for a double-quoted CSS `url()`. Attribute quotes
   /// become `'` and `%`, `#`, `<`, `>` are escaped; spaces stay as they are.
@@ -49,35 +48,40 @@ const String _round = 'stroke-linecap="round" stroke-linejoin="round"';
 const String _frame = '<rect x="3" y="4" width="18" height="16" rx="1.5"/>';
 
 const SiteIcon sideBySideIcon = SiteIcon('sbs-icon',
-    sizeClass: 'layout-icon',
+    size: 18,
     paint: _stroke,
     shapes: '$_frame<line x1="12" y1="4" x2="12" y2="20"/>');
 
 const SiteIcon stackedIcon = SiteIcon('stack-icon',
-    sizeClass: 'layout-icon',
+    size: 18,
     paint: _stroke,
     shapes: '$_frame<line x1="3" y1="12" x2="21" y2="12"/>');
 
 const SiteIcon upIcon = SiteIcon('up-icon',
+    size: 18,
     paint: '$_stroke $_round',
     shapes: '<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/>');
 
 const SiteIcon searchIcon = SiteIcon('search-icon',
+    size: 18,
     paint: '$_stroke stroke-linecap="round"',
     shapes: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/>');
 
 const SiteIcon searchCloseIcon = SiteIcon('search-close-icon',
+    size: 20,
     paint: '$_stroke stroke-linecap="round"',
     shapes: '<path d="M6 6l12 12"/><path d="M18 6L6 18"/>');
 
 /// The ↗ that says the link opens a new tab. A heavier stroke, as it is
 /// drawn smaller than the rest.
 const SiteIcon newTabIcon = SiteIcon('new-tab-icon',
+    size: 14,
     paint: 'fill="none" stroke="black" stroke-width="2" $_round',
     shapes: '<path d="M7 17L17 7"/><path d="M9 7h8v8"/>');
 
 /// The ⋮. Filled, not stroked.
 const SiteIcon moreIcon = SiteIcon('more-icon',
+    size: 18,
     paint: 'fill="black"',
     shapes: '<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/>'
         '<circle cx="12" cy="19" r="1.6"/>');

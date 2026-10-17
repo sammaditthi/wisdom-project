@@ -51,7 +51,9 @@ String buildStylesheet(ThemeTokens tokens, {required String fontVersion}) {
 }
 
 /// Below this width, two columns of text stop being readable and side-by-side
-/// folds to one — see [_writeLayouts].
+/// folds to one — see [_writeLayouts]. The same 768px as the app's
+/// `ResponsiveUtils.mobileBreakpoint`, below which the app opens a page stacked
+/// in portrait.
 ///
 /// ⚠️ **This is 768px, not 691px.** Inside a media query `rem` resolves against
 /// the *initial* root font size (16px) and ignores `html { font-size: 90% }`,
@@ -618,7 +620,6 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('}');
   css.writeln('.layouts label + label '
       '{ border-left: 1px solid var(--c-outline); }');
-  css.writeln('.layout-icon { width: 18px; height: 18px; }');
   css.writeln();
 
   // Which button is lit. Every layout lights its own button — except the
@@ -786,7 +787,7 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln();
 }
 
-/// Every icon in [siteIcons]: one shared rule, then each one's mask.
+/// Every icon in [siteIcons]: one shared rule, then each one's size and mask.
 ///
 /// `currentColor` paints it, so a lit layout button or a hovered link colours
 /// its icon as the inline SVG's stroke did. Forced colours and print treat a
@@ -811,7 +812,8 @@ void _writeIcons(StringBuffer css) {
   css.writeln('  print-color-adjust: exact;');
   css.writeln('}');
   for (final icon in siteIcons) {
-    css.writeln('.${icon.maskClass} { --icon: url("${icon.maskUrl}"); }');
+    css.writeln('.${icon.maskClass} { width: ${icon.size}px; '
+        'height: ${icon.size}px; --icon: url("${icon.maskUrl}"); }');
   }
   css.writeln();
 }
@@ -1003,8 +1005,6 @@ void _writeToolbarNav(StringBuffer css) {
   // without this the search button shows for every reader with JS off — the
   // dead control C8 forbids.
   css.writeln('.search-trigger[hidden] { display: none; }');
-  css.writeln('.up-icon, .search-icon, .more-icon '
-      '{ width: 18px; height: 18px; }');
   css.writeln();
 }
 
@@ -1023,7 +1023,6 @@ void _writeToolbarApp(StringBuffer css) {
   css.writeln('  white-space: nowrap;');
   css.writeln('  text-decoration: none;');
   css.writeln('}');
-  css.writeln('.new-tab-icon { width: 14px; height: 14px; flex: none; }');
   // Same height as the bar's other controls; filled, as its one action.
   css.writeln('.app-pill {');
   css.writeln('  box-sizing: border-box;');
@@ -1189,7 +1188,6 @@ void _writeSearch(StringBuffer css) {
   css.writeln('.search-close:hover '
       '{ background: var(--c-surface-container-low); }');
   css.writeln('.search-close:focus-visible { ${_focusRing()} }');
-  css.writeln('.search-close-icon { width: 20px; height: 20px; }');
   css.writeln();
 
   // `:empty` keeps the line from reserving space before there is anything to
