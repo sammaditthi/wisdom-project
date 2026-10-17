@@ -771,21 +771,40 @@ already makes for rows. `SitePage.hasPreamble` is `!node.isLeaf` today and would
 gain that second clause. Verify by re-diffing a full build: exactly two files
 should change.
 
-## C9. HTML validator over `build/`
+## C9. HTML parse check over `build/` ✅ **shipped 2026-10-17**
 
-**Moved here 2026-09-11** from the build plan's P6, its last unshipped
-verification. Blocks nothing, but has no substitute: `check_links.dart` proves
-references resolve and the wiring contract proves markup and stylesheet agree on
-names — neither reads the markup as a *parser* does, so an unclosed or misnested
-element passes both.
+`check_links.dart` proves references resolve and the wiring contract proves
+markup and stylesheet agree on names — neither reads the markup as a *parser*
+does, so an unclosed or misnested element passed both. Every page comes off one
+template, so such a defect is never on one page; it is on all
+`FIGURES.realPages`.
 
-A Node/Java CLI job (`vnu`), and the one place worth leaving the toolchain for —
-D9 permits Node over finished bytes. It runs over the built tree, so it belongs
-beside `check_links.dart` in `deploy.sh`, not in `dart test`.
+`tool/check_markup.dart` parses every page of a build with `package:html`, the
+Dart port of html5lib (a dev dependency, pinned by `pubspec.lock`), and fails on
+any HTML5 parse error: an unclosed or misnested element, a stray end tag, a
+duplicate attribute. It reports each distinct message once, with how many pages
+carry it and the first one. The costly case it covers is a stray element in
+`<head>`: the parser closes `<head>` there, the canonical after it lands in
+`<body>` where Google ignores it, and the grep checks in `deploy.sh` still pass.
 
-**Worth doing before the site is indexed.** Every page comes off one template,
-so a markup defect is never on one page — it is on all `FIGURES.realPages`.
-Cheap now; a full re-push later.
+- **Where:** `deploy.sh`, right after the link check, on `--prod` and on
+  `--dry-run`, partial builds included. A dev upload skips it — dev is noindex.
+- **By hand:** `dart run static_site_generator/tool/check_markup.dart
+  [--build <dir>]`, or `./scripts/static_site/deploy.sh --dry-run`.
+- **No filter file.** The full build had zero parse errors when it shipped.
+- **Checked by breaking it:** an unclosed element added to `page_template.dart`
+  fails the dry run with the message, the page count and the first page.
+
+**Why not `vnu`**, which the plan named. Measured 2026-10-17 over a full build:
+`vnu` 26.10.12 found zero errors, and its only warnings were Sinhala text not in
+Unicode NFC on a few pages — content, not markup. A parser catches the class C9
+exists for with no new toolchain; `vnu` needs Java on the workstation and in CI.
+What it alone adds is content-model and attribute rules — which child each
+element allows, ARIA, `alt` — where a defect is an accessibility problem rather
+than a rendering or crawling one. For those, run `vnu` by hand after a template
+change that adds elements: install `vnu-jar` at a fixed version into a scratch
+folder, then `java -jar <that folder>/node_modules/vnu-jar/build/dist/vnu.jar
+--skip-non-html --errors-only static_site_generator/build`.
 
 ## C10. The app's strings came hand-copied from `app_si.arb` ✅ **shipped 2026-09-30**
 
@@ -1034,9 +1053,9 @@ What is left, re-ranked:
 4. **A9 font preload, A8 heading duplication** — measure first, both are small.
 5. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
 
-**C9 the HTML validator sits outside that ranking**, because it is release
-verification rather than an improvement: run it once over a full build before the
-first deploy, then keep it in `deploy.sh`. See [`web-release.md`](./web-release.md).
+**C9 the HTML parse check sits outside that ranking**, because it is release
+verification rather than an improvement. Shipped 2026-10-17; it runs in
+`deploy.sh`. See [`web-release.md`](./web-release.md).
 
 **Part D is not in the ranking at all.** Those are decisions waiting on a signal,
 not tasks waiting on a turn.

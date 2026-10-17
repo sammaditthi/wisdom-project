@@ -562,6 +562,31 @@ else
   echo ""
 fi
 
+# Every page parsed as a browser parses it (backlog C9). check_links reads the
+# markup with patterns, so an unclosed or misnested element passes it — and one
+# template means one defect is on every page. A stray element in <head> is the
+# costly case: the parser closes <head> there, the canonical after it lands in
+# <body>, and Google ignores it while the grep checks above still pass.
+#
+# Release and dry runs only: dev is noindex, and a dry run is how a build gets
+# checked before release day. Partial builds too, unlike check_links — whether
+# markup parses does not depend on having the whole corpus. Run from the
+# package so `dart run` resolves its parser even when --skip-tests skipped
+# test.sh's `pub get`.
+if [ "$TARGET" = "prod" ] || [ "$DRY_RUN" = true ]; then
+  echo "Checking markup..."
+  if ! (cd static_site_generator &&
+      dart run tool/check_markup.dart --build "$WISDOM_ROOT/$OUT"); then
+    echo "error: the build's HTML does not parse cleanly (report above)." >&2
+    echo "       Nothing uploaded." >&2
+    exit 1
+  fi
+  echo ""
+else
+  echo "Checking markup... skipped on a dev deploy; --prod and --dry-run run it."
+  echo ""
+fi
+
 echo "target     $TARGET"
 echo "account    $ACCOUNT_LINE"
 echo "files      $FILE_COUNT / $MAX_FILES   ($(du -sh "$OUT" | awk '{print $1}'))"
