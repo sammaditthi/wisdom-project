@@ -55,7 +55,7 @@ const String stackedLayoutId = 'L-stack';
 /// never in the app, and two names for one control is how the two surfaces
 /// start to drift.
 ///
-/// `final`, not `const`: an icon's markup is a getter.
+/// `final`, not `const`: a constant cannot read an icon's markup.
 final List<ReadingLayout> readingLayouts = [
   (
     id: paliOnlyLayoutId,
