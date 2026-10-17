@@ -59,7 +59,7 @@ void main() {
     matching: find.byTooltip('Search'),
   );
   // Its tooltip says Hide or Show, by the navigator's state.
-  final menuButton = find.byTooltip(RegExp(r'^(Hide|Show) Navigator$'));
+  final menuButton = find.byTooltip(RegExp(r'^(Hide|Show) navigator$'));
   final searchField = find.byType(app.SearchBar);
   final backArrow = find.descendant(
     of: searchField,
@@ -200,7 +200,8 @@ void main() {
 
   testWidgets(
     'phone width: the search icon opens search mode; a tap outside, '
-    'widening, back arrow, system back, Esc and picking a result close it',
+    'widening, back arrow, system back, Esc and picking a result close it; '
+    'system back then closes a reader menu first',
     (tester) async {
       // Picking a result (step 13) saves a recent search.
       forgetRecentSearchesAfterTest();
@@ -345,6 +346,18 @@ void main() {
         ),
         findsOneWidget,
       );
+
+      // ---- 14. System back closes a toolbar menu, not the app ----
+      // Flutter's menus don't take back themselves.
+      await tester.tap(find.byTooltip('Share'));
+      await pumpForSettle(tester);
+      expect(find.text('Copy link'), findsOneWidget, reason: '14. menu open');
+      expect(await pressSystemBack(tester), isTrue,
+          reason: '14. the screen takes the back');
+      expect(find.text('Copy link'), findsNothing,
+          reason: '14. back closed the menu');
+      expect(await pressSystemBack(tester), isFalse,
+          reason: '14. with nothing open, back is the app\'s');
     },
   );
 

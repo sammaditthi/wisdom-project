@@ -85,7 +85,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
   // ============================================
 
   /// Style for the text label of an action button shown next to an icon
-  /// (e.g. reader toolbar: Bookmark, Share). Color is left to the call site
+  /// (e.g. the refine dialogs' Clear). Color is left to the call site
   /// since it usually wants the theme's primary color.
   final TextStyle actionLabel;
 
@@ -129,8 +129,8 @@ class AppTypography extends ThemeExtension<AppTypography> {
   /// under a menu option
   final TextStyle menuSectionLabel;
 
-  /// Style for segmented button labels (P, P+S, S)
-  final TextStyle segmentedButtonLabel;
+  /// The layout letter (P, S) in the reader toolbar and its Layout menu
+  final TextStyle layoutGlyph;
 
   // ============================================
   // Input
@@ -175,7 +175,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
     required this.treeNodeLabelSelected,
     required this.dialogTitle,
     required this.menuSectionLabel,
-    required this.segmentedButtonLabel,
+    required this.layoutGlyph,
     required this.searchHint,
     required this.searchInput,
     required this.emptyStateMessage,
@@ -354,12 +354,14 @@ class AppTypography extends ThemeExtension<AppTypography> {
         color: colorScheme.onSurfaceVariant,
         height: AppFonts.uiLineHeight,
       ),
-      segmentedButtonLabel: TextStyle(
+      layoutGlyph: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
-        fontSize: scaledFonts.badge,
-        fontWeight: FontWeight.w500,
-        color: colorScheme.onSurface,
+        // Fixed like the 20px icons it sits among, which don't follow the
+        // font-size setting either.
+        fontSize: 14,
+        fontWeight: FontWeight.w700,
+        color: colorScheme.primary,
         height: AppFonts.uiLineHeight,
       ),
 
@@ -444,7 +446,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
     TextStyle? treeNodeLabelSelected,
     TextStyle? dialogTitle,
     TextStyle? menuSectionLabel,
-    TextStyle? segmentedButtonLabel,
+    TextStyle? layoutGlyph,
     TextStyle? searchHint,
     TextStyle? searchInput,
     TextStyle? emptyStateMessage,
@@ -472,7 +474,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
           treeNodeLabelSelected ?? this.treeNodeLabelSelected,
       dialogTitle: dialogTitle ?? this.dialogTitle,
       menuSectionLabel: menuSectionLabel ?? this.menuSectionLabel,
-      segmentedButtonLabel: segmentedButtonLabel ?? this.segmentedButtonLabel,
+      layoutGlyph: layoutGlyph ?? this.layoutGlyph,
       searchHint: searchHint ?? this.searchHint,
       searchInput: searchInput ?? this.searchInput,
       emptyStateMessage: emptyStateMessage ?? this.emptyStateMessage,
@@ -512,8 +514,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
       dialogTitle: TextStyle.lerp(dialogTitle, other.dialogTitle, t)!,
       menuSectionLabel:
           TextStyle.lerp(menuSectionLabel, other.menuSectionLabel, t)!,
-      segmentedButtonLabel:
-          TextStyle.lerp(segmentedButtonLabel, other.segmentedButtonLabel, t)!,
+      layoutGlyph: TextStyle.lerp(layoutGlyph, other.layoutGlyph, t)!,
       searchHint: TextStyle.lerp(searchHint, other.searchHint, t)!,
       searchInput: TextStyle.lerp(searchInput, other.searchInput, t)!,
       emptyStateMessage:

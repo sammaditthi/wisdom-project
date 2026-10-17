@@ -50,7 +50,7 @@ class AnchoredPageList extends StatelessWidget {
   static const _centerKey = ValueKey('anchored-page-list-center');
 
   static const _spacer =
-      SizedBox(height: PaneWidthConstants.readerActionButtonGroupHeight);
+      SizedBox(height: PaneWidthConstants.readerToolbarHeight);
 
   @override
   Widget build(BuildContext context) {

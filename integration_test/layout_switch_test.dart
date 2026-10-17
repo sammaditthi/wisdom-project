@@ -89,7 +89,7 @@ void main() {
     //      first capture.
     //
     // Driving switches through `updateActiveTabLayoutProvider` keeps the
-    // test independent of `ReaderLayoutPill` UI — the pill ultimately
+    // test independent of the toolbar's Layout menu, which ultimately
     // calls the same provider.
     // ---------------------------------------------------------------
     testWidgets(
@@ -463,8 +463,8 @@ void main() {
         await pumpForSettle(tester, const Duration(seconds: 1));
         expect(readSearchState(container, 0).currentMatchIndex, 4);
 
-        // Close search BEFORE switching layout. The layout pill in the
-        // UI is gated on !searchState.isVisible, so the real-world path
+        // Close search BEFORE switching layout. The toolbar's Layout menu
+        // is hidden while find in page is open, so the real-world path
         // always closes first. This also triggers the
         // recomputeActiveTabMatches drop-matches branch when the layout
         // listener fires next.

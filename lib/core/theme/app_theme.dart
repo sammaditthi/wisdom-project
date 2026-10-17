@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_fonts.dart';
+import 'app_menu_theme.dart';
 import 'app_typography.dart';
 import 'dictionary_badge_theme.dart';
 import 'text_entry_theme.dart';
@@ -75,6 +76,7 @@ class AppTheme {
       dividerColor: LightThemeColors.outline,
 
       colorScheme: colorScheme,
+      menuTheme: AppMenuTheme.of(colorScheme),
 
       textSelectionTheme: const TextSelectionThemeData(
         selectionColor: LightThemeColors.highlight,
@@ -139,6 +141,7 @@ class AppTheme {
       dividerColor: DarkThemeColors.divider,
 
       colorScheme: colorScheme,
+      menuTheme: AppMenuTheme.of(colorScheme),
 
       // Typography extensions
       extensions: [
@@ -198,6 +201,7 @@ class AppTheme {
       dividerColor: WarmThemeColors.divider,
 
       colorScheme: colorScheme,
+      menuTheme: AppMenuTheme.of(colorScheme),
 
       // Typography extensions
       extensions: [
