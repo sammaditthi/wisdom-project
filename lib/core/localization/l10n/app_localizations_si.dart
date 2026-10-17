@@ -30,6 +30,11 @@ class AppLocalizationsSi extends AppLocalizations {
   String get layoutSinhalaOnly => 'සිංහල පමණයි';
 
   @override
+  String currentLayout(String name) {
+    return 'පිරිසැලසුම: $name';
+  }
+
+  @override
   String get layoutSideBySide => 'දෙකම';
 
   @override
@@ -95,6 +100,9 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get layout => 'පිරිසැලසුම';
+
+  @override
+  String get appLayout => 'යෙදුම';
 
   @override
   String get hideNavigationBar => 'ප්‍රධාන සංචාලකය සඟවන්න';
@@ -294,6 +302,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String goToSutta(String name) {
     return 'වෙත යන්න: $name';
   }
+
+  @override
+  String get previousSutta => 'පෙර';
+
+  @override
+  String get nextSutta => 'ඊළඟ';
 
   @override
   String get findInPage => 'පිටුවේ සොයන්න';

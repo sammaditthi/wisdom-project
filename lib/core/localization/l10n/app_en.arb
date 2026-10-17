@@ -36,6 +36,16 @@
     "description": "Label for Sinhala-only reader layout"
   },
 
+  "currentLayout": "Layout: {name}",
+  "@currentLayout": {
+    "description": "Tooltip and screen-reader label of the reader toolbar's layout button, naming the current layout (e.g. Layout: Stacked)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "layoutSideBySide": "Side by side",
   "@layoutSideBySide": {
     "description": "Label for side-by-side reader layout showing both Pali and Sinhala horizontally"
@@ -143,6 +153,11 @@
 
   "layout": "Layout",
   "@layout": {
+    "description": "The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu"
+  },
+
+  "appLayout": "App layout",
+  "@appLayout": {
     "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
   },
 
@@ -487,6 +502,16 @@
         "type": "String"
       }
     }
+  },
+
+  "previousSutta": "Previous",
+  "@previousSutta": {
+    "description": "Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu"
+  },
+
+  "nextSutta": "Next",
+  "@nextSutta": {
+    "description": "Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu"
   },
 
   "findInPage": "Find in page",
@@ -908,10 +933,10 @@
 
   "share": "Share",
   "@share": {
-    "description": "Reader button (and FAB item) that opens the share menu"
+    "description": "Reader toolbar button (and scrolled-menu row) that opens the share menu"
   },
   "openAsWebPage": "Open as web page",
   "@openAsWebPage": {
-    "description": "App on the web only: reader button that opens the text being read on the static web site, in a new tab"
+    "description": "App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab"
   }
 }

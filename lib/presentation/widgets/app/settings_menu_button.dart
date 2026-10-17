@@ -63,7 +63,7 @@ class SettingsMenuButton extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _MenuSectionLabel((l10n) => l10n.layout),
+                _MenuSectionLabel((l10n) => l10n.appLayout),
                 const SizedBox(height: 4),
                 _LayoutSection(),
               ],

@@ -6,8 +6,8 @@ Started 2026-10-14. Design stage, not started.
 
 ## Two controls, both in the reader's settings menu
 
-1. **Hide navigation bar** — a switch that hides only the navigation rail (the Reader / Research icons). Tablet and desktop only, since phones have no rail. **Shipped 2026-10-14**: `navigationRailHiddenProvider`, under a "Layout" section in `settings_menu_button.dart`. It only takes effect while the Reader shows: other sections have no settings menu to bring the rail back.
-2. **Focus mode** — in the same "Layout" section. Hides everything except the text: the rail, the tree navigator, the tab bar and the app bar; on phones, the bottom bar too.
+1. **Hide navigation bar** — a switch that hides only the navigation rail (the Reader / Research icons). Tablet and desktop only, since phones have no rail. **Shipped 2026-10-14**: `navigationRailHiddenProvider`, under a "App layout" section in `settings_menu_button.dart`. It only takes effect while the Reader shows: other sections have no settings menu to bring the rail back.
+2. **Focus mode** — in the same "App layout" section. Hides everything except the text: the rail, the tree navigator, the tab bar and the app bar; on phones, the bottom bar too.
 
 ## Decided
 
@@ -23,7 +23,7 @@ Started 2026-10-14. Design stage, not started.
 
 ## To decide
 
-1. Inline switch below "Hide navigation bar", or a sub-menu? The "Layout" section shows only on tablet and desktop today; phones need focus mode too, so on phones it shows with the focus-mode switch alone.
+1. Inline switch below "Hide navigation bar", or a sub-menu? The "App layout" section shows only on tablet and desktop today; phones need focus mode too, so on phones it shows with the focus-mode switch alone.
 2. Where the exit button sits, and whether it fades out.
 3. Do find-in-page (Ctrl/Cmd+F) and the dictionary sheet still open in focus mode?
 4. Check Ctrl/Cmd+Alt+Z is free in every browser, as was done for W.

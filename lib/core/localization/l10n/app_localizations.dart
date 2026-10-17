@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Sinhala only'**
   String get layoutSinhalaOnly;
 
+  /// Tooltip and screen-reader label of the reader toolbar's layout button, naming the current layout (e.g. Layout: Stacked)
+  ///
+  /// In en, this message translates to:
+  /// **'Layout: {name}'**
+  String currentLayout(String name);
+
   /// Label for side-by-side reader layout showing both Pali and Sinhala horizontally
   ///
   /// In en, this message translates to:
@@ -266,11 +272,17 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  /// The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu
   ///
   /// In en, this message translates to:
   /// **'Layout'**
   String get layout;
+
+  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  ///
+  /// In en, this message translates to:
+  /// **'App layout'**
+  String get appLayout;
 
   /// Switch that hides the side navigation rail (Reader / Research icons) on tablet and desktop. Saved across restarts.
   ///
@@ -649,6 +661,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to: {name}'**
   String goToSutta(String name);
+
+  /// Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousSutta;
+
+  /// Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextSutta;
 
   /// Placeholder text for the in-page search text field
   ///
@@ -1130,13 +1154,13 @@ abstract class AppLocalizations {
   /// **'More options'**
   String get moreOptions;
 
-  /// Reader button (and FAB item) that opens the share menu
+  /// Reader toolbar button (and scrolled-menu row) that opens the share menu
   ///
   /// In en, this message translates to:
   /// **'Share'**
   String get share;
 
-  /// App on the web only: reader button that opens the text being read on the static web site, in a new tab
+  /// App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab
   ///
   /// In en, this message translates to:
   /// **'Open as web page'**
