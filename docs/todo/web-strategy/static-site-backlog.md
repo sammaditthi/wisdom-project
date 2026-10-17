@@ -558,7 +558,24 @@ site, so they moved to where unblocking work lives. They are bigger than C1–C5
 and share the part for the reason the part is named: the site drops content its
 source carries, and a suite that runs nowhere catches nothing.
 
-## C1. Tests for `buildSiteHeaders()` and the asset wiring
+## C1. Tests for `buildSiteHeaders()` and the asset wiring ✅ **shipped 2026-10-17**
+
+> **What landed.** Three layers, each catching what the others cannot:
+> - `test/wiring_contract_test.dart`, part 4 (no corpus, runs in `--quick`):
+>   no two `_headers` rules give one URL two values of a header; each
+>   `SiteAssets` URL moves when its own bytes do and only then; the NUL join;
+>   the font token.
+> - `test/asset_wiring_test.dart` (tagged `corpus`): runs the real generator
+>   over a canon subtree and its commentary, then checks every `/assets/` and
+>   `/fonts/` link in every page and the stylesheet equals the URL derived from
+>   the bytes written beside it, and that every `_headers` path rule names
+>   something the build wrote.
+> - `deploy.sh`: before the link check, fails on any asset link with no `?v=`
+>   across the whole build that ships.
+>
+> Each was checked by breaking the code it guards (a hand-written emblem link,
+> a font token over the wrong bytes, an overlapping cache rule, a rule naming a
+> missing file) and watching it fail. The text below is the reasoning, kept.
 
 **Not hygiene — the one hazard the `_headers` work introduced.** Everything else
 in Part C is a tidy-up that fails visibly. This one fails silently, on other
@@ -1027,11 +1044,8 @@ See A7.
 
 What is left, re-ranked:
 
-1. **C1 the asset-wiring tests** — before the next asset change, not after. A
-   `/assets/*` miss is unrecallable for a year and silent at build time, and
-   step 2 is an asset change. P5 added `og-card.png` as a sixth asset and a
-   fifth token without adding a test, so the gap is one file wider than when
-   this was written.
+1. ~~**C1 the asset-wiring tests** — before the next asset change, not after.~~
+   ✅ **done 2026-10-17**, ahead of step 2 as planned.
 2. **B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.* Each is
    a shared-chrome edit that invalidates every page's hash; shipping them
    separately pays the full push twice. Together: ~8 MB off the build, ~575 B off

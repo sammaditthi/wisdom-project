@@ -34,6 +34,9 @@
 /// positional row, `assets/site.js` reads it back by position, and the links
 /// are only assembled in a browser, where none of the six signals can look.
 ///
+/// Part 4 is `_headers` ⇄ `SiteAssets`: the year-long cache is only safe while
+/// every asset URL moves with its bytes (backlog C1).
+///
 /// ## Deliberately not here
 ///
 /// Whether the CSS *renders* correctly: that a 600 weight reads as distinct,
@@ -61,9 +64,12 @@ import 'package:static_site_generator/render/search_dialog.dart';
 import 'package:static_site_generator/render/search_index.dart';
 import 'package:static_site_generator/render/site_assets.dart';
 import 'package:static_site_generator/render/site_build.dart';
+import 'package:static_site_generator/render/site_headers.dart';
 import 'package:static_site_generator/render/stylesheet.dart';
 import 'package:test/test.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
+import 'support/asset_contract.dart';
 
 void main() {
   // The real committed tokens, not a synthetic map: a hand-written stand-in
@@ -880,6 +886,104 @@ void main() {
       }
     });
   });
+
+  // Part 4 (backlog C1): `/assets/*` and `/fonts/*` are cached `immutable` for
+  // a year, so the `?v=` is the only thing that tells a returning reader their
+  // copy is stale. `asset_wiring_test.dart` checks a real build end to end;
+  // these are the properties that hold without one.
+  group('the asset cache contract — _headers ⇄ SiteAssets', () {
+    test('no URL gets two different values of one header', () {
+      // Pages applies every rule a URL matches and joins a header set twice
+      // with a comma, so `/assets/*` beside `/assets/emblem.png` would ship
+      // two cache policies in one `Cache-Control`.
+      expect(_headerConflicts(parseHeaderRules(buildSiteHeaders())), isEmpty);
+
+      // The same check on that exact hazard, so it cannot pass by never
+      // seeing an overlap.
+      final hazard = parseHeaderRules('/assets/*\n  Cache-Control: a\n\n'
+          '/assets/emblem.png\n  Cache-Control: b\n');
+      expect(_headerConflicts(hazard), isNotEmpty);
+    });
+
+    test('each asset URL moves when its own bytes do, and only then', () {
+      SiteAssets assetsWith({
+        String css = 'a{}',
+        String script = 's',
+        String searchIndex = '[]',
+        List<int> emblem = const [1],
+        List<int> ogCard = const [2],
+        List<int> favicon = const [3],
+      }) =>
+          SiteAssets.forContent(
+            css: css,
+            script: script,
+            searchIndex: searchIndex,
+            emblem: emblem,
+            ogCard: ogCard,
+            favicon: favicon,
+          );
+      final before = assetUrls(assetsWith());
+      Set<String> moved(SiteAssets after) {
+        final urls = assetUrls(after);
+        return {
+          for (final name in before.keys)
+            if (urls[name] != before[name]) name,
+        };
+      }
+
+      expect(moved(assetsWith()), isEmpty,
+          reason: 'Same bytes must give the same URLs, or every deploy '
+              're-uploads every page.');
+      expect(moved(assetsWith(css: 'b{}')), {'stylesheet'});
+      // site.js reads index rows by position: the two move together or a
+      // fresh script can pair with a cached index.
+      expect(moved(assetsWith(script: 't')), {'script', 'searchIndex'});
+      expect(moved(assetsWith(searchIndex: '[1]')), {'script', 'searchIndex'});
+      expect(moved(assetsWith(emblem: const [9])), {'emblem'});
+      expect(moved(assetsWith(ogCard: const [9])), {'ogCard'});
+      expect(moved(assetsWith(favicon: const [9])), {'favicon'});
+    });
+
+    test('bytes cannot cross the script ⇄ index join and keep the URL', () {
+      SiteAssets split(String script, String searchIndex) =>
+          SiteAssets.forContent(
+            css: '',
+            script: script,
+            searchIndex: searchIndex,
+            emblem: const [],
+            ogCard: const [],
+            favicon: const [],
+          );
+      expect(split('ab', 'c').script, isNot(split('a', 'bc').script));
+    });
+
+    test('the font token moves when any face does', () {
+      const faces = [
+        [1],
+        [2],
+      ];
+      expect(
+          fontsVersion(faces),
+          fontsVersion(const [
+            [1],
+            [2],
+          ]));
+      expect(
+          fontsVersion(const [
+            [1],
+            [3],
+          ]),
+          isNot(fontsVersion(faces)),
+          reason: 'A re-subset face keeps its file name, so only the token '
+              'can tell a reader it changed.');
+      expect(
+          fontsVersion(const [
+            [1],
+          ]),
+          isNot(fontsVersion(faces)),
+          reason: 'A build missing a face is not the same fonts.');
+    });
+  });
 }
 
 // ── fixtures ─────────────────────────────────────────────────────────────────
@@ -1377,3 +1481,54 @@ int _countOf(String haystack, String needle) =>
 /// `<main class="content nav">`, and matching the full tag would hand back the
 /// entire document instead of failing.
 String _mainOf(String html) => html.split('<main class="content').last;
+
+/// One line per pair of [rules] that can match the same URL and set the same
+/// header to different values.
+List<String> _headerConflicts(List<HeaderRule> rules) => [
+      for (var i = 0; i < rules.length; i++)
+        for (var j = i + 1; j < rules.length; j++)
+          if (_patternsOverlap(rules[i].pattern, rules[j].pattern))
+            for (final MapEntry(key: name, :value) in rules[i].headers.entries)
+              if (rules[j].headers[name] case final other? when other != value)
+                '${rules[i].pattern} and ${rules[j].pattern} both set $name',
+    ];
+
+/// Whether one URL can match both `_headers` patterns.
+///
+/// Knows the shapes the file uses: an optional `https://host` and a path whose
+/// only `*` is trailing. Anything else fails the test rather than guessing.
+bool _patternsOverlap(String a, String b) {
+  final first = _parsePattern(a);
+  final second = _parsePattern(b);
+  if (first.host != null && second.host != null && first.host != second.host) {
+    fail('Two different host patterns ($a, $b): teach _patternsOverlap '
+        'whether they can match one host.');
+  }
+  return switch ((first.splat, second.splat)) {
+    (true, true) => first.prefix.startsWith(second.prefix) ||
+        second.prefix.startsWith(first.prefix),
+    (true, false) => second.prefix.startsWith(first.prefix),
+    (false, true) => first.prefix.startsWith(second.prefix),
+    (false, false) => first.prefix == second.prefix,
+  };
+}
+
+/// A `_headers` pattern split into its host (null: every host), the path
+/// before any `*`, and whether a trailing `*` follows.
+typedef _UrlPattern = ({String? host, String prefix, bool splat});
+
+_UrlPattern _parsePattern(String pattern) {
+  final scheme = RegExp(r'^https?://[^/]+').firstMatch(pattern);
+  final path = pattern.substring(scheme?.end ?? 0);
+  final star = path.indexOf('*');
+  if (!path.startsWith('/') ||
+      path.contains(':') ||
+      (star >= 0 && star != path.length - 1)) {
+    fail('"$pattern" is not a shape _patternsOverlap understands.');
+  }
+  return (
+    host: scheme?.group(0),
+    prefix: star < 0 ? path : path.substring(0, star),
+    splat: star >= 0,
+  );
+}
