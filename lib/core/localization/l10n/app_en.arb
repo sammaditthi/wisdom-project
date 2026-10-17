@@ -151,14 +151,9 @@
     "description": "Switch 1 — toggles the touching join (ZWJ before hal) for remaining clusters plus long-to-short vowel shortening. Default on."
   },
 
-  "layout": "Layout",
-  "@layout": {
-    "description": "The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu"
-  },
-
   "appLayout": "App layout",
   "@appLayout": {
-    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)"
+    "description": "Section header for the screen-layout switches in the settings menu (hide navigation bar)"
   },
 
   "hideNavigationBar": "Hide navigation bar",
@@ -502,16 +497,6 @@
         "type": "String"
       }
     }
-  },
-
-  "previousSutta": "Previous",
-  "@previousSutta": {
-    "description": "Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu"
-  },
-
-  "nextSutta": "Next",
-  "@nextSutta": {
-    "description": "Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu"
   },
 
   "findInPage": "Find in page",

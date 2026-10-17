@@ -272,13 +272,7 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// The reader's layout picker (how Pali and Sinhala are arranged): screen-reader name of the row of layout buttons in the scrolled actions menu
-  ///
-  /// In en, this message translates to:
-  /// **'Layout'**
-  String get layout;
-
-  /// Section header for the screen-layout switches in the settings menu (hide navigation bar; focus mode later)
+  /// Section header for the screen-layout switches in the settings menu (hide navigation bar)
   ///
   /// In en, this message translates to:
   /// **'App layout'**
@@ -661,18 +655,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to: {name}'**
   String goToSutta(String name);
-
-  /// Small caption above the sutta name on the previous-sutta row of the reader's scrolled actions menu
-  ///
-  /// In en, this message translates to:
-  /// **'Previous'**
-  String get previousSutta;
-
-  /// Small caption above the sutta name on the next-sutta row of the reader's scrolled actions menu
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get nextSutta;
 
   /// Placeholder text for the in-page search text field
   ///

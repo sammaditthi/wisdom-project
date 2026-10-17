@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/overlay_stack_provider.dart';
 
+/// Space between a button and its menu.
+const double _menuGap = 4;
+
 extension MenuControllerToggle on MenuController {
   void toggle() => isOpen ? close() : open();
 }
@@ -24,7 +27,6 @@ class DismissibleMenuAnchor extends ConsumerStatefulWidget {
   ) builder;
   final bool visible;
   final double? endAlignedWidth;
-  final double gap;
 
   const DismissibleMenuAnchor({
     super.key,
@@ -33,7 +35,6 @@ class DismissibleMenuAnchor extends ConsumerStatefulWidget {
     required this.builder,
     this.visible = true,
     this.endAlignedWidth,
-    this.gap = 4,
   });
 
   @override
@@ -85,7 +86,7 @@ class _DismissibleMenuAnchorState extends ConsumerState<DismissibleMenuAnchor> {
     return MenuAnchor(
       controller: _controller,
       childFocusNode: _buttonFocusNode,
-      alignmentOffset: Offset(width == null ? 0 : -width, widget.gap),
+      alignmentOffset: Offset(width == null ? 0 : -width, _menuGap),
       style: width == null
           ? null
           : const MenuStyle(alignment: AlignmentDirectional.bottomEnd),

@@ -1,6 +1,6 @@
 # Reader toolbar auto-hide — plan
 
-Started 2026-10-17. Plan ready, not started. Branch `feat/reader-toolbar-auto-hide`.
+Started 2026-10-17. Built 2026-10-17 on branch `feat/reader-toolbar-auto-hide`; not yet tried in the app.
 Design: [Reader toolbar · ways back canvas](https://claude.ai/artifact/1qPRDahEtzfvDJdDqtpwsw), the "Step 1" row. The rows above it are the options considered.
 
 **Goal:** one toolbar and no FAB. The toolbar gets out of the way while the reader reads and comes back when they scroll up.
@@ -133,10 +133,10 @@ Worth covering:
 
 ## Done when
 
-- [ ] No FAB on any platform, and no `reader_actions.dart`.
+- [x] No FAB on any platform, and no `reader_actions.dart`.
 - [ ] The toolbar hides on scrolling down, returns past the threshold, and shows at the top and the end.
 - [ ] Search jumps, anchoring, restores and keyboard scrolling never toggle it.
 - [ ] Go to beginning shows only mid-sutta and works.
 - [ ] Every action behaves as before; a menu closes when the toolbar hides, on find, a tab switch, an outside tap and Esc.
 - [ ] Threshold tuned on a phone, a trackpad and a mouse wheel.
-- [ ] `reader-toolbar-merge.md`, the deep-linking doc § B and `focus-mode.md` updated.
+- [x] `reader-toolbar-merge.md`, the deep-linking doc § B and `focus-mode.md` updated.

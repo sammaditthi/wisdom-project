@@ -59,8 +59,6 @@
 
   "paliTouching": "පාළි බැඳි අකුරු",
 
-  "layout": "පිරිසැලසුම",
-
   "appLayout": "යෙදුම",
 
   "hideNavigationBar": "ප්‍රධාන සංචාලකය සඟවන්න",
@@ -188,10 +186,6 @@
   "scrollToBeginning": "ආරම්භයට යන්න",
 
   "goToSutta": "වෙත යන්න: {name}",
-
-  "previousSutta": "පෙර",
-
-  "nextSutta": "ඊළඟ",
 
   "findInPage": "පිටුවේ සොයන්න",
 

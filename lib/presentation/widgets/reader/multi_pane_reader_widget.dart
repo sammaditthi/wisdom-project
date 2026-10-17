@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart' show computeHitSlop, kPrimaryButton;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../models/reader_layout.dart';
@@ -9,6 +10,7 @@ import '../../models/in_page_search_state.dart';
 import '../../../domain/entities/navigation/tipitaka_tree_node.dart';
 import '../../../domain/entities/reader/document_slice.dart';
 import '../../../domain/entities/reader/reader_unit.dart';
+import '../../providers/app_section_provider.dart';
 import '../../providers/document_provider.dart';
 import '../../providers/dictionary_provider.dart'
     show
@@ -36,7 +38,7 @@ import 'stacked_pane.dart';
 import 'reader_selection_handler.dart';
 import 'in_page_search_bar.dart';
 import 'reader_action_buttons.dart';
-import 'reader_actions.dart' show ReaderStepTarget;
+import 'toolbar_auto_hide.dart';
 import '../dictionary/dictionary_bottom_sheet.dart';
 import '../common/app_emblem.dart';
 import '../common/status_message_view.dart';
@@ -64,9 +66,17 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   // Shared with all pane widgets.
   final EntryKeyRegistry _entryKeyRegistry = EntryKeyRegistry();
 
-  // Tracks whether the user has scrolled away from the top.
+  // Tracks whether the user has scrolled away from the top: mid-unit, where
+  // the toolbar offers Go to beginning.
   // Updated in _onScroll; only calls setState when the value actually changes.
   bool _isScrolledDown = false;
+
+  final ToolbarAutoHide _toolbarAutoHide = ToolbarAutoHide();
+
+  // The scroll view the reader is scrolling, if any. Its context rather than
+  // a flag, so a view swapped out mid-fling can't pass the user's scroll on
+  // to the next view's restore.
+  BuildContext? _userScrollContext;
 
   // When true, the layout change listener is suppressed. Set during tab
   // switches to prevent the layout listener from firing when the "change"
@@ -125,25 +135,23 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     }
   }
 
-  /// Syncs the two things that follow how much of the unit is above the
-  /// viewport: Mode 1/Mode 2 of the action buttons, and the app bar's
-  /// "scrolled under" tint ([readerScrolledUnderProvider]).
+  /// Syncs what follows the scroll position, however it moved: mid-unit or
+  /// not, the toolbar's top and end rule ([ToolbarAutoHide.scrolledTo]), and
+  /// the app bar's "scrolled under" tint ([readerScrolledUnderProvider]).
   ///
-  /// Both read `extentBefore`, never `pixels`: offset 0 is the anchor row,
+  /// All read `extentBefore`, never `pixels`: offset 0 is the anchor row,
   /// which can sit pages into the unit. The tint uses `extentBefore > 0`, the
   /// threshold Material 3's own detection uses. Called from [_onScroll], and
   /// explicitly after anything that changes the content but not the offset
   /// (a restore, a new anchor), which notifies no scroll listener.
   void _syncScrollState() {
     if (!mounted || !_scrollController.hasClients) return;
-    final extentBefore = _scrollController.position.extentBefore;
+    final position = _scrollController.position;
+    final extentBefore = position.extentBefore;
 
-    // A small fixed threshold (not a full viewport) so Mode 2 kicks in
-    // promptly once the user starts scrolling, while still ignoring
-    // overscroll/bounce jitter near the top.
-    const scrollAwayFromTopThreshold = 60.0;
-    final scrolledDown = extentBefore > scrollAwayFromTopThreshold;
-    if (scrolledDown != _isScrolledDown) {
+    final scrolledDown = extentBefore > ToolbarAutoHide.topZone;
+    final toolbarChanged = _toolbarAutoHide.scrolledTo(position);
+    if (scrolledDown != _isScrolledDown || toolbarChanged) {
       setState(() => _isScrolledDown = scrolledDown);
     }
 
@@ -180,10 +188,33 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   /// Not a scroll: above the anchor `minScrollExtent` is only an estimate
   /// until those pages are built, so a jump to it stops short of the top.
   void _scrollToBeginning() {
-    // Reset scroll-tracking state so the button transitions correctly
-    // (from scroll-to-top to skip-previous once we're at the beginning).
+    // Drops Go to beginning now, not after the post-frame sync.
     setState(() => _isScrolledDown = false);
     _anchorAt(null);
+  }
+
+  /// Feeds the reader's own scrolling to [_toolbarAutoHide]. A programmatic
+  /// jump carries no user scroll direction, so it never gets this far.
+  bool _onScrollNotification(ScrollNotification notification) {
+    if (notification.depth != 0) return false;
+    if (notification is UserScrollNotification) {
+      _userScrollContext = notification.direction == ScrollDirection.idle
+          ? null
+          : notification.context;
+    } else if (notification is ScrollUpdateNotification &&
+        notification.context == _userScrollContext &&
+        _toolbarAutoHide.userScrolled(
+          notification.scrollDelta ?? 0,
+          notification.metrics,
+        )) {
+      setState(() {});
+    }
+    return false;
+  }
+
+  /// Shows the toolbar, e.g. on opening a sutta.
+  void _showToolbar() {
+    if (_toolbarAutoHide.show()) setState(() {});
   }
 
   /// Anchors the active tab at [anchor] (null: the unit's top), with the
@@ -339,6 +370,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         // land on the new one.
         _scrollSaveDebounce?.cancel();
 
+        // Opening a sutta opens a tab, so this also covers opening.
+        _showToolbar();
+
         // Clear entry key registry — old tab's keys are stale
         _entryKeyRegistry.clear();
 
@@ -363,6 +397,17 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
           ref.read(readerScrolledUnderProvider.notifier).state = false;
         }
       }
+    });
+
+    // Previous / Next change the tab's sutta in place.
+    ref.listen<String?>(activeNodeKeyProvider, (previous, next) {
+      if (previous != next) _showToolbar();
+    });
+
+    // The IndexedStack keeps the reader mounted in other sections, so a
+    // return to it is only seen here.
+    ref.listen<AppSection>(selectedAppSectionProvider, (previous, next) {
+      if (previous != next && next == AppSection.reader) _showToolbar();
     });
 
     // Restore scroll position once the unit's pages are actually on screen.
@@ -400,13 +445,15 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       }
     });
 
-    // Listen to in-page search state changes to trigger scroll-to-match
+    // Listen to in-page search state changes to trigger scroll-to-match, and
+    // to bring the toolbar back when find closes.
     ref.listen<InPageSearchState>(activeInPageSearchStateProvider,
         (previous, next) {
       if (next.currentMatchIndex >= 0 &&
           next.currentMatchIndex != (previous?.currentMatchIndex ?? -1)) {
         _scrollToCurrentMatch(next);
       }
+      if ((previous?.isVisible ?? false) && !next.isVisible) _showToolbar();
     });
 
     // The unit resolves before its text does, so both are watched: the unit
@@ -433,13 +480,13 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         ? null
         : ref.watch(neighbourLeafProvider((nodeKey, ReaderStep.next)));
 
-    // Visibility flags for the two action button modes.
-    // Computed once here so IgnorePointer, AnimatedOpacity, and AnimatedSlide
-    // all reference the same boolean — avoids duplication and drift.
-    // "Scrolled down" counts everything above the viewport, anchor or not.
+    // Computed once here so IgnorePointer, ExcludeFocus, AnimatedOpacity,
+    // AnimatedSlide and the toolbar's menus all read the same flag. Pinned
+    // for screen readers, to whom a control that moves away is lost.
     final hasContent = slice != null && !slice.isEmpty;
-    final showMode1 = hasContent && !searchState.isVisible && !_isScrolledDown;
-    final showMode2 = hasContent && !searchState.isVisible && _isScrolledDown;
+    final showToolbar = hasContent &&
+        !searchState.isVisible &&
+        (MediaQuery.accessibleNavigationOf(context) || _toolbarAutoHide.shown);
 
     return Stack(
       children: [
@@ -470,10 +517,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         if (searchState.isVisible)
           Positioned(
             // Stable key so the Stack matches this child by identity. Without
-            // it, inserting this child shifts the keyless Positioned wrappers
-            // below by one slot, and the FAB's (opacity-1) AnimatedOpacity
-            // element gets reused to render the Mode 1 toolbar for a frame —
-            // making the top toolbar flash in on every open.
+            // it, inserting this child shifts the siblings below by one slot,
+            // and an element of one gets reused to render another for a frame
+            // (it once made the toolbar flash in on every open).
             key: const ValueKey('in-page-search-bar'),
             top: 8,
             right: 16,
@@ -489,73 +535,50 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
               ),
             ),
           ),
-        // Mode 1: the action toolbar at top-right when at the unit's beginning.
-        // IgnorePointer disables taps on the invisible widget.
+        // The action toolbar at top-right. It hides while the reader reads on
+        // and comes back on a scroll up ([ToolbarAutoHide]).
+        // IgnorePointer and ExcludeFocus keep a hidden toolbar out of reach.
         if (hasContent)
           Positioned(
-            // Keyed so reconciliation pins this to the Mode 1 element no matter
-            // what conditional siblings appear/disappear above it (see the
-            // search-bar key note above).
+            // Keyed so reconciliation pins this to the toolbar's element no
+            // matter what conditional siblings appear/disappear above it (see
+            // the search-bar key note above).
             key: const ValueKey('reader-actions-top'),
             top: 12,
             // Bounded on both sides so the toolbar gets the width it may use.
             left: 16,
             right: 16,
             child: IgnorePointer(
-              ignoring: !showMode1,
-              child: AnimatedOpacity(
-                opacity: showMode1 ? 1.0 : 0.0,
-                // Matches Mode 2's 200ms so the two modes cross-fade
-                // symmetrically with no brief "neither visible" gap.
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutCubic,
-                child: Align(
-                  alignment: Alignment.topRight,
-                  // Shrinks the toolbar a little on the narrowest phones
-                  // rather than letting it overflow.
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.topRight,
-                    child: ReaderActionToolbar(
-                      visible: showMode1,
-                      onSearchTap: () => ref
-                          .read(inPageSearchStatesProvider.notifier)
-                          .openSearch(),
-                      previous: _stepTarget(previousNode),
-                      next: _stepTarget(nextNode),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        // Mode 2: FAB at bottom-right (scrolled down), opening the actions
-        // menu.
-        if (hasContent)
-          Positioned(
-            // Keyed so reconciliation pins this to the Mode 2 (FAB) element —
-            // see the search-bar key note above.
-            key: const ValueKey('reader-actions-fab'),
-            bottom: 24,
-            right: 16,
-            child: IgnorePointer(
-              ignoring: !showMode2,
-              child: AnimatedOpacity(
-                opacity: showMode2 ? 1.0 : 0.0,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutCubic,
-                child: AnimatedSlide(
-                  offset: showMode2 ? Offset.zero : const Offset(0, 0.3),
+              ignoring: !showToolbar,
+              child: ExcludeFocus(
+                excluding: !showToolbar,
+                child: AnimatedOpacity(
+                  opacity: showToolbar ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOutCubic,
-                  child: ReaderActionMenuFab(
-                    visible: showMode2,
-                    onSearchTap: () => ref
-                        .read(inPageSearchStatesProvider.notifier)
-                        .openSearch(),
-                    onScrollTap: _scrollToBeginning,
-                    previous: _stepTarget(previousNode),
-                    next: _stepTarget(nextNode),
+                  child: AnimatedSlide(
+                    offset: showToolbar ? Offset.zero : const Offset(0, -0.3),
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutCubic,
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      // Shrinks the toolbar a little on the narrowest phones
+                      // rather than letting it overflow.
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.topRight,
+                        child: ReaderActionToolbar(
+                          visible: showToolbar,
+                          onSearchTap: () => ref
+                              .read(inPageSearchStatesProvider.notifier)
+                              .openSearch(),
+                          previous: _stepTarget(previousNode),
+                          next: _stepTarget(nextNode),
+                          onScrollToBeginning:
+                              _isScrolledDown ? _scrollToBeginning : null,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -689,7 +712,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   /// Delegates to the appropriate pane widget based on reader layout.
   ///
   /// Keyed by the tab's index, so a tab switch starts a fresh scroll view at
-  /// that tab's saved offset rather than keeping the last tab's.
+  /// that tab's saved offset rather than keeping the last tab's. Its scrolling
+  /// drives the toolbar; the dictionary sheet sits beside it, so the sheet's
+  /// own list never reaches [_onScrollNotification].
   Widget _buildContentLayout(
     BuildContext context,
     DocumentSlice slice,
@@ -697,9 +722,12 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     ReaderLayout readerLayout,
     InPageSearchState searchState,
   ) {
-    return KeyedSubtree(
-      key: ValueKey(ref.watch(activeTabIndexProvider)),
-      child: _buildPane(slice, anchor, readerLayout, searchState),
+    return NotificationListener<ScrollNotification>(
+      onNotification: _onScrollNotification,
+      child: KeyedSubtree(
+        key: ValueKey(ref.watch(activeTabIndexProvider)),
+        child: _buildPane(slice, anchor, readerLayout, searchState),
+      ),
     );
   }
 

@@ -99,9 +99,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliTouching => 'Touching letters';
 
   @override
-  String get layout => 'Layout';
-
-  @override
   String get appLayout => 'App layout';
 
   @override
@@ -302,12 +299,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String goToSutta(String name) {
     return 'Go to: $name';
   }
-
-  @override
-  String get previousSutta => 'Previous';
-
-  @override
-  String get nextSutta => 'Next';
 
   @override
   String get findInPage => 'Find in page';

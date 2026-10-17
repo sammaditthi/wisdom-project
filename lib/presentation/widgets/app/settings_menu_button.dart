@@ -368,7 +368,7 @@ class _ContentLanguageSelector extends ConsumerWidget {
   }
 }
 
-/// Screen-layout switches. Focus mode joins here later (docs/todo/reader/focus-mode.md).
+/// Screen-layout switches.
 class _LayoutSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
