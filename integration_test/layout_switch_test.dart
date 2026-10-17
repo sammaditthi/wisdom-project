@@ -89,7 +89,7 @@ void main() {
     //      first capture.
     //
     // Driving switches through `updateActiveTabLayoutProvider` keeps the
-    // test independent of `ReaderLayoutPill` UI — the pill ultimately
+    // test independent of the toolbar's Layout menu, which ultimately
     // calls the same provider.
     // ---------------------------------------------------------------
     testWidgets(

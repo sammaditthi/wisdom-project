@@ -25,7 +25,7 @@ Design: [Reader toolbar merge canvas](https://claude.ai/artifact/4W4A57wzXDm2dXL
 
 ## How it is built
 
-- **`ReaderActionToolbar`** (`widgets/reader/reader_action_buttons.dart`): the pill, its buttons in three groups (view, reading, outward) with a divider between two groups.
+- **`ReaderActionToolbar`** (`widgets/reader/reader_action_buttons.dart`): the pill, its buttons in three groups (this page, another sutta, outside the app) with a divider between two groups.
 - Layout ▾ and Share ▾ are `MenuAnchor` buttons with `MenuItemButton` rows. Keyboard navigation, focus, outside-tap and Esc close, and screen-reader roles come with them.
 - Every menu goes through `DismissibleMenuAnchor` (`widgets/common/`), which the search match-options menu uses too: it puts the menu on the overlay stack while open and closes it when its button fades out. Every menu takes its look from `AppMenuTheme` (`core/theme/`), set as `ThemeData.menuTheme`: 12px corners, a 1px outline, the same selected-row tint and divider height.
 - An open menu closes when the toolbar hides, on an outside tap (a tab switch is one) and on Esc.

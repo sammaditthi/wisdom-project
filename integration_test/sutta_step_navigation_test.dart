@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -7,11 +8,13 @@ import 'package:the_wisdom_project/presentation/providers/document_provider.dart
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/reader_scroll_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/reader_unit_provider.dart';
+import 'package:the_wisdom_project/presentation/widgets/reader/toolbar_auto_hide.dart';
 
 import 'test_overrides.dart';
 
 /// Integration tests for the reader's step navigation — the previous and next
-/// sutta buttons, and the scroll-to-top action that shares their corner.
+/// sutta buttons, and Go to beginning, which joins them in the toolbar
+/// mid-sutta.
 ///
 /// **The buttons step between leaves, not between readable nodes.** A container
 /// is a unit here — tapping සීලක්ඛන්ධවග්ගො renders the whole vagga — so leaving
@@ -48,14 +51,14 @@ void main() {
     // Test 1: FTS mid-sutta
     // =================================================================
     testWidgets(
-      '1. FTS mid-sutta: shows scroll-to-top icon and scrolls to sutta beginning',
+      '1. FTS mid-sutta: Go to beginning returns to the sutta beginning',
       (tester) async {
         final container = await pumpReaderApp(tester);
 
         // An FTS hit inside බ්රහ්මජාලසුත්තං. The tab is still the whole
         // sutta, anchored at page 5 entry 3: it opens on that row with the
-        // pages above it still to scroll up into, which is what the two
-        // modes below key off.
+        // pages above it still to scroll up into, which is what puts Go to
+        // beginning in the toolbar.
         final tab = ReaderTab.fromNode(
           nodeKey: 'dn-1-1',
           paliName: 'බ්රහ්මජාලසුත්තං',
@@ -71,23 +74,14 @@ void main() {
             reason: 'The anchor row is pages into the sutta, so the tab '
                 'must open with those pages above the viewport');
 
-        // Scrolled down shows the expandable FAB (Mode 2) instead of the
-        // pill (Mode 1). The scroll-to-top icon is inside the collapsed FAB.
-        // ASSERT: FAB trigger visible, pill icons hidden
-        expect(find.byIcon(Icons.more_vert), findsOneWidget,
-            reason: 'Mid-sutta should show the expandable FAB trigger');
-        expect(find.byIcon(Icons.skip_previous).hitTestable(), findsNothing,
-            reason: 'Mid-sutta should NOT show skip-previous icon');
+        // ASSERT: opened mid-sutta, the toolbar shows with Go to beginning.
+        // `.hitTestable()`: the toolbar never leaves the tree, kept out of
+        // reach by IgnorePointer while hidden.
+        expect(
+            find.byIcon(Icons.vertical_align_top).hitTestable(), findsOneWidget,
+            reason: 'Mid-sutta the toolbar should offer Go to beginning');
 
-        // Expand the FAB to reveal the scroll-to-top action
-        await tester.tap(find.byIcon(Icons.more_vert));
-        await pumpForSettle(tester);
-
-        // ASSERT: vertical_align_top icon now visible inside the expanded FAB
-        expect(find.byIcon(Icons.vertical_align_top), findsOneWidget,
-            reason: 'Expanded FAB should show scroll-to-top icon');
-
-        // ACT: Tap the scroll-to-top button
+        // ACT: Tap Go to beginning
         await tester.tap(find.byIcon(Icons.vertical_align_top));
         await pumpForSettle(tester);
 
@@ -101,12 +95,10 @@ void main() {
             reason: 'Nothing of the unit may be left above the viewport');
         expect(container.read(activeNodeKeyProvider), 'dn-1-1',
             reason: 'nodeKey should remain the same');
-        // `.hitTestable()` matters: Mode 1 is always in the tree, kept out of
-        // reach by IgnorePointer and faded to zero. Without it this passes
-        // whether or not the mode actually came back — see the same finder at
-        // the top of this test, which needs it to prove the opposite.
+        expect(find.byIcon(Icons.vertical_align_top), findsNothing,
+            reason: 'At the beginning Go to beginning has nothing to do');
         expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
-            reason: 'At the beginning again, Mode 1 comes back');
+            reason: 'At the beginning the toolbar still shows');
       },
     );
 
@@ -259,7 +251,7 @@ void main() {
         expect(find.byIcon(Icons.skip_previous), findsNothing,
             reason: 'No skip-previous at the very first sutta');
         expect(find.byIcon(Icons.vertical_align_top), findsNothing,
-            reason: 'No scroll-to-top at beginning of first sutta');
+            reason: 'No Go to beginning at the beginning of the first sutta');
       },
     );
 
@@ -324,80 +316,72 @@ void main() {
     );
 
     // =================================================================
-    // Test 8: User scrolled down — button switches to "Go to beginning"
+    // Test 8: Scrolling hides the toolbar, scrolling back brings it back
     // =================================================================
     testWidgets(
-      '8. User scrolled down: button changes from skip-previous to scroll-to-top',
+      '8. Scrolling: reading on hides the toolbar, scrolling back past the '
+      'threshold brings it back with Go to beginning',
       (tester) async {
         final container = await pumpReaderApp(tester);
 
         // Open බ්රහ්මජාලසුත්තං (dn-1-1) at its beginning. The unit runs to
-        // the sutta's end, which is far more than the one viewport this
-        // test needs to scroll past.
+        // the sutta's end, far more than this test scrolls through.
         final tab = tabFromNode(container, 'dn-1-1');
-
         await openTab(tester, container, tab);
 
-        // VERIFY: At the beginning, button is skip_previous. `.hitTestable()`
-        // like the two assertions further down — the icon is in the tree in
-        // either mode, so a bare finder would let this test start from an
-        // unproven premise.
-        expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
-            reason: 'Initially at sutta beginning → skip-previous icon');
+        // `.hitTestable()` throughout: the toolbar never leaves the tree, so
+        // a bare finder would pass whether or not it shows.
+        final toolbar = find.byIcon(Icons.skip_previous).hitTestable();
+        final goToBeginning =
+            find.byIcon(Icons.vertical_align_top).hitTestable();
+        expect(toolbar, findsOneWidget,
+            reason: 'At the sutta beginning the toolbar shows');
+        expect(goToBeginning, findsNothing,
+            reason: 'At the beginning Go to beginning has nothing to do');
 
         final controller = readerScrollController(tester);
-
-        // Verify content is scrollable past one viewport
-        final maxExtent = controller.position.maxScrollExtent;
         final vpDim = controller.position.viewportDimension;
-        expect(maxExtent, greaterThan(vpDim),
-            reason:
-                'Content must be scrollable past viewport (max=$maxExtent, vp=$vpDim)');
+        expect(controller.position.maxScrollExtent, greaterThan(vpDim * 3),
+            reason: 'Content must run well past what this test scrolls '
+                '(max=${controller.position.maxScrollExtent}, vp=$vpDim)');
 
-        // ACT: Scroll down past one viewport height.
-        // Use the controller directly + explicit pump cycle to ensure the
-        // scroll listener fires and setState triggers a rebuild.
-        controller.jumpTo(vpDim + 200);
+        // ACT: a jump, as a search hit or a restore makes. Not the reader's
+        // own scrolling, so the toolbar stays.
+        controller.jumpTo(vpDim);
         await tester.pump();
-        await tester.pump(const Duration(milliseconds: 100));
-        await tester.pump(const Duration(milliseconds: 100));
+        expect(toolbar, findsOneWidget,
+            reason: 'A programmatic jump must not hide the toolbar');
+        expect(goToBeginning, findsOneWidget,
+            reason: 'Mid-sutta the toolbar offers Go to beginning');
 
-        // Verify the scroll actually happened
-        expect(controller.position.pixels, greaterThan(vpDim),
-            reason:
-                'Scroll position should be past viewport (actual=${controller.position.pixels})');
+        // ACT: the reader reads on, with the mouse wheel.
+        await _wheel(tester, 300);
+        expect(toolbar, findsNothing,
+            reason: 'Scrolling down mid-sutta hides the toolbar');
 
-        // ASSERT: Scrolling switches from Mode 1 (pill) to Mode 2 (FAB)
-        // The FAB trigger (more_vert) should be visible; the pill's
-        // skip_previous should be hidden.
-        expect(find.byIcon(Icons.more_vert), findsOneWidget,
-            reason:
-                'After scrolling past one viewport → expandable FAB visible');
-        // Mode 1 widget is still in the tree (AnimatedOpacity fades it out),
-        // but IgnorePointer makes it non-interactive. Use hitTestable() to
-        // verify it's effectively hidden.
-        expect(find.byIcon(Icons.skip_previous).hitTestable(), findsNothing,
-            reason:
-                'Scroll-to-top FAB should replace skip-previous when scrolled down');
+        // ACT: back up by less than the threshold, then past it in total,
+        // over two notches: a pause between them keeps the count.
+        const reveal = ToolbarAutoHide.revealDistance;
+        await _wheel(tester, -reveal * 0.5);
+        expect(toolbar, findsNothing,
+            reason: 'Scrolling back less than the threshold keeps it hidden');
+        await _wheel(tester, -reveal * 0.6);
+        expect(toolbar, findsOneWidget,
+            reason: 'Scrolling back past the threshold brings it back');
+        expect(goToBeginning, findsOneWidget,
+            reason: 'Still mid-sutta, so with Go to beginning');
 
-        // Expand the FAB to reveal the scroll-to-top action
-        await tester.tap(find.byIcon(Icons.more_vert));
+        // ACT: Go to beginning
+        await tester.tap(goToBeginning);
         await pumpForSettle(tester);
 
-        // ASSERT: vertical_align_top icon now visible inside the expanded FAB
-        expect(find.byIcon(Icons.vertical_align_top), findsOneWidget,
-            reason: 'Expanded FAB should show scroll-to-top icon');
-
-        // ACT: Tap the scroll-to-top button
-        await tester.tap(find.byIcon(Icons.vertical_align_top));
-        await pumpForSettle(tester);
-
-        // ASSERT: Back at the top, button reverts to skip_previous (Mode 1)
-        // `.hitTestable()` for the same reason the absence above needs it:
-        // Mode 1 never leaves the tree, so a bare finder passes whether or
-        // not it came back.
-        expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
-            reason: 'After scrolling back to top → skip-previous icon returns');
+        // ASSERT: at the top, the toolbar stays and Go to beginning goes.
+        expect(controller.position.extentBefore, 0.0,
+            reason: 'Nothing of the unit may be left above the viewport');
+        expect(find.byIcon(Icons.vertical_align_top), findsNothing,
+            reason: 'At the beginning Go to beginning has nothing to do');
+        expect(toolbar, findsOneWidget,
+            reason: 'At the beginning the toolbar shows');
       },
     );
   });
@@ -553,8 +537,8 @@ void main() {
         expect(find.byIcon(Icons.skip_next), findsNothing,
             reason: 'No skip-next at the very last sutta');
 
-        // Positive control: the pill is rendering, and only the forward slot
-        // dropped out of it. Without this the assertion above passes on a
+        // Positive control: the toolbar is rendering, and only the forward
+        // slot dropped out of it. Without this the assertion above passes on a
         // reader with no action buttons at all.
         expect(find.byIcon(Icons.skip_previous), findsOneWidget,
             reason: 'The last sutta still has a previous one');
@@ -596,10 +580,10 @@ void main() {
     );
 
     // =================================================================
-    // Test 6: From the top of an anchored tab, next opens in Mode 1
+    // Test 6: From the top of an anchored tab, next opens at the top
     // =================================================================
     testWidgets(
-      '6. Anchored tab scrolled to its top: next opens the sutta in Mode 1',
+      '6. Anchored tab scrolled to its top: next opens the sutta at its top',
       (tester) async {
         final container = await pumpReaderApp(tester);
 
@@ -628,7 +612,7 @@ void main() {
         expect(controller.position.extentBefore, 0,
             reason: 'The step must start from the very top of the unit');
         expect(find.byIcon(Icons.skip_next).hitTestable(), findsOneWidget,
-            reason: 'At the top, Mode 1 shows with its next button');
+            reason: 'At the top, the toolbar shows with its next button');
 
         // ACT. The anchor row still has pages above it, so a jump to offset 0
         // measured against this layout reads as "scrolled down".
@@ -641,12 +625,23 @@ void main() {
             reason: 'A step opens the sutta at its top, with no anchor');
         expect(controller.position.extentBefore, 0,
             reason: 'Nothing of the new sutta is above the viewport');
+        expect(find.byIcon(Icons.vertical_align_top), findsNothing,
+            reason: 'At the top of the new sutta the reader must not count '
+                'as scrolled down, so no Go to beginning');
         expect(find.byIcon(Icons.skip_previous).hitTestable(), findsOneWidget,
-            reason: 'At the top of the new sutta Mode 1 must show, not the '
-                'scrolled-down FAB');
+            reason: 'And the toolbar shows');
         expect(container.read(readerScrolledUnderProvider), isFalse,
             reason: 'And the app bar must not be tinted as scrolled under');
       },
     );
   });
+}
+
+/// Scrolls the reader by [dy] with one mouse-wheel notch: the reader's own
+/// scrolling, unlike a controller jump.
+Future<void> _wheel(WidgetTester tester, double dy) async {
+  final pointer = TestPointer(1, PointerDeviceKind.mouse)
+    ..hover(tester.getCenter(readerScrollView));
+  await tester.sendEventToBinding(pointer.scroll(Offset(0, dy)));
+  await tester.pump();
 }

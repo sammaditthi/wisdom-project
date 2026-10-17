@@ -62,8 +62,8 @@ class ReaderActionToolbar extends ConsumerWidget {
           onTap: target.onTap,
         );
 
-    // View, reading and outward, with a divider between two groups. The
-    // reading group can be empty.
+    // This page, another sutta, outside the app, with a divider between two
+    // groups. The middle group can be empty.
     final groups = <List<Widget>>[
       [
         _LayoutMenuButton(visible: visible),
@@ -72,6 +72,14 @@ class ReaderActionToolbar extends ConsumerWidget {
           tooltip: l10n.findInPage,
           onTap: onSearchTap,
         ),
+        // Last in its group: when a tap takes it away, the buttons to its
+        // left slide over, so Find lands under the pointer, not Next.
+        if (onScrollToBeginning != null)
+          _ToolbarButton.icon(
+            Icons.vertical_align_top,
+            tooltip: l10n.scrollToBeginning,
+            onTap: onScrollToBeginning,
+          ),
       ],
       [
         // Commentary/Root text toggle — only when there is a parallel text
@@ -88,15 +96,7 @@ class ReaderActionToolbar extends ConsumerWidget {
         if (previous != null) step(previous, Icons.skip_previous),
         if (next != null) step(next, Icons.skip_next),
       ],
-      [
-        if (onScrollToBeginning != null)
-          _ToolbarButton.icon(
-            Icons.vertical_align_top,
-            tooltip: l10n.scrollToBeginning,
-            onTap: onScrollToBeginning,
-          ),
-        _ShareMenuButton(visible: visible),
-      ],
+      [_ShareMenuButton(visible: visible)],
     ].where((group) => group.isNotEmpty);
 
     return Material(
