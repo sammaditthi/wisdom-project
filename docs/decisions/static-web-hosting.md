@@ -486,8 +486,9 @@ writes, so a renamed asset cannot leave a rule pointing at nothing):
 | `site.css` | hash of the CSS |
 | `site.js` | hash of the script **and** the index |
 | `search-index.json` | the same hash |
-| `emblem.png` | hash of the image |
+| `emblem.png`, `@2x`, `@3x` | one hash of all three copies, cut together |
 | `og-card.png` | hash of the image (its own token, not the emblem's — the two are re-cut independently) |
+| `favicon.png` | hash of the image |
 | `fonts/*.woff2` | one hash of all eight faces, carried in the CSS |
 
 Two things to know before editing it:

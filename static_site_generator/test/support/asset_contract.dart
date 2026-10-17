@@ -29,20 +29,20 @@ Map<String, String> assetUrls(SiteAssets assets) => {
       'stylesheet': assets.stylesheet,
       'script': assets.script,
       'searchIndex': assets.searchIndex,
-      'emblem': assets.emblem,
+      for (final (i, url) in assets.emblems.indexed) 'emblems[$i]': url,
       'ogCard': assets.ogCard,
       'favicon': assets.favicon,
     };
 
 /// The path of every `/assets/` or `/fonts/` link in [source], query included,
-/// origin dropped, in document order. Only text right after a quote or `(`
-/// counts, so a comment that names `static_site_generator/assets/` is not a
-/// link. A stylesheet's `../fonts/…` comes back as `/fonts/…`: `site.css`
-/// sits one level down, in `assets/`.
+/// origin dropped, in document order. Only text right after a quote, a `(` or
+/// a `srcset`'s `, ` counts, so a comment that names
+/// `static_site_generator/assets/` is not a link. A stylesheet's `../fonts/…`
+/// comes back as `/fonts/…`: `site.css` sits one level down, in `assets/`.
 Iterable<String> assetLinksIn(String source) => _assetLink
     .allMatches(source)
     .map((match) => match.group(1)!)
     .map((link) => link.startsWith('../') ? link.substring(2) : link);
 
 final RegExp _assetLink = RegExp(
-    r'''["'(](?:https?://[^/"']+)?((?:\.\.)?/(?:assets|fonts)/[^"'()<>\s]+)''');
+    r'''(?:["'(]|, )(?:https?://[^/"']+)?((?:\.\.)?/(?:assets|fonts)/[^"'()<>\s]+)''');

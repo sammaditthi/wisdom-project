@@ -1,5 +1,7 @@
 import '../domain/theme_tokens.dart';
 import 'reading_layouts.dart';
+import 'site_assets.dart';
+import 'site_icons.dart';
 import 'web_fonts.dart';
 
 /// Builds `assets/site.css` from the app's exported theme tokens.
@@ -38,6 +40,7 @@ String buildStylesheet(ThemeTokens tokens, {required String fontVersion}) {
   _writePageChrome(css, tokens);
   _writeEntryStyles(css, tokens);
   _writeLayouts(css, tokens);
+  _writeIcons(css);
   _writeToolbarNav(css);
   _writeToolbarApp(css);
   _writeSearch(css);
@@ -48,7 +51,9 @@ String buildStylesheet(ThemeTokens tokens, {required String fontVersion}) {
 }
 
 /// Below this width, two columns of text stop being readable and side-by-side
-/// folds to one — see [_writeLayouts].
+/// folds to one — see [_writeLayouts]. The same 768px as the app's
+/// `ResponsiveUtils.mobileBreakpoint`, below which the app opens a page stacked
+/// in portrait.
 ///
 /// ⚠️ **This is 768px, not 691px.** Inside a media query `rem` resolves against
 /// the *initial* root font size (16px) and ignores `html { font-size: 90% }`,
@@ -139,14 +144,20 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// `.breadcrumb` went from 0.85em (12.24px) to the page's own UI size
 /// (14.4px). The trail scales by 14.4 / 12.24 and the pinned controls do not, so
 /// each step is its pinned width plus the scaled trail, the 28px emblem
-/// excepted: 861.6 → 946.6 → **60rem**, 669.6 → 728.0 → **46rem**,
-/// 438.8 → 480.2 → **31rem**, and [_layoutsFoldWidth] 573.6 → 615.0 →
-/// **39rem**. Scaled, not re-measured over the corpus.
+/// excepted: 861.6 → 946.6, 669.6 → 728.0, 438.8 → 480.2, and
+/// [_layoutsFoldWidth] 573.6 → 615.0. Scaled, not re-measured over the corpus.
+///
+/// ## The 36px emblem added 8px (2026-10-17)
+///
+/// 8px more of the trail that never gives way, so the same method again:
+/// 946.6 → 954.6 → **60rem**, 728.0 → 736.0 → **46rem**, 480.2 → 488.2 →
+/// **31rem**, and the fold 615.0 → 623.0 → **39rem**. None crosses a rem; the
+/// pill's step, which adds to the first, does.
 ///
 /// ## What it costs on a phone
 ///
 /// A tap: the layout buttons are in the ⋮ menu. In return the trail gets ~214px
-/// at 390px; emblem 28 and the leaf's 17px of padding leave ~169px for the
+/// at 390px; emblem 36 and the leaf's 17px of padding leave ~161px for the
 /// page's own name against a ~148px median.
 ///
 /// [_trailKeepThree] no longer coincides with [_twoColumnMinWidth], as it did
@@ -164,9 +175,9 @@ const String _layoutsFoldWidth = '39rem';
 ///
 /// Set so the trail never has less room with the pill than it had with the ⋮
 /// at [_trailKeepThree]. Measured in Chrome (2026-10-17, no book icon): the
-/// pill is 164px and pins 140px more than the ⋮. 946.6 + 140 = 1086.6px,
+/// pill is 164px and pins 140px more than the ⋮. 954.6 + 140 = 1094.6px,
 /// rounded up to the next whole rem (16px in a media query).
-const String _appPillMinWidth = '68rem';
+const String _appPillMinWidth = '69rem';
 
 /// Height of the sticky reader toolbar.
 ///
@@ -609,7 +620,6 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('}');
   css.writeln('.layouts label + label '
       '{ border-left: 1px solid var(--c-outline); }');
-  css.writeln('.layout-icon { width: 18px; height: 18px; }');
   css.writeln();
 
   // Which button is lit. Every layout lights its own button — except the
@@ -777,6 +787,37 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln();
 }
 
+/// Every icon in [siteIcons]: one shared rule, then each one's size and mask.
+///
+/// `currentColor` paints it, so a lit layout button or a hovered link colours
+/// its icon as the inline SVG's stroke did. Forced colours and print treat a
+/// background differently from an SVG; the last four declarations undo that.
+void _writeIcons(StringBuffer css) {
+  css.writeln(
+      '/* Icons: a mask each, in the text colour (site_icons.dart). */');
+  css.writeln('${siteIcons.map((icon) => '.${icon.maskClass}').join(', ')} {');
+  css.writeln('  display: inline-block;');
+  css.writeln('  flex: none;');
+  css.writeln('  background-color: currentColor;');
+  // Prefixed for Chrome before 120 and Safari before 15.4.
+  css.writeln('  -webkit-mask: var(--icon) center / contain no-repeat;');
+  css.writeln('  mask: var(--icon) center / contain no-repeat;');
+  // Forced colours repaint a background as the page behind it, which hides
+  // the icon. `preserve-parent-color` paints it in its parent's forced text
+  // colour, as the UA does for an inline SVG. `none` is the fallback where
+  // that value is unknown: the icon keeps the page's own colours.
+  css.writeln('  forced-color-adjust: none;');
+  css.writeln('  forced-color-adjust: preserve-parent-color;');
+  css.writeln('  -webkit-print-color-adjust: exact;');
+  css.writeln('  print-color-adjust: exact;');
+  css.writeln('}');
+  for (final icon in siteIcons) {
+    css.writeln('.${icon.maskClass} { width: ${icon.size}px; '
+        'height: ${icon.size}px; --icon: url("${icon.maskUrl}"); }');
+  }
+  css.writeln();
+}
+
 /// The bar's navigation half: the trail, the emblem that opens it, and the up
 /// button pinned beyond its right edge.
 ///
@@ -830,7 +871,7 @@ void _writeToolbarNav(StringBuffer css) {
   // The vertical padding is slack for `overflow: hidden`. `line-height: 1` sets
   // the box to the em, and Sinhala ink runs taller than its em, so without this
   // each segment would shave the marks off its own text. 6px keeps the box at
-  // ~26px, still under the 28px emblem, so the bar's height is untouched.
+  // ~26px, still under the 36px emblem, so the bar's height is untouched.
   css.writeln('.breadcrumb > :not(.home) {');
   css.writeln('  position: relative;');
   css.writeln('  min-width: 0;');
@@ -880,7 +921,8 @@ void _writeToolbarNav(StringBuffer css) {
   // `.breadcrumb`'s padding box and clipped by its `overflow: hidden`.
   css.writeln('.home:focus-visible '
       '{ ${_focusRing()} border-radius: 8px; }');
-  css.writeln('.home img { display: block; width: 28px; height: 28px; }');
+  css.writeln('.home img '
+      '{ display: block; width: ${emblemSize}px; height: ${emblemSize}px; }');
   css.writeln();
   // Where compressing stops paying and dropping starts. Derivation and the
   // measurements behind each width are on [_trailKeepThree] and its two
@@ -938,7 +980,7 @@ void _writeToolbarNav(StringBuffer css) {
   // Three declarations serve one of the two and are harmless on the other:
   // `text-decoration` for the anchor, which sits outside `.breadcrumb` and so
   // keeps the UA underline; `padding` and `cursor` for the button's UA
-  // defaults. Neither needs a font reset — both hold an SVG and no text.
+  // defaults. Neither needs a font reset — both hold an icon and no text.
   css.writeln('.up, .search-trigger, .more-trigger {');
   css.writeln('  display: flex;');
   css.writeln('  flex: none;');
@@ -963,8 +1005,6 @@ void _writeToolbarNav(StringBuffer css) {
   // without this the search button shows for every reader with JS off — the
   // dead control C8 forbids.
   css.writeln('.search-trigger[hidden] { display: none; }');
-  css.writeln('.up-icon, .search-icon, .more-icon '
-      '{ width: 18px; height: 18px; }');
   css.writeln();
 }
 
@@ -983,7 +1023,6 @@ void _writeToolbarApp(StringBuffer css) {
   css.writeln('  white-space: nowrap;');
   css.writeln('  text-decoration: none;');
   css.writeln('}');
-  css.writeln('.new-tab-icon { width: 14px; height: 14px; flex: none; }');
   // Same height as the bar's other controls; filled, as its one action.
   css.writeln('.app-pill {');
   css.writeln('  box-sizing: border-box;');
@@ -1149,7 +1188,6 @@ void _writeSearch(StringBuffer css) {
   css.writeln('.search-close:hover '
       '{ background: var(--c-surface-container-low); }');
   css.writeln('.search-close:focus-visible { ${_focusRing()} }');
-  css.writeln('.search-close-icon { width: 20px; height: 20px; }');
   css.writeln();
 
   // `:empty` keeps the line from reserving space before there is anything to

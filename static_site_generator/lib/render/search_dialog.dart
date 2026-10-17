@@ -28,6 +28,7 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import 'entry_renderer.dart';
 import 'node_labels.dart';
 import 'site_build.dart';
+import 'site_icons.dart';
 
 /// ARB key of the accessible name of the trigger and of the dialog it opens —
 /// "search the Tipitaka". Its trailing ellipsis is kept: on a control it says
@@ -79,7 +80,7 @@ String searchTrigger(SiteBuild build) {
   return '<button class="search-trigger" id="$searchTriggerId" type="button" '
       'hidden aria-haspopup="dialog" '
       'aria-keyshortcuts="Control+Shift+F Meta+Shift+F" '
-      'title="$label" aria-label="$label">$_searchGlyph</button>';
+      'title="$label" aria-label="$label">${searchIcon.markup}</button>';
 }
 
 /// The modal itself, emitted at the end of every page's body.
@@ -140,21 +141,9 @@ String searchDialog(SiteBuild build) {
       'autocomplete="off" autocorrect="off" spellcheck="false">'
       '<button class="search-close" id="$searchCloseId" type="button" '
       'title="$close" aria-label="$close">'
-      '$_closeGlyph</button>'
+      '${searchCloseIcon.markup}</button>'
       '</div>'
       '<p class="search-status" id="$searchStatusId" role="status"></p>'
       '<ul class="search-results" id="$searchResultsId"></ul>'
       '</dialog>';
 }
-
-/// Inline SVG on the same terms as the layout and up icons: `currentColor`, no
-/// second request, drawn to the same 1.6 stroke so the bar reads as one set.
-const String _searchGlyph = '<svg class="search-icon" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="1.6" '
-    'stroke-linecap="round" aria-hidden="true">'
-    '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/></svg>';
-
-const String _closeGlyph = '<svg class="search-close-icon" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="1.6" '
-    'stroke-linecap="round" aria-hidden="true">'
-    '<path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>';

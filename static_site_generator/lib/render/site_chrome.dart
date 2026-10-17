@@ -26,6 +26,7 @@ import 'reading_layouts.dart';
 import 'search_dialog.dart';
 import 'site_assets.dart';
 import 'site_build.dart';
+import 'site_icons.dart';
 
 /// ARB key of the home link's name — the app's `navHome`, not new wording.
 const String homeLabelKey = 'navHome';
@@ -60,15 +61,19 @@ const String upLabel = 'ඉහළ';
 /// that stops being a link on one page is the odder behaviour, and the
 /// alternative costs a branch through every caller to save one anchor.
 ///
-/// The emblem's URL arrives from [SiteAssets] rather than being written here:
-/// it carries a hash of the image, which only the build that read the bytes can
-/// know.
+/// The emblem's URLs arrive from [SiteAssets] rather than being written here:
+/// they carry a hash of the images, which only the build that read the bytes
+/// can know. `src` is the 1× copy; `srcset` offers the denser ones.
 String homeLink(SiteBuild build) {
   final label = build.strings.html(homeLabelKey);
+  final emblems = build.assets.emblems;
+  final srcset = [
+    for (var i = 1; i < emblems.length; i++) '${emblems[i]} ${i + 1}x',
+  ].join(', ');
   return '<a class="home" href="/" '
       'title="$label">'
-      '<img src="${build.assets.emblem}" width="28" height="28" '
-      'alt="$label"></a>';
+      '<img src="${emblems.first}" srcset="$srcset" '
+      'width="$emblemSize" height="$emblemSize" alt="$label"></a>';
 }
 
 /// The trail: home, the ancestors, and the page itself.
@@ -176,16 +181,8 @@ String upLink(TipitakaNode parent) {
   // covers `"`, which is what makes the same string safe in an attribute.
   final name = '$upLabel ${nodeLabelHtml(parent)}';
   return '<a class="up" href="${tipitakaUrl(parent.nodeKey)}" '
-      'title="$name">$_upGlyph</a>';
+      'title="$name">${upIcon.markup}</a>';
 }
-
-/// Inline SVG on the same terms as the layout icons: `currentColor`, no second
-/// request, ~140 bytes, and drawn to their stroke weight so the two controls in
-/// the bar read as one set.
-const String _upGlyph = '<svg class="up-icon" viewBox="0 0 24 24" fill="none" '
-    'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '
-    'stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
 
 /// A list of child links — a container's table of contents, and `/`'s list of
 /// the seven roots.
@@ -273,7 +270,7 @@ String toolbar({
     buffer.write('<span class="app-sep" aria-hidden="true"></span>');
     buffer.write(_appLink(appUrl, build, pill: true));
     buffer.write('<details class="more"><summary class="more-trigger" '
-        'aria-label="$more" title="$more">$_moreGlyph</summary>'
+        'aria-label="$more" title="$more">${moreIcon.markup}</summary>'
         '<div class="more-menu">${withLayouts ? _layoutGroup(build) : ''}'
         '${_appLink(appUrl, build)}</div></details>');
   }
@@ -302,14 +299,4 @@ String _layoutGroup(SiteBuild build) {
 String _appLink(String url, SiteBuild build, {bool pill = false}) =>
     '<a class="app-link${pill ? ' app-pill' : ''}" href="$url" '
     'target="_blank" rel="noopener">'
-    '<span>${build.strings.html('readInApp')}</span>$_newTabGlyph</a>';
-
-/// The ↗ that says the link opens a new tab.
-const String _newTabGlyph = '<svg class="new-tab-icon" viewBox="0 0 24 24" '
-    'fill="none" stroke="currentColor" stroke-width="2" '
-    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
-    '<path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg>';
-
-const String _moreGlyph = '<svg class="more-icon" viewBox="0 0 24 24" '
-    'fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/>'
-    '<circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
+    '<span>${build.strings.html('readInApp')}</span>${newTabIcon.markup}</a>';

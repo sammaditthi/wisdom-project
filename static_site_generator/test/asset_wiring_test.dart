@@ -47,7 +47,10 @@ void main() {
       css: _text(out, stylesheetOutputPath),
       script: _text(out, siteScriptOutputPath),
       searchIndex: _text(out, searchIndexOutputPath),
-      emblem: _bytes(out, emblemOutputPath),
+      emblems: [
+        for (final name in emblemFileNames)
+          _bytes(out, '$assetsOutputDir/$name'),
+      ],
       ogCard: _bytes(out, ogCardOutputPath),
       favicon: _bytes(out, faviconOutputPath),
     );
@@ -71,8 +74,12 @@ void main() {
           ...assetLinksIn(file.readAsStringSync()),
     };
 
-    // Guards against a scan that finds nothing and so passes.
-    expect(linked, containsAll([expected.stylesheet, expected.script]));
+    // Guards against a scan that finds nothing and so passes. The emblem's
+    // denser copies are only in a `srcset`.
+    expect(
+        linked,
+        containsAll(
+            [expected.stylesheet, expected.script, ...expected.emblems]));
     expect(linked.where((link) => link.startsWith('/$fontsOutputDir/')),
         isNotEmpty);
     expect(linked.difference(valid), isEmpty,

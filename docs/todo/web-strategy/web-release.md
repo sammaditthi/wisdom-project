@@ -49,7 +49,7 @@ Ranked. Nothing left on it is a must.
 |---|---|---|
 | ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh`, on every deploy (§2). |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
-| should | **B2 + B1 in one deploy** | Toolbar SVGs into the stylesheet, re-cut the emblem. Both edit shared chrome, so shipping them apart pays the full push twice. Do them before the first prod push or well after it, never between. |
+| ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. C2's policy now needs `img-src 'self' data:` (backlog C2). |
 | should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
 | optional | A9 font preload, A8 heading duplication | Small, measure first. |
 
