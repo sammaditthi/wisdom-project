@@ -503,8 +503,8 @@ void main() {
         );
 
         final first = readSearchState(container, 0).currentMatch!;
-        expect(isEntryOnScreen(tester, first.pageIndex, first.entryIndex),
-            isTrue,
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isTrue,
             reason: 'Reopening search must bring match[0] on screen');
 
         // Step forward 5 times — reaches match[5] (page 6 entry 4 si,

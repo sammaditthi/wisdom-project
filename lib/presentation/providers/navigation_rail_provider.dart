@@ -6,9 +6,8 @@ import '../../core/storage/storage_keys.dart';
 /// Whether the user has hidden the navigation rail (the "Hide navigation
 /// bar" switch in settings). Starts from the saved value; shown if none.
 final navigationRailHiddenProvider = StateProvider<bool>((ref) {
-  final stored = ref
-      .read(keyValueStoreProvider)
-      .getInt(StorageKeys.navigationRailHidden);
+  final stored =
+      ref.read(keyValueStoreProvider).getInt(StorageKeys.navigationRailHidden);
   return stored == 1;
 });
 

@@ -33,8 +33,8 @@ class AppShell extends ConsumerWidget {
     final isTabletOrDesktop = ResponsiveUtils.isTabletOrDesktop(context);
     // Hidden only while the Reader shows: its settings menu holds the switch,
     // and other sections have no menu to bring the rail back.
-    final railHidden = ref.watch(navigationRailHiddenProvider) &&
-        section == AppSection.reader;
+    final railHidden =
+        ref.watch(navigationRailHiddenProvider) && section == AppSection.reader;
 
     // One spec per shown section, in _navSections order. The exhaustive
     // switch means adding a section won't compile until it gets an icon and
@@ -71,8 +71,7 @@ class AppShell extends ConsumerWidget {
     final navIndex = _navSections.indexOf(section);
 
     void selectSection(int index) {
-      ref.read(selectedAppSectionProvider.notifier).state =
-          _navSections[index];
+      ref.read(selectedAppSectionProvider.notifier).state = _navSections[index];
     }
 
     return Scaffold(
