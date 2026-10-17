@@ -402,11 +402,8 @@ mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
 
 ## B2. Move the toolbar SVG icons into the stylesheet — ~24 MB
 
-> **Re-measured 2026-10-17** on a full build. The 2026-08-15 figure was 575 B a
-> page for three icons; the search dialog, the ⋮ menu and the "read in the app"
-> link have added four more since, and the ⋮ repeats two of them.
-
-Seven icons are emitted verbatim into the pages:
+Seven icons are emitted verbatim into the pages (measured 2026-10-17, full
+build):
 
 | glyph | where | on a reading page |
 |---|---|---|
@@ -526,12 +523,6 @@ on a page, so hand-trimming it returns a fraction of its raw weight:
 | all five inline SVGs (incl. search, close) | 981 | 232 |
 | search dialog + trigger | 1,757 | 400 |
 
-⚠ **Correction to B2.** It is still worth doing for the ~8.6 MB it takes off the
-build, but "~575 B off every single page's wire payload" is a raw number; the
-wire saving is **~92 B/page, 1.4 MB corpus-wide**. Step 5 of the order repeats
-the same figure. *(Superseded 2026-10-17: with seven icons it is ~370 B brotli
-per reading page — see B2.)*
-
 **Compression Dictionary Transport** collects the whole 1,381 B without touching
 a template: page 1 is served with `Use-As-Dictionary`, the browser keeps it, and
 the next navigation sends `Available-Dictionary` so the server compresses
@@ -577,73 +568,42 @@ source carries, and a suite that runs nowhere catches nothing.
 
 ## C1. Tests for `buildSiteHeaders()` and the asset wiring ✅ **shipped 2026-10-17**
 
-> **What landed.** Three layers, each catching what the others cannot:
-> - `test/wiring_contract_test.dart`, part 4 (no corpus, runs in `--quick`):
->   no two `_headers` rules give one URL two values of a header; each
->   `SiteAssets` URL moves when its own bytes do and only then; the NUL join;
->   the font token.
-> - `test/asset_wiring_test.dart` (tagged `corpus`): runs the real generator
->   over a canon subtree and its commentary, then checks every `/assets/` and
->   `/fonts/` link in every page and the stylesheet equals the URL derived from
->   the bytes written beside it, and that every `_headers` path rule names
->   something the build wrote.
-> - `deploy.sh`: before the link check, fails on any asset link with no `?v=`
->   across the whole build that ships.
->
-> Each was checked by breaking the code it guards (a hand-written emblem link,
-> a font token over the wrong bytes, an overlapping cache rule, a rule naming a
-> missing file) and watching it fail. The text below is the reasoning, kept.
-
-**Not hygiene — the one hazard the `_headers` work introduced.** Everything else
-in Part C is a tidy-up that fails visibly. This one fails silently, on other
-people's machines, for a year. Rank it above C2.
-
-**Why it waited:** tests in this repo are written on request, not by reflex.
-
-Nothing currently tests `render/site_headers.dart` at all, and the wiring test
-hard-codes its asset URLs (`?v=test`), so the hashing in `sitegen.dart` is
-uncovered — an unhashed build would ship green. Three belong in
-`test/wiring_contract_test.dart`, which already exists to catch exactly this
-class of bug (two files that must agree with nothing connecting them):
-
-| test | catches |
-|---|---|
-| no two `_headers` rules match the same path | the comma-join hazard the whole file is shaped around — Pages merges matching rules and joins duplicate header names, so an overlap silently emits two policies in one `Cache-Control` |
-| every non-wildcard rule names a file the build writes | a renamed asset leaving a rule pointing at nothing |
-| a page's `<link rel="stylesheet">` equals `SiteAssets.forContent(...)`'s | the hashing wiring itself, which no test sees today |
-
-> **P5 widened this, 2026-08-22.** `assets/og-card.png` is a sixth asset and a
-> fifth token, added with no test — and it is the first one whose absence is
-> *invisible on the site*: a stale or unhashed stylesheet is eventually
-> noticeable, a stale link-preview card is only ever seen by a scraper. The
-> third test below is now one file further from covering what it should.
-
-Collapsing to `/assets/*` made the third of those matter more than it did.
-Five exact paths failed **safe**: an asset with no rule of its own simply kept
-the revalidating default, so forgetting one cost speed. A wildcard fails
-**unsafe** — anything that lands in that directory linked without a `?v=` is
-served `immutable` for a year, so forgetting one costs a year of a stale file on
-readers' disks. "Every asset URL comes from `SiteAssets`" went from a tidiness
-convention to the load-bearing invariant of the whole caching scheme, and
-nothing enforces it.
-
-Three properties make that worth a test rather than care:
+`/assets/*` and `/fonts/*` are cached by one wildcard `immutable` rule each, so
+"every asset URL comes from `SiteAssets`" is what the whole caching scheme rests
+on. Exact paths failed **safe**: an asset with no rule of its own kept the
+revalidating default, so forgetting one cost speed. A wildcard fails **unsafe**:
+anything in those directories linked without its `?v=` is cached on readers'
+disks for a year. Three properties make that a test rather than care:
 
 - **Purging Cloudflare's cache does not fix it.** That clears the edge, not the
   copy on a reader's disk, and no API reaches a browser cache. The only exit is
   to change the URL — i.e. add the `?v=` that was missing — which rewrites every
-  page's `<head>` and re-uploads the full ~425 MB.
+  page's `<head>` and re-uploads the whole build.
 - **You will not notice.** Hard-refresh bypasses the browser cache, so the bug
   is invisible to whoever shipped it and visible only to readers who already
   loaded the page once.
 - **It is silent at build time.** An unhashed asset produces a valid build, a
   green deploy, and a correct-looking page.
 
-The properties `SiteAssets` is supposed to hold are cheap to assert and were
-verified by hand once (2026-08-15, all passing): same inputs → same URLs;
-editing the CSS moves only the stylesheet URL; editing *either* `site.js` or the
-index moves **both** of their URLs; editing the emblem moves only the emblem;
-and the NUL join makes `("ab","c")` and `("a","bc")` hash differently.
+Three layers enforce it, each catching what the others cannot:
+
+- `test/wiring_contract_test.dart`, part 4 (no corpus, runs in `--quick`): no
+  two `_headers` rules give one URL two values of a header — Pages joins them
+  with a comma, so an overlap ships two policies in one `Cache-Control`; each
+  `SiteAssets` URL moves when its own bytes do and only then; the NUL join; the
+  font token.
+- `test/asset_wiring_test.dart` (tagged `corpus`): runs the real generator over
+  a canon subtree and its commentary, then checks every `/assets/` and
+  `/fonts/` link in every page and the stylesheet equals the URL derived from
+  the bytes written beside it, and that every `_headers` path rule names
+  something the build wrote. It derives those URLs with `SiteAssets` itself, so
+  it catches links that bypass `SiteAssets`; a bug inside it is part 4's.
+- `deploy.sh`: before the link check, fails on any asset link with no `?v=`
+  across the whole build that ships.
+
+Each was checked by breaking the code it guards and watching it fail. All three
+name `assets/` and `fonts/` explicitly: a new `immutable` directory in
+`_headers` needs adding to the test's pattern and the script's.
 
 ## C2. A Content-Security-Policy header
 
@@ -1061,19 +1021,18 @@ See A7.
 
 What is left, re-ranked:
 
-1. ~~**C1 the asset-wiring tests** — before the next asset change, not after.~~
-   ✅ **done 2026-10-17**, ahead of step 2 as planned.
-2. **B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.* Each is
+1. **B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.* Each is
    a shared-chrome edit that invalidates every page's hash; shipping them
    separately pays the full push twice. Together: ~24 MB off the build, ~370 B
-   brotli off every reading page, ~40 KB off first paint. **B1 is unopposed now** — the OG card is
-   its own file, so the emblem's 200px is subsidising nothing.
-3. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
+   brotli off every reading page, ~40 KB off first paint. **B1 is unopposed
+   now** — the OG card is its own file, so the emblem's 200px is subsidising
+   nothing.
+2. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
    every item below it cheaper to ship. Spec in
    [`web-release.md`](./web-release.md) §5.
-4. **C2 CSP** — its own deploy and verify.
-5. **A9 font preload, A8 heading duplication** — measure first, both are small.
-6. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
+3. **C2 CSP** — its own deploy and verify.
+4. **A9 font preload, A8 heading duplication** — measure first, both are small.
+5. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
 
 **C9 the HTML validator sits outside that ranking**, because it is release
 verification rather than an improvement: run it once over a full build before the
