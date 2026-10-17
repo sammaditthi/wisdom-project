@@ -391,28 +391,44 @@ than the toolbar does. Both are true; neither survives closely:
   square is the wrong shape and too small regardless. A5 will cut a dedicated
   raster, so the toolbar mark is not subsidising it.
 
-**Action:** re-cut to 56×56 (2× for a 28px mark) in `make_emblem.sh`, expect
-~4–6 KB, commit the output. If A5 wants an OG raster, add it as a second file.
+**Action:** re-cut to 56×56 (2× for a 28px mark), expect ~4–6 KB, commit the
+output — in which script, see below. If A5 wants an OG raster, add it as a second file.
 Build-size gain is trivial; **first-paint gain is ~40 KB**, the largest available.
 
-## B2. Move the toolbar SVG icons into the stylesheet — ~8 MB
+**Where to cut it (2026-10-17).** `make_emblem.sh` needs `sips`, which is
+macOS-only. Since 2026-10-14 `assets/icons/make_icons.sh` (Pillow, any OS) cuts
+the app's small emblems and the favicon the site already uses, so the toolbar
+mark belongs there too; `og-card.png` stays in `make_emblem.sh`.
 
-Three icons are emitted verbatim into every page:
+## B2. Move the toolbar SVG icons into the stylesheet — ~24 MB
 
-- the up-arrow — `render/site_chrome.dart:181` (`_upGlyph`)
-- side-by-side and stacked layout marks — `render/reading_layouts.dart:71,77`,
-  sharing `_iconFrame` at `:103`
+> **Re-measured 2026-10-17** on a full build. The 2026-08-15 figure was 575 B a
+> page for three icons; the search dialog, the ⋮ menu and the "read in the app"
+> link have added four more since, and the ⋮ repeats two of them.
 
-That's **575 B/page → 8.1 MB corpus-wide** for three shapes that never change.
-Declaring them once in `site.css` as `mask-image` data URIs moves them into the
-one file every visitor already caches.
+Seven icons are emitted verbatim into the pages:
 
-This is the only item that improves **both** numbers meaningfully: ~8 MB off the
-build, and ~575 B off every single page's wire payload.
+| glyph | where | on a reading page |
+|---|---|---|
+| `_iconFrame` + the side-by-side and stacked marks | `render/reading_layouts.dart` | 4 (the bar, and the ⋮ menu's copy) |
+| `_bookGlyph`, `_newTabGlyph` | `_appLink`, `render/site_chrome.dart` | 2 each (the pill, and the ⋮ menu's copy) |
+| `_upGlyph`, `_moreGlyph` | `render/site_chrome.dart` | 1 each |
+| `_searchGlyph`, `_closeGlyph` | `render/search_dialog.dart` | 1 each, on every page |
+
+That's **2,641 B on every reading page**, 400–1,793 B on a TOC page and 400 B
+on `/` — about 24 MB of that build, 5.6% of its HTML, for shapes that never
+change. Declaring them once in `site.css` as `mask-image` data URIs moves them
+into the one file every visitor already caches.
+
+This is the only item that improves **both** numbers meaningfully: ~24 MB off
+the build, and **~370 B brotli** (~400 B gzip) off every reading page. The wire
+figure is far below the raw one because the ⋮ copies compress against the bar's
+(B6).
 
 Watch the details — `currentColor` stroke becomes `background-color` under
 `mask-image`, and the icons must stay invisible to assistive tech exactly as
-`aria-hidden="true"` makes them today.
+`aria-hidden="true"` makes them today. A masked background is not an inline
+SVG in forced-colors mode or in print; check both.
 
 Per-page repeated chrome for context, measured over a 400-page random sample
 (pre-search-dialog):
@@ -513,7 +529,8 @@ on a page, so hand-trimming it returns a fraction of its raw weight:
 ⚠ **Correction to B2.** It is still worth doing for the ~8.6 MB it takes off the
 build, but "~575 B off every single page's wire payload" is a raw number; the
 wire saving is **~92 B/page, 1.4 MB corpus-wide**. Step 5 of the order repeats
-the same figure.
+the same figure. *(Superseded 2026-10-17: with seven icons it is ~370 B brotli
+per reading page — see B2.)*
 
 **Compression Dictionary Transport** collects the whole 1,381 B without touching
 a template: page 1 is served with `Use-As-Dictionary`, the browser keeps it, and
@@ -1048,8 +1065,8 @@ What is left, re-ranked:
    ✅ **done 2026-10-17**, ahead of step 2 as planned.
 2. **B2 SVG icons → CSS** and **B1 re-cut the emblem** — *in one deploy.* Each is
    a shared-chrome edit that invalidates every page's hash; shipping them
-   separately pays the full push twice. Together: ~8 MB off the build, ~575 B off
-   every page, ~40 KB off first paint. **B1 is unopposed now** — the OG card is
+   separately pays the full push twice. Together: ~24 MB off the build, ~370 B
+   brotli off every reading page, ~40 KB off first paint. **B1 is unopposed now** — the OG card is
    its own file, so the emblem's 200px is subsidising nothing.
 3. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
    every item below it cheaper to ship. Spec in
@@ -1080,8 +1097,8 @@ clause on `hasPreamble`.
 **C12 the breadcrumb scroll and web text at 100%** is parity with the app, not
 a fix: one change, whenever it is wanted.
 
-The build stays ~417 MB after all of it (425 less B2's ~8 MB; B1 is ~40 KB and
-does not show), because **the corpus is the corpus** — **365 MB of the 394 MB
+The build stays above 400 MB after all of it (436 MB on 2026-10-17, less B2's
+~24 MB; B1 is ~40 KB and does not show), because **the corpus is the corpus** — **365 MB of the 394 MB
 2026-08-09 build was Sinhala and Pali text** at 3 UTF-8 bytes per character, and
 no amount of markup work touches that. The page-count reduction in
 `reading-units-and-grouping.md` is the only change that moves the total
