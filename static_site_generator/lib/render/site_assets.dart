@@ -120,8 +120,8 @@ const List<String> emblemFileNames = [
   'emblem@3x.png',
 ];
 
-/// A committed 1200×630 link-preview card, from
-/// `static_site_generator/assets/make_emblem.sh` and the emblem's master.
+/// A committed 1200×630 link-preview card, cut by `assets/icons/make_icons.sh`
+/// from the emblem's master.
 ///
 /// Its own file rather than a second use of the emblem: an OG image wants
 /// 1.91:1 at ~1200px, so a square is the wrong shape at any size.
@@ -203,9 +203,9 @@ class SiteAssets {
         for (final name in emblemFileNames)
           '/$assetsOutputDir/$name?v=$emblemVersion',
       ],
-      // Its own token, not the emblem's, though both are cut from one master:
-      // different scripts re-cut them independently, so a shared token would
-      // change a URL whose bytes did not.
+      // Its own token, not the emblem's, though one script cuts both: the
+      // card's layout or paper can change on its own, and a shared token would
+      // then move the emblem's URLs for bytes that did not change.
       ogCard: '/$ogCardOutputPath?v=${contentHashOfBytes(ogCard)}',
       favicon: '/$faviconOutputPath?v=${contentHashOfBytes(favicon)}',
     );

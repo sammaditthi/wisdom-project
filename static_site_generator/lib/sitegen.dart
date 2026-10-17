@@ -153,7 +153,7 @@ class SiteGenerator {
       ogCardFileName,
       'shared links will preview without an image — a bare URL in WhatsApp '
       'rather than a card. No page renders differently. Fix: run '
-      'static_site_generator/assets/make_emblem.sh and commit its output.',
+      'assets/icons/make_icons.sh and commit its output.',
     );
     final favicon = _readPackageAsset(
       faviconFileName,

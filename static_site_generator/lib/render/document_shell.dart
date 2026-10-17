@@ -171,7 +171,7 @@ const String siteName = 'බුද්ධ ජයන්ති ත්‍රිප�
 /// - **`og:image:width` / `:height`.** They let a scraper lay the card out
 ///   before it has fetched the image, which is worth something on a first
 ///   share — and it costs the card's dimensions being written in Dart as well
-///   as in `make_emblem.sh`, where they are already decided. Two places to
+///   as in `make_icons.sh`, where they are already decided. Two places to
 ///   disagree about one picture, on every page in the build, to save one
 ///   fetch that happens once per URL ever shared.
 /// - **Twitter Card tags.** X falls back to Open Graph.

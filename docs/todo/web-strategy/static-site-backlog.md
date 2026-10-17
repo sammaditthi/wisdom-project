@@ -261,7 +261,7 @@ Gated on the canonical rather than a flag of its own, which is what keeps
 one without the other.
 
 **`og:image` is its own raster**, `assets/og-card.png` — 1200×630, the logo at
-440px padded out with the site's own page background, cut by `make_emblem.sh`
+440px on the site's own page background, cut by `assets/icons/make_icons.sh`
 beside the emblem and committed like it. That retired the last reason the
 toolbar emblem was kept at 200px, which B1 then re-cut.
 
@@ -388,8 +388,8 @@ It is now drawn at **36px**, picked from screenshots of the real bar at 28, 36,
 | file | one 200px PNG, 47,115 B | `emblem.png` 36px 2,787 B · `@2x` 72px 8,370 B · `@3x` 108px 16,255 B |
 | first visit, 1× / 2× / 3× screen | 47,115 B on all three | **−44 / −39 / −31 KB** |
 
-- Cut by `assets/icons/make_icons.sh` beside the app's emblems, from the same
-  master with the same resize. `make_emblem.sh` keeps only the og-card.
+- Cut by `assets/icons/make_icons.sh` beside the app's emblems and the
+  og-card, from the same master with the same resize.
 - One `?v=` token for the three copies (`SiteAssets.emblems`), as for the
   fonts: one script cuts them together. `emblemSize` in `site_assets.dart`
   sizes both the `<img>` and `.home img`; `make_icons.sh` repeats the 36.

@@ -13,14 +13,16 @@
 #                static_site_generator/assets/, with emblem@2x.png and
 #                emblem@3x.png beside it for srcset. PNG, which every browser
 #                reads.
+#   og-card.png  the static site's 1200x630 link-preview card, beside the
+#                emblem copies.
 #
 # Run by hand and commit the output, like ../fonts/subset_fonts.sh.
-# The site's og-card.png comes from static_site_generator/assets/make_emblem.sh.
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
 python3 - <<'PY'
+import json
 import os
 from PIL import Image, ImageDraw
 
@@ -53,7 +55,19 @@ for scale in (1, 2, 3):
     suffix = "" if scale == 1 else f"@{scale}x"
     logo.resize((36 * scale, 36 * scale), Image.LANCZOS).save(
         f"../../static_site_generator/assets/emblem{suffix}.png", optimize=True)
+
+# The link-preview card. 1200x630 is the size every scraper documents and the
+# one ratio (1.91:1) Facebook, WhatsApp and X crop to without cutting the mark.
+# The logo at 440px, centred on the site's page background, so a shared link
+# previews in the paper colour of the page it opens. Read from the tokens, so
+# a theme change reaches the card on the next run.
+# PNG, not JPEG, though JPEG is under a third the size: only scrapers fetch it,
+# never a reader, and JPEG rings the line art.
+tokens = json.load(open("../../static_site_generator/assets/theme_tokens.json"))
+card = Image.new("RGBA", (1200, 630), tokens["colors"]["light"]["background"])
+card.alpha_composite(logo.resize((440, 440), Image.LANCZOS), (380, 95))
+card.convert("RGB").save("../../static_site_generator/assets/og-card.png", optimize=True)
 PY
 
 echo "Wrote emblem.webp, its 2.0x/ 3.0x/ 4.0x/ copies, web/favicon.png and"
-echo "the site's emblem.png, emblem@2x.png and emblem@3x.png"
+echo "the site's emblem.png, emblem@2x.png, emblem@3x.png and og-card.png"

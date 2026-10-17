@@ -346,8 +346,8 @@ fi
 # to index anything. Every value below comes from the build, so a mismatch is
 # always a bug in the build.
 
-# The committed inputs (make_emblem.sh's card, make_icons.sh's three emblem
-# copies and favicon, site.js by hand). The generator only warns about a missing
+# The committed inputs (make_icons.sh's three emblem copies, card and favicon,
+# site.js by hand). The generator only warns about a missing
 # one — sitegen.dart's _readPackageAsset — and a warning in a 10,000-page build
 # scrolls past. None makes a page wrong, which is exactly why they need
 # catching here: SiteAssets emits the URL from whatever bytes it got, so an
@@ -373,9 +373,8 @@ done
 if [ ! -f "$OUT/assets/og-card.png" ]; then
   echo "error: $OUT/assets/og-card.png is missing — every page would point" >&2
   echo "       og:image at a 404, so every shared link previews as a bare" >&2
-  echo "       URL rather than a card. Run" >&2
-  echo "       static_site_generator/assets/make_emblem.sh and commit its" >&2
-  echo "       output. Nothing uploaded." >&2
+  echo "       URL rather than a card. Run assets/icons/make_icons.sh and" >&2
+  echo "       commit its output. Nothing uploaded." >&2
   exit 1
 fi
 if [ ! -f "$OUT/assets/favicon.png" ]; then
