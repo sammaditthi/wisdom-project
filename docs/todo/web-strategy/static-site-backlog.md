@@ -615,22 +615,29 @@ Each was checked by breaking the code it guards and watching it fail. All three
 name `assets/` and `fonts/` explicitly: a new `immutable` directory in
 `_headers` needs adding to the test's pattern and the script's.
 
-## C2. A Content-Security-Policy header
+## C2. A Content-Security-Policy header ✅ **shipped 2026-10-18**
 
-**Why it waited:** it changes the response headers on every URL, which is its
-own change to deploy and verify — not something to fold into a caching diff.
-
-`_headers` is now the file where one goes, and the site already qualifies for a
-strict policy **with no refactor**. Verified on the full build: zero `<form>`,
-zero inline event handlers, zero `style=` attributes, and `site.js` builds
-result rows with `createElement`/`textContent` and calls no `eval`. The one
-inline `<script>` is `layoutScript` (2026-10-17), the same bytes on every page:
-allow it by hash, computed by the build from the constant rather than pasted.
+The policy below, on `/*` in `_headers` (`lib/render/site_headers.dart`). The
+hash is computed by the build from `layoutScriptSource`, the exact text between
+`layoutScript`'s tags, with `package:crypto` — the generator's first
+third-party dependency, because a CSP hash has to be a real SHA-256.
 
 ```
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<layoutScript>'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<layoutScriptSource>'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 ```
+
+Checked 2026-10-18 in Chromium against an `an-1` build with the header applied:
+no violation on `/`, a container TOC, a chapter, a leaf or the 404 page; a
+saved layout and `?layout=` both restore; search fetches its index; the toolbar
+masks render; and a script injected at runtime is refused. `deploy.sh` fails
+after an upload when `/` does not answer with exactly the generated policy,
+which catches a zone feature adding a second one.
+
+It needed no refactor. Verified on the full build: zero `<form>`, zero inline
+event handlers, zero `style=` attributes, and `site.js` builds result rows with
+`createElement`/`textContent` and calls no `eval`. The JSON-LD blocks are data,
+not script, so the policy does not apply to them.
 
 `img-src 'self' data:` since B2 (2026-10-17): the toolbar icons are `data:`
 masks in `site.css`, and `default-src 'self'` alone blocks every one of them —
@@ -641,7 +648,7 @@ per header *name*, and this is a different one.
 
 Live headers already carry `x-content-type-options: nosniff` and
 `referrer-policy: strict-origin-when-cross-origin` from Pages' own defaults; CSP
-is the one that is missing.
+was the one missing.
 
 ## C3. `.manifest.json` is publicly fetchable ✅ **shipped 2026-08-19**
 
@@ -1053,7 +1060,7 @@ What is left, re-ranked:
 1. **CI, the four no-corpus rows** — a checkout and `dart test`, and it makes
    every item below it cheaper to ship. Spec in
    [`web-release.md`](./web-release.md) §5.
-2. **C2 CSP** — its own deploy and verify.
+2. ~~**C2 CSP**~~ — ✅ shipped 2026-10-18.
 3. **A9 font preload, A8 heading duplication** — measure first, both are small.
 4. **A10 the 38 unnamed containers** — decide the derivation before estimating it.
 

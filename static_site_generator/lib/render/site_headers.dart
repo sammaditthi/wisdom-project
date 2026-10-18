@@ -59,6 +59,12 @@
 /// result for a site: query, which is a page of raw XML offered to a reader
 /// who wanted the canon.
 ///
+/// ## One Content-Security-Policy for every URL
+///
+/// Backlog C2. The site loads nothing from another origin, so the policy is
+/// `'self'` throughout; the two exceptions are the toolbar icons, `data:` masks
+/// in `site.css`, and [layoutScript], allowed by the hash of its exact bytes.
+///
 /// ## Every `*.pages.dev` host is noindex
 ///
 /// A production deployment carries no `X-Robots-Tag`, so without this rule the
@@ -79,13 +85,18 @@
 /// `Cache-Control: public, max-age=31536000, immutable, public, max-age=604800`
 /// and leave the real policy to whatever the browser makes of that. The two
 /// patterns below are disjoint, which is the only reason the file is this
-/// short. A future rule setting a *different* header (`Content-Security-Policy`
-/// on `/*`, say) can safely span both. One overlap is deliberate: on a
+/// short. `/*` spans all of them safely, because nothing else sets
+/// `Content-Security-Policy`. One overlap is deliberate: on a
 /// `pages.dev` host the host rule and the two file rules all set
 /// `X-Robots-Tag: noindex`, and `noindex, noindex` means the same thing.
 library;
 
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+
 import '../manifest/build_manifest.dart';
+import 'reading_layouts.dart';
 import 'site_assets.dart';
 import 'sitemap.dart';
 import 'web_fonts.dart';
@@ -96,6 +107,20 @@ const String siteHeadersOutputPath = '_headers';
 /// A year, the conventional ceiling. Safe for every path below because each one
 /// is versioned by content.
 const String _immutable = 'public, max-age=31536000, immutable';
+
+/// Hashed from the constant the pages write, so editing the script cannot
+/// leave the policy blocking it.
+String _contentSecurityPolicy() {
+  final digest = sha256.convert(utf8.encode(layoutScriptSource));
+  return [
+    "default-src 'self'",
+    "script-src 'self' 'sha256-${base64.encode(digest.bytes)}'",
+    "img-src 'self' data:",
+    "base-uri 'none'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+}
 
 /// Built from the same constants the rest of the build writes and links, so a
 /// renamed asset cannot leave a rule pointing at a path nothing is served from.
@@ -109,8 +134,10 @@ String buildSiteHeaders() {
   // Whole header lines rather than values, because the rules no longer set one
   // header between them. A map keyed by path is still the right shape: it is
   // the key Pages matches on, and two entries for one path would be the
-  // overlap the section above warns about — here the compiler refuses it.
-  const rules = <String, List<String>>{
+  // overlap the section above warns about — the analyzer refuses it
+  // (`equal_keys_in_map`).
+  final rules = <String, List<String>>{
+    '/*': ['Content-Security-Policy: ${_contentSecurityPolicy()}'],
     '/$assetsOutputDir/*': ['Cache-Control: $_immutable'],
     '/$fontsOutputDir/*': ['Cache-Control: $_immutable'],
     '/$manifestOutputPath': ['X-Robots-Tag: noindex'],
@@ -123,7 +150,7 @@ String buildSiteHeaders() {
   out.writeln('# Pages consumes this file; it is never served.');
   out.writeln('# Every cached path below carries a ?v=<hash of its bytes>,');
   out.writeln('# so a changed file is a changed URL — see site_assets.dart.');
-  out.writeln('# HTML is deliberately absent: it keeps Pages\' default');
+  out.writeln('# HTML has no cache rule: it keeps Pages\' default');
   out.writeln(
       '# `max-age=0, must-revalidate`, because a page\'s URL is stable');
   out.writeln('# while its content is not.');

@@ -632,7 +632,7 @@ find .wrangler/tmp -maxdepth 1 -type d -name 'pages-*' -empty -delete 2>/dev/nul
 
 [ $STATUS -eq 0 ] || exit $STATUS
 
-# --- After the upload: the site answers, noindex on dev only ----------------
+# --- After the upload: the site answers, noindex on dev only, CSP as built --
 echo ""
 echo "Checking $ORIGIN/..."
 if ! expect_http "$ORIGIN/"; then
@@ -646,4 +646,17 @@ case "$TARGET:$NOINDEX" in
   dev:false)  echo "error: uploaded, but the dev copy answers without noindex." >&2; exit 1 ;;
   prod:true)  echo "error: the release answers noindex — roll back now (README)." >&2; exit 1 ;;
 esac
-echo "OK: $ORIGIN/ answers 200."
+# The CSP exactly as generated (backlog C2). Missing means _headers lost it; two
+# lines or a different value means the zone added its own, which can block the
+# hashed layout script while every page still answers 200.
+WANT_CSP=$(sed -n 's/^  Content-Security-Policy: //p' "$OUT/_headers")
+LIVE_CSP=$(printf '%s' "$HTTP_RESPONSE" | tr -d '\r' | sed '/^$/q' \
+  | sed -n 's/^[Cc]ontent-[Ss]ecurity-[Pp]olicy: *//p')
+if [ -z "$WANT_CSP" ] || [ "$LIVE_CSP" != "$WANT_CSP" ]; then
+  echo "error: uploaded, but $ORIGIN/ does not answer with the generated" >&2
+  echo "       Content-Security-Policy (lib/render/site_headers.dart)." >&2
+  echo "       want: ${WANT_CSP:-<none in _headers>}" >&2
+  echo "       got:  ${LIVE_CSP:-<none>}" >&2
+  exit 1
+fi
+echo "OK: $ORIGIN/ answers 200, with the generated Content-Security-Policy."

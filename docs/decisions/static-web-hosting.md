@@ -506,8 +506,8 @@ Two things to know before editing it:
   rules and joins duplicate header names with a comma, so `/assets/*` beside a
   `/assets/emblem.png` exception would emit both policies in one
   `Cache-Control` rather than overriding. The two patterns above are disjoint,
-  which is the only reason the file is this short. A rule setting a *different*
-  header (a CSP on `/*`) can safely span both.
+  which is the only reason the file is this short. The CSP on `/*` (backlog
+  C2) sets a different header, so it spans both safely.
 
 **Deploy cost.** A change to any asset rewrites the `<head>` of **every** page
 — fonts included, since their token rides inside the CSS the pages link —
