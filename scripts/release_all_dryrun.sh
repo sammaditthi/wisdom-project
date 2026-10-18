@@ -21,6 +21,10 @@
 # Never run it while a static-site deploy is uploading: it rebuilds
 # static_site_generator/build/ under that upload.
 #
+# It also reports whether the vendored canon is behind upstream, because a
+# release is the moment to know. Reporting only: taking the corrections is
+# sync-regen.sh's job, and a human reviews the tree.json diff there.
+#
 # --list reads the `# Status: dev=… prod=…` line in each deploy.sh header,
 # because running a live deploy.sh to ask would start its tests.
 # END-USAGE
@@ -79,6 +83,33 @@ sweep_step() {
   _LINES+=("$(printf '%-28s %s%-10s%s  %4ss' "$name ($side)" "$colour" "$word" "$NC" $((SECONDS - start)))")
 }
 
+# The canon's staleness, printed beside the verdict. Never a failure and never
+# a fix: upstream text corrections can move tree.json nodeKeys, which breaks
+# deep links, so they are taken by hand through sync-regen.sh. A missing
+# receipt, no jq or no network says nothing rather than crying wolf.
+canon_heartbeat() {
+  local receipt="$WISDOM_ROOT/scripts/bjt-sync-regen/bjt-provenance.json"
+  local ours source branch upstream
+  command -v jq >/dev/null 2>&1 || return 0
+  [ -f "$receipt" ] || return 0
+  ours=$(jq -r '.upstream_sha // empty' "$receipt" 2>/dev/null)
+  source=$(jq -r '.source // empty' "$receipt" 2>/dev/null)
+  branch=$(jq -r '.branch // empty' "$receipt" 2>/dev/null)
+  [ -n "$ours" ] && [ -n "$source" ] && [ -n "$branch" ] || return 0
+  # GIT_TERMINAL_PROMPT=0: a remote that asks for credentials must fail, not
+  # sit waiting for someone to type them.
+  upstream=$(GIT_TERMINAL_PROMPT=0 git ls-remote "$source" "refs/heads/$branch" \
+    2>/dev/null | awk '{print $1}')
+  if [ -z "$upstream" ]; then
+    echo "canon: upstream unreachable, staleness unknown."
+  elif [ "$upstream" = "$ours" ]; then
+    echo "canon: up to date with upstream ${ours:0:8}."
+  else
+    echo "${BOLD}canon: upstream is at ${upstream:0:8}, we vendored ${ours:0:8}.${NC}"
+    echo "       ./scripts/bjt-sync-regen/sync-regen.sh --dry-run   # review, then sync"
+  fi
+}
+
 sweep() {
   local t side line
   for t in "${TARGETS[@]}"; do
@@ -95,6 +126,8 @@ sweep() {
   for line in "${_LINES[@]}"; do
     echo "$line"
   done
+  echo ""
+  canon_heartbeat
   echo ""
   if [ $_FAILED -eq 0 ]; then
     echo "${GREEN}${BOLD}release_all_dryrun: no dry run failed.${NC}"
