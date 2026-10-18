@@ -632,7 +632,8 @@ no violation on `/`, a container TOC, a chapter, a leaf or the 404 page; a
 saved layout and `?layout=` both restore; search fetches its index; the toolbar
 masks render; and a script injected at runtime is refused. `deploy.sh` fails
 after an upload when `/` does not answer with exactly the generated policy,
-which catches a zone feature adding a second one.
+which catches a zone feature adding a second one. `asset_wiring_test.dart`
+fails when a built page carries an inline script the policy does not allow.
 
 It needed no refactor. Verified on the full build: zero `<form>`, zero inline
 event handlers, zero `style=` attributes, and `site.js` builds result rows with
