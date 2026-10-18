@@ -50,7 +50,7 @@ Ranked. Nothing left on it is a must.
 | ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh`, on every deploy (§2). |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
 | ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. C2's policy now needs `img-src 'self' data:` (backlog C2). |
-| should | **C2 — CSP header** | One `_headers` line; the site already qualifies for a strict policy with no refactor. |
+| ✅ done | ~~**C2 — CSP header**~~ | Shipped 2026-10-18: one `_headers` rule on `/*`, its script hash computed by the build; `deploy.sh` checks the live header after every upload (§4). |
 | optional | A9 font preload, A8 heading duplication | Small, measure first. |
 
 All five are specified in [`static-site-backlog.md`](./static-site-backlog.md).
@@ -123,7 +123,9 @@ no lock, and the second wipes `build/` mid-upload.
       nothing prepended by the zone.
 - [ ] `curl -I https://www.sammaditthi.net/tipitaka/sp` → `301` to the same path
       on the apex.
-- [ ] CSP present, if C2 shipped.
+- [ ] DevTools console on a reading page: no `Refused to` line. `deploy.sh`
+      already checks the CSP header itself; this catches a script the zone
+      injects (Rocket Loader, Web Analytics), which the policy blocks.
 - [ ] Search Console **and** Bing Webmaster Tools: submit `sitemap.xml`. Copilot,
       and partly ChatGPT search, read Bing's index rather than Google's.
 - [ ] Research Worker: re-deploy from the prod account, CORS re-pinned.
@@ -234,8 +236,6 @@ Still open:
   a bare "Sammaditthi" card with English text. One generic Sinhala card (title,
   description, image) is enough — the bundle is static, so a card per page would
   need an edge function. BJT shares go to the static page, which has its own.
-- The font preload in `index.html` names `NotoSansSinhala-Regular.ttf`, the full
-  face. The bundle ships only the `-Subset.ttf`, and not at that path.
 - **A connection lost mid-download shows the error icon, not the offline one.**
   In `_download` (`web_database_installer.dart`) a `fetch` that throws or a
   `reader.read()` that fails reaches `_asFailure` and becomes `other`. Wrap
