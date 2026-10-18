@@ -1098,11 +1098,11 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
   ],
   // A vagga inside the collection, so its sutta has a parent that is not its
   // collection — the one shape where `<title>` and description differ. Real
-  // Pali names (DN 1, DN 1.1), raw as `tree.json` has them: no ZWJ, though both
-  // need a ligature (න්ධ, බ්ර).
+  // names (DN 1, DN 1.1), as `tree.json` has them: the Pali carries no ZWJ,
+  // though both need a ligature (න්ධ, බ්ර).
   'sp-toc-v': [
     'සීලක්ඛන්ධවග්ගො',
-    'සීලක්ඛන්ධ වර්ගය',
+    'සීලස්කන්‍ධ වර්‍ගය',
     5,
     [0, 6],
     'sp-toc',
@@ -1110,7 +1110,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
   ],
   'sp-toc-v-1': [
     'බ්රහ්මජාලසුත්තං',
-    'බ්රහ්මජාල සූත්රය',
+    'බ්‍රහ්මජාල සූත්‍රය',
     1,
     [0, 7],
     'sp-toc-v',
