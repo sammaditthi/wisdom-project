@@ -203,7 +203,7 @@ which made a sutta's depth in the tree decide how long it waited to be found.
 
 **`<lastmod>` is deliberately absent, against what P5 originally specified.**
 "From the manifest hashes" does not survive contact with the manifest: it holds
-FNV-1a content hashes and by §11.8 carries no date anywhere, and a hash answers
+content hashes and by §11.8 carries no date anywhere, and a hash answers
 "did this change", never "when". The one date available is
 `bjt-provenance.json`'s single `synced_on`, which would stamp every URL with the
 same day — the uninformative signal that gets discounted, and being discounted

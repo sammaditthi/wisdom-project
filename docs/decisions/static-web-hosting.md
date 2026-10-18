@@ -549,7 +549,7 @@ The SSG emits all of it as static files:
   takes Google from "found one page" to the whole corpus indexed.
   > ⚠️ **`<lastmod>` is NOT emitted, and the 2026-07-23 plan for it was wrong.**
   > "Per URL from the build manifest's content hashes" cannot be done: the
-  > manifest holds FNV-1a hashes and, by the build plan's §11.8, carries no date
+  > manifest holds content hashes and, by the build plan's §11.8, carries no date
   > anywhere — a hash says *whether* something changed, never *when*, and
   > `<lastmod>` is a W3C datetime. The only date available is
   > `bjt-provenance.json`'s one `synced_on`, which would stamp every URL the
