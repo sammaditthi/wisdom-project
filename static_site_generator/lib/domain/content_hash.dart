@@ -5,10 +5,9 @@ import 'dart:convert';
 /// **Change detection, not cryptography.** The only question asked of it is
 /// "did these bytes change since the last build?" — by `.manifest.json` of the
 /// corpus files, and by `SiteAssets` of everything the pages link — where
-/// an accidental collision is somewhere around 1 in 10^15. It was rolled by
-/// hand to keep the dependency list empty; `crypto` arrived later for the CSP
-/// hash (backlog C2), which must be a real SHA-256. This stays, because every
-/// `?v=` and manifest entry is already one of its digests.
+/// an accidental collision is somewhere around 1 in 10^15. `package:crypto` is
+/// a dependency for the CSP hash (backlog C2), but moving this onto its SHA-256
+/// would change every `?v=` and manifest entry at once, for no gain.
 ///
 /// Lives in `domain/` rather than beside its consumer in `manifest/` because
 /// `data/` needs it too, and `data/ -> manifest/` would have the layers

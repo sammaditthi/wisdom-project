@@ -49,8 +49,8 @@ Ranked. Nothing left on it is a must.
 |---|---|---|
 | ✅ done | ~~**C9 — HTML parse check over a full build**~~ | Shipped 2026-10-17: `check_markup.dart` in `deploy.sh`, on every deploy (§2). |
 | ✅ done | ~~**C1 — asset-wiring tests**~~ | Shipped 2026-10-17: tests in the generator's suite and a `?v=` check in `deploy.sh` (§2). |
-| ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. C2's policy now needs `img-src 'self' data:` (backlog C2). |
-| ✅ done | ~~**C2 — CSP header**~~ | Shipped 2026-10-18: one `_headers` rule on `/*`, its script hash computed by the build; `deploy.sh` checks the live header after every upload (§4). |
+| ✅ done | ~~**B2 + B1 in one deploy**~~ | Shipped 2026-10-17, together: the toolbar icons are drawn from `site.css`, and the emblem is drawn at 36px from 1×/2×/3× copies. |
+| ✅ done | ~~**C2 — CSP header**~~ | Shipped 2026-10-18: one `_headers` rule on `/*`, its script hash computed by the build; `deploy.sh` checks the live header after every upload (§3). |
 | optional | A9 font preload, A8 heading duplication | Small, measure first. |
 
 All five are specified in [`static-site-backlog.md`](./static-site-backlog.md).
@@ -102,6 +102,10 @@ both, so what ships is always the whole corpus and always checked:**
    in the dev account, its production branch `main`. Kept out of the index by
    the generated `_headers`, which noindexes every `*.pages.dev` host.
 2. **Prod** — `./scripts/static_site/deploy.sh --prod --yes`.
+
+After every upload `deploy.sh` checks the live `/`: it answers 200, noindex on
+dev and indexable on prod, with exactly the Content-Security-Policy the build
+generated (backlog C2).
 
 Both project names are in `scripts/config/targets.env`; `secrets.env` is credentials only.
 If a deploy dies with `Error: {})` and no message, the real cause is only in
@@ -160,7 +164,7 @@ don't re-derive it:
 | job | runs |
 |---|---|
 | every push / PR | `scripts/test_all.sh --quick` |
-| release | `scripts/static_site/deploy.sh --prod --yes` — full `static_site/test.sh`, build, `check_links.dart`, `check_markup.dart`, upload |
+| release | `scripts/static_site/deploy.sh --prod --yes` — full `static_site/test.sh`, build, `check_links.dart`, `check_markup.dart`, upload, the live checks (§3) |
 | integration (optional, macOS runner) | build the databases (`tools/`), then `scripts/app/test.sh` |
 
 The push/PR job is the half that catches the silent failures. Build it first,

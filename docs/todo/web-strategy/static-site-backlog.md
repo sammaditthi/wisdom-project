@@ -643,8 +643,8 @@ not script, so the policy does not apply to them.
 masks in `site.css`, and `default-src 'self'` alone blocks every one of them —
 measured in Chrome, not assumed.
 
-`/*` overlaps the two `Cache-Control` rules, which is safe: the merge hazard is
-per header *name*, and this is a different one.
+`/*` overlaps every other rule, which is safe: the merge hazard is per header
+*name*, and no other rule sets this one.
 
 Live headers already carry `x-content-type-options: nosniff` and
 `referrer-policy: strict-origin-when-cross-origin` from Pages' own defaults; CSP

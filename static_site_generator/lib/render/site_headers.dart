@@ -63,7 +63,8 @@
 ///
 /// Backlog C2. The site loads nothing from another origin, so the policy is
 /// `'self'` throughout; the two exceptions are the toolbar icons, `data:` masks
-/// in `site.css`, and [layoutScript], allowed by the hash of its exact bytes.
+/// in `site.css`, and [layoutScript], allowed by the SHA-256 of
+/// [layoutScriptSource].
 ///
 /// ## Every `*.pages.dev` host is noindex
 ///
