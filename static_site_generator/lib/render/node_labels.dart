@@ -56,8 +56,8 @@ bool carriesCommentaryMarker(TipitakaNode node) =>
 /// The `atta-*` pages carry their canon twins' names, so without the marker the
 /// two compete for the same searches (§10).
 ///
-/// Raw text and un-welded, unlike [nodeLabelHtml]: `<title>` takes it as it is
-/// (D2), visible uses weld it first (D1).
+/// Un-welded ([unweldTitle]), unlike [nodeLabelHtml]: `<title>` takes it as it
+/// is (D2), visible uses weld it first (D1).
 String nodeTitle(TipitakaNode node) {
   final name = unweldTitle(node.paliName);
   return carriesCommentaryMarker(node) ? '$name $commentaryMarker' : name;

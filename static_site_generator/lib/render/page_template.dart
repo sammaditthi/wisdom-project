@@ -277,17 +277,15 @@ class PageTemplate {
       {required bool bothLanguages,
       required String head,
       required String body}) {
-    // Composed once and used twice. The description opens on the same string
-    // the tab does, because that string is already this site's one answer to
-    // "where does this page sit" — deriving a second location for the snippet
-    // would be free to disagree with the first.
-    final title = _titleText(page.node);
+    final location = _locationParts(page.node);
     return htmlDocument(
-      title: title,
+      // Name and vagga: enough to tell same-named suttas apart for search,
+      // short enough for a browser tab. The description adds the collection.
+      title: location.take(2).join(' — '),
       build: build,
       canonical: page.url,
       description: pageDescription(
-        title: title,
+        location: location.join(' — '),
         readable: page.isReadable,
         bothLanguages: bothLanguages,
         sections: _sectionCount(page),
@@ -725,18 +723,12 @@ class PageTemplate {
 
   // ── titles ────────────────────────────────────────────────────────────────
 
-  /// `<leaf> — <vagga> — <collection>` for the `<title>` element, un-welded per
-  /// D2. The only string on the page that gets that treatment — everything a
-  /// reader looks at goes through [weldTitle] instead.
-  ///
-  /// The three parts are not decoration. `FIGURES.numericOnlyLeafTitles` leaves
-  /// are titled with nothing but a number ("1. 16. 8. 9-24"), and
-  /// `FIGURES.leavesSharingATitle` share a name with another leaf — a bare name
-  /// would give thousands of pages an identical, meaningless `<title>`, which
-  /// is the duplicate-content signal C2 exists to avoid.
-  /// Parts that repeat are dropped, so a node directly under its collection
-  /// does not say the collection twice.
-  String _titleText(TipitakaNode node) {
+  /// `[name, vagga, collection]`, un-welded per D2. The `<title>` takes the
+  /// first two and the description all three; the name alone would not do,
+  /// because `FIGURES.leavesSharingATitle` leaves share theirs. Parts that
+  /// repeat are dropped, so a node directly under its collection does not say
+  /// the collection twice.
+  List<String> _locationParts(TipitakaNode node) {
     final parts = <String>[nodeTitle(node)];
     // Dedupe against the node's *bare* name, not the marked one in parts[0]:
     // "X අට්ඨකථා" can never equal a candidate, so a commentary node directly
@@ -750,19 +742,19 @@ class PageTemplate {
       if (name.isEmpty || !seen.add(name)) continue;
       parts.add(name);
     }
-    return parts.join(' — ');
+    return parts;
   }
 
   /// The visible page heading.
   ///
   /// Welded, not un-welded — it is text a person reads, so it follows D1 like
-  /// the body does. Only the `<title>` above takes the D2 treatment.
+  /// the body does. Only the `<title>` takes the D2 treatment.
   ///
   /// Carries the commentary marker like the `<title>` does, and for the same
   /// reason: without it a commentary page and its canon twin are two documents
   /// whose heading is the identical string. It does **not** repeat the vagga
-  /// and collection the `<title>` appends — the breadcrumb in the toolbar
-  /// already says them (§10).
+  /// the `<title>` appends — the breadcrumb in the toolbar already says it
+  /// (§10).
   ///
   /// That trail now ends on this node too, so the name is on screen twice. Not
   /// a repeat worth suppressing, unlike the preamble's in [_withoutRepeatedTitle]:

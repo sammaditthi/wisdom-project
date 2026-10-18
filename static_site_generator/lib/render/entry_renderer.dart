@@ -136,24 +136,27 @@ final RegExp _needsEscaping = RegExp('[&<>"\']');
 String weldTitle(String title) =>
     beautifyPaliText(title, EntryRenderer.bakedOptions);
 
-/// Strips the *touching* ZWJ from a title (build plan D2).
+/// A raw node name as machines read it (build plan D2): welded by [weldTitle],
+/// then the *touching* ZWJ taken back out —
+/// `consonant + ZWJ + hal + consonant` → `consonant + hal + consonant`. The
+/// same two steps tipitaka.lk takes for its document title: `getName`
+/// beautifies, then `views/Home.vue:118` removes the touching form.
 ///
-/// `consonant + ZWJ + hal + consonant` → `consonant + hal + consonant`, which
-/// is character-for-character what tipitaka.lk does in `views/Home.vue:118`
-/// before setting its document title.
+/// Welded first because the raw Pali names almost never carry a ZWJ, so their
+/// ligatures only exist once [weldTitle] adds them; without that step `බ්‍ර`
+/// prints as `බ්ර`, a bare hal.
 ///
 /// Only the touching form goes. The **ligature** ZWJ that follows a hal —
 /// `සූත්‍ර`, rakaransaya and yansaya — is ordinary Sinhala spelling and appears
 /// in `FIGURES.namesWithLigatureZwj` of the tree's `FIGURES.nodeNames`;
 /// removing it would misspell them.
 ///
-/// **Machine-read strings only** — `<title>`, and OG / JSON-LD when P5 adds
-/// them. A reader searching for a sutta types plain Sinhala, so baked ZWJ in an
-/// indexed string means the form a search engine holds is not the form they
-/// typed. That argument covers strings a *crawler* reads and nothing else;
+/// **Machine-read strings only** — `<title>`, `og:title` and JSON-LD. A reader
+/// searching for a sutta types plain Sinhala, so baked ZWJ in an indexed
+/// string means the form a search engine holds is not the form they typed. That argument covers strings a *crawler* reads and nothing else;
 /// applying it to visible chrome as well (as this first did) diverges from both
 /// the app and tipitaka.lk, which un-welds `document.title` alone.
-String unweldTitle(String title) => title.replaceAllMapped(
+String unweldTitle(String title) => weldTitle(title).replaceAllMapped(
       _touchingInTitle,
       (match) => '${match[1]}්${match[2]}',
     );

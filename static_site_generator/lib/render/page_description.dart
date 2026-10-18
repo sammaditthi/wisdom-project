@@ -41,13 +41,13 @@
 ///
 /// ## Two readers, two forms of the same sentence
 ///
-/// The snippet opens on the title because Google prints it *under* a title the
-/// searcher has already skimmed past, and a location repeated there is a
-/// location confirmed. A link-preview card is the other shape: it draws the
-/// title in bold and the description directly beneath it, so the same string
-/// renders as a subtitle that repeats its own heading word for word before
-/// adding six words of its own — on exactly the surface Open Graph was added
-/// for. [PageDescription] carries both forms so neither caller has to take the
+/// The snippet opens on the page's location — its name, vagga and collection —
+/// because Google prints it *under* a title that stops at the vagga, and a
+/// location repeated there is a location confirmed. A link-preview card is the
+/// other shape: it draws the title in bold and the description directly
+/// beneath it, so the same string renders as a subtitle that repeats its own
+/// heading word for word before adding six words of its own — on exactly the
+/// surface Open Graph was added for. [PageDescription] carries both forms so neither caller has to take the
 /// other's.
 library;
 
@@ -83,12 +83,12 @@ const int _descriptionMaxChars = 155;
 /// tag a WhatsApp card draws cannot describe the page differently — which is
 /// the whole reason this is a class rather than two functions.
 class PageDescription {
-  /// `<meta name="description">` — opens on the `<title>` string, because a
-  /// SERP snippet is printed under a title and confirms it rather than
+  /// `<meta name="description">` — opens on the page's location, because a
+  /// SERP snippet is printed under a title and extends it rather than
   /// competing with it.
   final String snippet;
 
-  /// `og:description` — the same sentences with that leading title clause
+  /// `og:description` — the same sentences with that leading location clause
   /// removed, because a card draws `og:title` immediately above this line and
   /// a subtitle that restates its own heading is the one thing a preview has
   /// no room for.
@@ -129,10 +129,7 @@ class PageDescription {
 
 /// Builds the description for one page.
 ///
-/// [title] is the composed `<title>` text — `<leaf> — <vagga> — <collection>`,
-/// un-welded and de-duplicated. Reused deliberately rather than re-derived: it
-/// is already this site's one answer to "where does this page sit", and a
-/// second answer would be free to disagree with the first.
+/// [location] is `<name> — <vagga> — <collection>`, un-welded (D2).
 ///
 /// [sections] is how many subdivisions the page names — the leaves a chapter
 /// carries, or the children a container lists. Null on a page that names none,
@@ -142,12 +139,12 @@ class PageDescription {
 /// at all. **No description beats a blank description**, and an empty `content`
 /// attribute is a worse signal than an absent element.
 PageDescription? pageDescription({
-  required String title,
+  required String location,
   required bool readable,
   required bool bothLanguages,
   int? sections,
 }) {
-  final trimmed = title.trim();
+  final trimmed = location.trim();
   // Cannot fire on the vendored corpus — every node has a name, even if
   // `FIGURES.numericOnlyLeafTitles` of them are only a number, and a number is
   // still something to print. Guarded because the alternative to a description
@@ -155,8 +152,8 @@ PageDescription? pageDescription({
   if (trimmed.isEmpty) return null;
 
   // What the page says about itself *beyond* naming where it sits. The snippet
-  // puts the title in front of these; the card, which draws the title itself
-  // one line above, gets them alone.
+  // puts the location in front of these; the card, which draws the title
+  // itself one line above, gets them alone.
   final claims = <String>[];
 
   if (sections != null && sections > 0) {

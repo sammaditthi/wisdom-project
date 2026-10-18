@@ -115,11 +115,9 @@ class LandingPage {
     // written rather than derived. Without one, `/` is the highest-value page on
     // the site for search and the only one with no heading at all.
     //
-    // [siteName] and not a name of its own. The rest of the site titles itself
-    // `<leaf> — <vagga> — <collection>` because a bare name would repeat across
-    // `FIGURES.realPages` pages; `/` has no ancestors to disambiguate it
-    // against, and is the one page whose name *is* the whole site's name — the
-    // same string `og:site_name` carries everywhere else.
+    // [siteName] and not a name of its own: `/` is the one page whose name *is*
+    // the whole site's name — the same string `og:site_name` carries everywhere
+    // else.
     final title = isNotFound ? build.strings[_notFoundTitleKey] : siteName;
     // Welded like the root names under it (D1); `<title>` stays unwelded (D2).
     // The not-found heading is an app string, shown as the app shows it.

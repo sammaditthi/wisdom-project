@@ -104,13 +104,14 @@ free.
   paint, and the page jumped). It is byte-identical on every page, so the
   strict CSP in Part C needs one hash for it. `site.js` builds result rows with
   `createElement`/`textContent`.
-- **The `<title>` grammar** — `<leaf> — <vagga> — <collection>`
-  (`page_template.dart:476`, built by `_titleText` at `:486`). This is doing
-  nearly all the keyword work on the
-  site. It exists because 1,165 leaves are titled with only a number and 2,216
-  share a name; without the trailing parts, thousands of pages would carry an
-  identical `<title>`, which is the duplicate-content signal C2 was written to
-  avoid.
+- **The `<title>` grammar** — `<name> — <vagga>` (`_locationParts` in
+  `page_template.dart`; decided 2026-10-18), spelled as tipitaka.lk's tab
+  spells it: ligatures kept, touching joiner removed (`unweldTitle`). Search
+  ranking reads the title, and `FIGURES.numericOnlyLeafTitles` leaves are
+  titled with only a number and `FIGURES.leavesSharingATitle` share a name, so
+  the name alone would give many pages one `<title>`. The vagga tells nearly
+  all of them apart; the collection added almost nothing and is dropped to keep
+  the tab short. The description and the JSON-LD breadcrumb still carry it.
 - **Self-canonical on commentary.** The `atta-*` pages point at themselves, never
   at their canon twin — they're different texts, not duplicates.
 - **One text, one URL.** The grouped-vagga rule means no passage is ever
@@ -161,10 +162,10 @@ line of Pali — accurate, and it tells a searcher nothing about what they found
 This was the **click-through** lever, and the largest one available.
 
 Generated, because there are `FIGURES.realPages` of them:
-`render/page_description.dart` composes `<title>. කොටස් {n}ක්. පාළි පෙළ සහ සිංහල
-පරිවර්තනය.`, capped at 155 characters and cut on a word boundary. It opens on
-the `<title>` string rather than re-deriving a location, so the tab and the
-snippet cannot disagree about where a page sits.
+`render/page_description.dart` composes `<name> — <vagga> — <collection>.
+කොටස් {n}ක්. පාළි පෙළ සහ සිංහල පරිවර්තනය.`, capped at 155 characters and cut on
+a word boundary. It opens on the page's location because the `<title>` stops at
+the vagga.
 
 **The words are borrowed, not invented.** `පාළි පෙළ` / `සිංහල පරිවර්තනය` is
 tipitaka.lk's own pairing for this exact material (`src/views/Welcome.vue`);
