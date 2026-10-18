@@ -129,7 +129,8 @@ void main() {
       for (final script in _script.allMatches(page.readAsStringSync())) {
         final attributes = script.group(1)!;
         // A src= script is covered by 'self'; JSON-LD is data, never run.
-        if (attributes.contains('src=') ||
+        // `\s` so a `data-src` does not count as a `src`.
+        if (RegExp(r'\ssrc\s*=').hasMatch(attributes) ||
             attributes.contains('application/ld+json')) {
           continue;
         }
