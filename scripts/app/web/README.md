@@ -1,12 +1,13 @@
 # App on the web — deploy setup
 
-`deploy.sh --dev` uploads the databases to R2, then the app to Cloudflare
-Pages. `--prod` is a placeholder until `app.sammaditthi.net` exists.
+`deploy.sh --dev` or `--prod` uploads the databases to R2, then the app to
+Cloudflare Pages. A release (`--prod`) is cut from a clean `main`, always runs
+the tests, and asks once (`--yes` for CI).
 
 | Target | Account | Pages project | Serves at |
 |---|---|---|---|
 | dev | wisdomproject.dev | `app-sammaditthi-test` | `https://app-sammaditthi-test.pages.dev` — noindex |
-| prod | ops | `app-sammaditthi` — not created yet | `https://app.sammaditthi.net`, later |
+| prod | ops | `app-sammaditthi` | `https://app.sammaditthi.net` — noindex |
 
 The databases come from one R2 bucket in the **prod (ops)** account,
 `wisdom-databases` at `https://db.sammaditthi.net`, read by every web build:
@@ -23,9 +24,12 @@ Everything below is done once, by hand.
 1. **Tokens.** The dev token needs *Cloudflare Pages: Edit*; the prod (ops)
    token also needs *Workers R2 Storage: Write*. Both need *Account Settings:
    Read*. The recipe is in `scripts/config/secrets.env.example`.
-2. **Pages project (dev account).** Workers & Pages → Create → Pages → *Use
-   direct upload*, named `app-sammaditthi-test`, production branch `main`. The
-   deploy checks both and stops if either is wrong.
+2. **Pages projects.** Workers & Pages → Create → Pages → *Use direct
+   upload*, production branch `main`: `app-sammaditthi-test` in the dev
+   account, `app-sammaditthi` in ops. The deploy checks the name and branch
+   and stops if either is wrong. On `app-sammaditthi`, Custom domains → Set up
+   → `app.sammaditthi.net`, and wait for *Active*: a release checks the app
+   answers there.
 3. **R2 (ops account).** Turn R2 on, then create the bucket `wisdom-databases`.
 4. **Domain.** wisdom-databases → Settings → Custom Domains → Add →
    `db.sammaditthi.net`. Wait for *Active*. Not `r2.dev`: it is rate-limited and
@@ -52,25 +56,28 @@ Everything below is done once, by hand.
    Transform Rule: `(http.host eq "db.sammaditthi.net")`, Set static
    `Access-Control-Allow-Origin` = `*`. Only this host: the research Worker
    keeps its own list.
-6. **Research CORS.** The research Worker must list the app's origin too
-   (`RESEARCH_CORS_ORIGINS` in `research_server/wrangler.jsonc`), then be
-   released.
+6. **Research CORS.** The research Worker lists both app origins
+   (`RESEARCH_CORS_ORIGINS` in `research_server/wrangler.jsonc`). A new
+   origin there takes effect when the Worker is released.
 
 ## What a deploy does
 
-1. Checks both tokens, the Pages project's branch, and that the bucket can be
-   listed — before the tests, so a bad one stops it in seconds.
-2. Runs `scripts/app/test.sh` (skip with `--skip-tests`).
-3. `flutter build web --release` with `RESEARCH_BASE_URL` and
-   `DATABASE_BASE_URL`. `_headers` comes from `web/_headers`.
+1. Checks the tokens (dev uses both accounts, prod only ops), the Pages
+   project's branch, and that the bucket can be listed — before the tests, so
+   a bad one stops it in seconds. A release also refuses anything but a clean
+   `main`.
+2. Runs `scripts/app/test.sh` (dev can skip it with `--skip-tests`).
+3. `flutter build web --release` with `RESEARCH_BASE_URL`,
+   `DATABASE_BASE_URL`, and `LINK_BASE_URL` set to the same target's static
+   site. `_headers` comes from `web/_headers`.
 4. Checks each `.db` in the build against `manifest.json`, then takes it out
    of the build.
 5. Uploads each database version the bucket doesn't have yet, as
    `<db>-<16 hex of its SHA-256>.db.gz`, gzipped with `Content-Encoding: gzip`.
    Then, for every version, new or not, asks for its headers from the app's
    origin: 200, the CORS header, gzip.
-6. Deploys the app, then checks it answers 200 with cross-origin isolation and
-   noindex.
+6. A release asks to confirm here. Then it deploys the app and checks it
+   answers 200 on its origin, with cross-origin isolation and noindex.
 
 A new database means a new name, so a file on R2 is never overwritten. Old
 versions stay until you delete them by hand: a tab on an older build may still

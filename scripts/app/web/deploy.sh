@@ -4,17 +4,19 @@
 # Usage:
 #   ./scripts/app/web/deploy.sh [--dev]            # test, build, upload
 #   ./scripts/app/web/deploy.sh --dev --dry-run    # test, build + check, DON'T upload
-#   ./scripts/app/web/deploy.sh --prod             # not set up: exits 3
+#   ./scripts/app/web/deploy.sh --prod             # release to app.sammaditthi.net
 #
-#   --skip-tests       don't run scripts/app/test.sh first
-#   --yes              accepted for every deploy.sh's command line; no effect yet
+#   --skip-tests       dev: don't run scripts/app/test.sh first
+#   --yes              Skip the release confirmation prompt (--prod only, for CI)
 #
-# Status: dev=live prod=placeholder
+# Status: dev=live prod=live
 #
-# TWO ACCOUNTS IN ONE DEPLOY. The databases go to the R2 bucket in the prod
+# TWO ACCOUNTS IN A DEV DEPLOY. The databases go to the R2 bucket in the prod
 # (ops) account — R2 is paid, so there is one bucket and every web build reads
-# it. The app goes to the dev account's Pages project. Both tokens are checked
-# before the tests, so a bad one stops the deploy in seconds.
+# it. The app goes to its target's Pages project: dev's in the dev account,
+# prod's in ops beside the bucket. Every token is checked before the tests, so
+# a bad one stops the deploy in seconds. A release is cut from a clean
+# APP_WEB_PROD_BRANCH and always runs the tests.
 #
 # One R2 file per database version, `<db>-<first 16 hex of its SHA-256>.db.gz`,
 # named from the build's own manifest.json — the same name the app asks for.
@@ -26,9 +28,9 @@
 #
 # The build is `flutter build web --release` with RESEARCH_BASE_URL and
 # DATABASE_BASE_URL from scripts/config/targets.env and LINK_BASE_URL set to
-# dev's static site, minus the two .db files (manifest.json stays: the app
-# reads each version from it). `_headers` comes from web/_headers: cross-origin
-# isolation for the databases, noindex on every host.
+# the same target's static site, minus the two .db files (manifest.json stays:
+# the app reads each version from it). `_headers` comes from web/_headers:
+# cross-origin isolation for the databases, noindex on every host.
 #
 # A dry run uploads nothing and needs no credentials, so
 # scripts/release_all_dryrun.sh can run it anywhere.
@@ -44,6 +46,7 @@ set -e
 TARGET="dev"
 DRY_RUN=false
 SKIP_TESTS=false
+ASSUME_YES=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -51,7 +54,7 @@ while [[ $# -gt 0 ]]; do
     --prod)       TARGET="prod"; shift ;;
     --dry-run)    DRY_RUN=true;  shift ;;
     --skip-tests) SKIP_TESTS=true; shift ;;
-    --yes|-y)     shift ;;
+    --yes|-y)     ASSUME_YES=true; shift ;;
     -h|--help)    usage ;;
     *)
       echo "Unknown option: $1" >&2
@@ -61,21 +64,28 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [ "$TARGET" = "prod" ]; then
-  echo "app web --prod is not set up yet: it will be app.sammaditthi.net in the"
-  echo "  ops account. See scripts/app/web/README.md."
-  exit 3
+if [ "$TARGET" = "prod" ] && [ "$SKIP_TESTS" = true ]; then
+  echo "error: --skip-tests is dev-only. A release always runs the tests." >&2
+  exit 1
 fi
 
-PROJECT=$(target APP_WEB_DEV_PROJECT)
-BRANCH=$(target APP_WEB_DEV_BRANCH)
+# LINK_BASE_URL is where the reader's copied links and "Open as web page"
+# point: the same target's static site, as scripts/static_site/deploy.sh
+# derives it.
+if [ "$TARGET" = "prod" ]; then
+  PROJECT=$(target APP_WEB_PROD_PROJECT)
+  BRANCH=$(target APP_WEB_PROD_BRANCH)
+  ORIGIN=$(target APP_WEB_PROD_ORIGIN)
+  LINK_BASE_URL=$(target STATIC_SITE_PROD_ORIGIN)
+else
+  PROJECT=$(target APP_WEB_DEV_PROJECT)
+  BRANCH=$(target APP_WEB_DEV_BRANCH)
+  ORIGIN="https://$PROJECT.pages.dev"
+  LINK_BASE_URL="https://$(target STATIC_SITE_DEV_PROJECT).pages.dev"
+fi
 BUCKET=$(target DATABASE_BUCKET)
 DATABASE_BASE_URL=$(target DATABASE_BASE_URL)
 RESEARCH_BASE_URL=$(target RESEARCH_BASE_URL)
-ORIGIN="https://$PROJECT.pages.dev"
-# Where the reader's copied links and "Open as web page" point: dev's static
-# site, as scripts/static_site/deploy.sh derives it. The app's default is prod.
-LINK_BASE_URL="https://$(target STATIC_SITE_DEV_PROJECT).pages.dev"
 
 # The build, and the databases taken out of it, in folders of this run's own
 # outside build/: nothing else (a local flutter run, run_mac.sh --clean, a
@@ -123,15 +133,21 @@ r2_list() {
 cd "$WISDOM_ROOT"
 
 # --- Accounts ---------------------------------------------------------------
-# Dev first, for the Pages project; then prod, which stays selected for the
-# R2 upload. The bucket is listed here so a token without R2 fails now.
+# The target's account first, for the Pages project; then prod, which stays
+# selected for the R2 upload (on prod it already is). The bucket is listed
+# here so a token without R2 fails now.
 DB_ACCOUNT_LINE="(not checked — dry run)"
 APP_ACCOUNT_LINE="(not checked — dry run)"
 if [ "$DRY_RUN" = false ]; then
-  use_cloudflare dev || exit 1
+  if [ "$TARGET" = "prod" ]; then
+    require_release_commit "$BRANCH" || exit 1
+  fi
+  use_cloudflare "$TARGET" || exit 1
   APP_ACCOUNT_LINE="$CLOUDFLARE_ACCOUNT_LINE"
   check_pages_branch "$PROJECT" "$BRANCH" || exit 1
-  use_cloudflare prod || exit 1
+  if [ "$TARGET" = "dev" ]; then
+    use_cloudflare prod || exit 1
+  fi
   DB_ACCOUNT_LINE="$CLOUDFLARE_ACCOUNT_LINE"
   r2_list "$BUCKET" "none" >/dev/null || exit 1
   echo ""
@@ -230,6 +246,11 @@ if [ "$DRY_RUN" = true ]; then
   exit 0
 fi
 
+# A release is public, so it asks once. --yes for CI.
+if [ "$TARGET" = "prod" ] && [ "$ASSUME_YES" = false ]; then
+  confirm_release "Release the app to PRODUCTION ($PROJECT)?"
+fi
+
 # --- The databases on R2 (prod account, still selected) ---------------------
 # Before the app, so the build never names a file that isn't there yet. Each
 # one is checked on every deploy, not only when sent: a file a failed run left
@@ -281,9 +302,11 @@ for i in "${!DB_KEYS[@]}"; do
 done
 echo ""
 
-# --- Deploy the app (dev account) -------------------------------------------
-use_cloudflare dev || exit 1
-echo ""
+# --- Deploy the app (the target's account) ----------------------------------
+if [ "$TARGET" = "dev" ]; then
+  use_cloudflare dev || exit 1
+  echo ""
+fi
 
 git_stamp
 

@@ -77,8 +77,8 @@ bash -c '. scripts/lib/common.sh && use_cloudflare prod \
 - **Filling a store:** `ingest.sh` uploads SuttaCentral's texts into a File
   Search store with that key; its header has the usage and the one-time venv.
 - **CORS.** A browser app can only call the Worker from an origin listed in
-  `RESEARCH_CORS_ORIGINS` (`wrangler.jsonc`). Add the prod app's origin there
-  when the app goes live on the web, then deploy.
+  `RESEARCH_CORS_ORIGINS` (`wrangler.jsonc`): local, dev and prod Flutter web.
+  A new origin there takes effect when the Worker is released.
 - **A dev Worker later**, if ever: a second Worker in the dev account with its
   own domain, a `CLOUDFLARE_DEV_*` path in `deploy.sh --dev`, and its own
   `RESEARCH_BASE_URL`.

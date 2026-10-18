@@ -9,8 +9,8 @@
 > it was built in `docs/done/web/`. This doc owns the release itself and the CI
 > that runs it, and nothing else.
 >
-> **Scope: the apex static site.** Flutter web is not in this release — the
-> placeholder at the end says why.
+> **Scope: the apex static site**, and Flutter web's prod in §6, which goes out
+> with it.
 
 ---
 
@@ -132,7 +132,9 @@ no lock, and the second wipes `build/` mid-upload.
       injects (Rocket Loader, Web Analytics), which the policy blocks.
 - [ ] Search Console **and** Bing Webmaster Tools: submit `sitemap.xml`. Copilot,
       and partly ChatGPT search, read Bing's index rather than Google's.
-- [ ] Research Worker: re-deploy from the prod account, CORS re-pinned.
+- [ ] Research Worker released (`scripts/research_server/deploy.sh --prod`), so
+      its CORS list carries `app.sammaditthi.net`; a question asked in the prod
+      app answers.
 - [ ] Start watching the 404 logs — they are the trigger for backlog **D3**
       (stub files vs Bulk Redirects). Decide from traffic, not projection.
 
@@ -172,15 +174,19 @@ once the product scripts exist; it does not wait on the release job.
 
 ---
 
-## 6. Flutter web — dev live, prod later
+## 6. Flutter web — dev live, prod ready to release
 
 **Dev is live since 2026-09-27.** `./scripts/app/web/deploy.sh --dev` uploads
 each new database version to R2 in the ops account (`db.sammaditthi.net`), then
-the app to the `app-sammaditthi-test` Pages project in the dev account. What it
-does, the one-time setup and rollback are in
-[`scripts/app/web/README.md`](../../../scripts/app/web/README.md). Prod —
-`app-sammaditthi` in ops, at `app.sammaditthi.net` — is not created yet, and
-`--prod` is a placeholder.
+the app to the `app-sammaditthi-test` Pages project in the dev account.
+`--prod` (2026-10-18) does the same into `app-sammaditthi` in ops, at
+`app.sammaditthi.net`, from a clean `main`. What it does, the one-time setup
+and rollback are in
+[`scripts/app/web/README.md`](../../../scripts/app/web/README.md).
+
+**Release it with the static site, not before or after.** A prod static build
+points "read in the app" at `app.sammaditthi.net`, and the app's link card and
+shared links point at the apex.
 
 **Three targets**, all in `scripts/app/web/`
 ([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md)):
@@ -189,7 +195,7 @@ does, the one-time setup and rollback are in
 |---|---|---|
 | local | `run_mac.sh` | works: `flutter run -d web-server`, with the databases downloaded into the browser |
 | dev | `deploy.sh --dev` | live |
-| prod | `deploy.sh --prod` | placeholder |
+| prod | `deploy.sh --prod` | ready; the Pages project and its domain are made by hand first |
 
 Project names, the bucket and origins are in `scripts/config/targets.env`,
 credentials in `scripts/config/secrets.env` — never in the deploy script.
@@ -236,10 +242,6 @@ Still open:
 
 **Banked for prod** — cheap, and currently wrong:
 
-- **No Open Graph tags in `web/index.html`**, so a shared `app.` link previews as
-  a bare "Sammaditthi" card with English text. One generic Sinhala card (title,
-  description, image) is enough — the bundle is static, so a card per page would
-  need an edge function. BJT shares go to the static page, which has its own.
 - **A connection lost mid-download shows the error icon, not the offline one.**
   In `_download` (`web_database_installer.dart`) a `fetch` that throws or a
   `reader.read()` that fails reaches `_asFailure` and becomes `other`. Wrap
@@ -250,8 +252,6 @@ Still open:
   `<Team ID>.<bundle id>`), so they wait on **App ID** in
   [`first-ios-release.md`](../mobile-release/first-ios-release.md);
   assetlinks also needs the Android release key's SHA-256 fingerprint.
-- Research Worker CORS must include the app's prod origin (dev's is in
-  `research_server/wrangler.jsonc`).
 - **Links between the two products.** Site → app is built on sutta and chapter
   pages (`deep-linking-and-shareable-urls.md`, first task §A) but missing from
   `/` and the TOC pages, and the site never names the app: "Sammaditthi" appears

@@ -4,20 +4,20 @@
 URL into readable JS, so from that day the endpoint is public. Until then
 nothing here is urgent (dev-only exposure).
 
-## Where we are (2026-07-20)
+## Where we are (2026-10-18)
 
+- **Decision (2026-10-18): research ships on the public web app before App
+  Check.** The guard until then is CORS plus the zone's per-IP rate-limiting
+  rule on `/research` (set up and checked 2026-09-27, recipe in
+  `scripts/research_server/README.md`). Neither stops many IPs at once, so a
+  determined script can still burn the Gemini free-tier quota (feature goes
+  429 for real users; no money at risk). Accepted; App Check comes later.
 - **Decision (2026-07-20): skip the intermediate `X-App-Token`.** Rather than
-  ship a shared-secret token for the tester window and then rip it out, we go
-  straight to Firebase App Check when it's built. **Trade-off accepted:** until
-  App Check lands there is neither a token nor App Check, so the public Worker
-  URL is guarded only by CORS — and CORS is browser-only, so a script that
-  finds the URL can still burn our Gemini free-tier quota (feature goes 429 for
-  real users; no money at risk). Tolerable for a small LAN tester group, not
-  for a public release.
-- CORS is **pinned** to local Flutter web, `http://localhost:8080`
+  ship a shared-secret token and then rip it out, we go straight to Firebase
+  App Check when it's built.
+- CORS is **pinned** to local, dev and prod Flutter web
   (`RESEARCH_CORS_ORIGINS` in `wrangler.jsonc`; no trailing slash — must match
-  the browser's `Origin` header exactly). Add the real domain/IP alongside it
-  (comma-separated) once the web build is hosted somewhere public.
+  the browser's `Origin` header exactly).
 - The `X-App-Token` gate is **built but dormant** on both sides — server
   (`app.ts:59` skips it while `RESEARCH_APP_TOKEN` is unset) and client
   (`research_provider.dart` → `api_client.dart` send the header only when built
@@ -32,7 +32,7 @@ nothing here is urgent (dev-only exposure).
 
 > Updated 2026-07-20: steps 2–3 (the `X-App-Token`) are **superseded** — we're
 > skipping the intermediate token and going straight to App Check (see the
-> decision above). Step 4 (CORS) is **done** (pinned to the LAN tester origin).
+> decision above). Step 4 (CORS) is **done** (pinned as above).
 > The token steps are kept below only in case that decision is reversed.
 
 1. Deploy any pending server code: `cd research_server && npm run deploy`.

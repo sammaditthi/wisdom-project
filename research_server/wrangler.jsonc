@@ -28,8 +28,8 @@
     // browser's Origin header — scheme+host+port, NO trailing slash, NO path.
     //   localhost:8080                 = local Flutter web (scripts/app/web/run_mac.sh)
     //   app-sammaditthi-test.pages.dev = dev Flutter web (scripts/app/web/README.md)
-    // Add the prod app's origin when Flutter web prod goes live.
-    "RESEARCH_CORS_ORIGINS": "http://localhost:8080,https://app-sammaditthi-test.pages.dev"
+    //   app.sammaditthi.net            = prod Flutter web
+    "RESEARCH_CORS_ORIGINS": "http://localhost:8080,https://app-sammaditthi-test.pages.dev,https://app.sammaditthi.net"
   },
   // Pin the Worker to a US region so outbound Gemini calls egress from a
   // Gemini-supported location. Cloudflare's global anycast egress otherwise
