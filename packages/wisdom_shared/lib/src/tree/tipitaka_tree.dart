@@ -332,9 +332,9 @@ class TipitakaTree {
   ///
   /// Defined as the highest ancestor *below* the root-level pitaka node, which
   /// is the level BJT itself titles its volumes at. Used as the last part of
-  /// every page title, where it does the disambiguating work:
-  /// `FIGURES.leavesSharingATitle` leaves share a name with another leaf, and
-  /// the collection plus the parent vagga separates almost all of them.
+  /// every static-site page description. The `<title>` stops at the parent
+  /// vagga, which alone separates almost all of the
+  /// `FIGURES.leavesSharingATitle` leaves that share a name.
   ///
   /// A method here rather than a free function beside `SitePlan`, where it used
   /// to live: it reads [ancestorsOf] and returns a [TipitakaNode], and no part
