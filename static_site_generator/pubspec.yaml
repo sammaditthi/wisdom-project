@@ -13,6 +13,10 @@ environment:
 dependencies:
   wisdom_shared:
     path: ../packages/wisdom_shared
+  # SHA-256, for the CSP hash of `layoutScript` (backlog C2) and every content
+  # hash (`domain/content_hash.dart`). Pure Dart from the Dart team, so
+  # PREREQ-3 still holds.
+  crypto: ^3.0.7
 
 dev_dependencies:
   lints: ^3.0.0

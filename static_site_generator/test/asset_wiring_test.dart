@@ -11,6 +11,7 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:static_site_generator/domain/theme_tokens.dart';
 import 'package:static_site_generator/render/site_assets.dart';
 import 'package:static_site_generator/render/site_headers.dart';
@@ -107,7 +108,45 @@ void main() {
       }
     }
   });
+
+  // Backlog C2: the CSP allows inline script only by hash, so a new inline
+  // script would be refused by the browser while the build and the deploy
+  // checks all still pass.
+  test('every inline script in a page is one the CSP allows', () {
+    final policy = parseHeaderRules(_text(out, siteHeadersOutputPath))
+        .firstWhere((rule) => rule.pattern == '/*')
+        .headers['content-security-policy']!;
+    final allowed = {
+      for (final match in RegExp(r"'(sha256-[^']+)'").allMatches(policy))
+        match.group(1)!,
+    };
+    var checked = 0;
+    final pages = out
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.html'));
+    for (final page in pages) {
+      for (final script in _script.allMatches(page.readAsStringSync())) {
+        final attributes = script.group(1)!;
+        // A src= script is covered by 'self'; JSON-LD is data, never run.
+        // `\s` so a `data-src` does not count as a `src`.
+        if (RegExp(r'\ssrc\s*=').hasMatch(attributes) ||
+            attributes.contains('application/ld+json')) {
+          continue;
+        }
+        final digest = sha256.convert(utf8.encode(script.group(2)!));
+        expect(allowed, contains('sha256-${base64.encode(digest.bytes)}'),
+            reason: '${page.path} has an inline script the CSP refuses.');
+        checked++;
+      }
+    }
+    expect(checked, isPositive,
+        reason: 'No inline script found, so nothing was checked.');
+  });
 }
+
+/// A `<script>` element: its attributes, then its text.
+final RegExp _script = RegExp(r'<script([^>]*)>([\s\S]*?)</script>');
 
 String _text(Directory out, String path) =>
     File('${out.path}/$path').readAsStringSync();

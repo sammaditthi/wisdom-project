@@ -38,7 +38,7 @@ const String sitemapOutputPath = 'sitemap.xml';
 /// ## No `<lastmod>`, and that is a decision
 ///
 /// The build plan asked for one "from manifest hashes". That does not survive
-/// contact with the manifest: it holds FNV-1a *content hashes* and, by §11.8,
+/// contact with the manifest: it holds *content hashes* and, by §11.8,
 /// carries no date anywhere — deliberately, since a timestamp would rewrite
 /// every file on every build. A hash answers "did this change", never "when",
 /// and `<lastmod>` is a W3C datetime.

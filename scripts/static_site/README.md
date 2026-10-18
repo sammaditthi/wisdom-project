@@ -32,7 +32,8 @@ The names are in `scripts/config/targets.env`.
 Dev needs nothing for noindex: the generated `_headers` sends
 `X-Robots-Tag: noindex` on every `*.pages.dev` host, which covers dev and prod's
 own `sammaditthi.pages.dev`, and never the custom domain. After every upload the
-deploy checks the site answers 200, noindex on dev and indexable on prod.
+deploy checks the site answers 200, noindex on dev and indexable on prod, with
+exactly the Content-Security-Policy the build generated.
 
 ## Rollback
 

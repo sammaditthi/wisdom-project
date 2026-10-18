@@ -74,8 +74,8 @@
 /// and why content edits, which touch only the pages they touch, are
 /// unaffected.
 ///
-/// [contentHash] is FNV-1a: change detection, not cryptography, which is the
-/// question being asked. Same inputs give the same URLs, so §11.8's
+/// [contentHash] is change detection, not cryptography, which is the question
+/// being asked. Same inputs give the same URLs, so §11.8's
 /// byte-determinism survives.
 library;
 

@@ -107,9 +107,13 @@ const String narrowFallbackLayoutId = stackedLayoutId;
 /// Inline, straight after the radios, so it runs before the text below them
 /// paints. In the deferred `site.js` it ran after first paint, and every page
 /// showed side-by-side for a moment before jumping to the saved layout.
-/// The page's only inline script; byte-identical on every page, so a CSP needs
-/// one hash for it. No Sinhala and no URLs, on the same terms as `site.js`.
-const String layoutScript = '<script>(function(){'
+/// The page's only inline script; byte-identical on every page, so the CSP in
+/// `_headers` allows it by one hash of [layoutScriptSource].
+/// No Sinhala and no URLs, on the same terms as `site.js`.
+const String layoutScript = '<script>$layoutScriptSource</script>';
+
+/// What the browser hashes for the CSP: the text between the tags, exactly.
+const String layoutScriptSource = '(function(){'
     'var K="wisdom.layout",r=document.getElementsByName("layout");'
     'function on(t){for(var i=0;i<r.length;i++)'
     'if(r[i].value===t){r[i].checked=true;return true}return false}'
@@ -119,4 +123,4 @@ const String layoutScript = '<script>(function(){'
     'catch(e){}'
     'for(var i=0;i<r.length;i++)r[i].addEventListener("change",function(){'
     'try{localStorage.setItem(K,this.value)}catch(e){}})'
-    '})();</script>';
+    '})();';
