@@ -563,6 +563,49 @@ void main() {
           reason: 'The conjunct transform leaked into the translation.');
     });
 
+    test('machine-read names keep ligatures and drop the touching ZWJ', () {
+      // D2, spelled as tipitaka.lk's tab spells it: welded, then the touching
+      // ZWJ taken back out. Raw names almost never carry a ZWJ, so skipping
+      // the weld printed බ්ර with a bare hal in the tab.
+      final html = _render(_vaggaSuttaPage,
+          slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')});
+      final surfaces = {
+        '<title>': _firstCapture(html, r'<title>([^<]*)</title>'),
+        'og:title': _firstCapture(
+            html, r'<meta property="og:title" content="([^"]*)">'),
+        // Past `/`, whose label is an app string rather than a node name.
+        'JSON-LD': _breadcrumbNames(html).skip(1).join(' — '),
+      };
+
+      surfaces.forEach((surface, text) {
+        // Rakaransaya in the sutta's name, a common pair in the vagga's.
+        expect(text, contains('බ\u0DCA\u200Dර'),
+            reason: '$surface lost the rakaransaya ligature: "$text".');
+        expect(text, contains('න\u0DCA\u200Dධ'),
+            reason: '$surface lost the න + ධ ligature: "$text".');
+        // Not vacuous: the ligatures above prove the weld ran, and it welds
+        // සුත්ත and ලක්ඛ touching.
+        expect(text, isNot(contains('\u200D\u0DCA')),
+            reason: '$surface kept a touching ZWJ: "$text".');
+      });
+    });
+
+    test('the <title> stops at the vagga; the description adds the collection',
+        () {
+      // Decided 2026-10-18: name and vagga tell nearly every same-named sutta
+      // apart, and the collection made the tab long for little gain.
+      final html = _render(_vaggaSuttaPage,
+          slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')});
+      final sutta = unweldTitle(_tree['sp-toc-v-1']!.paliName);
+      final vagga = unweldTitle(_tree['sp-toc-v']!.paliName);
+      final collection = unweldTitle(_tree['sp-toc']!.paliName);
+
+      expect(_firstCapture(html, r'<title>([^<]*)</title>'), '$sutta — $vagga');
+      expect(
+          _firstCapture(html, r'<meta name="description" content="([^"]*)">'),
+          startsWith('$sutta — $vagga — $collection. '));
+    });
+
     test('the toolbar is on every page; the radios only on readable ones', () {
       // Every page carries the bar: a page without one has no way home, and no
       // route to search once P4 lands. What stays gated is the *layout group*,
@@ -1011,7 +1054,7 @@ void main() {
 
 // ── fixtures ─────────────────────────────────────────────────────────────────
 
-/// Seven nodes — the smallest tree that produces all three page kinds.
+/// A small tree that produces all three page kinds.
 ///
 /// Rows are `tree.json`'s wire format:
 /// `[pali, sinhala, hierarchyLevel, [pageIndex, entryIndex], parent, fileId]`.
@@ -1051,6 +1094,26 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 5],
     'sp-toc',
+    'an-1'
+  ],
+  // A vagga inside the collection, so its sutta has a parent that is not its
+  // collection — the one shape where `<title>` and description differ. Real
+  // Pali names (DN 1, DN 1.1), raw as `tree.json` has them: no ZWJ, though both
+  // need a ligature (න්ධ, බ්ර).
+  'sp-toc-v': [
+    'සීලක්ඛන්ධවග්ගො',
+    'සීලක්ඛන්ධ වර්ගය',
+    5,
+    [0, 6],
+    'sp-toc',
+    'an-1'
+  ],
+  'sp-toc-v-1': [
+    'බ්රහ්මජාලසුත්තං',
+    'බ්රහ්මජාල සූත්රය',
+    1,
+    [0, 7],
+    'sp-toc-v',
     'an-1'
   ],
   // A container that groups: its children live inside one chapter file.
@@ -1194,6 +1257,14 @@ SitePage get _suttaPage => SitePage(
       kind: PageKind.sutta,
       node: _tree['sp-toc-1']!,
       suttas: [_tree['sp-toc-1']!],
+    );
+
+/// The sutta under [_tree]'s vagga — the only page whose location has three
+/// distinct parts.
+SitePage get _vaggaSuttaPage => SitePage(
+      kind: PageKind.sutta,
+      node: _tree['sp-toc-v-1']!,
+      suttas: [_tree['sp-toc-v-1']!],
     );
 
 SitePage get _chapterPage => SitePage(
@@ -1506,6 +1577,24 @@ String _cell(String html, String cssClass) {
           .firstMatch(html);
   if (match == null) fail('No .$cssClass cell in the rendered page.');
   return match.group(1)!;
+}
+
+/// The first capture group of [pattern] in [html].
+String _firstCapture(String html, String pattern) {
+  final match = RegExp(pattern).firstMatch(html);
+  if (match == null) fail('Nothing in the rendered page matches $pattern.');
+  return match.group(1)!;
+}
+
+/// The JSON-LD breadcrumb's names, `/` first.
+List<String> _breadcrumbNames(String html) {
+  final json = jsonDecode(_firstCapture(
+          html, r'<script type="application/ld\+json">(.*?)</script>'))
+      as Map<String, dynamic>;
+  return [
+    for (final item in json['itemListElement'] as List)
+      (item as Map<String, dynamic>)['name'] as String,
+  ];
 }
 
 int _countOf(String haystack, String needle) =>
