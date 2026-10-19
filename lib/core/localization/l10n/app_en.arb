@@ -359,7 +359,7 @@
     "description": "Tooltip for the filter-row button that opens the match options menu"
   },
 
-  "matchEachWord": "Match each word",
+  "matchEachWord": "Match search text",
   "@matchEachWord": {
     "description": "Match menu section header: how each typed word is matched"
   },
@@ -369,17 +369,17 @@
     "description": "Match menu option and button label: a word matches anything that starts with it"
   },
 
-  "matchStartsWithHint": "Finds the word and its longer forms",
+  "matchStartsWithHint": "Finds the search text and its longer forms",
   "@matchStartsWithHint": {
     "description": "Tooltip on the Starts with option"
   },
 
-  "matchWholeWord": "Whole word",
+  "matchWholeWord": "Exact word",
   "@matchWholeWord": {
     "description": "Match menu option and button label: only the exact word matches"
   },
 
-  "matchWholeWordHint": "Finds only the exact word",
+  "matchWholeWordHint": "Finds only the exact search text",
   "@matchWholeWordHint": {
     "description": "Tooltip on the Whole word option"
   },
@@ -394,7 +394,7 @@
     "description": "Match menu option: the words must be together, as typed"
   },
 
-  "matchPhraseHint": "Finds the words together, as typed",
+  "matchPhraseHint": "Finds the words together, as a sentence",
   "@matchPhraseHint": {
     "description": "Tooltip on the As a phrase option"
   },
@@ -404,7 +404,7 @@
     "description": "Short form of As a phrase, added to the match button label"
   },
 
-  "matchAnywhereHint": "Finds the words in any order",
+  "matchAnywhereHint": "Finds the search text in any order",
   "@matchAnywhereHint": {
     "description": "Tooltip on the Anywhere in the same text option"
   },

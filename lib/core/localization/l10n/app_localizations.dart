@@ -509,7 +509,7 @@ abstract class AppLocalizations {
   /// Match menu section header: how each typed word is matched
   ///
   /// In en, this message translates to:
-  /// **'Match each word'**
+  /// **'Match search text'**
   String get matchEachWord;
 
   /// Match menu option and button label: a word matches anything that starts with it
@@ -521,19 +521,19 @@ abstract class AppLocalizations {
   /// Tooltip on the Starts with option
   ///
   /// In en, this message translates to:
-  /// **'Finds the word and its longer forms'**
+  /// **'Finds the search text and its longer forms'**
   String get matchStartsWithHint;
 
   /// Match menu option and button label: only the exact word matches
   ///
   /// In en, this message translates to:
-  /// **'Whole word'**
+  /// **'Exact word'**
   String get matchWholeWord;
 
   /// Tooltip on the Whole word option
   ///
   /// In en, this message translates to:
-  /// **'Finds only the exact word'**
+  /// **'Finds only the exact search text'**
   String get matchWholeWordHint;
 
   /// Match menu section header, shown for two or more words
@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// Tooltip on the As a phrase option
   ///
   /// In en, this message translates to:
-  /// **'Finds the words together, as typed'**
+  /// **'Finds the words together, as a sentence'**
   String get matchPhraseHint;
 
   /// Short form of As a phrase, added to the match button label
@@ -563,7 +563,7 @@ abstract class AppLocalizations {
   /// Tooltip on the Anywhere in the same text option
   ///
   /// In en, this message translates to:
-  /// **'Finds the words in any order'**
+  /// **'Finds the search text in any order'**
   String get matchAnywhereHint;
 
   /// Short form of Anywhere in the same text, added to the match button label

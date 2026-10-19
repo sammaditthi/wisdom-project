@@ -18,10 +18,10 @@ class AppLocalizationsSi extends AppLocalizations {
   String get readerTitle => 'පාඨකය';
 
   @override
-  String get showNavigator => 'සංචාලකය පෙන්වන්න';
+  String get showNavigator => 'පටුන පෙන්වන්න';
 
   @override
-  String get hideNavigator => 'සංචාලකය සඟවන්න';
+  String get hideNavigator => 'පටුන සඟවන්න';
 
   @override
   String get layoutPaliOnly => 'පාළි පමණයි';
@@ -35,10 +35,10 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get layoutSideBySide => 'දෙකම';
+  String get layoutSideBySide => 'සමාන්තරව';
 
   @override
-  String get layoutStacked => 'ගොඩගැසූ';
+  String get layoutStacked => 'අනුක්‍රමිකව';
 
   @override
   String get paliLanguageLabel => 'පාළි';
@@ -53,11 +53,10 @@ class AppLocalizationsSi extends AppLocalizations {
   String get errorLoadingContent => 'අන්තර්ගතය පූරණය කිරීමේ දෝෂයකි';
 
   @override
-  String get errorLoadingTree => 'සංචාලන ව්‍යූහය පූරණය කිරීමේ දෝෂයකි';
+  String get errorLoadingTree => 'පටුන පූරණය කිරීමේ දෝෂයකි';
 
   @override
-  String get selectNodeToRead =>
-      'කියවීම ආරම්භ කිරීමට සංචාලකයෙන් සූත්‍රයක් තෝරන්න';
+  String get selectNodeToRead => 'කියවීම ඇරඹීමට පෙළක් තෝරන්න';
 
   @override
   String get searchPlaceholder => 'ත්‍රිපිටකයේ සොයන්න...';
@@ -102,7 +101,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get appLayout => 'යෙදුම';
 
   @override
-  String get hideNavigationBar => 'ප්‍රධාන සංචාලකය සඟවන්න';
+  String get hideNavigationBar => 'පැති තීරුව සඟවන්න';
 
   @override
   String get fontSize => 'අක්ෂර ප්‍රමාණය';
@@ -211,7 +210,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get scopeOther => 'අන්‍ය';
 
   @override
-  String get anywhereInText => 'එකම පෙළෙහි ඕනෑම තැනක';
+  String get anywhereInText => 'ඕනෑම තැනක';
 
   @override
   String get openSearch => 'සොයන්න';
@@ -220,47 +219,48 @@ class AppLocalizationsSi extends AppLocalizations {
   String get matchOptions => 'ගැළපීමේ විකල්ප';
 
   @override
-  String get matchEachWord => 'එක් එක් වචනය ගැළපෙන ආකාරය';
+  String get matchEachWord => 'වචන ගැළපෙන ආකාරය';
 
   @override
   String get matchStartsWith => 'ඇරඹෙන වචන';
 
   @override
-  String get matchStartsWithHint => 'වචනය සහ එයින් ඇරඹෙන දිගු වචන සොයයි';
+  String get matchStartsWithHint => 'සෙවුම් පාඨය සහ එයින් ඇරඹෙන දිගු වචන සොයයි';
 
   @override
-  String get matchWholeWord => 'සම්පූර්ණ වචනය';
+  String get matchWholeWord => 'එම වචනයම';
 
   @override
-  String get matchWholeWordHint => 'එම වචනයම පමණක් සොයයි';
+  String get matchWholeWordHint => 'සෙවුම් පාඨය පමණක් සොයයි';
 
   @override
-  String get matchHowWordsSit => 'වචන එකට පිහිටන ආකාරය';
+  String get matchHowWordsSit => 'වචන පිහිටන ආකාරය';
 
   @override
   String get matchPhrase => 'වාක්‍යයක් ලෙස';
 
   @override
-  String get matchPhraseHint => 'ලියූ පිළිවෙළටම, වචන එකට සොයයි';
+  String get matchPhraseHint => 'ලියූ පිළිවෙළටම, වාක්‍ය ඛණ්ඩයක් ලෙස සොයයි';
 
   @override
   String get matchPhraseShort => 'වාක්‍යය';
 
   @override
-  String get matchAnywhereHint => 'වචන ඕනෑම පිළිවෙළකින් සොයයි';
+  String get matchAnywhereHint =>
+      'එකම පෙළෙහි ඕනෑම තැනක වෙන්වූ වචන සමූහයක් ලෙස සොයයි';
 
   @override
   String get matchAnywhereShort => 'ඕනෑම තැනක';
 
   @override
-  String get matchNear => 'එකිනෙකට ළඟින්';
+  String get matchNear => 'එකිනෙකට ආසන්නව';
 
   @override
-  String get matchNearHint => 'එකිනෙකට ළඟින් ඇති වචන සොයයි';
+  String get matchNearHint => 'එකිනෙකට ආසන්නව නිශ්චිත දුරකින් ඇති වචන සොයයි';
 
   @override
   String matchNearShort(int count) {
-    return 'ළඟින් $count';
+    return 'දුර $count';
   }
 
   @override
@@ -269,10 +269,10 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get fewerWords => 'වචන අඩු කරන්න';
+  String get fewerWords => 'පරතරය අඩු කරන්න';
 
   @override
-  String get moreWords => 'වචන වැඩි කරන්න';
+  String get moreWords => 'පරතරය වැඩි කරන්න';
 
   @override
   String get resetToDefault => 'පෙරනිමියට යළි සකසන්න';

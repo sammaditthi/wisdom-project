@@ -220,19 +220,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchOptions => 'Match options';
 
   @override
-  String get matchEachWord => 'Match each word';
+  String get matchEachWord => 'Match search text';
 
   @override
   String get matchStartsWith => 'Starts with';
 
   @override
-  String get matchStartsWithHint => 'Finds the word and its longer forms';
+  String get matchStartsWithHint =>
+      'Finds the search text and its longer forms';
 
   @override
-  String get matchWholeWord => 'Whole word';
+  String get matchWholeWord => 'Exact word';
 
   @override
-  String get matchWholeWordHint => 'Finds only the exact word';
+  String get matchWholeWordHint => 'Finds only the exact search text';
 
   @override
   String get matchHowWordsSit => 'How words sit together';
@@ -241,13 +242,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchPhrase => 'As a phrase';
 
   @override
-  String get matchPhraseHint => 'Finds the words together, as typed';
+  String get matchPhraseHint => 'Finds the words together, as a sentence';
 
   @override
   String get matchPhraseShort => 'Phrase';
 
   @override
-  String get matchAnywhereHint => 'Finds the words in any order';
+  String get matchAnywhereHint => 'Finds the search text in any order';
 
   @override
   String get matchAnywhereShort => 'Anywhere';

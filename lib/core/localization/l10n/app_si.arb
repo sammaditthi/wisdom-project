@@ -7,9 +7,9 @@
 
   "readerTitle": "පාඨකය",
 
-  "showNavigator": "සංචාලකය පෙන්වන්න",
+  "showNavigator": "පටුන පෙන්වන්න",
 
-  "hideNavigator": "සංචාලකය සඟවන්න",
+  "hideNavigator": "පටුන සඟවන්න",
 
   "layoutPaliOnly": "පාළි පමණයි",
 
@@ -17,9 +17,9 @@
 
   "currentLayout": "පිරිසැලසුම: {name}",
 
-  "layoutSideBySide": "දෙකම",
+  "layoutSideBySide": "සමාන්තරව",
 
-  "layoutStacked": "ගොඩගැසූ",
+  "layoutStacked": "අනුක්‍රමිකව",
 
   "paliLanguageLabel": "පාළි",
 
@@ -29,9 +29,9 @@
 
   "errorLoadingContent": "අන්තර්ගතය පූරණය කිරීමේ දෝෂයකි",
 
-  "errorLoadingTree": "සංචාලන ව්‍යූහය පූරණය කිරීමේ දෝෂයකි",
+  "errorLoadingTree": "පටුන පූරණය කිරීමේ දෝෂයකි",
 
-  "selectNodeToRead": "කියවීම ආරම්භ කිරීමට සංචාලකයෙන් සූත්‍රයක් තෝරන්න",
+  "selectNodeToRead": "කියවීම ඇරඹීමට පෙළක් තෝරන්න",
 
   "searchPlaceholder": "ත්‍රිපිටකයේ සොයන්න...",
 
@@ -61,7 +61,7 @@
 
   "appLayout": "යෙදුම",
 
-  "hideNavigationBar": "ප්‍රධාන සංචාලකය සඟවන්න",
+  "hideNavigationBar": "පැති තීරුව සඟවන්න",
 
   "fontSize": "අක්ෂර ප්‍රමාණය",
 
@@ -131,45 +131,45 @@
 
   "scopeOther": "අන්‍ය",
 
-  "anywhereInText": "එකම පෙළෙහි ඕනෑම තැනක",
+  "anywhereInText": "ඕනෑම තැනක",
 
   "openSearch": "සොයන්න",
 
   "matchOptions": "ගැළපීමේ විකල්ප",
 
-  "matchEachWord": "එක් එක් වචනය ගැළපෙන ආකාරය",
+  "matchEachWord": "වචන ගැළපෙන ආකාරය",
 
   "matchStartsWith": "ඇරඹෙන වචන",
 
-  "matchStartsWithHint": "වචනය සහ එයින් ඇරඹෙන දිගු වචන සොයයි",
+  "matchStartsWithHint": "සෙවුම් පාඨය සහ එයින් ඇරඹෙන දිගු වචන සොයයි",
 
-  "matchWholeWord": "සම්පූර්ණ වචනය",
+  "matchWholeWord": "එම වචනයම",
 
-  "matchWholeWordHint": "එම වචනයම පමණක් සොයයි",
+  "matchWholeWordHint": "සෙවුම් පාඨය පමණක් සොයයි",
 
-  "matchHowWordsSit": "වචන එකට පිහිටන ආකාරය",
+  "matchHowWordsSit": "වචන පිහිටන ආකාරය",
 
   "matchPhrase": "වාක්‍යයක් ලෙස",
 
-  "matchPhraseHint": "ලියූ පිළිවෙළටම, වචන එකට සොයයි",
+  "matchPhraseHint": "ලියූ පිළිවෙළටම, වාක්‍ය ඛණ්ඩයක් ලෙස සොයයි",
 
   "matchPhraseShort": "වාක්‍යය",
 
-  "matchAnywhereHint": "වචන ඕනෑම පිළිවෙළකින් සොයයි",
+  "matchAnywhereHint": "එකම පෙළෙහි ඕනෑම තැනක වෙන්වූ වචන සමූහයක් ලෙස සොයයි",
 
   "matchAnywhereShort": "ඕනෑම තැනක",
 
-  "matchNear": "එකිනෙකට ළඟින්",
+  "matchNear": "එකිනෙකට ආසන්නව",
 
-  "matchNearHint": "එකිනෙකට ළඟින් ඇති වචන සොයයි",
+  "matchNearHint": "එකිනෙකට ආසන්නව නිශ්චිත දුරකින් ඇති වචන සොයයි",
 
-  "matchNearShort": "ළඟින් {count}",
+  "matchNearShort": "දුර {count}",
 
   "matchNearWithin": "වචන {count}ක් ඇතුළත",
 
-  "fewerWords": "වචන අඩු කරන්න",
+  "fewerWords": "පරතරය අඩු කරන්න",
 
-  "moreWords": "වචන වැඩි කරන්න",
+  "moreWords": "පරතරය වැඩි කරන්න",
 
   "resetToDefault": "පෙරනිමියට යළි සකසන්න",
 
