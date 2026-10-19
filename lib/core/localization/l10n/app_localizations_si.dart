@@ -361,8 +361,7 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get statusSelectSuttaToRead =>
-      'කියවීම ආරම්භ කිරීමට ව්‍යූහයෙන් සූත්‍රයක් තෝරන්න';
+  String get statusSelectSuttaToRead => 'කියවීම ඇරඹීමට පටුනෙන් පෙළක් තෝරන්න';
 
   @override
   String get statusNoContentToDisplay => 'පෙන්වීමට අන්තර්ගතයක් නැත';

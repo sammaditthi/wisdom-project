@@ -81,7 +81,7 @@
     "description": "Error message when navigation tree fails to load"
   },
 
-  "selectNodeToRead": "Select a sutta from the navigator to begin reading",
+  "selectNodeToRead": "Select a text from the navigator to begin reading",
   "@selectNodeToRead": {
     "description": "Placeholder message shown when no content is selected"
   },

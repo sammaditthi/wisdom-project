@@ -191,7 +191,7 @@ abstract class AppLocalizations {
   /// Placeholder message shown when no content is selected
   ///
   /// In en, this message translates to:
-  /// **'Select a sutta from the navigator to begin reading'**
+  /// **'Select a text from the navigator to begin reading'**
   String get selectNodeToRead;
 
   /// Not shown in the app. The static site's search button reads the Sinhala value from app_si.arb, so do not delete it as unused.

@@ -57,7 +57,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectNodeToRead =>
-      'Select a sutta from the navigator to begin reading';
+      'Select a text from the navigator to begin reading';
 
   @override
   String get searchPlaceholder => 'Search Tipitaka...';
