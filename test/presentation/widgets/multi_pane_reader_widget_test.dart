@@ -35,7 +35,7 @@ void main() {
 
       // ASSERT
       expect(
-        find.text('Select a sutta from the tree to begin reading'),
+        find.text('Select a text from the navigator to begin reading'),
         findsOneWidget,
       );
       // The "select a sutta" hint shows the Urna Hair Relic emblem
@@ -125,7 +125,7 @@ void main() {
 
       // ASSERT - Placeholder should be gone
       expect(
-        find.text('Select a sutta from the tree to begin reading'),
+        find.text('Select a text from the navigator to begin reading'),
         findsNothing,
       );
     });

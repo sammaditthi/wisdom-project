@@ -338,7 +338,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Select a sutta from the tree to begin reading'),
+        find.text('Select a text from the navigator to begin reading'),
         findsOneWidget,
       );
       // Reader hint shows the emblem via [StatusMessageView.leading]

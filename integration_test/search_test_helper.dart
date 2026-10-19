@@ -157,11 +157,11 @@ extension SearchTestHelpers on WidgetTester {
 
   // ---- Match options menu ("Starts with ▾") ----
 
-  /// Flip "Starts with" ↔ "Whole word" in the match options menu.
+  /// Flip "Starts with" ↔ "Exact word" in the match options menu.
   Future<void> toggleExactMatch() async {
     final exact = getSearchState().isExactMatch;
     await _inMatchMenu(() async {
-      await tap(_matchOption(exact ? 'Starts with' : 'Whole word'));
+      await tap(_matchOption(exact ? 'Starts with' : 'Exact word'));
       await pump();
     });
   }

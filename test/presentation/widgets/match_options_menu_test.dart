@@ -49,7 +49,7 @@ void main() {
   group('MatchOptionsButton label', () {
     final cases = [
       (_query(_oneWord), 'Starts with'),
-      (_query(_oneWord).copyWith(isExactMatch: true), 'Whole word'),
+      (_query(_oneWord).copyWith(isExactMatch: true), 'Exact word'),
       // A second word adds where the words sit.
       (_query(_twoWords), 'Starts with · Phrase'),
       (
@@ -65,7 +65,7 @@ void main() {
           isPhraseSearch: false,
           proximityDistance: 20,
         ),
-        'Whole word · Near 20',
+        'Exact word · Near 20',
       ),
       // Counts the words that are searched: the leading space is dropped.
       (
@@ -84,12 +84,13 @@ void main() {
   });
 
   group('Match options menu', () {
-    testWidgets('one word: only the "match each word" options', (tester) async {
+    testWidgets('one word: only the "match search text" options',
+        (tester) async {
       await _pumpButton(tester, _query(_oneWord));
       await _openMenu(tester);
 
       expect(_option('Starts with'), findsOneWidget);
-      expect(_option('Whole word'), findsOneWidget);
+      expect(_option('Exact word'), findsOneWidget);
       expect(find.text('As a phrase'), findsNothing);
       expect(find.text('Near each other'), findsNothing);
     });
@@ -111,10 +112,10 @@ void main() {
       await _openMenu(tester);
 
       for (final hint in const [
-        'Finds the word and its longer forms',
-        'Finds only the exact word',
-        'Finds the words together, as typed',
-        'Finds the words in any order',
+        'Finds the search text and its longer forms',
+        'Finds only the exact search text',
+        'Finds the words together, as a sentence',
+        'Finds the search text in any order',
         'Finds the words close together',
       ]) {
         expect(find.byTooltip(hint), findsOneWidget, reason: hint);
@@ -127,11 +128,11 @@ void main() {
       final notifier = await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);
 
-      await tester.tap(_option('Whole word'));
+      await tester.tap(_option('Exact word'));
       await tester.pumpAndSettle();
 
       expect(notifier.state.isExactMatch, isTrue);
-      expect(find.text('Whole word · Phrase'), findsOneWidget);
+      expect(find.text('Exact word · Phrase'), findsOneWidget);
       // Still open, so a second option can be picked straight away.
       expect(_option('Anywhere in the same text'), findsOneWidget);
     });
@@ -151,7 +152,7 @@ void main() {
       container.read(overlayStackProvider.notifier).dismissTop();
       await tester.pumpAndSettle();
 
-      expect(_option('Whole word'), findsNothing);
+      expect(_option('Exact word'), findsNothing);
       expect(stack(), isEmpty);
     });
 

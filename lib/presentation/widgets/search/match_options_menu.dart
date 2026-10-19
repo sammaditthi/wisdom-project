@@ -198,7 +198,7 @@ class _MatchMenu extends ConsumerWidget {
   }
 }
 
-/// Section header inside the menu, e.g. "MATCH EACH WORD", styled like the
+/// Section header inside the menu, e.g. "MATCH SEARCH TEXT", styled like the
 /// results panel's section headers.
 class _SectionLabel extends StatelessWidget {
   final String text;
