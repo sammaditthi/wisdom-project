@@ -6,11 +6,6 @@
     "description": "The title of the application"
   },
 
-  "treeNavigatorTitle": "Tipitaka navigator",
-  "@treeNavigatorTitle": {
-    "description": "Title for the tree navigation screen"
-  },
-
   "readerTitle": "Reader",
   "@readerTitle": {
     "description": "Title for the reading screen"
@@ -79,11 +74,6 @@
   "errorLoadingTree": "Error loading navigation tree",
   "@errorLoadingTree": {
     "description": "Error message when navigation tree fails to load"
-  },
-
-  "selectNodeToRead": "Select a text from the navigator to begin reading",
-  "@selectNodeToRead": {
-    "description": "Placeholder message shown when no content is selected"
   },
 
   "searchPlaceholder": "Search Tipitaka...",
@@ -359,7 +349,7 @@
     "description": "Tooltip for the filter-row button that opens the match options menu"
   },
 
-  "matchEachWord": "Match search text",
+  "matchEachWord": "How each word matches",
   "@matchEachWord": {
     "description": "Match menu section header: how each typed word is matched"
   },
@@ -369,7 +359,7 @@
     "description": "Match menu option and button label: a word matches anything that starts with it"
   },
 
-  "matchStartsWithHint": "Finds the search text and its longer forms",
+  "matchStartsWithHint": "Finds the word and its longer forms",
   "@matchStartsWithHint": {
     "description": "Tooltip on the Starts with option"
   },
@@ -379,9 +369,9 @@
     "description": "Match menu option and button label: only the exact word matches"
   },
 
-  "matchWholeWordHint": "Finds only the exact search text",
+  "matchWholeWordHint": "Finds only the exact word",
   "@matchWholeWordHint": {
-    "description": "Tooltip on the Whole word option"
+    "description": "Tooltip on the Exact word option"
   },
 
   "matchHowWordsSit": "How words sit together",
@@ -394,7 +384,7 @@
     "description": "Match menu option: the words must be together, as typed"
   },
 
-  "matchPhraseHint": "Finds the words together, as a sentence",
+  "matchPhraseHint": "Finds the words together, in the order typed",
   "@matchPhraseHint": {
     "description": "Tooltip on the As a phrase option"
   },
@@ -404,7 +394,7 @@
     "description": "Short form of As a phrase, added to the match button label"
   },
 
-  "matchAnywhereHint": "Finds the search text in any order",
+  "matchAnywhereHint": "Finds the words in any order",
   "@matchAnywhereHint": {
     "description": "Tooltip on the Anywhere in the same text option"
   },
@@ -424,7 +414,7 @@
     "description": "Tooltip on the Near each other option"
   },
 
-  "matchNearShort": "Near {count}",
+  "matchNearShort": "Gap {count}",
   "@matchNearShort": {
     "description": "Short form of Near each other, added to the match button label",
     "placeholders": {
@@ -444,13 +434,13 @@
     }
   },
 
-  "fewerWords": "Fewer words",
-  "@fewerWords": {
+  "smallerGap": "Smaller gap",
+  "@smallerGap": {
     "description": "Tooltip for the - button of the distance stepper"
   },
 
-  "moreWords": "More words",
-  "@moreWords": {
+  "largerGap": "Larger gap",
+  "@largerGap": {
     "description": "Tooltip for the + button of the distance stepper"
   },
 
@@ -601,7 +591,7 @@
 
   "statusSelectSuttaToRead": "Select a text from the navigator to begin reading",
   "@statusSelectSuttaToRead": {
-    "description": "Empty state shown in the reader before any sutta has been selected"
+    "description": "Empty state shown in the reader before any text has been selected"
   },
 
   "statusNoContentToDisplay": "No content to display",

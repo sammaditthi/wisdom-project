@@ -104,12 +104,6 @@ abstract class AppLocalizations {
   /// **'Sammaditthi'**
   String get appTitle;
 
-  /// Title for the tree navigation screen
-  ///
-  /// In en, this message translates to:
-  /// **'Tipitaka navigator'**
-  String get treeNavigatorTitle;
-
   /// Title for the reading screen
   ///
   /// In en, this message translates to:
@@ -187,12 +181,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error loading navigation tree'**
   String get errorLoadingTree;
-
-  /// Placeholder message shown when no content is selected
-  ///
-  /// In en, this message translates to:
-  /// **'Select a text from the navigator to begin reading'**
-  String get selectNodeToRead;
 
   /// Not shown in the app. The static site's search button reads the Sinhala value from app_si.arb, so do not delete it as unused.
   ///
@@ -509,7 +497,7 @@ abstract class AppLocalizations {
   /// Match menu section header: how each typed word is matched
   ///
   /// In en, this message translates to:
-  /// **'Match search text'**
+  /// **'How each word matches'**
   String get matchEachWord;
 
   /// Match menu option and button label: a word matches anything that starts with it
@@ -521,7 +509,7 @@ abstract class AppLocalizations {
   /// Tooltip on the Starts with option
   ///
   /// In en, this message translates to:
-  /// **'Finds the search text and its longer forms'**
+  /// **'Finds the word and its longer forms'**
   String get matchStartsWithHint;
 
   /// Match menu option and button label: only the exact word matches
@@ -530,10 +518,10 @@ abstract class AppLocalizations {
   /// **'Exact word'**
   String get matchWholeWord;
 
-  /// Tooltip on the Whole word option
+  /// Tooltip on the Exact word option
   ///
   /// In en, this message translates to:
-  /// **'Finds only the exact search text'**
+  /// **'Finds only the exact word'**
   String get matchWholeWordHint;
 
   /// Match menu section header, shown for two or more words
@@ -551,7 +539,7 @@ abstract class AppLocalizations {
   /// Tooltip on the As a phrase option
   ///
   /// In en, this message translates to:
-  /// **'Finds the words together, as a sentence'**
+  /// **'Finds the words together, in the order typed'**
   String get matchPhraseHint;
 
   /// Short form of As a phrase, added to the match button label
@@ -563,7 +551,7 @@ abstract class AppLocalizations {
   /// Tooltip on the Anywhere in the same text option
   ///
   /// In en, this message translates to:
-  /// **'Finds the search text in any order'**
+  /// **'Finds the words in any order'**
   String get matchAnywhereHint;
 
   /// Short form of Anywhere in the same text, added to the match button label
@@ -587,7 +575,7 @@ abstract class AppLocalizations {
   /// Short form of Near each other, added to the match button label
   ///
   /// In en, this message translates to:
-  /// **'Near {count}'**
+  /// **'Gap {count}'**
   String matchNearShort(int count);
 
   /// Distance shown beside the - / + stepper under Near each other
@@ -599,14 +587,14 @@ abstract class AppLocalizations {
   /// Tooltip for the - button of the distance stepper
   ///
   /// In en, this message translates to:
-  /// **'Fewer words'**
-  String get fewerWords;
+  /// **'Smaller gap'**
+  String get smallerGap;
 
   /// Tooltip for the + button of the distance stepper
   ///
   /// In en, this message translates to:
-  /// **'More words'**
-  String get moreWords;
+  /// **'Larger gap'**
+  String get largerGap;
 
   /// Match menu action: back to Starts with, As a phrase, distance 10
   ///
@@ -770,7 +758,7 @@ abstract class AppLocalizations {
   /// **'No {category} found'**
   String statusNoResultsForCategory(String category);
 
-  /// Empty state shown in the reader before any sutta has been selected
+  /// Empty state shown in the reader before any text has been selected
   ///
   /// In en, this message translates to:
   /// **'Select a text from the navigator to begin reading'**

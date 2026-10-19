@@ -65,7 +65,7 @@ void main() {
           isPhraseSearch: false,
           proximityDistance: 20,
         ),
-        'Exact word · Near 20',
+        'Exact word · Gap 20',
       ),
       // Counts the words that are searched: the leading space is dropped.
       (
@@ -112,10 +112,10 @@ void main() {
       await _openMenu(tester);
 
       for (final hint in const [
-        'Finds the search text and its longer forms',
-        'Finds only the exact search text',
-        'Finds the words together, as a sentence',
-        'Finds the search text in any order',
+        'Finds the word and its longer forms',
+        'Finds only the exact word',
+        'Finds the words together, in the order typed',
+        'Finds the words in any order',
         'Finds the words close together',
       ]) {
         expect(find.byTooltip(hint), findsOneWidget, reason: hint);
@@ -212,7 +212,7 @@ void main() {
       final notifier = await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);
 
-      await tester.tap(find.byTooltip('More words'));
+      await tester.tap(find.byTooltip('Larger gap'));
       await tester.pumpAndSettle();
 
       expect(notifier.state.proximityDistance, 11);

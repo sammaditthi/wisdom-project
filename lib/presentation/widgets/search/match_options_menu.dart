@@ -299,12 +299,12 @@ class _DistanceStepper extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.remove, size: 18),
-            tooltip: l10n.fewerWords,
+            tooltip: l10n.smallerGap,
             onPressed: distance > _min ? () => onChanged(distance - 1) : null,
           ),
           IconButton(
             icon: const Icon(Icons.add, size: 18),
-            tooltip: l10n.moreWords,
+            tooltip: l10n.largerGap,
             onPressed: distance < _max ? () => onChanged(distance + 1) : null,
           ),
         ],

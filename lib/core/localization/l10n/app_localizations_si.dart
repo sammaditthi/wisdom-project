@@ -12,9 +12,6 @@ class AppLocalizationsSi extends AppLocalizations {
   String get appTitle => 'Sammaditthi';
 
   @override
-  String get treeNavigatorTitle => 'ත්‍රිපිටක සංචාලකය';
-
-  @override
   String get readerTitle => 'පාඨකය';
 
   @override
@@ -54,9 +51,6 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get errorLoadingTree => 'පටුන පූරණය කිරීමේ දෝෂයකි';
-
-  @override
-  String get selectNodeToRead => 'කියවීම ඇරඹීමට පෙළක් තෝරන්න';
 
   @override
   String get searchPlaceholder => 'ත්‍රිපිටකයේ සොයන්න...';
@@ -210,7 +204,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get scopeOther => 'අන්‍ය';
 
   @override
-  String get anywhereInText => 'ඕනෑම තැනක';
+  String get anywhereInText => 'එකම පෙළෙහි ඕනෑම තැනක';
 
   @override
   String get openSearch => 'සොයන්න';
@@ -225,13 +219,13 @@ class AppLocalizationsSi extends AppLocalizations {
   String get matchStartsWith => 'ඇරඹෙන වචන';
 
   @override
-  String get matchStartsWithHint => 'සෙවුම් පාඨය සහ එයින් ඇරඹෙන දිගු වචන සොයයි';
+  String get matchStartsWithHint => 'වචනය සහ එයින් ඇරඹෙන දිගු වචන සොයයි';
 
   @override
   String get matchWholeWord => 'එම වචනයම';
 
   @override
-  String get matchWholeWordHint => 'සෙවුම් පාඨය පමණක් සොයයි';
+  String get matchWholeWordHint => 'එම වචනයම පමණක් සොයයි';
 
   @override
   String get matchHowWordsSit => 'වචන පිහිටන ආකාරය';
@@ -247,7 +241,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get matchAnywhereHint =>
-      'එකම පෙළෙහි ඕනෑම තැනක වෙන්වූ වචන සමූහයක් ලෙස සොයයි';
+      'ඕනෑම පිළිවෙළකින්, වෙන්වූ වචන සමූහයක් ලෙස සොයයි';
 
   @override
   String get matchAnywhereShort => 'ඕනෑම තැනක';
@@ -269,10 +263,10 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get fewerWords => 'පරතරය අඩු කරන්න';
+  String get smallerGap => 'පරතරය අඩු කරන්න';
 
   @override
-  String get moreWords => 'පරතරය වැඩි කරන්න';
+  String get largerGap => 'පරතරය වැඩි කරන්න';
 
   @override
   String get resetToDefault => 'පෙරනිමියට යළි සකසන්න';

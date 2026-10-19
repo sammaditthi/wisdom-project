@@ -154,11 +154,8 @@ class LandingPage {
   }
 }
 
-/// ARB key of the hint under the heading.
-///
-/// **Not** the near-identical `selectNodeToRead`, which says සංචාලකයෙන් where
-/// this says ව්‍යූහයෙන් and belongs to a different empty state — one word apart,
-/// so the wrong one would have looked right.
+/// ARB key of the hint under the heading — the reader's own empty state,
+/// which asks for a text from the පටුන and is true of this page too.
 const String _hintKey = 'statusSelectSuttaToRead';
 
 /// `/`'s description, written because it has no node to generate one from.

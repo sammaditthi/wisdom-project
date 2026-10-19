@@ -181,7 +181,7 @@ extension SearchTestHelpers on WidgetTester {
           final now = getSearchState().proximityDistance;
           if (now == distance) break;
           await tap(
-              find.byTooltip(now < distance ? 'More words' : 'Fewer words'));
+              find.byTooltip(now < distance ? 'Larger gap' : 'Smaller gap'));
           await pump();
         }
         expect(getSearchState().proximityDistance, distance);

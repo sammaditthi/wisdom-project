@@ -12,9 +12,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Sammaditthi';
 
   @override
-  String get treeNavigatorTitle => 'Tipitaka navigator';
-
-  @override
   String get readerTitle => 'Reader';
 
   @override
@@ -54,10 +51,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorLoadingTree => 'Error loading navigation tree';
-
-  @override
-  String get selectNodeToRead =>
-      'Select a text from the navigator to begin reading';
 
   @override
   String get searchPlaceholder => 'Search Tipitaka...';
@@ -220,20 +213,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchOptions => 'Match options';
 
   @override
-  String get matchEachWord => 'Match search text';
+  String get matchEachWord => 'How each word matches';
 
   @override
   String get matchStartsWith => 'Starts with';
 
   @override
-  String get matchStartsWithHint =>
-      'Finds the search text and its longer forms';
+  String get matchStartsWithHint => 'Finds the word and its longer forms';
 
   @override
   String get matchWholeWord => 'Exact word';
 
   @override
-  String get matchWholeWordHint => 'Finds only the exact search text';
+  String get matchWholeWordHint => 'Finds only the exact word';
 
   @override
   String get matchHowWordsSit => 'How words sit together';
@@ -242,13 +234,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchPhrase => 'As a phrase';
 
   @override
-  String get matchPhraseHint => 'Finds the words together, as a sentence';
+  String get matchPhraseHint => 'Finds the words together, in the order typed';
 
   @override
   String get matchPhraseShort => 'Phrase';
 
   @override
-  String get matchAnywhereHint => 'Finds the search text in any order';
+  String get matchAnywhereHint => 'Finds the words in any order';
 
   @override
   String get matchAnywhereShort => 'Anywhere';
@@ -261,7 +253,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String matchNearShort(int count) {
-    return 'Near $count';
+    return 'Gap $count';
   }
 
   @override
@@ -270,10 +262,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get fewerWords => 'Fewer words';
+  String get smallerGap => 'Smaller gap';
 
   @override
-  String get moreWords => 'More words';
+  String get largerGap => 'Larger gap';
 
   @override
   String get resetToDefault => 'Reset to default';

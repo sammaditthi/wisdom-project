@@ -3,8 +3,6 @@
 
   "appTitle": "Sammaditthi",
 
-  "treeNavigatorTitle": "ත්‍රිපිටක සංචාලකය",
-
   "readerTitle": "පාඨකය",
 
   "showNavigator": "පටුන පෙන්වන්න",
@@ -30,8 +28,6 @@
   "errorLoadingContent": "අන්තර්ගතය පූරණය කිරීමේ දෝෂයකි",
 
   "errorLoadingTree": "පටුන පූරණය කිරීමේ දෝෂයකි",
-
-  "selectNodeToRead": "කියවීම ඇරඹීමට පෙළක් තෝරන්න",
 
   "searchPlaceholder": "ත්‍රිපිටකයේ සොයන්න...",
 
@@ -131,7 +127,7 @@
 
   "scopeOther": "අන්‍ය",
 
-  "anywhereInText": "ඕනෑම තැනක",
+  "anywhereInText": "එකම පෙළෙහි ඕනෑම තැනක",
 
   "openSearch": "සොයන්න",
 
@@ -141,11 +137,11 @@
 
   "matchStartsWith": "ඇරඹෙන වචන",
 
-  "matchStartsWithHint": "සෙවුම් පාඨය සහ එයින් ඇරඹෙන දිගු වචන සොයයි",
+  "matchStartsWithHint": "වචනය සහ එයින් ඇරඹෙන දිගු වචන සොයයි",
 
   "matchWholeWord": "එම වචනයම",
 
-  "matchWholeWordHint": "සෙවුම් පාඨය පමණක් සොයයි",
+  "matchWholeWordHint": "එම වචනයම පමණක් සොයයි",
 
   "matchHowWordsSit": "වචන පිහිටන ආකාරය",
 
@@ -155,7 +151,7 @@
 
   "matchPhraseShort": "වාක්‍යය",
 
-  "matchAnywhereHint": "එකම පෙළෙහි ඕනෑම තැනක වෙන්වූ වචන සමූහයක් ලෙස සොයයි",
+  "matchAnywhereHint": "ඕනෑම පිළිවෙළකින්, වෙන්වූ වචන සමූහයක් ලෙස සොයයි",
 
   "matchAnywhereShort": "ඕනෑම තැනක",
 
@@ -167,9 +163,9 @@
 
   "matchNearWithin": "වචන {count}ක් ඇතුළත",
 
-  "fewerWords": "පරතරය අඩු කරන්න",
+  "smallerGap": "පරතරය අඩු කරන්න",
 
-  "moreWords": "පරතරය වැඩි කරන්න",
+  "largerGap": "පරතරය වැඩි කරන්න",
 
   "resetToDefault": "පෙරනිමියට යළි සකසන්න",
 
