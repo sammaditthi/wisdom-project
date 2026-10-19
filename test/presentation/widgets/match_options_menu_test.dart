@@ -84,7 +84,7 @@ void main() {
   });
 
   group('Match options menu', () {
-    testWidgets('one word: only the "match search text" options',
+    testWidgets('one word: only the "how each word matches" options',
         (tester) async {
       await _pumpButton(tester, _query(_oneWord));
       await _openMenu(tester);

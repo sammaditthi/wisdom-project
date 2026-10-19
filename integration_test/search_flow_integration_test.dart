@@ -654,7 +654,7 @@ void main() {
           findsOneWidget,
         );
 
-        // Definitions tab — "Viewing 50 out of 3252 results"
+        // Definitions tab — "Viewing 50 out of 3598 results"
         await tester.switchToTab('Definitions');
         await tester.dragUntilVisible(
           find.textContaining('Viewing 50 out of'),
@@ -662,7 +662,7 @@ void main() {
           const Offset(0, -300),
         );
         expect(
-          find.textContaining('Viewing 50 out of 3252 results'),
+          find.textContaining('Viewing 50 out of 3598 results'),
           findsOneWidget,
         );
       },
