@@ -54,4 +54,4 @@ GROUP BY a.word;
 DROP VIEW IF EXISTS view_dpd_construction;
 CREATE VIEW view_dpd_construction AS 
 SELECT lemma_1 aword, construction meaning FROM dpd_headwords h INNER JOIN lookup l ON h.lemma_1 = l.lookup_key 
-WHERE construction <> '' AND meaning_1 <> ''
+WHERE construction <> '' AND meaning_1 <> '';
