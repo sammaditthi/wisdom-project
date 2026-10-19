@@ -599,7 +599,7 @@
     }
   },
 
-  "statusSelectSuttaToRead": "Select a sutta from the tree to begin reading",
+  "statusSelectSuttaToRead": "Select a text from the navigator to begin reading",
   "@statusSelectSuttaToRead": {
     "description": "Empty state shown in the reader before any sutta has been selected"
   },

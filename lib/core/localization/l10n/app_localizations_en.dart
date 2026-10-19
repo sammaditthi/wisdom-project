@@ -362,7 +362,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusSelectSuttaToRead =>
-      'Select a sutta from the tree to begin reading';
+      'Select a text from the navigator to begin reading';
 
   @override
   String get statusNoContentToDisplay => 'No content to display';

@@ -773,7 +773,7 @@ abstract class AppLocalizations {
   /// Empty state shown in the reader before any sutta has been selected
   ///
   /// In en, this message translates to:
-  /// **'Select a sutta from the tree to begin reading'**
+  /// **'Select a text from the navigator to begin reading'**
   String get statusSelectSuttaToRead;
 
   /// Empty state shown in the reader when the loaded document has no pages in range
