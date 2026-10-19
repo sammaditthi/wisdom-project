@@ -37,6 +37,10 @@
 
 set -euo pipefail
 
+# git pages long output through `less` when stdout is a terminal, which parks this
+# script mid-run with no visible prompt. Every git call here is for reading.
+export GIT_PAGER=cat
+
 # --- Config (override via env) ---------------------------------------------
 UPSTREAM_URL="${TIPITAKA_UPSTREAM_URL:-https://github.com/pathnirvana/tipitaka.lk.git}"
 UPSTREAM_BRANCH="${TIPITAKA_UPSTREAM_BRANCH:-master}"
