@@ -1,218 +1,161 @@
 # Things to Consider Before Going Live
 
-A running list of caching, asset, and deployment items to revisit before the
-app is exposed to the public internet. Everything here is fine for LAN-only
-deploys today, but will need attention when real users arrive over WAN.
+The cross-product items that have to hold before the first public `--prod`, and
+the ones deliberately accepted. Nothing here is a deploy procedure: the release
+itself is [`web-release.md`](../todo/web-strategy/web-release.md), and the
+version-and-tag mechanics are [`how-to-release.md`](./how-to-release.md).
+
+Swept 2026-10-22 against the tree and against the live hosts. Measurements are
+dated because they are measurements, not rules.
 
 ---
 
-## 1. HTTP caching strategy for the web bundle
+## Blockers
 
-### What we do today
+### 1. Attribution and licence notices
 
-`server_app.dart` sends `Cache-Control: no-cache` on files that change every
-deploy:
+Neither product credits its sources. `grep -rn -i "licen\|attribut" lib/` and the
+same over `static_site_generator/lib/render/` both return nothing: no about
+screen, no licence row, no site footer credit. The settings menu's version row
+is the only thing there, and it opens nothing.
 
-- `index.html` and `/` (the default document)
-- every `.js` file (`main.dart.js`, `flutter.js`, `flutter_bootstrap.js`)
-- `manifest.json`, `version.json`
+Two licences are already breached the moment the site is public:
 
-Everything else (fonts, `canvaskit.wasm`, images, `assets/*`) inherits
-`shelf_static`'s default: `ETag` + `Last-Modified`, no explicit
-`Cache-Control`. Chrome then uses heuristic freshness to decide how long to
-trust them without revalidation.
+- **The canon text — CC BY-ND 4.0** (`LICENSE.md` in the upstream mirror). Four
+  terms, and term 4 is *"Attribution should be given to tipitaka.lk"*. Term 2
+  forbids local modification — errors go to path.nirvana@gmail.com, never into
+  our copy. Term 3 wants an automated or easy sync method, which
+  `scripts/bjt-sync-regen/sync-regen.sh` satisfies, and
+  `release_all_dryrun.sh` reports when the vendored canon has fallen behind.
+- **The dictionary — CC BY-NC-SA 4.0**, carried in `dpd.db`'s own `db_info`
+  table beside its citation string (`docs/todo/dictionary/dpd-provenance-and-refresh.md`).
+  Attribution, share-alike and non-commercial. Free app, so NC is fine; the
+  notice is not optional.
 
-`no-cache` means: "browser may cache, but MUST revalidate with server before
-using". Combined with the ETag, unchanged files return a tiny `304 Not
-Modified` (fast), changed files return `200` with fresh bytes (correct).
+**Unresolved:** that licence covers *"the Buddha Jayanthi Pali text"* only. The
+Sinhala translation and the aṭṭhakathā have no stated terms in the upstream repo
+— its README says only "check the LICENSE file if you wish to extract any
+content". Ask path.nirvana what covers them rather than assuming the same file
+does.
 
-### Why this is enough for LAN
+Needed: one about/credits surface per product naming the canon source, the
+dictionary and its licence, and the translation and commentary sources. A site
+footer or `/` section, and one settings row in the app.
 
-Revalidation round-trips on a LAN are ~5–30 ms. Six revalidations per cold
-load is invisible. The correctness win — every deploy shows up on the next
-reload for every user — dwarfs the cost.
+### 2. The research Worker's prod CORS is a deploy behind
 
-### Why it needs rethinking for public internet
+Measured 2026-10-22, preflight only — no Gemini call:
 
-Round-trip time on mobile / transcontinental networks is 150–250 ms. Six
-revalidations, some serialized on `main.dart.js`, can add **200–800 ms** to
-cold startup. Still vastly better than broken deploys, but not optimal.
+| `Origin:` | live `access-control-allow-origin` |
+|---|---|
+| `https://app-sammaditthi-test.pages.dev` | the same origin ✅ |
+| `http://localhost:8080` | the same origin ✅ |
+| `https://app.sammaditthi.net` | **`http://localhost:8080`** ❌ |
 
-### The long-term fix: content-hashed filenames + `immutable`
+`wrangler.jsonc` lists the prod origin; the deployed Worker predates that line.
+Hono's `cors()` answers `allowed[0]` on a miss (`app.ts`), so that fallback *is*
+the symptom. Research is CORS-blocked in the prod app until
+`scripts/research_server/deploy.sh --prod` runs.
 
-Industry standard for SPAs:
+### 3. Cloudflare's managed robots.txt is answering at the apex
 
-| File                     | Caching                                             |
-|--------------------------|-----------------------------------------------------|
-| `index.html`             | `Cache-Control: no-cache` (always revalidate)       |
-| `main.<hash>.js`         | `Cache-Control: public, max-age=31536000, immutable`|
-| `flutter.<hash>.js`      | `Cache-Control: public, max-age=31536000, immutable`|
-| fonts, wasm, images (hashed) | `Cache-Control: public, max-age=31536000, immutable`|
+`curl https://sammaditthi.net/robots.txt` → 200, `max-age=14400`, and it is
+Cloudflare's content-signals preamble with **no directives at all**: no
+`User-agent`, no `Allow`, and no `Sitemap:` line. Pages has no deployment yet,
+so that file is purely the zone's.
 
-Flow:
+The generated `robots.txt` exists for its `Sitemap:` line (`robots.dart`), and
+the zone will alter or shadow it. The signals it injects may also assert
+`ai-train=no`, the opposite of the decision in `web-release.md` to let AI
+crawlers in for both search and training. Dashboard, before the first `--prod`:
+AI Crawl Control → managed robots.txt off, or confirm its signals say what we
+want.
 
-1. Browser checks `index.html` (cheap ~300 byte 304).
-2. New `index.html` references `main.NEW_HASH.js` — a URL the browser has
-   never seen.
-3. Browser fetches it fresh. Everything else it already has cached for a
-   year.
-4. Zero-cost cache hits from then on.
+### 4. HEAD carries no tag
 
-### What that costs to implement
-
-Flutter web does NOT hash `main.dart.js` or `flutter.js` by default. Options:
-
-- **Post-build step in `scripts/app/web/deploy.sh`**: after `flutter build web`, rename
-  `main.dart.js` → `main.<sha256-prefix>.js`, same for `flutter.js`, then
-  rewrite references inside `flutter_bootstrap.js` and `index.html`. ~20
-  lines of bash. Deterministic, no runtime changes.
-- **Reverse proxy (nginx, Cloudflare)**: handle cache headers at the proxy;
-  some CDNs auto-rewrite for you. More infra, less code.
-- **Accept the `no-cache` overhead**: pragmatic if latency isn't critical.
-  The app isn't real-time; 300 ms slower startup on public launch is
-  survivable.
-
-### CDN compatibility
-
-`no-cache` is honored correctly by Cloudflare, Fastly, CloudFront. The edge
-can still cache at its tier and revalidate with origin; browsers revalidate
-with the edge. So round-trip cost collapses to the edge (usually 10–30 ms
-globally) instead of origin. Putting a CDN in front is the quickest win
-without restructuring the build.
-
-### TL;DR decision points for launch day
-
-- **Minimum viable**: keep current `no-cache` setup, add a CDN in front.
-  Works, slight cold-start hit.
-- **Better**: add a post-build hash-and-rewrite step; keep `no-cache` on
-  `index.html` only; mark hashed assets `immutable`.
-- **Keep forever**: `Cache-Control: no-cache` on `index.html`. It's the
-  universal SPA pattern.
+The version system landed in `2db020c`, but `git tag -l` is empty. Every prod
+deploy calls `require_release_commit`, which refuses an untagged HEAD — and
+`static_site/deploy.sh --prod` refuses even for `--dry-run`. The first release
+is `dart run tools/release.dart finish` (no bump; `1.0.0` is the version),
+then `git push --tags`.
 
 ---
 
-## 2. Pushing through binary-asset changes
+## Settled — do not re-open
 
-Cache rules for non-JS assets (fonts, images, wasm) are still default today,
-so swapping a binary file in-place is invisible to Chrome's cache.
-
-### Changes that ship automatically
-
-Anything that compiles into `main.dart.js` is covered by `no-cache`:
-
-- Widget code, layouts, navigation
-- `TextStyle` — font size, weight, letter spacing, colour
-- Theme definitions, colour palette
-- Localization (ARB files compile into the bundle)
-- `index.html` changes
-- `manifest.json` / favicon references
-
-### Changes that DON'T ship without effort
-
-Anything where only the *file contents* change but the URL stays the same:
-
-- Font file binaries (`NotoSansSinhala-Regular.ttf` replaced with a new
-  version)
-- Image file binaries
-- `canvaskit.wasm` (Flutter usually upgrades this by version; stable within
-  an engine revision)
-- Raw JSON / DB files under `assets/` that the client reads directly
-
-### How to push a font/image binary change
-
-**Option A — rename the file (recommended)**
-
-```
-assets/fonts/noto-sans-sinhala/NotoSansSinhala-Regular.ttf
-  → NotoSansSinhala-Regular-v2.ttf
-```
-
-Update references in `pubspec.yaml` and `web/index.html` preload tag. New
-URL = automatic cache-bust for every user. Zero infra work.
-
-**Option B — temporarily widen `mustRevalidate`**
-
-In `server_app.dart`, add `.ttf` / `.otf` / `.png` to the `mustRevalidate`
-list. Deploy. Wait ~24–48 hours so every returning user revalidates once.
-Remove the extensions and redeploy.
-
-Trade-off: a few extra revalidations per cold load during the window. Use
-when renaming is impractical (e.g. many files at once).
-
-**Option C — long-term: hash asset filenames in the build**
-
-Same pattern as `main.dart.js`. The deploy script renames each asset to
-include a content hash, rewrites `AssetManifest.json` / `FontManifest.json`
-to match. Most work; best user experience.
-
-**Option D (don't use) — `?v=2` query strings**
-
-Works for `<link>` and `<img>` tags in `index.html`, but Flutter's engine
-loads fonts/assets from `pubspec.yaml`-derived URLs without the query
-string. Incomplete fix; skip.
+- **Caching and content hashing.** Pages answers every file
+  `public, max-age=0, must-revalidate` and revalidates at the edge; the static
+  site adds one `immutable` tier for `/assets/*` and `/fonts/*`, keyed by the
+  build-computed `?v=` hash. The app's `/assets/*` is deliberately left
+  revalidating — Flutter's asset URLs carry no hash, so an `immutable` manifest
+  would pair a new app with an old database (`web-release.md` §6). There is
+  nothing to hash by hand and no header work left.
+- **Service workers.** Flutter's is deprecated and off: the generated
+  `flutter_bootstrap.js` sets `serviceWorkerVersion = null`, and the
+  `flutter_service_worker.js` in the build is a 0-byte file that is never
+  registered. No stale-SW lockout to design against, nothing to strip from the
+  build. Revisit only for a real offline or installable-PWA requirement.
+- **CORS allow-list.** Pinned to local, dev and prod web in
+  `RESEARCH_CORS_ORIGINS` — exact origin match, no trailing slash. (Deploying
+  it is blocker 2.)
+- **Request size and deadline caps.** `contracts.ts` caps the question and the
+  history; `config.ts` gives each mode a deadline.
+- **Rate limiting.** A per-IP zone rule on `/research`, set up 2026-09-27
+  (recipe in `scripts/research_server/README.md`). It is why `workers_dev` and
+  `preview_urls` stay off — either address would bypass the rule. App Check is
+  consciously deferred; the accepted residual risk is quota burn, not money
+  (`research-endpoint-security-before-testers.md`).
+- **The apex is attached** to the `sammaditthi` Pages project: apex and
+  `sammaditthi.pages.dev` serve the identical not-yet-deployed placeholder.
+- **`www` redirects** to the apex with a 301.
+- **Soft-404 and the `immutable` tier work on live Pages**, checked on dev
+  2026-10-22: `/tipitaka/does-not-exist` → a real 404 with `no-store`, and
+  `/assets/site.css` → `max-age=31536000, immutable`. `web-release.md` §4 owes
+  the same two checks against prod, but the mechanism is no longer in doubt.
+- **Rollback** is the Pages dashboard: project → Deployments → the last good one
+  → *Rollback to this deployment*. It names its own database versions and those
+  are still on R2 (`scripts/app/web/README.md`).
 
 ---
 
-## 3. Service worker strategy
+## Open, not blocking
 
-The retired Windows-box deploy stripped `flutter_service_worker.js` from the
-build; `scripts/app/web/deploy.sh` (a placeholder today) should do the same. Reasoning: without it, redeploys are served fresh immediately via
-the `no-cache` mechanism above.
-
-### When to reintroduce a service worker
-
-- **Offline support**: if the app ever needs to work without a live server
-  connection (e.g. airplane mode reading), a SW is the only way to cache
-  the Flutter bundle + assets for offline use.
-- **Installable PWA**: iOS/Android install prompts and true PWA experience
-  require a registered SW (even a minimal one).
-
-### What to watch out for if you do
-
-- **Cache eviction on deploy**: the SW's own cache won't evict itself just
-  because the server changed. You need a versioning scheme inside the SW so
-  it notices a new `index.html` and flushes its caches. Flutter's default
-  SW template does this via `serviceWorkerVersion` — handle updates with
-  an explicit `registration.update()` + `skipWaiting()` flow, or users
-  stay on old versions for days.
-- **Stale SW lockout**: once a SW is registered in a user's browser, it
-  lives there until explicitly unregistered or superseded. If a SW bug
-  ships, every user is stuck until they hard-reload or you ship a fix SW.
-  Have a "kill switch" SW ready.
-- **Interaction with `no-cache`**: SW intercepts fetches before HTTP cache.
-  Your `Cache-Control` headers no longer matter for SW-managed resources.
-  Pick one strategy per asset class; don't mix.
-
-Safer posture: **don't reintroduce a SW until you have a clear offline /
-PWA requirement**. The `no-cache` + hashing combo handles pure online
-deployment with far less complexity.
-
----
-
-## 4. Security & transport items to revisit before public launch
-
-Not caching-related but same "LAN is forgiving, public isn't" theme.
-
-- **CORS**: the research Worker allows only the origins in
-  `RESEARCH_CORS_ORIGINS` (`research_server/wrangler.jsonc`), today just
-  `http://localhost:8080`. Add the app's public origin when it is hosted.
-- **Rate limiting**: the research Worker is the only endpoint left (search
-  runs in the app), and nothing limits it today. CORS stops browsers, not
-  scripts, so anyone with the URL can use up the Gemini quota. The planned
-  fix is App Check; see
-  [`research-endpoint-security-before-testers.md`](../todo/research/research-endpoint-security-before-testers.md).
-- **Request size / timeout limits**: done. The Worker caps question and
-  history size (`research_server/src/contracts.ts`) and gives up at a
-  deadline for each mode (`config.ts`).
-- **Logging PII**: the Worker's own log lines hold a request id, mode,
-  model, status and timings, never the question. Before launch, check
-  what Cloudflare's Workers Logs (`observability` in `wrangler.jsonc`)
-  keeps for each request, and what the `unhandled:` error dump in
-  `app.ts` can contain.
+- **No error reporting and no analytics.** Nothing in either product. After
+  launch the only signal is Cloudflare's request counts — a database install
+  that fails on a real network is invisible. The CSP also blocks zone-injected
+  scripts (Rocket Loader, Web Analytics), so this is a choice to make
+  deliberately. The known-wrong offline-vs-error icon in
+  `web_database_installer.dart` (`web-release.md` §6, "banked for prod") is the
+  kind of thing we would otherwise never hear about.
+- **No privacy note.** The research feature ships enabled and sends
+  user-typed questions to Gemini through our Worker. Nothing tells the user.
+  One sentence in the research sheet plus a line on the credits surface from
+  blocker 1 covers it, and the store listings will need a hosted URL anyway.
+- **Logging PII.** The Worker's own lines hold a request id, mode, model,
+  status and timings, never the question. Still to check: what Workers Logs
+  (`observability` in `wrangler.jsonc`) retains per request, and what the
+  `unhandled:` dump in `app.ts` can carry out of a provider error object.
+- **The app origin answers 200 for everything.** An unknown path serves
+  `index.html` (checked on dev), which is right for client-side deep links and
+  harmless for search because the app is `noindex` on every host. Worth
+  confirming a bad `nodeKey` lands somewhere graceful rather than on a blank
+  reader.
+- **`og-card.png` is referenced without a `?v=`.** `web/index.html` points the
+  app's share card at the static site's copy, which sits under the `immutable`
+  tier. Replacing that image later leaves scrapers on the old one for a year;
+  rename it if it ever changes.
+- **Asset size.** `main.dart.js` was 3.5 MB on 2026-10-22. Nothing watches it,
+  and Flutter web bundles grow quietly with dependencies. A budget check in the
+  deploy would catch a regression before users do.
+- **No CI.** `.github/` does not exist, so `scripts/test_all.sh` by hand is the
+  whole gate. The workflow is specified in `web-release.md` §5.
+- **The site never names the app.** "Sammaditthi" appears only in the domain;
+  `/` and the TOC pages carry no app link. Product gap, tracked in
+  `web-release.md` §6.
 
 ---
 
-## 5. Deploy pipeline items
+## Deploy pipeline
 
 - **Nothing verifies *which* build went live.** Each deploy does check its own
   product after the upload, past the bare 200 from `expect_http`
@@ -225,32 +168,25 @@ Not caching-related but same "LAN is forgiving, public isn't" theme.
   so the build could stamp its version into the output and the deploy could
   compare it. That needs the generated version file to move out of `lib/` first
   — see the changelog seams in `docs/done/ops/versioning-system.md`.
-- **Rollback**: no automatic rollback today. Keep the previous `build/web/`
-  tree around after a deploy (e.g. `build/web.prev/`) so a single
-  `mv` reverts the live site if a bad deploy slips through.
-- **Asset sizes**: watch `main.dart.js` size over time. Flutter web bundles
-  can silently grow with deps; a budget check (e.g. fail deploy if
-  `main.dart.js > 5 MB`) stops regressions before users notice.
 
 ---
 
-## 6. Quick reference — what triggers a browser cache miss today
+## Launch order
 
-After the `no-cache` change in `server_app.dart`:
+1. The credits surface and the privacy sentence (blocker 1, and the privacy
+   item above) — the only code work on this list.
+2. The `unhandled:` log line.
+3. Dashboard: managed robots.txt off, AI Crawl Control allowing search and
+   training (blocker 3).
+4. `scripts/release_all_dryrun.sh` — proves all six targets still build, and
+   reports whether the vendored canon is stale.
+5. `dart run tools/release.dart finish`, then `git push && git push --tags`
+   (blocker 4).
+6. `scripts/research_server/deploy.sh --prod`, then re-run the preflight table
+   in blocker 2.
+7. `scripts/static_site/deploy.sh --prod`, then `scripts/app/web/deploy.sh --prod`
+   — the site bakes app links and the app bakes site links.
+8. Walk `web-release.md` §4, the post-deploy list.
 
-| Change type                                    | Next reload ships it? |
-|------------------------------------------------|------------------------|
-| Any Dart code change                           | Yes (main.dart.js)     |
-| Theme / typography / widget styling            | Yes                    |
-| Translations (ARB files)                       | Yes                    |
-| `index.html` edits                             | Yes                    |
-| `manifest.json` / `version.json`               | Yes                    |
-| New font file added (new filename)             | Yes                    |
-| Font file replaced (same filename)             | **No** — rename it     |
-| Image file replaced (same filename)            | **No** — rename it     |
-| `pubspec.yaml` asset path change               | Yes (compiled in)      |
-| Server-side API behaviour change               | N/A — no caching       |
-
-If something doesn't land and isn't in the "No" rows above, the first
-debugging step is still **DevTools → Network → Disable cache → reload**.
-That tells you instantly whether it's a caching issue or a deploy issue.
+Mobile stays gated by `docs/todo/mobile-release/`; the android, ios and macos
+`deploy.sh` are placeholders that exit 3.
