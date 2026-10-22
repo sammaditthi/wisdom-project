@@ -22,7 +22,6 @@ import 'presentation/providers/navigation_rail_provider.dart'
     show navigationRailHiddenPersistenceProvider;
 import 'presentation/widgets/app/deep_link_listener.dart';
 import 'presentation/widgets/app/overlay_stack_sync.dart';
-import 'presentation/widgets/app/update_available_banner.dart';
 import 'core/theme/theme_notifier.dart';
 
 void main() async {
@@ -211,17 +210,6 @@ class _MyAppState extends ConsumerState<MyApp> {
       // Theme - Single theme based on user preference
       theme: themeData,
 
-      // Overlay every route with an "update available" notification
-      // card. The card sits in a Stack on top of the page content (not
-      // a Column above it) — so it never displaces the screen and never
-      // double-counts the status-bar inset, regardless of platform.
-      // The banner is a no-op when there's no update or when the
-      // feature flag is off (see BuildInfo.canCheckForUpdates), so it's
-      // safe to keep in the tree unconditionally.
-      //
-      // `Positioned.fill` is wrapped here (not inside the widget) so
-      // UpdateAvailableBanner stays portable — it can also be dropped
-      // into an OverlayEntry later without a layout-context change.
       // AppShortcuts installs the top-level Shortcuts/Actions/Focus tree
       // for keyboard handling (ESC, Ctrl/Cmd+F, Ctrl/Cmd+Shift+F, smart copy).
       // OverlayStackSync sits inside it and feeds the LIFO overlay stack that
@@ -234,13 +222,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         return DeepLinkListener(
           child: AppShortcuts(
             child: OverlayStackSync(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  child ?? const SizedBox.shrink(),
-                  const Positioned.fill(child: UpdateAvailableBanner()),
-                ],
-              ),
+              child: child ?? const SizedBox.shrink(),
             ),
           ),
         );

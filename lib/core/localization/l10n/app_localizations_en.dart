@@ -92,6 +92,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliTouching => 'Touching letters';
 
   @override
+  String version(String version) {
+    return 'Version $version';
+  }
+
+  @override
   String get appLayout => 'App layout';
 
   @override
@@ -361,15 +366,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get statusNoTreeContent => 'No content available';
-
-  @override
-  String get updateBannerTitle => 'A new version is available';
-
-  @override
-  String get updateBannerRefreshAction => 'Refresh';
-
-  @override
-  String get updateBannerDismissTooltip => 'Dismiss';
 
   @override
   String get navHome => 'Home';

@@ -8,6 +8,7 @@ import 'package:the_wisdom_project/domain/entities/content/edition.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 import 'package:the_wisdom_project/core/storage/storage_keys.dart';
+import 'package:the_wisdom_project/core/version/app_version.gen.dart';
 
 import '../../helpers/fake_key_value_store.dart';
 import '../../helpers/pump_app.dart';
@@ -142,6 +143,52 @@ void main() {
       expect(selector.selected, equals({ContentLanguage.sinhala}));
       // Sanity: the raw saved preference really is the unsupported Pali.
       expect(container.read(contentLanguageProvider), ContentLanguage.pali);
+    });
+
+    testWidgets('closes with the running version, in each app language',
+        (tester) async {
+      // The version comes from AppVersion.display, not a literal: a literal
+      // turns every release into a red suite, and the deploy gate runs this.
+      // The display rule itself is pinned elsewhere — test/core/version checks
+      // it against name and build, and those against the pubspec. What is
+      // asserted here is the localized wrapper around it.
+      for (final (locale, expected) in const [
+        (Locale('en'), 'Version ${AppVersion.display}'),
+        (Locale('si'), 'අනුවාදය ${AppVersion.display}'),
+      ]) {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: defaultTestOverrides(),
+            child: MaterialApp(
+              locale: locale,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              home: const Scaffold(body: SettingsMenuButton()),
+            ),
+          ),
+        );
+        await tester.tap(find.byIcon(Icons.settings));
+        await tester.pumpAndSettle();
+
+        expect(find.text(expected), findsOneWidget);
+
+        // Disabled like every other row in this menu, so a tap cannot close
+        // the menu or select anything.
+        expect(
+          tester
+              .widget<PopupMenuItem<String>>(
+                find.ancestor(
+                  of: find.text(expected),
+                  matching: find.byType(PopupMenuItem<String>),
+                ),
+              )
+              .enabled,
+          isFalse,
+        );
+
+        Navigator.of(tester.element(find.byIcon(Icons.settings))).pop();
+        await tester.pumpAndSettle();
+      }
     });
   });
 }

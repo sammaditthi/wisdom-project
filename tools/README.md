@@ -85,9 +85,31 @@ Check that the script completed without errors. It writes the database there dir
 
 ---
 
+## Version
+
+`release.dart` owns the one version for the whole repo. The `version:` line of
+`pubspec.yaml` is the source; `lib/core/version/app_version.gen.dart` is generated
+from it and must never be hand-edited.
+
+```bash
+dart run tools/release.dart status        # version, last tag, commits since it
+dart run tools/release.dart bump minor    # major | minor | patch, and build +1
+dart run tools/release.dart finish        # regenerate, commit, tag. No push
+dart run tools/release.dart check         # exit 1 if drifted; else print the tag
+dart run tools/release.dart tag           # print `v<name>`, and nothing else
+```
+
+`require_release_commit` in `scripts/lib/common.sh` runs `check` and demands the
+tag it names be at HEAD, so every prod deploy needs a release. How to cut one:
+`docs/general/how-to-release.md`. Why it is built this way:
+`docs/done/ops/versioning-system.md`.
+
+---
+
 ### Files
 
 - `bjt-populate.js` - Database generation script (writes `../assets/databases/bjt.db`, gitignored)
+- `release.dart` - The repo's version command (see Version above)
 - `package.json` - Node.js dependencies
 - `README.md` - This file
 

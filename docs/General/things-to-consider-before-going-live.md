@@ -214,10 +214,17 @@ Not caching-related but same "LAN is forgiving, public isn't" theme.
 
 ## 5. Deploy pipeline items
 
-- **Deploy verification runs only on `/healthz` SHA match**. Once public,
-  consider also hitting a sample page (`/`) and checking the response
-  contains a known build marker — catches cases where the server is up but
-  serving the wrong static root.
+- **Nothing verifies *which* build went live.** Each deploy does check its own
+  product after the upload, past the bare 200 from `expect_http`
+  (`scripts/lib/common.sh`, six tries): the app asserts `noindex` and both
+  isolation headers, the static site asserts the live CSP equals the generated
+  `_headers` value exactly, and the research Worker parses `/health` for
+  `"mode":"live"` and a configured key. What none of them assert is the build
+  that answered — a server serving a stale static root passes every one. The
+  versioning work supplies the marker: every prod deploy has `v<name>` at HEAD,
+  so the build could stamp its version into the output and the deploy could
+  compare it. That needs the generated version file to move out of `lib/` first
+  — see the changelog seams in `docs/done/ops/versioning-system.md`.
 - **Rollback**: no automatic rollback today. Keep the previous `build/web/`
   tree around after a deploy (e.g. `build/web.prev/`) so a single
   `mv` reverts the live site if a bad deploy slips through.

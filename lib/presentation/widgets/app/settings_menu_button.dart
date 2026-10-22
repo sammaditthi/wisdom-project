@@ -6,6 +6,7 @@ import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/theme_notifier.dart';
 import '../../../core/utils/responsive_utils.dart';
+import '../../../core/version/app_version.gen.dart';
 import '../../../domain/entities/content/content_language.dart';
 import '../../providers/app_language_provider.dart';
 import '../../providers/content_language_provider.dart';
@@ -116,7 +117,35 @@ class SettingsMenuButton extends ConsumerWidget {
             ],
           ),
         ),
+
+        const PopupMenuDivider(),
+
+        // The running build, as a closing aside. Nothing to open yet.
+        const PopupMenuItem<String>(
+          enabled: false,
+          child: _VersionFootnote(),
+        ),
       ],
+    );
+  }
+}
+
+/// The version row at the foot of the settings menu.
+///
+/// Resolves its own [AppLocalizations] for the reason [_MenuSectionLabel]
+/// does: `itemBuilder` runs once, at open time, so a label built there would
+/// freeze at the App Language that was active then.
+class _VersionFootnote extends StatelessWidget {
+  const _VersionFootnote();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Text(
+        AppLocalizations.of(context).version(AppVersion.display),
+        style: context.typography.menuFootnote,
+      ),
     );
   }
 }

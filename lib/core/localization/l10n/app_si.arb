@@ -55,6 +55,8 @@
 
   "paliTouching": "පාළි බැඳි අකුරු",
 
+  "version": "අනුවාදය {version}",
+
   "appLayout": "යෙදුම",
 
   "hideNavigationBar": "පැති තීරුව සඟවන්න",
@@ -226,12 +228,6 @@
   "statusNoContentToDisplay": "පෙන්වීමට අන්තර්ගතයක් නැත",
 
   "statusNoTreeContent": "අන්තර්ගතයක් නොමැත",
-
-  "updateBannerTitle": "නව අනුවාදයක් තිබේ",
-
-  "updateBannerRefreshAction": "රීලෝඩ් කරන්න",
-
-  "updateBannerDismissTooltip": "ඉවත් කරන්න",
 
   "navHome": "මුල් පිටුව",
 

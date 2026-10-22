@@ -261,12 +261,17 @@ expect_http() {
   return 1
 }
 
-# `require_release_commit BRANCH` — fails unless HEAD is BRANCH and the tree is
-# clean, so a release can be rebuilt from its commit. `git status --porcelain`
-# rather than `git diff`, so staged and untracked files count too: a
-# never-added file is invisible to `git diff` yet part of the build.
+# `require_release_commit BRANCH` — fails unless HEAD is BRANCH, the tree is
+# clean, the version constant matches the pubspec, and HEAD carries that
+# version's tag. `git status --porcelain` rather than `git diff`, so staged and
+# untracked files count too: a never-added file is invisible to `git diff` yet
+# part of the build.
+#
+# One repo version covers every product, so a site-only or Worker-only release
+# needs a tag too. `bump patch` + `finish` is the intended cost. A shallow
+# checkout has no tags, so CI must fetch them.
 require_release_commit() {
-  local branch
+  local branch tag release_out
   branch=$(git -C "$WISDOM_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)
   if [ "$branch" != "$1" ]; then
     echo "error: a release must be cut from '$1' (on '$branch')." >&2
@@ -276,6 +281,33 @@ require_release_commit() {
   if [ -n "$(git -C "$WISDOM_ROOT" status --porcelain 2>/dev/null)" ]; then
     echo "error: working tree is dirty — a release must be reproducible from a commit." >&2
     git -C "$WISDOM_ROOT" status --short >&2
+    return 1
+  fi
+  # Prints its own diagnosis, including for a pubspec it cannot parse, and on
+  # success names the tag — so one `dart run` answers both questions. `dart run`
+  # writes "Running build hooks..." to stderr even when it succeeds, and without
+  # a trailing newline, so its output is held back and replayed only on failure
+  # — otherwise every prod deploy logs what reads like an error.
+  if ! release_out=$(cd "$WISDOM_ROOT" && dart run tools/release.dart check 2>&1); then
+    echo "$release_out" >&2
+    return 1
+  fi
+  # The tool owns the version format. `sed` cannot read YAML: a trailing
+  # comment yields the version anyway and a two-part version yields a bare
+  # "v", both of which release.dart refuses outright. Read by label, not
+  # position — the changelog work is expected to add lines to `check`.
+  tag=$(printf '%s\n' "$release_out" | sed -n 's/^tag  *//p')
+  if [ -z "$tag" ]; then
+    echo "error: tools/release.dart check printed no tag line — has its output" >&2
+    echo "       changed? Without the name there is nothing to check HEAD for." >&2
+    echo "$release_out" >&2
+    return 1
+  fi
+  # -F so the name is matched literally: as a regex, `v1.0.0` also matches a
+  # tag named `v1b0c0`.
+  if ! git -C "$WISDOM_ROOT" tag --points-at HEAD | grep -qxF "$tag"; then
+    echo "error: HEAD carries no tag $tag — a reported version must lead to one commit." >&2
+    echo "       dart run tools/release.dart bump <part> && dart run tools/release.dart finish" >&2
     return 1
   fi
 }

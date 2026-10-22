@@ -260,6 +260,12 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
+  /// Last row of the settings menu: the running build, e.g. "Version 1.0.0 (1)". Shown faint and disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String version(String version);
+
   /// Section header for the screen-layout switches in the settings menu (hide navigation bar)
   ///
   /// In en, this message translates to:
@@ -775,24 +781,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No content available'**
   String get statusNoTreeContent;
-
-  /// Title text of the banner shown when a fresher app build is live on the server
-  ///
-  /// In en, this message translates to:
-  /// **'A new version is available'**
-  String get updateBannerTitle;
-
-  /// Tappable text in the update banner that reloads the page to pick up the new version
-  ///
-  /// In en, this message translates to:
-  /// **'Refresh'**
-  String get updateBannerRefreshAction;
-
-  /// Tooltip on the close (×) icon of the update banner
-  ///
-  /// In en, this message translates to:
-  /// **'Dismiss'**
-  String get updateBannerDismissTooltip;
 
   /// Label of the Home destination in the navigation rail / bottom navigation bar
   ///

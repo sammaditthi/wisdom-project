@@ -92,6 +92,11 @@ class AppLocalizationsSi extends AppLocalizations {
   String get paliTouching => 'පාළි බැඳි අකුරු';
 
   @override
+  String version(String version) {
+    return 'අනුවාදය $version';
+  }
+
+  @override
   String get appLayout => 'යෙදුම';
 
   @override
@@ -362,15 +367,6 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get statusNoTreeContent => 'අන්තර්ගතයක් නොමැත';
-
-  @override
-  String get updateBannerTitle => 'නව අනුවාදයක් තිබේ';
-
-  @override
-  String get updateBannerRefreshAction => 'රීලෝඩ් කරන්න';
-
-  @override
-  String get updateBannerDismissTooltip => 'ඉවත් කරන්න';
 
   @override
   String get navHome => 'මුල් පිටුව';
