@@ -249,9 +249,12 @@ A shallow checkout has no tags, so when CI is wired up its checkout must fetch
 them (`fetch-depth: 0`). There are no workflow files in the repo yet. The guard
 also needs a Dart SDK on PATH, which `scripts/research_server/deploy.sh` did not
 before this work: its CI job will need one even though the Worker build does
-not. The guard reads the tag name from `release.dart tag` rather than parsing the
-pubspec in shell — `sed` yields a version for a line with a trailing comment and
-a bare `v` for a two-part version, both of which the tool refuses outright.
+not. The guard takes the tag name from `check`'s own output, which ends with a
+labelled `tag` line, rather than parsing the pubspec in shell — `sed` yields a
+version for a line with a trailing comment and a bare `v` for a two-part
+version, both of which the tool refuses outright. One `dart run` therefore
+answers both questions, and the label means a changelog line added to `check`
+later cannot shift the one the shell reads.
 
 Two consequences to know before writing it:
 
