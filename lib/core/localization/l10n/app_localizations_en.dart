@@ -605,7 +605,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contentLanguageHint =>
-      'The language book, chapter and sutta names are shown in.';
+      'The language titles such as sutta names are shown in.';
 
   @override
   String get paliLettersHint => 'How joined Pali letters are shown.';

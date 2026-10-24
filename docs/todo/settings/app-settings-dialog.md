@@ -90,8 +90,11 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
    tabs rewritten with the user; the Sinhala is no longer a placeholder.
    Settled there:
    - The two language hints name the choice, not a list of screens. Content
-     language names three levels — book, chapter, sutta — because every tree
-     node carries a Pali name and a Sinhala one, from pitaka down.
+     language says *titles such as sutta names* — open-ended, like the Sinhala
+     beside it (`සූත්‍රනාම ආදිය`), because every tree node carries a Pali name
+     and a Sinhala one, from pitaka down. Never *text*: the setting changes
+     names in the navigator, tabs, breadcrumbs and search, and never which
+     text is read.
    - Sinhala theme names are **ආලෝකමත් / අඳුරු**, not ශ්වේත / කාළ, which are
      literary colour words. `themeDarkComingSoon` already said අඳුරු.
    - Sinhala for the canonical Pali text is **පෙළ**, not පාඨය, which reads as

@@ -107,7 +107,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.text('The language book, chapter and sutta names are shown in.'),
+        find.text('The language titles such as sutta names are shown in.'),
         findsOneWidget,
       );
       expect(find.text('How joined Pali letters are shown.'), findsOneWidget);

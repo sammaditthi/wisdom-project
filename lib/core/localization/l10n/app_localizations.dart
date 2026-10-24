@@ -1175,7 +1175,7 @@ abstract class AppLocalizations {
   /// Settings > General: one-line explanation of what the content-language control changes
   ///
   /// In en, this message translates to:
-  /// **'The language book, chapter and sutta names are shown in.'**
+  /// **'The language titles such as sutta names are shown in.'**
   String get contentLanguageHint;
 
   /// Settings > General: one-line explanation of the three Pali-letter switches
