@@ -71,7 +71,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get theme => 'තේමාව';
 
   @override
-  String get themeLight => 'ශ්වේත';
+  String get themeLight => 'ආලෝකමත්';
 
   @override
   String get appLanguage => 'යෙදුම් භාෂාව';
@@ -90,11 +90,6 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get paliTouching => 'පාළි බැඳි අකුරු';
-
-  @override
-  String version(String version) {
-    return 'අනුවාදය $version';
-  }
 
   @override
   String get appLayout => 'යෙදුම';
@@ -387,6 +382,10 @@ class AppLocalizationsSi extends AppLocalizations {
   String get researchEmptyState => 'පාළි ත්‍රිපිටකය පිළිබඳ ඕනෑම දෙයක් අසන්න.';
 
   @override
+  String get researchPrivacyNote =>
+      'පිළිතුරු සපයන්නේ Google Gemini මගිනි. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
+
+  @override
   String get researchInputHint => 'සූත්‍ර පිළිබඳ ප්‍රශ්නයක් අසන්න…';
 
   @override
@@ -580,4 +579,100 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get openAsWebPage => 'වෙබ් පිටුවක් ලෙස විවෘත කරන්න';
+
+  @override
+  String get readerSettings => 'කියවීම් සැකසුම්';
+
+  @override
+  String get settingsGeneral => 'සාමාන්‍ය';
+
+  @override
+  String get settingsAnumodana => 'පුණ්‍යානුමෝදනා';
+
+  @override
+  String get settingsAppearance => 'පෙනුම';
+
+  @override
+  String get settingsLanguage => 'භාෂාව';
+
+  @override
+  String get themeDark => 'අඳුරු';
+
+  @override
+  String get themeDarkComingSoon => 'අඳුරු තේමාව ඉදිරියේදී.';
+
+  @override
+  String get appLanguageHint => 'යෙදුම භාවිතා කිරීමට ඔබ කැමති භාෂාව.';
+
+  @override
+  String get contentLanguageHint => 'සූත්‍රනාම ආදිය දිස්වීමට ඔබ කැමති භාෂාව.';
+
+  @override
+  String get paliLettersHint => 'පාළි බැඳි අකුරු පෙන්වන ආකාරය.';
+
+  @override
+  String get settingsPrivacy => 'පෞද්ගලිකත්වය';
+
+  @override
+  String get researchPrivacyDetail =>
+      'ඔබේ ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අපි භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන්ට ඒවා කියවිය හැක. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
+
+  @override
+  String get anumodanaLineage => 'භාණක පරම්පරාව';
+
+  @override
+  String get anumodanaLineageBody =>
+      'ත්‍රිපිටකය කටපාඩමින් දරාගෙන පරපුරෙන් පරපුරට පවත්වාගෙන ආ භාණක පරම්පරාවට.';
+
+  @override
+  String get anumodanaTextSources => 'මූලාශ්‍ර';
+
+  @override
+  String get anumodanaTipitakaLkUse =>
+      'බුද්ධ ජයන්ති පාළි පෙළ, එහි සිංහල පරිවර්තනය සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය.\nපාළි පෙළ CC BY-ND 4.0 යටතේ.';
+
+  @override
+  String get anumodanaSuttaCentralUse =>
+      'ඉංග්‍රීසි පරිවර්තන සහ සූත්‍ර අංකන ක්‍රමය.\nCC0 1.0.';
+
+  @override
+  String get anumodanaDictionaries => 'ශබ්දකෝෂ';
+
+  @override
+  String get anumodanaDictionariesHint =>
+      'වචන අර්ථ බැලීමට භාවිතා කරන ශබ්දකෝෂ, අකාරාදී පිළිවෙළින්.';
+
+  @override
+  String get anumodanaDictGroupSinhala => 'පාළි – සිංහල';
+
+  @override
+  String get anumodanaDictGroupEnglish => 'පාළි – ඉංග්‍රීසි';
+
+  @override
+  String get anumodanaDpdLicence =>
+      'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
+
+  @override
+  String get anumodanaContributors => 'දායක වූ සැම';
+
+  @override
+  String get anumodanaContributorsBody =>
+      'අවවාදානුශාසනා දීමෙන් හා කාලය කැප කිරීමෙන් දායක වූ සියලු දෙනාට ප්‍රඥාව වැඩීමටම උපනිශ්‍රයක් වේවා.';
+
+  @override
+  String get anumodanaLicences => 'බලපත්‍ර';
+
+  @override
+  String get openSourceLicences => 'විවෘත මූලාශ්‍ර බලපත්‍ර';
+
+  @override
+  String get settingsAbout => 'යෙදුම ගැන';
+
+  @override
+  String get versionLabel => 'අනුවාදය';
+
+  @override
+  String openLinkTo(String name) {
+    return '$name විවෘත කරන්න';
+  }
 }

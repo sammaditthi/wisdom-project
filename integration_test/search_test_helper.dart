@@ -322,14 +322,14 @@ extension SearchTestHelpers on WidgetTester {
       await _tapLanguageSegment('Pali');
     }
     if (sinhala && !getSearchState().searchInSinhala) {
-      await _tapLanguageSegment('Sinhala');
+      await _tapLanguageSegment('සිංහල');
     }
     // Then turn the others off.
     if (!pali && getSearchState().searchInPali) {
       await _tapLanguageSegment('Pali');
     }
     if (!sinhala && getSearchState().searchInSinhala) {
-      await _tapLanguageSegment('Sinhala');
+      await _tapLanguageSegment('සිංහල');
     }
 
     await tap(find.text('Done'));

@@ -157,6 +157,9 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
                   // Matches the assistant avatar's glyph.
                   iconOverride: Icons.auto_awesome,
                   title: l10n.researchEmptyState,
+                  // Where a question goes, said before one is typed. The
+                  // fuller statement is Settings > General > Privacy.
+                  description: l10n.researchPrivacyNote,
                 )
               // Centered on the prose measure — the same one the citation
               // peek rises at, so a peek lands aligned with its answer.

@@ -161,7 +161,7 @@ abstract class AppLocalizations {
   /// Label for Sinhala language
   ///
   /// In en, this message translates to:
-  /// **'Sinhala'**
+  /// **'සිංහල'**
   String get sinhalaLanguageLabel;
 
   /// Loading indicator text
@@ -259,12 +259,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Touching letters'**
   String get paliTouching;
-
-  /// Last row of the settings menu: the running build, e.g. "Version 1.0.0 (1)". Shown faint and disabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Version {version}'**
-  String version(String version);
 
   /// Section header for the screen-layout switches in the settings menu (hide navigation bar)
   ///
@@ -818,6 +812,12 @@ abstract class AppLocalizations {
   /// **'Ask anything about the Pali Canon.'**
   String get researchEmptyState;
 
+  /// Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Answered by Google Gemini. Don\'t include anything private.'**
+  String get researchPrivacyNote;
+
   /// Hint text inside the Q&A question input field
   ///
   /// In en, this message translates to:
@@ -1123,6 +1123,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open as web page'**
   String get openAsWebPage;
+
+  /// Tooltip of the reader toolbar's sliders button, which holds only the settings you change while reading (font size, hide navigation bar)
+  ///
+  /// In en, this message translates to:
+  /// **'Reader settings'**
+  String get readerSettings;
+
+  /// Settings dialog: name of the tab holding appearance, language and Pali letters
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settingsGeneral;
+
+  /// Settings dialog: name of the credits tab. Pali for rejoicing in another's merit; left untranslated in English
+  ///
+  /// In en, this message translates to:
+  /// **'Anumodanā'**
+  String get settingsAnumodana;
+
+  /// Settings > General: section header above the theme control
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// Settings > General: section header above the app- and content-language controls
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// Settings > General: the dark option of the theme control
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// Settings > General: hint under the theme control explaining why the Dark option cannot be chosen yet
+  ///
+  /// In en, this message translates to:
+  /// **'A dark theme is coming soon.'**
+  String get themeDarkComingSoon;
+
+  /// Settings > General: one-line explanation of what the app-language control changes
+  ///
+  /// In en, this message translates to:
+  /// **'The language you\'d like the app to use.'**
+  String get appLanguageHint;
+
+  /// Settings > General: one-line explanation of what the content-language control changes
+  ///
+  /// In en, this message translates to:
+  /// **'The language of titles such as sutta names.'**
+  String get contentLanguageHint;
+
+  /// Settings > General: one-line explanation of the three Pali-letter switches
+  ///
+  /// In en, this message translates to:
+  /// **'How joined Pali letters are shown.'**
+  String get paliLettersHint;
+
+  /// Settings > General: section header above what Research sends to Google
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsPrivacy;
+
+  /// Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products
+  ///
+  /// In en, this message translates to:
+  /// **'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.'**
+  String get researchPrivacyDetail;
+
+  /// Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally
+  ///
+  /// In en, this message translates to:
+  /// **'The Bhāṇaka lineage'**
+  String get anumodanaLineage;
+
+  /// Settings > Anumodanā: the thanks to the reciters. Placeholder wording, to be reviewed
+  ///
+  /// In en, this message translates to:
+  /// **'To the lineages of reciters who held the Tipiṭaka in memory and passed it on, generation by generation.'**
+  String get anumodanaLineageBody;
+
+  /// Settings > Anumodanā: section header above the editions the app's text comes from
+  ///
+  /// In en, this message translates to:
+  /// **'Text sources'**
+  String get anumodanaTextSources;
+
+  /// Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā
+  ///
+  /// In en, this message translates to:
+  /// **'The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.'**
+  String get anumodanaTipitakaLkUse;
+
+  /// Settings > Anumodanā: the two things SuttaCentral supplies, and its licence. Named, not explained — a credit says what the source gives, as the tipitaka.lk row above it does, and leaves what we do with it to where it is used
+  ///
+  /// In en, this message translates to:
+  /// **'English translations and sutta numbering.\nCC0 1.0.'**
+  String get anumodanaSuttaCentralUse;
+
+  /// Settings > Anumodanā: section header above the bundled dictionaries
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionaries'**
+  String get anumodanaDictionaries;
+
+  /// Settings > Anumodanā: one line saying what the dictionaries below are for, and why they are in this order
+  ///
+  /// In en, this message translates to:
+  /// **'The dictionaries used for word lookups, listed alphabetically.'**
+  String get anumodanaDictionariesHint;
+
+  /// Settings > Anumodanā: label above the dictionaries that translate Pali into Sinhala
+  ///
+  /// In en, this message translates to:
+  /// **'Pali – Sinhala'**
+  String get anumodanaDictGroupSinhala;
+
+  /// Settings > Anumodanā: label above the dictionaries that translate Pali into English
+  ///
+  /// In en, this message translates to:
+  /// **'Pali – English'**
+  String get anumodanaDictGroupEnglish;
+
+  /// Settings > Anumodanā: the Digital Pali Dictionary's required citation and licence. Proper names and the version are not translated
+  ///
+  /// In en, this message translates to:
+  /// **'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.'**
+  String get anumodanaDpdLicence;
+
+  /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
+  ///
+  /// In en, this message translates to:
+  /// **'Those who contributed'**
+  String get anumodanaContributors;
+
+  /// Settings > Anumodanā: thanks to everyone who helped build the app, ending in an aspiration for them. The Sinhala is the original and the English follows it: the two gifts named are guidance and time, and wisdom is what is wished for them, not what they gave
+  ///
+  /// In en, this message translates to:
+  /// **'To all who offered their guidance and time — may it help you grow in wisdom.'**
+  String get anumodanaContributorsBody;
+
+  /// Settings > Anumodanā: section header above the font licence and the open-source licences
+  ///
+  /// In en, this message translates to:
+  /// **'Licences'**
+  String get anumodanaLicences;
+
+  /// Settings > Anumodanā: link that opens Flutter's licence list
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get openSourceLicences;
+
+  /// Settings > General: section header above the version
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAbout;
+
+  /// Settings > General: label of the row showing the running build. The number itself is not localized
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get versionLabel;
+
+  /// Accessible name of the button that opens a credited source's website
+  ///
+  /// In en, this message translates to:
+  /// **'Open {name}'**
+  String openLinkTo(String name);
 }
 
 class _AppLocalizationsDelegate

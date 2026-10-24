@@ -41,7 +41,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliLanguageLabel => 'Pali';
 
   @override
-  String get sinhalaLanguageLabel => 'Sinhala';
+  String get sinhalaLanguageLabel => 'සිංහල';
 
   @override
   String get loading => 'Loading...';
@@ -90,11 +90,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paliTouching => 'Touching letters';
-
-  @override
-  String version(String version) {
-    return 'Version $version';
-  }
 
   @override
   String get appLayout => 'App layout';
@@ -386,6 +381,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get researchEmptyState => 'Ask anything about the Pali Canon.';
 
   @override
+  String get researchPrivacyNote =>
+      'Answered by Google Gemini. Don\'t include anything private.';
+
+  @override
   String get researchInputHint => 'Ask a question about the suttas…';
 
   @override
@@ -579,4 +578,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openAsWebPage => 'Open as web page';
+
+  @override
+  String get readerSettings => 'Reader settings';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsAnumodana => 'Anumodanā';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeDarkComingSoon => 'A dark theme is coming soon.';
+
+  @override
+  String get appLanguageHint => 'The language you\'d like the app to use.';
+
+  @override
+  String get contentLanguageHint =>
+      'The language of titles such as sutta names.';
+
+  @override
+  String get paliLettersHint => 'How joined Pali letters are shown.';
+
+  @override
+  String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get researchPrivacyDetail =>
+      'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.';
+
+  @override
+  String get anumodanaLineage => 'The Bhāṇaka lineage';
+
+  @override
+  String get anumodanaLineageBody =>
+      'To the lineages of reciters who held the Tipiṭaka in memory and passed it on, generation by generation.';
+
+  @override
+  String get anumodanaTextSources => 'Text sources';
+
+  @override
+  String get anumodanaTipitakaLkUse =>
+      'The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.';
+
+  @override
+  String get anumodanaSuttaCentralUse =>
+      'English translations and sutta numbering.\nCC0 1.0.';
+
+  @override
+  String get anumodanaDictionaries => 'Dictionaries';
+
+  @override
+  String get anumodanaDictionariesHint =>
+      'The dictionaries used for word lookups, listed alphabetically.';
+
+  @override
+  String get anumodanaDictGroupSinhala => 'Pali – Sinhala';
+
+  @override
+  String get anumodanaDictGroupEnglish => 'Pali – English';
+
+  @override
+  String get anumodanaDpdLicence =>
+      'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
+
+  @override
+  String get anumodanaContributors => 'Those who contributed';
+
+  @override
+  String get anumodanaContributorsBody =>
+      'To all who offered their guidance and time — may it help you grow in wisdom.';
+
+  @override
+  String get anumodanaLicences => 'Licences';
+
+  @override
+  String get openSourceLicences => 'Open-source licences';
+
+  @override
+  String get settingsAbout => 'About';
+
+  @override
+  String get versionLabel => 'Version';
+
+  @override
+  String openLinkTo(String name) {
+    return 'Open $name';
+  }
 }

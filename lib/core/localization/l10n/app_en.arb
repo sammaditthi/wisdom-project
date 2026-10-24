@@ -56,7 +56,7 @@
     "description": "Label for Pali language"
   },
 
-  "sinhalaLanguageLabel": "Sinhala",
+  "sinhalaLanguageLabel": "සිංහල",
   "@sinhalaLanguageLabel": {
     "description": "Label for Sinhala language"
   },
@@ -139,17 +139,6 @@
   "paliTouching": "Touching letters",
   "@paliTouching": {
     "description": "Switch 1 — toggles the touching join (ZWJ before hal) for remaining clusters plus long-to-short vowel shortening. Default on."
-  },
-
-  "version": "Version {version}",
-  "@version": {
-    "description": "Last row of the settings menu: the running build, e.g. \"Version 1.0.0 (1)\". Shown faint and disabled.",
-    "placeholders": {
-      "version": {
-        "type": "String",
-        "example": "1.0.0 (1)"
-      }
-    }
   },
 
   "appLayout": "App layout",
@@ -645,6 +634,11 @@
     "description": "Placeholder shown in the Q&A dialog before the first question is asked"
   },
 
+  "researchPrivacyNote": "Answered by Google Gemini. Don't include anything private.",
+  "@researchPrivacyNote": {
+    "description": "Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings"
+  },
+
   "researchInputHint": "Ask a question about the suttas…",
   "@researchInputHint": {
     "description": "Hint text inside the Q&A question input field"
@@ -909,5 +903,130 @@
   "openAsWebPage": "Open as web page",
   "@openAsWebPage": {
     "description": "App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab"
+  },
+
+  "readerSettings": "Reader settings",
+  "@readerSettings": {
+    "description": "Tooltip of the reader toolbar's sliders button, which holds only the settings you change while reading (font size, hide navigation bar)"
+  },
+
+  "settingsGeneral": "General",
+  "@settingsGeneral": {
+    "description": "Settings dialog: name of the tab holding appearance, language and Pali letters"
+  },
+  "settingsAnumodana": "Anumodanā",
+  "@settingsAnumodana": {
+    "description": "Settings dialog: name of the credits tab. Pali for rejoicing in another's merit; left untranslated in English"
+  },
+  "settingsAppearance": "Appearance",
+  "@settingsAppearance": {
+    "description": "Settings > General: section header above the theme control"
+  },
+  "settingsLanguage": "Language",
+  "@settingsLanguage": {
+    "description": "Settings > General: section header above the app- and content-language controls"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Settings > General: the dark option of the theme control"
+  },
+  "themeDarkComingSoon": "A dark theme is coming soon.",
+  "@themeDarkComingSoon": {
+    "description": "Settings > General: hint under the theme control explaining why the Dark option cannot be chosen yet"
+  },
+  "appLanguageHint": "The language you'd like the app to use.",
+  "@appLanguageHint": {
+    "description": "Settings > General: one-line explanation of what the app-language control changes"
+  },
+  "contentLanguageHint": "The language of titles such as sutta names.",
+  "@contentLanguageHint": {
+    "description": "Settings > General: one-line explanation of what the content-language control changes"
+  },
+  "paliLettersHint": "How joined Pali letters are shown.",
+  "@paliLettersHint": {
+    "description": "Settings > General: one-line explanation of the three Pali-letter switches"
+  },
+  "settingsPrivacy": "Privacy",
+  "@settingsPrivacy": {
+    "description": "Settings > General: section header above what Research sends to Google"
+  },
+  "researchPrivacyDetail": "Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don't type anything private.",
+  "@researchPrivacyDetail": {
+    "description": "Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products"
+  },
+
+  "anumodanaLineage": "The Bhāṇaka lineage",
+  "@anumodanaLineage": {
+    "description": "Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally"
+  },
+  "anumodanaLineageBody": "To the lineages of reciters who held the Tipiṭaka in memory and passed it on, generation by generation.",
+  "@anumodanaLineageBody": {
+    "description": "Settings > Anumodanā: the thanks to the reciters. Placeholder wording, to be reviewed"
+  },
+  "anumodanaTextSources": "Text sources",
+  "@anumodanaTextSources": {
+    "description": "Settings > Anumodanā: section header above the editions the app's text comes from"
+  },
+  "anumodanaTipitakaLkUse": "The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.",
+  "@anumodanaTipitakaLkUse": {
+    "description": "Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā"
+  },
+  "anumodanaSuttaCentralUse": "English translations and sutta numbering.\nCC0 1.0.",
+  "@anumodanaSuttaCentralUse": {
+    "description": "Settings > Anumodanā: the two things SuttaCentral supplies, and its licence. Named, not explained — a credit says what the source gives, as the tipitaka.lk row above it does, and leaves what we do with it to where it is used"
+  },
+  "anumodanaDictionaries": "Dictionaries",
+  "@anumodanaDictionaries": {
+    "description": "Settings > Anumodanā: section header above the bundled dictionaries"
+  },
+  "anumodanaDictionariesHint": "The dictionaries used for word lookups, listed alphabetically.",
+  "@anumodanaDictionariesHint": {
+    "description": "Settings > Anumodanā: one line saying what the dictionaries below are for, and why they are in this order"
+  },
+  "anumodanaDictGroupSinhala": "Pali – Sinhala",
+  "@anumodanaDictGroupSinhala": {
+    "description": "Settings > Anumodanā: label above the dictionaries that translate Pali into Sinhala"
+  },
+  "anumodanaDictGroupEnglish": "Pali – English",
+  "@anumodanaDictGroupEnglish": {
+    "description": "Settings > Anumodanā: label above the dictionaries that translate Pali into English"
+  },
+  "anumodanaDpdLicence": "Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.",
+  "@anumodanaDpdLicence": {
+    "description": "Settings > Anumodanā: the Digital Pali Dictionary's required citation and licence. Proper names and the version are not translated"
+  },
+  "anumodanaContributors": "Those who contributed",
+  "@anumodanaContributors": {
+    "description": "Settings > Anumodanā: section header above the thanks to everyone who helped build the app"
+  },
+  "anumodanaContributorsBody": "To all who offered their guidance and time — may it help you grow in wisdom.",
+  "@anumodanaContributorsBody": {
+    "description": "Settings > Anumodanā: thanks to everyone who helped build the app, ending in an aspiration for them. The Sinhala is the original and the English follows it: the two gifts named are guidance and time, and wisdom is what is wished for them, not what they gave"
+  },
+  "anumodanaLicences": "Licences",
+  "@anumodanaLicences": {
+    "description": "Settings > Anumodanā: section header above the font licence and the open-source licences"
+  },
+  "openSourceLicences": "Open-source licences",
+  "@openSourceLicences": {
+    "description": "Settings > Anumodanā: link that opens Flutter's licence list"
+  },
+  "settingsAbout": "About",
+  "@settingsAbout": {
+    "description": "Settings > General: section header above the version"
+  },
+  "versionLabel": "Version",
+  "@versionLabel": {
+    "description": "Settings > General: label of the row showing the running build. The number itself is not localized"
+  },
+  "openLinkTo": "Open {name}",
+  "@openLinkTo": {
+    "description": "Accessible name of the button that opens a credited source's website",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "tipitaka.lk"
+      }
+    }
   }
 }

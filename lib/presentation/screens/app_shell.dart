@@ -5,6 +5,7 @@ import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../providers/app_section_provider.dart';
 import '../providers/navigation_rail_provider.dart';
+import '../widgets/settings/settings_dialog.dart';
 import 'home_screen.dart';
 import 'notes_screen.dart';
 import 'reader_screen.dart';
@@ -90,6 +91,17 @@ class AppShell extends ConsumerWidget {
               // readers; the tooltips show them on hover and stay out of
               // semantics so the label isn't announced twice.
               labelType: NavigationRailLabelType.none,
+              // Settings is not a destination — it opens a dialog over
+              // whatever section you are in, so it sits apart, at the foot.
+              trailingAtBottom: true,
+              trailing: Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: IconButton(
+                  icon: const Icon(Icons.settings_outlined),
+                  tooltip: l10n.settings,
+                  onPressed: () => SettingsDialog.show(context),
+                ),
+              ),
               destinations: [
                 for (final s in sections)
                   NavigationRailDestination(
