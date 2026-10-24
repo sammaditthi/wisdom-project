@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
+import 'package:the_wisdom_project/core/theme/app_theme.dart';
 import 'package:the_wisdom_project/domain/entities/content/content_language.dart';
 import 'package:the_wisdom_project/domain/entities/navigation/tipitaka_tree_node.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
@@ -64,10 +65,13 @@ void main() {
           navigationTreeProvider
               .overrideWith((ref) async => const <TipitakaTreeNode>[]),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
+          // The real theme: the toggle's own style has to win against the
+          // app-wide `segmentedButtonTheme`, which only exists on these.
+          theme: AppTheme.light(),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: Scaffold(body: RefineSearchDialog()),
+          home: const Scaffold(body: RefineSearchDialog()),
         ),
       ),
     );
@@ -96,6 +100,28 @@ void main() {
     expect(
       readToggle(tester).selected,
       {ContentLanguage.pali, ContentLanguage.sinhala},
+    );
+  });
+
+  testWidgets('keeps its pill against the app-wide segmented shape',
+      (tester) async {
+    await pumpDialog(
+      tester,
+      searchInPali: true,
+      searchInSinhala: true,
+      available: const [ContentLanguage.pali, ContentLanguage.sinhala],
+    );
+
+    // Every other SegmentedButton is a soft rectangle from
+    // `AppSegmentedButtonTheme`; this one is the deliberate exception — it
+    // shares the pill with the filter chips beside it.
+    final shape = readToggle(tester).style?.shape?.resolve({});
+    expect(shape, isA<RoundedRectangleBorder>());
+    expect(
+      ((shape! as RoundedRectangleBorder).borderRadius as BorderRadius)
+          .topLeft
+          .x,
+      100,
     );
   });
 

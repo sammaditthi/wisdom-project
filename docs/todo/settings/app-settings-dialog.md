@@ -306,49 +306,51 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
 
 ## Tests
 
-Not written as part of this (project rule), but two existing files were
-renamed to follow the widget and **four tests now fail** — they all tap
-`Icons.settings`, which is now `Icons.tune`, and then assert on controls that
-have moved:
+Written 2026-10-24, after the build. The suite is 726 passing; it was 662
+passing and 4 failing.
 
-`test/presentation/widgets/reader_settings_menu_button_test.dart` (was
-`settings_menu_button_test.dart`), all four cases:
+All four failures were in `settings_menu_button_test.dart`, and all four died
+on the same first line — `tap(find.byIcon(Icons.settings))`, which is
+`Icons.tune` now. Their deeper assertions never ran.
 
-| Test | Why it fails now |
+| File | Covers |
 |---|---|
-| renders complete settings menu structure | expects Theme, App language, Content language, Pali letters in the menu |
-| updates providers when options selected | drives the moved selectors |
-| content selector shows the effective (clamped) value | the content selector moved |
-| closes with the running version, in each app language | the version footnote is gone |
+| `test/presentation/widgets/reader/reader_settings_menu_button_test.dart` | The reader menu, moved beside its widget and cut back to Font size and App layout. Every control that left is asserted ABSENT, so none can drift back beside its copy on General. The slider's 0.05 rounding, Reset appearing only off-default, the rail switch, and Font size alone on a phone. |
+| `test/presentation/widgets/settings/general_settings_page_test.dart` | The three rehomed cases plus the page: the four sections, the theme segments (Dark disabled, names as tooltips, a tap on it cannot select), both language selectors, the clamped content value, the version in both app languages, and the Pali sample following each switch. |
+| `test/presentation/widgets/settings/settings_dialog_test.dart` | Both shapes: sidebar above 768px with the width clamp, full screen with a tab bar below it. Opening on a given tab, switching pages, the close button, a tap outside, the shared gutter — and **Esc**, against `overlayStackProvider`. |
+| `test/presentation/widgets/settings/anumodana_page_test.dart` | The attribution surface. The load-bearing case is that the two hardcoded groups account for all of `DictionaryInfo.all`: a third `targetLanguage` would be credited nowhere. Also alphabetical order on screen, DPD's mandated citation, the logos, and `showLicensePage`. |
+| `test/presentation/widgets/settings/settings_row_test.dart` | `SettingsSection` / `SettingsRow` / `SettingsTile` on their own, since the dialog-alignment pass gives them more callers. Includes why `mergeSemantics` is off for a `SegmentedButton`. |
+| `test/presentation/screens/app_shell_test.dart` | The rail's gear: at the foot, not a destination, opens over whichever section is showing. Pins the two accepted gaps (Decisions 4 and 8) so neither is forgotten — each flips when its follow-up lands. |
+| `test/core/theme/app_segmented_button_theme_test.dart` | All three themes carry the shape, and a button's own shape still wins. |
 
-`integration_test/search_mode_test.dart` only checks the button is absent in
-search mode; the rename is all it needed.
+Two existing files were edited: `refine_search_dialog_test.dart` now pumps the
+real theme and asserts its toggle keeps its pill against the app-wide shape,
+and `pump_app.dart` takes an optional `theme`. One helper is new,
+`test/helpers/test_view.dart`, for the width-dependent layouts.
 
-The first three cases belong on `GeneralSettingsPage` now; the fourth belongs
-on `AnumodanaPage`. What is left to cover in the reader menu is Font size and
-Hide navigation bar.
+Prose on Anumodanā is asserted through `AppLocalizations`, not as literals —
+the copy is still under review (Decisions 5 and 7), and what has to hold is
+that the right key reaches the right row. The two exceptions are DPD's citation
+form, which its licence mandates, and the Noto face names.
 
-Worth covering besides: the rail's gear opens the dialog and Esc closes it; the
-Pali sample follows the switches (it is transformed, so the raw string is never
-what is on screen); the Dark segment is disabled; Anumodanā lists every
-`DictionaryInfo.all` entry; no overflow at 390 px.
+Integration: `search_mode_test.dart` and `search_language_toggle_test.dart`
+both pass on macOS. Nothing else in `integration_test/` touches the shell, the
+rail, the reader menu or the moved controls.
 
 ## Verified while building
 
-A throwaway harness (run, then deleted) confirmed: the dialog opens on General
-and on a given initial tab; the sidebar switches pages; the sample renders
-transformed; Anumodanā scrolls to Version and lists the dictionaries; at 390 px
-it is full screen with a tab bar and nothing overflows; the close button pops
-it. `flutter analyze` and `dart format --set-exit-if-changed` are both clean
-over `lib`, `test` and `integration_test`.
+A throwaway harness (run, then deleted) confirmed the dialog's shapes and
+pages by eye; the tests above now hold all of it. `flutter analyze` and
+`dart format --set-exit-if-changed` are clean over `lib`, `test` and
+`integration_test`.
 
-One bug it caught and that is fixed: the sidebar was a coloured `Container`,
-whose `ColoredBox` swallowed the `ListTile`'s selected fill and its ink. It is
-a `Material` now.
+One bug the harness caught and that is fixed: the sidebar was a coloured
+`Container`, whose `ColoredBox` swallowed the `ListTile`'s selected fill and
+its ink. It is a `Material` now.
 
-**Not verified:** the gear inside a real `NavigationRail` (`AppShell` is too
-heavy to pump), and Esc — the dismiss registration is copied verbatim from
-`RefineSearchDialog.show`, but nothing exercised it.
+`AppShell` turned out to be pumpable after all — two overrides (the tree data
+source and SharedPreferences) are the whole harness, so the gear is covered in
+a widget test rather than left to the integration suite.
 
 ## Related
 
@@ -359,9 +361,8 @@ heavy to pump), and Esc — the dismiss registration is copied verbatim from
 
 ## Done when
 
-- [x] The rail's gear opens Settings on General; the close button and a tap
-      outside close it. Esc is wired the same way the refine dialogs are, but
-      untested.
+- [x] The rail's gear opens Settings on General; the close button, a tap
+      outside and Esc all close it — all four covered by tests.
 - [x] Two tabs, matching the canvas.
 - [x] Below 768px the dialog is full screen with a tab bar.
 - [x] The reader menu shows only Font size and App layout, under the sliders
@@ -371,4 +372,4 @@ heavy to pump), and Esc — the dismiss registration is copied verbatim from
 - [ ] The Sinhala strings reviewed (Decisions 7).
 - [ ] The Anumodanā copy reviewed, and the two placeholders written
       (Decisions 5).
-- [ ] The four stale tests rehomed — see *Tests*.
+- [x] The four stale tests rehomed — see *Tests*.

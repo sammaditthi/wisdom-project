@@ -46,15 +46,21 @@ List<Override> defaultTestOverrides() => [
 extension PumpApp on WidgetTester {
   /// Pumps a widget wrapped in MaterialApp, Scaffold, and ProviderScope
   /// The Scaffold provides Material ancestor needed by InkWell, etc.
+  ///
+  /// [theme] is for widgets that read the app's `ThemeExtension`s or its
+  /// component themes; left out, Material's defaults apply and the extensions
+  /// fall back to their `.standard()` values.
   Future<void> pumpApp(
     Widget widget, {
     List<Override> overrides = const [],
     NavigatorObserver? navigatorObserver,
+    ThemeData? theme,
   }) async {
     await pumpWidget(
       ProviderScope(
         overrides: [...defaultTestOverrides(), ...overrides],
         child: MaterialApp(
+          theme: theme,
           home: Scaffold(body: widget),
           navigatorObservers: [
             if (navigatorObserver != null) navigatorObserver,
