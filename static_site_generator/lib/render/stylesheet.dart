@@ -1202,7 +1202,16 @@ void _writeSearch(StringBuffer css) {
   css.writeln();
 
   css.writeln('.search-results {');
-  css.writeln('  flex: 1;');
+  // `auto` basis, not `flex: 1`'s `0`. A flex item sized from zero contributes
+  // nothing to the intrinsic height of a column flex container on WebKit, and
+  // this dialog has no height of its own — only a `max-height` — so on iOS the
+  // panel shrank to its head and status line and drew the results at zero
+  // height: a search that announced "38 names" and showed none. Sizing from
+  // content makes the list part of what the dialog measures; `min-height: 0`
+  // then lets it shrink past that content and scroll, which is what a flex
+  // item's `auto` minimum would otherwise forbid.
+  css.writeln('  flex: 1 1 auto;');
+  css.writeln('  min-height: 0;');
   css.writeln('  margin: 0;');
   css.writeln('  padding: 0;');
   css.writeln('  list-style: none;');
