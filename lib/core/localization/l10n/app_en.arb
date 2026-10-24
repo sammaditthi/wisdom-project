@@ -934,11 +934,11 @@
   "@themeDarkComingSoon": {
     "description": "Settings > General: hint under the theme control explaining why the Dark option cannot be chosen yet"
   },
-  "appLanguageHint": "The language you'd like to use the app in.",
+  "appLanguageHint": "The language you'd like the app to use.",
   "@appLanguageHint": {
     "description": "Settings > General: one-line explanation of what the app-language control changes"
   },
-  "contentLanguageHint": "The language titles such as sutta names are shown in.",
+  "contentLanguageHint": "The language of titles such as sutta names.",
   "@contentLanguageHint": {
     "description": "Settings > General: one-line explanation of what the content-language control changes"
   },

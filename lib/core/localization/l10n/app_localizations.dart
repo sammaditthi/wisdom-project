@@ -1169,13 +1169,13 @@ abstract class AppLocalizations {
   /// Settings > General: one-line explanation of what the app-language control changes
   ///
   /// In en, this message translates to:
-  /// **'The language you\'d like to use the app in.'**
+  /// **'The language you\'d like the app to use.'**
   String get appLanguageHint;
 
   /// Settings > General: one-line explanation of what the content-language control changes
   ///
   /// In en, this message translates to:
-  /// **'The language titles such as sutta names are shown in.'**
+  /// **'The language of titles such as sutta names.'**
   String get contentLanguageHint;
 
   /// Settings > General: one-line explanation of the three Pali-letter switches

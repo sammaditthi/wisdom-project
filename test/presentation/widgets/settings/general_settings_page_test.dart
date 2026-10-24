@@ -103,11 +103,11 @@ void main() {
       // The hints that say what each axis actually changes — the reason the
       // two language rows are tellable apart.
       expect(
-        find.text("The language you'd like to use the app in."),
+        find.text("The language you'd like the app to use."),
         findsOneWidget,
       );
       expect(
-        find.text('The language titles such as sutta names are shown in.'),
+        find.text('The language of titles such as sutta names.'),
         findsOneWidget,
       );
       expect(find.text('How joined Pali letters are shown.'), findsOneWidget);

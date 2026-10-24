@@ -601,11 +601,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDarkComingSoon => 'A dark theme is coming soon.';
 
   @override
-  String get appLanguageHint => 'The language you\'d like to use the app in.';
+  String get appLanguageHint => 'The language you\'d like the app to use.';
 
   @override
   String get contentLanguageHint =>
-      'The language titles such as sutta names are shown in.';
+      'The language of titles such as sutta names.';
 
   @override
   String get paliLettersHint => 'How joined Pali letters are shown.';
