@@ -578,7 +578,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get share => 'බෙදාගන්න';
 
   @override
-  String get openAsWebPage => 'වෙබ් පිටුවක් ලෙස විවෘත කරන්න';
+  String get openAsWebPage => 'සරල වෙබ් පිටුවට';
 
   @override
   String get readerSettings => 'කියවීම් සැකසුම්';
