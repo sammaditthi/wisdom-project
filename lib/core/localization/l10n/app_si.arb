@@ -41,7 +41,7 @@
 
   "theme": "තේමාව",
 
-  "themeLight": "ශ්වේත",
+  "themeLight": "ආලෝකමත්",
 
   "appLanguage": "යෙදුම් භාෂාව",
 
@@ -238,6 +238,7 @@
   "researchNewChat": "නව සංවාදය",
 
   "researchEmptyState": "පාළි ත්‍රිපිටකය පිළිබඳ ඕනෑම දෙයක් අසන්න.",
+  "researchPrivacyNote": "පිළිතුරු සපයන්නේ Google Gemini මගිනි. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.",
 
   "researchInputHint": "සූත්‍ර පිළිබඳ ප්‍රශ්නයක් අසන්න…",
 
@@ -344,24 +345,26 @@
   "settingsAppearance": "පෙනුම",
   "settingsLanguage": "භාෂාව",
   "settingsAbout": "යෙදුම ගැන",
-  "themeDark": "කාළ",
+  "themeDark": "අඳුරු",
   "themeDarkComingSoon": "අඳුරු තේමාව ඉදිරියේදී.",
-  "appLanguageHint": "මෙනු, බොත්තම් සහ පණිවිඩ.",
-  "contentLanguageHint": "සංචාලකයේ, ටැබ්වල, මාර්ගයේ සහ සෙවුමේ පොත් හා සූත්‍ර නාම.",
+  "appLanguageHint": "යෙදුම භාවිතා කිරීමට ඔබ කැමති භාෂාව.",
+  "contentLanguageHint": "සූත්‍රනාම ආදිය දිස්වීමට ඔබ කැමති භාෂාව.",
   "paliLettersHint": "පාළි බැඳි අකුරු පෙන්වන ආකාරය.",
+  "settingsPrivacy": "පෞද්ගලිකත්වය",
+  "researchPrivacyDetail": "ඔබේ ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අපි භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන්ට ඒවා කියවිය හැක. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.",
 
   "anumodanaLineage": "භාණක පරම්පරාව",
   "anumodanaLineageBody": "ත්‍රිපිටකය කටපාඩමින් දරාගෙන පරපුරෙන් පරපුරට පවත්වාගෙන ආ භාණක පරම්පරාවට.",
   "anumodanaTextSources": "මූලාශ්‍ර",
-  "anumodanaTipitakaLkUse": "බුද්ධ ජයන්ති පාළි පාඨය, එහි සිංහල පරිවර්තනය සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය. පාළි පාඨය CC BY-ND 4.0 යටතේ.",
-  "anumodanaSuttaCentralUse": "ගවේෂණය උපුටා දක්වන ඉංග්‍රීසි පරිවර්තන සහ සෙවුම හඳුනන සූත්‍ර අංක. CC0 1.0.",
+  "anumodanaTipitakaLkUse": "බුද්ධ ජයන්ති පාළි පෙළ, එහි සිංහල පරිවර්තනය සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය.\nපාළි පෙළ CC BY-ND 4.0 යටතේ.",
+  "anumodanaSuttaCentralUse": "ඉංග්‍රීසි පරිවර්තන සහ සූත්‍ර අංකන ක්‍රමය.\nCC0 1.0.",
   "anumodanaDictionaries": "ශබ්දකෝෂ",
-  "anumodanaDictionariesHint": "පාළි වචනයක් ස්පර්ශ කර අර්ථය බලන්න, නැතහොත් අර්ථ ටැබයෙන් සොයන්න. අකාරාදී පිළිවෙළින් දක්වා ඇත.",
+  "anumodanaDictionariesHint": "වචන අර්ථ බැලීමට භාවිතා කරන ශබ්දකෝෂ, අකාරාදී පිළිවෙළින්.",
   "anumodanaDictGroupSinhala": "පාළි – සිංහල",
   "anumodanaDictGroupEnglish": "පාළි – ඉංග්‍රීසි",
   "anumodanaDpdLicence": "Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.",
-  "anumodanaThanks": "ස්තූතිය",
-  "anumodanaThanksBody": "මෙම යෙදුම නිර්මාණය කිරීමට කාලය, කුසලතාව සහ උපදෙස් දුන් සැමට.",
+  "anumodanaContributors": "දායක වූ සැම",
+  "anumodanaContributorsBody": "අවවාදානුශාසනා දීමෙන් හා කාලය කැප කිරීමෙන් දායක වූ සියලු දෙනාට ප්‍රඥාව වැඩීමටම උපනිශ්‍රයක් වේවා.",
   "anumodanaLicences": "බලපත්‍ර",
   "openSourceLicences": "විවෘත මූලාශ්‍ර බලපත්‍ර",
   "versionLabel": "අනුවාදය",

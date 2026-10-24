@@ -25,8 +25,8 @@ tabs and its phone screens are in *Later*.
 
 | Tab | Holds |
 |---|---|
-| General | **Appearance:** Theme (two icons, Dark disabled — see Decisions 3). **Language:** App language (English \| සිංහල) and Content language (Pāli \| සිංහල), each with a one-line hint. **Pali letters:** the three switches, under a sample line that follows them. **About:** the version. |
-| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Text sources, Dictionaries, Thanks, Licences. One placeholder section — see *Anumodanā*. |
+| General | **Appearance:** Theme (two icons, Dark disabled — see Decisions 3). **Language:** App language (English \| සිංහල) and Content language (Pali \| සිංහල), each with a one-line hint. **Pali letters:** the three switches, under a sample line that follows them. **Privacy:** what Research sends to Google — see Decisions 10. **About:** the version. |
+| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Text sources, Dictionaries, Those who contributed, Licences — see *Anumodanā*. |
 
 ### Narrow windows
 
@@ -70,24 +70,55 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
    letters — they are removed from the reader menu at every width, not kept
    behind a width check. Accepted knowingly: no temporary branch to unpick
    later.
-5. **Anumodanā is names, uses and licences** (2026-10-23) — no prose intro. The
-   user reviews and expands the copy before release.
+5. **Anumodanā is names, uses and licences** (2026-10-23) — no prose intro.
 6. **Anumodanā's row icons are generic.** Real logos only if supplied, with
    permission to use them.
-7. **Sinhala wording** for the new strings is a placeholder until reviewed.
-8. **Rail hidden on desktop.** Settings cannot be reached until the rail is
+7. **Rail hidden on desktop.** Settings cannot be reached until the rail is
    shown again; the switch stays in the reader menu. Parked — a Ctrl/Cmd+,
    shortcut would cover it.
-9. **First review round** (2026-10-24). Theme is icons with tooltips; Sinhala
+8. **First review round** (2026-10-24). Theme is icons with tooltips; Sinhala
    Dark is කාළ. Every `SegmentedButton` is a soft rectangle, from
    `AppSegmentedButtonTheme` in all three themes — except the search Refine
    dialog's language toggle, which keeps the pill it shares with the filter
-   chips beside it. Content language reads `Pāli | සිංහල`, self-labelled like
+   chips beside it. Content language reads `Pali | සිංහල`, self-labelled like
    App language, from the two ARB keys the Refine dialog shares. The
    Anumodanā tab icon is `Symbols.folded_hands`. Dictionaries are
    alphabetical, and the hint says so. Open-source licences is demoted from a
    row to a plain link rather than dropped: the MIT/BSD packages and the
    bundled Noto faces (OFL) need their text readable somewhere in the app.
+9. **Copy review, both languages** (2026-10-24). Every label and hint on both
+   tabs rewritten with the user; the Sinhala is no longer a placeholder.
+   Settled there:
+   - The two language hints name the choice, not a list of screens. Content
+     language names three levels — book, chapter, sutta — because every tree
+     node carries a Pali name and a Sinhala one, from pitaka down.
+   - Sinhala theme names are **ආලෝකමත් / අඳුරු**, not ශ්වේත / කාළ, which are
+     literary colour words. `themeDarkComingSoon` already said අඳුරු.
+   - Sinhala for the canonical Pali text is **පෙළ**, not පාඨය, which reads as
+     one passage. It also scopes the licence line exactly: CC BY-ND covers
+     the Pali text, not the translation or the aṭṭhakathā.
+   - Each source row is a noun phrase naming what the source gives, then its
+     licence on its own line. Both rows scan as a pair.
+   - *Thanks* became **Those who contributed** (SI: දායක වූ සැම): a section
+     called Thanks inside a tab called Anumodanā restates it. Keys renamed
+     `anumodanaContributors`/`…Body`.
+   - The Sinhala blessing is the original and the English follows it. Wisdom
+     is what is wished *for* contributors, not what they gave.
+   - `paliLanguageLabel` is **Pali**, not Pāli — see
+     `docs/todo/fonts/pali-diacritics-missing-from-ui-fonts.md`. English copy
+     spells it that way everywhere else regardless.
+   - Open-source licences keeps the divider above it, so it reads as its own
+     item and not as a third hint line under the font row.
+10. **Research's privacy notice ships with this dialog** (2026-10-24), closing
+    the "No privacy note" item in
+    `docs/general/things-to-consider-before-going-live.md`, which pairs it with
+    the credits surface at #1 in the launch order. Two places: a faint second
+    line on Research's empty state (`researchPrivacyNote`), and the full
+    statement under **Privacy** on General (`researchPrivacyDetail`). Not on
+    Anumodanā — that tab is gratitude and licences. The wording tracks Google's
+    *unpaid*-tier terms, checked 2026-10-24; the key's ARB description says to
+    re-check it if the Worker ever moves to the paid tier, where Google does
+    not use prompts to improve its products.
 
 ## How it is built
 
@@ -170,7 +201,7 @@ sources gives `isFirst` back.
 |---|---|
 | Text sources | tipitaka.lk · SuttaCentral, each with its own logo |
 | Dictionaries | A hint line, then the `DictionaryInfo.all` groups, alphabetical |
-| Thanks | **Placeholder** — one general line for everyone who helped build the app. |
+| Those who contributed | One line of thanks, ending in an aspiration for them. |
 | Licences | Fonts, then Open-source licences as a plain link |
 
 Each source row says where it is used in the app and carries its licence.
@@ -189,8 +220,10 @@ Checked against the upstream licence pages 2026-10-23:
   which is why it names the translation as well as the Pali.
 - **SuttaCentral** — CC0 1.0. `bilara-data` requires every supported
   translation to be CC0. Used by Research, and by the `sc-to-bjt` concordance
-  that makes `SN 15.3` resolve. **"File Search" is Gemini's name for the store
-  we upload to — never user-facing copy.**
+  that makes `SN 15.3` resolve. The row names the two things it supplies and
+  stops there: what they are *for* belongs where they are used, not in a
+  credit. **"File Search" is Gemini's name for the store we upload to — never
+  user-facing copy, and neither is "RAG".**
 - **DPD** — CC BY-NC-SA 4.0, and
   [its citation form](https://digitalpalidictionary.github.io/how_to_cite/) is
   *Bodhirasa Bhikkhu. Digital Pāḷi Dictionary. Version <v>. https://www.dpdict.net/*.
@@ -268,10 +301,11 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
 - Tabs: `settingsGeneral`, `settingsAnumodana`.
 - General: `settingsAppearance`, `settingsLanguage`, `themeDark`,
   `themeDarkComingSoon`, `appLanguageHint`, `contentLanguageHint`,
-  `paliLettersHint`.
+  `paliLettersHint`, `settingsPrivacy`, `researchPrivacyDetail`.
+- Research: `researchPrivacyNote`.
 - Reader menu: `readerSettings`.
 - Anumodanā: its five section names, the three source descriptions, the
-  dictionary hint, the two group labels, the two placeholder lines,
+  dictionary hint, the two group labels, the contributors line,
   `openSourceLicences` and its hint, `versionLabel`, `openLinkTo`.
 
 ## Later, not in this scope
@@ -302,7 +336,7 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   and now `SettingsDialog.show` repeat the same overlay-stack + `showDialog`
   block three times. One helper in `widgets/common/` replaces all three; folded
   into the dialog-alignment pass above.
-- **Ctrl/Cmd+,** to open Settings when the rail is hidden (Decisions 8).
+- **Ctrl/Cmd+,** to open Settings when the rail is hidden (Decisions 7).
 
 ## Tests
 
@@ -320,7 +354,7 @@ on the same first line — `tap(find.byIcon(Icons.settings))`, which is
 | `test/presentation/widgets/settings/settings_dialog_test.dart` | Both shapes: sidebar above 768px with the width clamp, full screen with a tab bar below it. Opening on a given tab, switching pages, the close button, a tap outside, the shared gutter — and **Esc**, against `overlayStackProvider`. |
 | `test/presentation/widgets/settings/anumodana_page_test.dart` | The attribution surface. The load-bearing case is that the two hardcoded groups account for all of `DictionaryInfo.all`: a third `targetLanguage` would be credited nowhere. Also alphabetical order on screen, DPD's mandated citation, the logos, and `showLicensePage`. |
 | `test/presentation/widgets/settings/settings_row_test.dart` | `SettingsSection` / `SettingsRow` / `SettingsTile` on their own, since the dialog-alignment pass gives them more callers. Includes why `mergeSemantics` is off for a `SegmentedButton`. |
-| `test/presentation/screens/app_shell_test.dart` | The rail's gear: at the foot, not a destination, opens over whichever section is showing. Pins the two accepted gaps (Decisions 4 and 8) so neither is forgotten — each flips when its follow-up lands. |
+| `test/presentation/screens/app_shell_test.dart` | The rail's gear: at the foot, not a destination, opens over whichever section is showing. Pins the two accepted gaps (Decisions 4 and 7) so neither is forgotten — each flips when its follow-up lands. |
 | `test/core/theme/app_segmented_button_theme_test.dart` | All three themes carry the shape, and a button's own shape still wins. |
 
 Two existing files were edited: `refine_search_dialog_test.dart` now pumps the
@@ -329,8 +363,8 @@ and `pump_app.dart` takes an optional `theme`. One helper is new,
 `test/helpers/test_view.dart`, for the width-dependent layouts.
 
 Prose on Anumodanā is asserted through `AppLocalizations`, not as literals —
-the copy is still under review (Decisions 5 and 7), and what has to hold is
-that the right key reaches the right row. The two exceptions are DPD's citation
+what has to hold is that the right key reaches the right row, so the copy can
+be reworded without touching a test. The two exceptions are DPD's citation
 form, which its licence mandates, and the Noto face names.
 
 Integration: `search_mode_test.dart` and `search_language_toggle_test.dart`
@@ -369,7 +403,5 @@ a widget test rather than left to the integration suite.
       icon.
 - [x] Every colour from theme roles; every string in both ARB files.
 - [x] The fonts appear in Open-source licences.
-- [ ] The Sinhala strings reviewed (Decisions 7).
-- [ ] The Anumodanā copy reviewed, and the two placeholders written
-      (Decisions 5).
+- [x] Both languages' copy reviewed end to end (Decisions 9).
 - [x] The four stale tests rehomed — see *Tests*.

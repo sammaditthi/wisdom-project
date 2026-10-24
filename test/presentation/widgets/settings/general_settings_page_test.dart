@@ -85,13 +85,14 @@ void main() {
       );
 
   group('GeneralSettingsPage structure', () {
-    testWidgets('four sections, each setting under its own heading',
+    testWidgets('five sections, each setting under its own heading',
         (tester) async {
       await pumpPage(tester);
 
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('Pali letters'), findsOneWidget);
+      expect(find.text('Privacy'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
 
       expect(find.text('Theme'), findsOneWidget);
@@ -101,10 +102,12 @@ void main() {
 
       // The hints that say what each axis actually changes — the reason the
       // two language rows are tellable apart.
-      expect(find.text('Menus, buttons and messages.'), findsOneWidget);
       expect(
-        find.text('Names of books and suttas in the navigator, tabs, '
-            'breadcrumbs and search.'),
+        find.text("The language you'd like to use the app in."),
+        findsOneWidget,
+      );
+      expect(
+        find.text('The language book, chapter and sutta names are shown in.'),
         findsOneWidget,
       );
       expect(find.text('How joined Pali letters are shown.'), findsOneWidget);
@@ -189,16 +192,16 @@ void main() {
       expect(store.getString(StorageKeys.appLanguage), 'sinhala');
     });
 
-    testWidgets('Content language reads Pāli | සිංහල, and a tap writes it',
+    testWidgets('Content language reads Pali | සිංහල, and a tap writes it',
         (tester) async {
       final container = await pumpPage(tester);
 
       // Self-labelled like App language, from the two keys the search Refine
       // dialog shares. Was 'Pali' | 'Sinhala' before the review round.
-      expect(segment<ContentLanguage>(find.text('Pāli')), findsOneWidget);
+      expect(segment<ContentLanguage>(find.text('Pali')), findsOneWidget);
       expect(segment<ContentLanguage>(find.text('සිංහල')), findsOneWidget);
 
-      await tester.tap(segment<ContentLanguage>(find.text('Pāli')));
+      await tester.tap(segment<ContentLanguage>(find.text('Pali')));
       await tester.pumpAndSettle();
       expect(container.read(contentLanguageProvider), ContentLanguage.pali);
 

@@ -119,15 +119,24 @@ class StatusMessageView extends StatelessWidget {
           );
     }
 
-    // Title style depends on whether the message is "negative" (error/offline)
-    // or "informational" (empty/info/invalid/loading). This keeps error states
+    // Styles depend on whether the message is "negative" (error/offline) or
+    // "informational" (empty/info/invalid/loading). This keeps error states
     // visually distinct without making other states look alarming.
-    final TextStyle titleStyle =
-        (variant == StatusVariant.error || variant == StatusVariant.offline)
-            ? typography.errorMessage
-            : typography.emptyStateMessage;
+    final bool isNegative =
+        variant == StatusVariant.error || variant == StatusVariant.offline;
 
-    final TextStyle descriptionStyle = typography.resultSubtitle;
+    final TextStyle titleStyle =
+        isNegative ? typography.errorMessage : typography.emptyStateMessage;
+
+    // The description follows the same split: an error keeps it at full
+    // strength, while an informational one sits below a title that is already
+    // muted — `resultSubtitle` alone reads heavier than `emptyStateMessage`
+    // and inverts the hierarchy.
+    final TextStyle descriptionStyle = isNegative
+        ? typography.resultSubtitle
+        : typography.resultSubtitle.copyWith(
+            color: colorScheme.onSurface.withValues(alpha: 0.5),
+          );
 
     return Center(
       child: Padding(

@@ -72,6 +72,10 @@ class GeneralSettingsPage extends StatelessWidget {
           ],
         ),
         SettingsSection(
+          title: l10n.settingsPrivacy,
+          children: [SettingsProse(l10n.researchPrivacyDetail)],
+        ),
+        SettingsSection(
           title: l10n.settingsAbout,
           children: [
             SettingsRow(

@@ -43,7 +43,7 @@ class AnumodanaPage extends StatelessWidget {
         // SettingsSection(
         //   title: l10n.anumodanaLineage,
         //   isFirst: true,
-        //   children: [_Prose(l10n.anumodanaLineageBody)],
+        //   children: [SettingsProse(l10n.anumodanaLineageBody)],
         // ),
         SettingsSection(
           title: l10n.anumodanaTextSources,
@@ -84,8 +84,8 @@ class AnumodanaPage extends StatelessWidget {
           ],
         ),
         SettingsSection(
-          title: l10n.anumodanaThanks,
-          children: [_Prose(l10n.anumodanaThanksBody)],
+          title: l10n.anumodanaContributors,
+          children: [SettingsProse(l10n.anumodanaContributorsBody)],
         ),
         SettingsSection(
           title: l10n.anumodanaLicences,
@@ -95,7 +95,6 @@ class AnumodanaPage extends StatelessWidget {
                   'Noto Serif Sinhala',
               hint: 'SIL Open Font License 1.1',
               leading: SettingsTile(icon: Icons.text_fields_outlined),
-              showDivider: false,
             ),
             _OpenSourceLicencesLink(),
           ],
@@ -153,45 +152,35 @@ class _DictionaryGroup extends StatelessWidget {
 ///
 /// Not a row: the MIT/BSD packages and the bundled Noto fonts (OFL) need
 /// their text to be readable somewhere in the app, which `showLicensePage`
-/// does — but it is the least interesting thing on the page.
+/// does — but it is the least interesting thing on the page. It keeps the
+/// divider above it so it reads as its own item, not as a third hint line
+/// under the font row it sits beneath.
 class _OpenSourceLicencesLink extends StatelessWidget {
   const _OpenSourceLicencesLink();
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: TextButton(
-        style: TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          textStyle: context.typography.menuSectionLabel,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          minimumSize: Size.zero,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
-        onPressed: () => showLicensePage(
-          context: context,
-          applicationName: l10n.appTitle,
-          applicationVersion: AppVersion.display,
-        ),
-        child: Text(l10n.openSourceLicences),
-      ),
-    );
-  }
-}
-
-/// A paragraph that is a statement rather than a labelled setting.
-class _Prose extends StatelessWidget {
-  const _Prose(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 2, bottom: 4),
-      child: Text(text, style: context.typography.listRowTitle),
+      padding: const EdgeInsets.only(top: 4),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: TextButton(
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+            textStyle: context.typography.menuSectionLabel,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          onPressed: () => showLicensePage(
+            context: context,
+            applicationName: l10n.appTitle,
+            applicationVersion: AppVersion.display,
+          ),
+          child: Text(l10n.openSourceLicences),
+        ),
+      ),
     );
   }
 }

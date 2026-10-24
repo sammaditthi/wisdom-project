@@ -3,7 +3,7 @@
 /// The build left this unverified — "AppShell is too heavy to pump" — but with
 /// the tree data source and SharedPreferences stood in for, it pumps. This
 /// file covers the entry point itself and pins the two gaps the plan accepts
-/// knowingly (Decisions 4 and 8), so neither is forgotten: a phone cannot
+/// knowingly (Decisions 4 and 7), so neither is forgotten: a phone cannot
 /// reach Settings at all, and a hidden rail takes the gear with it.
 library;
 
@@ -149,7 +149,7 @@ void main() {
       expect(bar.destinations.length, 2);
     });
 
-    testWidgets('a hidden rail takes the gear with it (Decisions 8)',
+    testWidgets('a hidden rail takes the gear with it (Decisions 7)',
         (tester) async {
       final container = await pumpShell(tester);
       expect(railGear, findsOneWidget);

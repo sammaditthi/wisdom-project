@@ -98,6 +98,13 @@ then `git push --tags`.
 - **CORS allow-list.** Pinned to local, dev and prod web in
   `RESEARCH_CORS_ORIGINS` — exact origin match, no trailing slash. (Deploying
   it is blocker 2.)
+- **The research privacy notice.** Shipped with the Settings dialog
+  (2026-10-24): a line on Research's empty state (`researchPrivacyNote`) and
+  the full statement under Settings > General > Privacy
+  (`researchPrivacyDetail`). The wording tracks Google's *unpaid*-tier terms —
+  re-check it only if the Worker moves to the paid tier, where Google does not
+  use prompts to improve its products. Store listings will still need a hosted
+  URL.
 - **Request size and deadline caps.** `contracts.ts` caps the question and the
   history; `config.ts` gives each mode a deadline.
 - **Rate limiting.** A per-IP zone rule on `/research`, set up 2026-09-27
@@ -127,10 +134,6 @@ then `git push --tags`.
   deliberately. The known-wrong offline-vs-error icon in
   `web_database_installer.dart` (`web-release.md` §6, "banked for prod") is the
   kind of thing we would otherwise never hear about.
-- **No privacy note.** The research feature ships enabled and sends
-  user-typed questions to Gemini through our Worker. Nothing tells the user.
-  One sentence in the research sheet plus a line on the credits surface from
-  blocker 1 covers it, and the store listings will need a hosted URL anyway.
 - **Logging PII.** The Worker's own lines hold a request id, mode, model,
   status and timings, never the question. Still to check: what Workers Logs
   (`observability` in `wrangler.jsonc`) retains per request, and what the
@@ -173,8 +176,9 @@ then `git push --tags`.
 
 ## Launch order
 
-1. The credits surface and the privacy sentence (blocker 1, and the privacy
-   item above) — the only code work on this list.
+1. The credits surface (blocker 1) — the only code work on this list. The app
+   side is done: Settings > Anumodanā names the sources, the dictionaries and
+   their licences. The site footer is still open.
 2. The `unhandled:` log line.
 3. Dashboard: managed robots.txt off, AI Crawl Control allowing search and
    training (blocker 3).

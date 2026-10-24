@@ -47,7 +47,7 @@ void main() {
       for (final heading in [
         l10n.anumodanaTextSources,
         l10n.anumodanaDictionaries,
-        l10n.anumodanaThanks,
+        l10n.anumodanaContributors,
         l10n.anumodanaLicences,
       ]) {
         expect(find.text(heading), findsOneWidget);
@@ -61,8 +61,10 @@ void main() {
       double y(String label) => tester.getTopLeft(find.text(label)).dy;
       expect(y(l10n.anumodanaTextSources),
           lessThan(y(l10n.anumodanaDictionaries)));
-      expect(y(l10n.anumodanaDictionaries), lessThan(y(l10n.anumodanaThanks)));
-      expect(y(l10n.anumodanaThanks), lessThan(y(l10n.anumodanaLicences)));
+      expect(y(l10n.anumodanaDictionaries),
+          lessThan(y(l10n.anumodanaContributors)));
+      expect(
+          y(l10n.anumodanaContributors), lessThan(y(l10n.anumodanaLicences)));
     });
 
     testWidgets('each text source names itself, its use and its way out',
@@ -98,10 +100,10 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Thanks is a statement, not a labelled setting',
+    testWidgets('Those who contributed is a statement, not a labelled setting',
         (tester) async {
       final l10n = await pumpPage(tester);
-      expect(find.text(l10n.anumodanaThanksBody), findsOneWidget);
+      expect(find.text(l10n.anumodanaContributorsBody), findsOneWidget);
     });
 
     testWidgets('the bundled faces and the open-source list are reachable',

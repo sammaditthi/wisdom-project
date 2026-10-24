@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// Label for Pali language
   ///
   /// In en, this message translates to:
-  /// **'Pāli'**
+  /// **'Pali'**
   String get paliLanguageLabel;
 
   /// Label for Sinhala language
@@ -812,6 +812,12 @@ abstract class AppLocalizations {
   /// **'Ask anything about the Pali Canon.'**
   String get researchEmptyState;
 
+  /// Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Answered by Google Gemini. Don\'t include anything private.'**
+  String get researchPrivacyNote;
+
   /// Hint text inside the Q&A question input field
   ///
   /// In en, this message translates to:
@@ -1163,13 +1169,13 @@ abstract class AppLocalizations {
   /// Settings > General: one-line explanation of what the app-language control changes
   ///
   /// In en, this message translates to:
-  /// **'Menus, buttons and messages.'**
+  /// **'The language you\'d like to use the app in.'**
   String get appLanguageHint;
 
   /// Settings > General: one-line explanation of what the content-language control changes
   ///
   /// In en, this message translates to:
-  /// **'Names of books and suttas in the navigator, tabs, breadcrumbs and search.'**
+  /// **'The language book, chapter and sutta names are shown in.'**
   String get contentLanguageHint;
 
   /// Settings > General: one-line explanation of the three Pali-letter switches
@@ -1177,6 +1183,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How joined Pali letters are shown.'**
   String get paliLettersHint;
+
+  /// Settings > General: section header above what Research sends to Google
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy'**
+  String get settingsPrivacy;
+
+  /// Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products
+  ///
+  /// In en, this message translates to:
+  /// **'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.'**
+  String get researchPrivacyDetail;
 
   /// Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally
   ///
@@ -1199,13 +1217,13 @@ abstract class AppLocalizations {
   /// Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā
   ///
   /// In en, this message translates to:
-  /// **'The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.'**
+  /// **'The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.'**
   String get anumodanaTipitakaLkUse;
 
-  /// Settings > Anumodanā: what SuttaCentral supplies, and its licence
+  /// Settings > Anumodanā: the two things SuttaCentral supplies, and its licence. Named, not explained — a credit says what the source gives, as the tipitaka.lk row above it does, and leaves what we do with it to where it is used
   ///
   /// In en, this message translates to:
-  /// **'The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.'**
+  /// **'English translations and sutta numbering.\nCC0 1.0.'**
   String get anumodanaSuttaCentralUse;
 
   /// Settings > Anumodanā: section header above the bundled dictionaries
@@ -1214,10 +1232,10 @@ abstract class AppLocalizations {
   /// **'Dictionaries'**
   String get anumodanaDictionaries;
 
-  /// Settings > Anumodanā: where in the app the dictionaries are used
+  /// Settings > Anumodanā: one line saying what the dictionaries below are for, and why they are in this order
   ///
   /// In en, this message translates to:
-  /// **'Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.'**
+  /// **'The dictionaries used for word lookups, listed alphabetically.'**
   String get anumodanaDictionariesHint;
 
   /// Settings > Anumodanā: label above the dictionaries that translate Pali into Sinhala
@@ -1241,14 +1259,14 @@ abstract class AppLocalizations {
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
   ///
   /// In en, this message translates to:
-  /// **'Thanks'**
-  String get anumodanaThanks;
+  /// **'Those who contributed'**
+  String get anumodanaContributors;
 
-  /// Settings > Anumodanā: the general thanks. Placeholder wording, to be reviewed
+  /// Settings > Anumodanā: thanks to everyone who helped build the app, ending in an aspiration for them. The Sinhala is the original and the English follows it: the two gifts named are guidance and time, and wisdom is what is wished for them, not what they gave
   ///
   /// In en, this message translates to:
-  /// **'To everyone who gave their time, skill and advice to build this app.'**
-  String get anumodanaThanksBody;
+  /// **'To all who offered their guidance and time — may it help you grow in wisdom.'**
+  String get anumodanaContributorsBody;
 
   /// Settings > Anumodanā: section header above the font licence and the open-source licences
   ///

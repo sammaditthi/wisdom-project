@@ -38,7 +38,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layoutStacked => 'Stacked';
 
   @override
-  String get paliLanguageLabel => 'Pāli';
+  String get paliLanguageLabel => 'Pali';
 
   @override
   String get sinhalaLanguageLabel => 'සිංහල';
@@ -381,6 +381,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get researchEmptyState => 'Ask anything about the Pali Canon.';
 
   @override
+  String get researchPrivacyNote =>
+      'Answered by Google Gemini. Don\'t include anything private.';
+
+  @override
   String get researchInputHint => 'Ask a question about the suttas…';
 
   @override
@@ -597,14 +601,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDarkComingSoon => 'A dark theme is coming soon.';
 
   @override
-  String get appLanguageHint => 'Menus, buttons and messages.';
+  String get appLanguageHint => 'The language you\'d like to use the app in.';
 
   @override
   String get contentLanguageHint =>
-      'Names of books and suttas in the navigator, tabs, breadcrumbs and search.';
+      'The language book, chapter and sutta names are shown in.';
 
   @override
   String get paliLettersHint => 'How joined Pali letters are shown.';
+
+  @override
+  String get settingsPrivacy => 'Privacy';
+
+  @override
+  String get researchPrivacyDetail =>
+      'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.';
 
   @override
   String get anumodanaLineage => 'The Bhāṇaka lineage';
@@ -618,18 +629,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anumodanaTipitakaLkUse =>
-      'The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.';
+      'The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.';
 
   @override
   String get anumodanaSuttaCentralUse =>
-      'The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.';
+      'English translations and sutta numbering.\nCC0 1.0.';
 
   @override
   String get anumodanaDictionaries => 'Dictionaries';
 
   @override
   String get anumodanaDictionariesHint =>
-      'Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.';
+      'The dictionaries used for word lookups, listed alphabetically.';
 
   @override
   String get anumodanaDictGroupSinhala => 'Pali – Sinhala';
@@ -642,11 +653,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
 
   @override
-  String get anumodanaThanks => 'Thanks';
+  String get anumodanaContributors => 'Those who contributed';
 
   @override
-  String get anumodanaThanksBody =>
-      'To everyone who gave their time, skill and advice to build this app.';
+  String get anumodanaContributorsBody =>
+      'To all who offered their guidance and time — may it help you grow in wisdom.';
 
   @override
   String get anumodanaLicences => 'Licences';

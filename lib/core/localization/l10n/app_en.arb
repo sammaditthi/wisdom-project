@@ -51,7 +51,7 @@
     "description": "Label for stacked reader layout showing Pali and Sinhala in alternating paragraphs"
   },
 
-  "paliLanguageLabel": "Pāli",
+  "paliLanguageLabel": "Pali",
   "@paliLanguageLabel": {
     "description": "Label for Pali language"
   },
@@ -634,6 +634,11 @@
     "description": "Placeholder shown in the Q&A dialog before the first question is asked"
   },
 
+  "researchPrivacyNote": "Answered by Google Gemini. Don't include anything private.",
+  "@researchPrivacyNote": {
+    "description": "Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings"
+  },
+
   "researchInputHint": "Ask a question about the suttas…",
   "@researchInputHint": {
     "description": "Hint text inside the Q&A question input field"
@@ -929,17 +934,25 @@
   "@themeDarkComingSoon": {
     "description": "Settings > General: hint under the theme control explaining why the Dark option cannot be chosen yet"
   },
-  "appLanguageHint": "Menus, buttons and messages.",
+  "appLanguageHint": "The language you'd like to use the app in.",
   "@appLanguageHint": {
     "description": "Settings > General: one-line explanation of what the app-language control changes"
   },
-  "contentLanguageHint": "Names of books and suttas in the navigator, tabs, breadcrumbs and search.",
+  "contentLanguageHint": "The language book, chapter and sutta names are shown in.",
   "@contentLanguageHint": {
     "description": "Settings > General: one-line explanation of what the content-language control changes"
   },
   "paliLettersHint": "How joined Pali letters are shown.",
   "@paliLettersHint": {
     "description": "Settings > General: one-line explanation of the three Pali-letter switches"
+  },
+  "settingsPrivacy": "Privacy",
+  "@settingsPrivacy": {
+    "description": "Settings > General: section header above what Research sends to Google"
+  },
+  "researchPrivacyDetail": "Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don't type anything private.",
+  "@researchPrivacyDetail": {
+    "description": "Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products"
   },
 
   "anumodanaLineage": "The Bhāṇaka lineage",
@@ -954,21 +967,21 @@
   "@anumodanaTextSources": {
     "description": "Settings > Anumodanā: section header above the editions the app's text comes from"
   },
-  "anumodanaTipitakaLkUse": "The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.",
+  "anumodanaTipitakaLkUse": "The digital edition of the Buddha Jayanti Pali text, its Sinhala translation, and the aṭṭhakathā.\nPali text CC BY-ND 4.0.",
   "@anumodanaTipitakaLkUse": {
     "description": "Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā"
   },
-  "anumodanaSuttaCentralUse": "The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.",
+  "anumodanaSuttaCentralUse": "English translations and sutta numbering.\nCC0 1.0.",
   "@anumodanaSuttaCentralUse": {
-    "description": "Settings > Anumodanā: what SuttaCentral supplies, and its licence"
+    "description": "Settings > Anumodanā: the two things SuttaCentral supplies, and its licence. Named, not explained — a credit says what the source gives, as the tipitaka.lk row above it does, and leaves what we do with it to where it is used"
   },
   "anumodanaDictionaries": "Dictionaries",
   "@anumodanaDictionaries": {
     "description": "Settings > Anumodanā: section header above the bundled dictionaries"
   },
-  "anumodanaDictionariesHint": "Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.",
+  "anumodanaDictionariesHint": "The dictionaries used for word lookups, listed alphabetically.",
   "@anumodanaDictionariesHint": {
-    "description": "Settings > Anumodanā: where in the app the dictionaries are used"
+    "description": "Settings > Anumodanā: one line saying what the dictionaries below are for, and why they are in this order"
   },
   "anumodanaDictGroupSinhala": "Pali – Sinhala",
   "@anumodanaDictGroupSinhala": {
@@ -982,13 +995,13 @@
   "@anumodanaDpdLicence": {
     "description": "Settings > Anumodanā: the Digital Pali Dictionary's required citation and licence. Proper names and the version are not translated"
   },
-  "anumodanaThanks": "Thanks",
-  "@anumodanaThanks": {
+  "anumodanaContributors": "Those who contributed",
+  "@anumodanaContributors": {
     "description": "Settings > Anumodanā: section header above the thanks to everyone who helped build the app"
   },
-  "anumodanaThanksBody": "To everyone who gave their time, skill and advice to build this app.",
-  "@anumodanaThanksBody": {
-    "description": "Settings > Anumodanā: the general thanks. Placeholder wording, to be reviewed"
+  "anumodanaContributorsBody": "To all who offered their guidance and time — may it help you grow in wisdom.",
+  "@anumodanaContributorsBody": {
+    "description": "Settings > Anumodanā: thanks to everyone who helped build the app, ending in an aspiration for them. The Sinhala is the original and the English follows it: the two gifts named are guidance and time, and wisdom is what is wished for them, not what they gave"
   },
   "anumodanaLicences": "Licences",
   "@anumodanaLicences": {

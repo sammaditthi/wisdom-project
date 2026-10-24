@@ -146,6 +146,25 @@ class SettingsRow extends StatelessWidget {
   }
 }
 
+/// A paragraph inside a [SettingsSection] that is a statement rather than a
+/// labelled setting — a credit, or a notice.
+///
+/// Set in the section-hint style, so a statement never reads heavier than the
+/// labelled rows around it.
+class SettingsProse extends StatelessWidget {
+  const SettingsProse(this.text, {super.key});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 4),
+      child: Text(text, style: context.typography.menuSectionLabel),
+    );
+  }
+}
+
 /// A row's leading mark on the Anumodanā page: a rounded square carrying an
 /// icon or a dictionary's abbreviation, or a source's own logo on its own.
 class SettingsTile extends StatelessWidget {
