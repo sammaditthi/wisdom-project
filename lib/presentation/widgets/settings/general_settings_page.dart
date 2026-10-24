@@ -209,41 +209,31 @@ class _ContentLanguageSelector extends ConsumerWidget {
 
 /// A line of Pali that follows the three switches below it.
 ///
-/// The words are the worked example from
-/// `docs/done/language/pali-letter-settings-bandi-special-toggles.md`: between
-/// them they exercise all three switches. Not an ARB string — Pali reads the
-/// same under either App Language, so a key would put one identical line in
-/// both files.
+/// Dhammapada 88 — the shortest canonical line holding a cluster for every
+/// rule the switches drive, so all eight combinations render it differently.
+/// Not an ARB string: Pali reads the same under either App Language.
 class _PaliLettersSample extends ConsumerWidget {
   const _PaliLettersSample();
 
-  static const _sample = 'ධර්ම බුද්ධ ධම්ම චන්ද';
+  static const _sample = 'තත්රාභිරතිමිච්ඡෙය්ය හිත්වා කාමෙ අකිඤ්චනො';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colors = Theme.of(context).colorScheme;
-    final l10n = AppLocalizations.of(context);
     // The same transformer and the same options object the reading pane uses,
     // so the sample cannot drift from the text it is previewing.
     final options = ref.watch(paliLetterOptionsProvider);
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(l10n.settingsSample, style: context.typography.menuSectionLabel),
-          const SizedBox(height: 2),
-          Text(
-            beautifyPaliText(_sample, options),
-            style: context.textEntryTheme.paragraphStyle,
-          ),
-        ],
+      child: Text(
+        beautifyPaliText(_sample, options),
+        style: context.textEntryTheme.paragraphStyle,
       ),
     );
   }

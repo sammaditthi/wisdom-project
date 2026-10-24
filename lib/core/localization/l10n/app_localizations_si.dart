@@ -592,9 +592,6 @@ class AppLocalizationsSi extends AppLocalizations {
   String get settingsLanguage => 'භාෂාව';
 
   @override
-  String get settingsSample => 'නිදසුන';
-
-  @override
   String get themeDark => 'කාළ';
 
   @override
@@ -608,8 +605,7 @@ class AppLocalizationsSi extends AppLocalizations {
       'සංචාලකයේ, ටැබ්වල, මාර්ගයේ සහ සෙවුමේ පොත් හා සූත්‍ර නාම.';
 
   @override
-  String get paliLettersHint =>
-      'පාළි පෙළ ඇති සෑම තැනකම බැඳි අකුරු පෙනෙන ආකාරය.';
+  String get paliLettersHint => 'පාළි බැඳි අකුරු පෙන්වන ආකාරය.';
 
   @override
   String get anumodanaLineage => 'භාණක පරම්පරාව';

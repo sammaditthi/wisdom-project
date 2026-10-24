@@ -1148,12 +1148,6 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get settingsLanguage;
 
-  /// Settings > General: label above the line of Pali that previews the Pali-letter switches
-  ///
-  /// In en, this message translates to:
-  /// **'Sample'**
-  String get settingsSample;
-
   /// Settings > General: the dark option of the theme control
   ///
   /// In en, this message translates to:
@@ -1181,7 +1175,7 @@ abstract class AppLocalizations {
   /// Settings > General: one-line explanation of the three Pali-letter switches
   ///
   /// In en, this message translates to:
-  /// **'How joined letters look wherever Pali appears.'**
+  /// **'How joined Pali letters are shown.'**
   String get paliLettersHint;
 
   /// Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally

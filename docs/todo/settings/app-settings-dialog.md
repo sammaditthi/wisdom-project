@@ -136,12 +136,27 @@ key.
 
 ### Pali letters sample
 
-`ධර්ම බුද්ධ ධම්ම චන්ද`, from
-`docs/done/language/pali-letter-settings-bandi-special-toggles.md`, rendered
-through `beautifyPaliText` and `paliLetterOptionsProvider` — the same pair the
-reader uses. A `const` in the page, not an ARB key: Pali is Pali in both
-locales, so a key would put the identical string in both files. Defaults
-unchanged.
+`තත්රාභිරතිමිච්ඡෙය්ය හිත්වා කාමෙ අකිඤ්චනො` — Dhammapada 88 (`kn-dhp.json`
+p44), rendered through `beautifyPaliText` and `paliLetterOptionsProvider` — the
+same pair the reader uses. A `const` in the page, not an ARB key: Pali is Pali
+in both locales, so a key would put the identical string in both files.
+Defaults unchanged.
+
+No "Sample" label above it, and no italics. The tinted rounded card already
+reads as a preview, and the reader never slants Pali — the bundled Noto Serif
+Sinhala has no italic face, so Flutter would synthesise a skew and the line
+would stop matching the text it is previewing.
+
+Chosen over the old `ධර්ම බුද්ධ ධම්ම චන්ද` because that line left two of
+Switch 3's three rules unpreviewed and led with `ධර්ම`, which is Sinhala, not
+Pali. A corpus scan settled the rest: the sample needs one cluster from each of
+five classes — yansaya `්ය`, rakaransaya `්ර`, a common pair, an *active*
+special pair (`ඤ්ච ට්ඨ ද්ධ ද්ව` only), and anything else for touching. Three
+things can never be previewed and no sample should chase them: repaya does not
+occur in Pali, Switch 1's long→short vowel step has no triggers because the
+edition already uses short vowels, and `ක්ෂ` never appears. Keep `ඤ්ජ`, `ඤ්ඡ`
+and `ණ්ඩ` out — they are disabled for want of a font glyph, so they would make
+Switch 2 look broken.
 
 ### Anumodanā
 
@@ -253,7 +268,7 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
 - Tabs: `settingsGeneral`, `settingsAnumodana`.
 - General: `settingsAppearance`, `settingsLanguage`, `themeDark`,
   `themeDarkComingSoon`, `appLanguageHint`, `contentLanguageHint`,
-  `paliLettersHint`, `settingsSample`.
+  `paliLettersHint`.
 - Reader menu: `readerSettings`.
 - Anumodanā: its five section names, the three source descriptions, the
   dictionary hint, the two group labels, the two placeholder lines,

@@ -921,10 +921,6 @@
   "@settingsLanguage": {
     "description": "Settings > General: section header above the app- and content-language controls"
   },
-  "settingsSample": "Sample",
-  "@settingsSample": {
-    "description": "Settings > General: label above the line of Pali that previews the Pali-letter switches"
-  },
   "themeDark": "Dark",
   "@themeDark": {
     "description": "Settings > General: the dark option of the theme control"
@@ -941,7 +937,7 @@
   "@contentLanguageHint": {
     "description": "Settings > General: one-line explanation of what the content-language control changes"
   },
-  "paliLettersHint": "How joined letters look wherever Pali appears.",
+  "paliLettersHint": "How joined Pali letters are shown.",
   "@paliLettersHint": {
     "description": "Settings > General: one-line explanation of the three Pali-letter switches"
   },

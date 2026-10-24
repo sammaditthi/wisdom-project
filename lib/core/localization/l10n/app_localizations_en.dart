@@ -591,9 +591,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguage => 'Language';
 
   @override
-  String get settingsSample => 'Sample';
-
-  @override
   String get themeDark => 'Dark';
 
   @override
@@ -607,8 +604,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Names of books and suttas in the navigator, tabs, breadcrumbs and search.';
 
   @override
-  String get paliLettersHint =>
-      'How joined letters look wherever Pali appears.';
+  String get paliLettersHint => 'How joined Pali letters are shown.';
 
   @override
   String get anumodanaLineage => 'The Bhāṇaka lineage';
