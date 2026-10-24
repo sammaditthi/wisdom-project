@@ -337,6 +337,11 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   block three times. One helper in `widgets/common/` replaces all three; folded
   into the dialog-alignment pass above.
 - **Ctrl/Cmd+,** to open Settings when the rail is hidden (Decisions 7).
+- **The sizes Material fixes for us.** The segmented buttons, the phone app bar
+  and its tab bar are the only text in the dialog that does not follow the
+  font-size preference — they fall through to `ThemeData`'s own text theme.
+  App-wide, not a Settings bug:
+  `docs/todo/theme/material-defaults-ignore-the-font-scale.md`.
 
 ## Tests
 
