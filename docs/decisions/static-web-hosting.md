@@ -561,10 +561,12 @@ The SSG emits all of it as static files:
   the same thing, for the crawl-then-noindex reason spelled out in the next
   bullet: `X-Robots-Tag` is a response header, and a crawler told `Disallow`
   never fetches the response to read it. **The zone must not add to it**
-  (2026-10-05): Cloudflare's managed robots.txt prepends `Disallow: /` for named
-  AI crawlers (GPTBot, ClaudeBot, CCBot, Google-Extended…), and a named crawler
-  obeys its own group over `User-agent: *` — undoing the allow for exactly the
-  crawlers this site is for. Checked at release (`web-release.md`).
+  (2026-10-05): Cloudflare's managed robots.txt — since renamed Bot Preference
+  Sync — prepends `Disallow: /` for named AI crawlers (GPTBot, ClaudeBot, CCBot,
+  Google-Extended…) when Training is set to Block, and a named crawler obeys its
+  own group over `User-agent: *` — undoing the allow for exactly the crawlers
+  this site is for. The switch is off (checked 2026-10-25); still checked at
+  release (`web-release.md`).
 - **Keep the app out of the index — `noindex`, NOT `Disallow` (fixed 2026-07-23):**
   the app project sends `X-Robots-Tag: noindex` on every response, dev and
   prod alike (one rule in `web/_headers`: `/*` → `X-Robots-Tag: noindex`) and its `robots.txt`

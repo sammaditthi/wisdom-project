@@ -33,9 +33,12 @@ accounts**.
   2025 (new domains blocked them) and on 15 Sept 2026 (separate search, training
   and agent settings). The domain was registered between the two, so check AI
   Crawl Control: allow search *and* training — search is how assistants cite
-  the site, training is how models learn the text. If **managed robots.txt** is
-  on, turn it off: it puts `Disallow: /` for GPTBot, ClaudeBot, CCBot,
-  Google-Extended and others in front of the generated file.
+  the site, training is how models learn the text. The managed-`robots.txt`
+  switch, renamed **Bot Preference Sync**, is already off (checked 2026-10-25 —
+  [`things-to-consider-before-going-live.md`](../../general/things-to-consider-before-going-live.md));
+  leave it off, because with it on and Training set to Block it prepends
+  `Disallow: /` for GPTBot, ClaudeBot, CCBot and Google-Extended to the
+  generated file.
 - **`www` → apex**: a proxied `www` record and one permanent redirect rule.
   Nothing in the plan covers `www`, and people type it.
 

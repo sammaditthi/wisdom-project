@@ -6,7 +6,7 @@ import { cors } from 'hono/cors';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { EnvVars, loadConfig } from './config.js';
 import { parseRequest } from './contracts.js';
-import { classifyUpstream, MSG, ResearchError } from './errors.js';
+import { classifyUpstream, GeminiError, MSG, ResearchError } from './errors.js';
 import { answer } from './pipeline.js';
 import { cannedAnswer } from './stub.js';
 import { cpuMs } from './timing.js';
@@ -98,7 +98,15 @@ app.post('/research', async (c) => {
   } catch (e) {
     const err = e instanceof ResearchError ? e : classifyUpstream(e);
     if (!(e instanceof ResearchError)) {
-      console.error(`research[${reqId}] unhandled:`, e);
+      // Chosen scalars, never the error object: a provider error can carry the
+      // request — and so the question — on `cause` or an echoed payload.
+      const why =
+        e instanceof GeminiError
+          ? `${e.httpStatus} ${e.rpcStatus} ${e.message}`.trim()
+          : e instanceof Error
+            ? (e.stack ?? `${e.name}: ${e.message}`)
+            : String(e);
+      console.error(`research[${reqId}] unhandled: ${why}`);
     }
     console.log(
       `research[${reqId}] POST /research mode=${mode} ${err.status} ${err.code} ` +

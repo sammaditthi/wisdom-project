@@ -5,8 +5,9 @@ the ones deliberately accepted. Nothing here is a deploy procedure: the release
 itself is [`web-release.md`](../todo/web-strategy/web-release.md), and the
 version-and-tag mechanics are [`how-to-release.md`](./how-to-release.md).
 
-Swept 2026-10-22 against the tree and against the live hosts. Measurements are
-dated because they are measurements, not rules.
+Swept 2026-10-22 against the tree and against the live hosts, `robots.txt` and
+the research Worker's CORS re-checked 2026-10-25. Measurements are dated because
+they are measurements, not rules.
 
 ---
 
@@ -57,21 +58,7 @@ Hono's `cors()` answers `allowed[0]` on a miss (`app.ts`), so that fallback *is*
 the symptom. Research is CORS-blocked in the prod app until
 `scripts/research_server/deploy.sh --prod` runs.
 
-### 3. Cloudflare's managed robots.txt is answering at the apex
-
-`curl https://sammaditthi.net/robots.txt` → 200, `max-age=14400`, and it is
-Cloudflare's content-signals preamble with **no directives at all**: no
-`User-agent`, no `Allow`, and no `Sitemap:` line. Pages has no deployment yet,
-so that file is purely the zone's.
-
-The generated `robots.txt` exists for its `Sitemap:` line (`robots.dart`), and
-the zone will alter or shadow it. The signals it injects may also assert
-`ai-train=no`, the opposite of the decision in `web-release.md` to let AI
-crawlers in for both search and training. Dashboard, before the first `--prod`:
-AI Crawl Control → managed robots.txt off, or confirm its signals say what we
-want.
-
-### 4. HEAD carries no tag
+### 3. HEAD carries no tag
 
 The version system landed in `2db020c`, but `git tag -l` is empty. Every prod
 deploy calls `require_release_commit`, which refuses an untagged HEAD — and
@@ -98,6 +85,17 @@ then `git push --tags`.
 - **CORS allow-list.** Pinned to local, dev and prod web in
   `RESEARCH_CORS_ORIGINS` — exact origin match, no trailing slash. (Deploying
   it is blocker 2.)
+- **The apex `robots.txt` is ours — the zone is not touching it.** The
+  comment-only content-signals text live at `sammaditthi.net/robots.txt`
+  (checked 2026-10-25) is Cloudflare's free-plan placeholder for a domain with
+  no `robots.txt` of its own: legend comments, no `User-agent` line and no
+  `Content-Signal` values, so it asserts nothing and blocks no crawler. The
+  managed-`robots.txt` switch — renamed **Bot Preference Sync**, under Security
+  → Settings → filter Bot traffic → Configure AI bot policies — is **off**,
+  which is why there is no switch to find. Were it on, the managed block is
+  *prepended* to a 200 from the origin, so the generated `Sitemap:` line would
+  survive either way. Separate from all of that is AI Crawl Control's
+  *enforcement*, which only the dashboard shows — launch order 3.
 - **The research privacy notice.** Shipped with the Settings dialog
   (2026-10-24): a line on Research's empty state (`researchPrivacyNote`) and
   the full statement under Settings > General > Privacy
@@ -180,12 +178,13 @@ then `git push --tags`.
    side is done: Settings > Anumodanā names the sources, the dictionaries and
    their licences. The site footer is still open.
 2. The `unhandled:` log line.
-3. Dashboard: managed robots.txt off, AI Crawl Control allowing search and
-   training (blocker 3).
+3. Dashboard: AI Crawl Control with **Search and Training both Allow**. A
+   crawler user-agent gets a 200 today, which is consistent with that but does
+   not establish it, and nothing outside the account can read the setting.
 4. `scripts/release_all_dryrun.sh` — proves all six targets still build, and
    reports whether the vendored canon is stale.
 5. `dart run tools/release.dart finish`, then `git push && git push --tags`
-   (blocker 4).
+   (blocker 3).
 6. `scripts/research_server/deploy.sh --prod`, then re-run the preflight table
    in blocker 2.
 7. `scripts/static_site/deploy.sh --prod`, then `scripts/app/web/deploy.sh --prod`
