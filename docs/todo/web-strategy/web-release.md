@@ -63,7 +63,8 @@ All five are specified in [`static-site-backlog.md`](./static-site-backlog.md).
 ## 2. Verify the build
 
 **Lifted from the archived site plan §11**, which was the only live procedure in
-it. `deploy.sh` already enforces the automatic list; the rest is by hand.
+it. `deploy.sh` enforces the first list on every deploy; the second is run
+before a release, by the three tools below it.
 
 **Automatic, in `deploy.sh` — a release forbids `--root` and `--skip-build`
 both, so what ships is always the whole corpus and always checked:**
@@ -80,9 +81,25 @@ both, so what ships is always the whole corpus and always checked:**
   unclosed or misnested element and no `<head>` closed early ahead of its
   canonical (backlog C9). Runs on every deploy, partial builds included
 
-**By hand — run 2026-10-25** against two full `--root all` builds sent by `--out`
-to a scratch directory, so a deploy rebuilding `build/` at the time was never
-touched. Only item 5 is still owed, and only a browser can answer it.
+**Before a release — last run 2026-10-25.** Items 1 and 2 ran against two full
+`--root all` builds sent by `--out` to a scratch directory, so a deploy
+rebuilding `build/` at the time was never touched. Items 3–7 are now three
+tools, each failing on a finding, so a release re-runs them rather than
+trusting this list:
+
+```sh
+dart run static_site_generator/tool/check_in_browser.dart   # 3-6, in Chrome
+dart run static_site_generator/tool/check_no_js.dart        # 3, every page
+dart run static_site_generator/tool/check_unique_text.dart  # 7
+```
+
+`check_in_browser.dart` serves the build and drives headless Chrome itself, and
+asks the page through CDP's DOM and CSS domains rather than through injected
+script — the only way to see a page that has script execution switched off. It
+finds the page of each shape in the build instead of naming node keys, so an
+upstream re-sync cannot quietly narrow it to nothing: a shape it cannot find is
+a failure. Nothing calls the three yet; they are a release step, not a deploy
+gate.
 
 1. ✅ **Determinism — the hard one.** Two builds of the same input, same file
    count, `diff -r` silent: zero files differ. Cloudflare's upload dedup is
@@ -93,28 +110,44 @@ touched. Only item 5 is still owed, and only a browser can answer it.
    `.manifest.json`. Sitemap and search index untouched, so neither carries body
    text. The content file was reverted: term 2 of the canon licence forbids
    keeping a local modification.
-3. ✅ **JS off**, from the output rather than a browser: the text is in the HTML,
-   the one inline `<script>` sits after the last layout radio, `site.js` is
-   deferred, layout switching is four CSS radios, and `#search-open` carries the
-   `hidden` attribute — so the search button never appears, as this list always
-   said it wouldn't.
-4. ✅ **Webfont off** → the stacks fall back: `--font-reader` to Georgia,
-   `Iskoola Pota`, `serif`, and `--font-ui` to `Iskoola Pota`, Roboto,
-   `system-ui`, `sans-serif`. Windows gets Iskoola Pota and everything else a
-   Sinhala-capable system default. Whether it *reads* well is still a human
-   judgment.
-5. ⬜ **Back/Forward across `#anchors`** → the `:has(:target)` filter
-   re-evaluates. The rule is in `site.css`; that an engine re-evaluates it on
-   history navigation is the part no inspection of the output can establish.
-   Degradation is the whole chapter scrolled to the anchor, which is acceptable.
-6. ✅ **From several page shapes** — the leaf's breadcrumb climbs `/` → `sp` →
-   `kn` → `kn-khp`, the chapter's three links, and the container TOC and `/`
-   carry home. Every shape reaches home.
-7. ✅ **No text in two files.** The longest text run from each of six sampled
-   pages (leaf, chapter, commentary leaf, three random) resolves to exactly one
-   file. A phrase that recurs across suttas in the canon itself is not a hit —
-   the failure this guards against is a page's text appearing on its own
-   ancestor.
+3. ✅ **JS off**, with script execution disabled at the engine. Every shape —
+   leaf, chapter, container TOC, top TOC, `/` — renders its text and its links,
+   all four layouts switch by clicking the radio labels, and the breadcrumb and
+   the up button both navigate on a real mouse press. The search button never
+   appears, which is also the proof that nothing ran: `site.js` is the only
+   thing that unhides it. `check_no_js.dart` then carries the claim across
+   `FIGURES.realPages` — no inline handler, no `javascript:` URL, no
+   destination-less link, and no script but the inline layout restorer and the
+   deferred `site.js`.
+4. ✅ **Webfont off**, with every WOFF2 blocked at the network layer and the
+   cache off. The reader text falls to Sinhala MN and the UI to Sinhala Sangam
+   MN on macOS, nothing paints as tofu, and phone width falls back the same
+   way; Windows gets Iskoola Pota from the same stacks. One real degradation:
+   the system faces have no welded glyph for the Pali's touching consonants, so
+   the Pali column shows a visible hal where the bundled face welds. Readable,
+   and the Sinhala column is untouched — but it is what a reader loses while
+   the webfont is still arriving, and the reason `font-display` matters here.
+5. ✅ **Back/Forward across `#anchors`** → the `:has(:target)` filter
+   re-evaluates on every Back and every Forward, and the chapter bar and the
+   pager swap follow it. Checked in both engines: Chrome through real history
+   traversal, and WebKit (iOS 26.2 Safari) driven the same way through the
+   simulator, since `safaridriver` needs Safari's remote-automation switch
+   thrown by hand. Neither engine needed the degradation this item allowed for.
+   Only the Chrome half is in the tool; the WebKit half was a one-off.
+6. ✅ **From several page shapes** — at both widths, because the up button is a
+   phone control: above 31rem the stylesheet hides it and the breadcrumb is the
+   way up. Every crumb's page really links to the one below it (each fetched,
+   each 200), the up button is the parent, the deepest crumb is clickable, and
+   the climb reaches `/` from every shape. On `/` the emblem points at `/` as
+   it does everywhere; what the landing shape promises is that nothing sits
+   above it.
+7. ✅ **No text in two files.** The longest unbroken run of body text from pages
+   sampled by a fixed stride across the corpus, looked for in every other
+   output file. Two outcomes are not failures: the canon repeats stock formulas
+   across unrelated suttas, and that is the source's doing. What fails is a
+   phrase on a page *and* on an ancestor or descendant of it — a run printed
+   both whole and in pieces — or body text reaching the search index or the
+   sitemap.
 
 ---
 
