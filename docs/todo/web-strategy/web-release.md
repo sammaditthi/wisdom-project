@@ -98,8 +98,7 @@ asks the page through CDP's DOM and CSS domains rather than through injected
 script — the only way to see a page that has script execution switched off. It
 finds the page of each shape in the build instead of naming node keys, so an
 upstream re-sync cannot quietly narrow it to nothing: a shape it cannot find is
-a failure. Nothing calls the three yet; they are a release step, not a deploy
-gate.
+a failure. Nothing calls the three yet — wiring them in is §5's open item.
 
 1. ✅ **Determinism — the hard one.** Two builds of the same input, same file
    count, `diff -r` silent: zero files differ. Cloudflare's upload dedup is
@@ -214,7 +213,8 @@ don't re-derive it:
 - **`--quick` is the checkout-only half**; the corpus rows ride the release job,
   which checks the corpus out to generate the site anyway.
 - **The release job calls `deploy.sh --prod --yes`**, not a raw wrangler action —
-  every gate in §2 lives in that script.
+  every *automatic* gate in §2 lives in that script. The three tools under §2's
+  second list do not, yet; that is the open item below.
 - **Repo secrets use the names in `scripts/config/secrets.env`**, so a script
   reads the environment in CI and the file on a workstation.
 
@@ -226,6 +226,19 @@ don't re-derive it:
 
 The push/PR job is the half that catches the silent failures. Build it first,
 once the product scripts exist; it does not wait on the release job.
+
+**⬜ Open: wire §2's three tools in.** They exist and pass; nothing runs them,
+so the checks they replaced are still only as good as somebody remembering to
+type three commands. All three need a full `build/`, so none of them belongs in
+`--quick`:
+
+- `check_no_js.dart` and `check_unique_text.dart` are plain passes over the
+  output, like `check_links.dart` — they go in `deploy.sh` beside it, which
+  puts them in the release job for free.
+- `check_in_browser.dart` wants a Chrome on the runner, which nothing else here
+  needs, and a failure in it is a reason not to ship rather than a reason to
+  fail a push. Decide whether it earns a job of its own or stays the one step a
+  release runs by hand.
 
 ---
 
