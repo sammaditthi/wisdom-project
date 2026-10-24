@@ -1040,6 +1040,16 @@ chains each contain a single-leaf container the lone-child rule already removes,
 so the remaining win is under 42 pages. Weighed against dead breadcrumbs on 634
 leaves, the honest default is **don't**.
 
+## D5. Attribution on the site — asking tipitaka.lk
+
+**Opened 2026-10-24.** Upstream `LICENSE.md` is CC BY-ND 4.0, term 4 *"attribution
+should be given to tipitaka.lk"*, and the site carries none — the app's Anumodanā
+credit (`anumodanaTipitakaLkUse`) never reaches a reader who only ever lands on a
+sutta page. **To ask Path Nirvana (`path.nirvana@gmail.com`) whether that credit
+covers the site**, since they are the only ones who can settle it. If it does not:
+one `<footer>` line from `document_shell.dart`, source and licence linked, scoped
+to the Pali as term 1 requires.
+
 ---
 
 # Order to do them in
