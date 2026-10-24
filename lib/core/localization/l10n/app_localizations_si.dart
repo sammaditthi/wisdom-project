@@ -595,7 +595,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get settingsSample => 'නිදසුන';
 
   @override
-  String get themeDark => 'අඳුරු';
+  String get themeDark => 'කාළ';
 
   @override
   String get themeDarkComingSoon => 'අඳුරු තේමාව ඉදිරියේදී.';
@@ -637,7 +637,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get anumodanaDictionariesHint =>
-      'පාළි වචනයක් ස්පර්ශ කර අර්ථය බලන්න, නැතහොත් අර්ථ ටැබයෙන් සොයන්න.';
+      'පාළි වචනයක් ස්පර්ශ කර අර්ථය බලන්න, නැතහොත් අර්ථ ටැබයෙන් සොයන්න. අකාරාදී පිළිවෙළින් දක්වා ඇත.';
 
   @override
   String get anumodanaDictGroupSinhala => 'පාළි – සිංහල';
@@ -657,13 +657,13 @@ class AppLocalizationsSi extends AppLocalizations {
       'මෙම යෙදුම නිර්මාණය කිරීමට කාලය, කුසලතාව සහ උපදෙස් දුන් සැමට.';
 
   @override
-  String get anumodanaLicences => 'බලපත්‍ර සහ අනුවාදය';
+  String get anumodanaLicences => 'බලපත්‍ර';
 
   @override
   String get openSourceLicences => 'විවෘත මූලාශ්‍ර බලපත්‍ර';
 
   @override
-  String get openSourceLicencesHint => 'යෙදුම ගොඩනඟා ඇති පැකේජ';
+  String get settingsAbout => 'යෙදුම ගැන';
 
   @override
   String get versionLabel => 'අනුවාදය';

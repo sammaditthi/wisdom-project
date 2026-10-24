@@ -319,17 +319,17 @@ extension SearchTestHelpers on WidgetTester {
     // Turn requested-ON languages on first (re-reading state each time, since a
     // tap updates the flags synchronously).
     if (pali && !getSearchState().searchInPali) {
-      await _tapLanguageSegment('Pali');
+      await _tapLanguageSegment('Pāli');
     }
     if (sinhala && !getSearchState().searchInSinhala) {
-      await _tapLanguageSegment('Sinhala');
+      await _tapLanguageSegment('සිංහල');
     }
     // Then turn the others off.
     if (!pali && getSearchState().searchInPali) {
-      await _tapLanguageSegment('Pali');
+      await _tapLanguageSegment('Pāli');
     }
     if (!sinhala && getSearchState().searchInSinhala) {
-      await _tapLanguageSegment('Sinhala');
+      await _tapLanguageSegment('සිංහල');
     }
 
     await tap(find.text('Done'));

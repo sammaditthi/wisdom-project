@@ -25,8 +25,8 @@ tabs and its phone screens are in *Later*.
 
 | Tab | Holds |
 |---|---|
-| General | **Appearance:** Theme (Light \| Dark, Dark disabled — see Decisions 3). **Language:** App language (English \| සිංහල) and Content language (Pali \| Sinhala), each with a one-line hint. **Pali letters:** the three switches, under a sample line that follows them. |
-| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Bhāṇaka lineage, Text sources, Dictionaries, Thanks, Licences & version. Two placeholder sections — see *Anumodanā*. |
+| General | **Appearance:** Theme (two icons, Dark disabled — see Decisions 3). **Language:** App language (English \| සිංහල) and Content language (Pāli \| සිංහල), each with a one-line hint. **Pali letters:** the three switches, under a sample line that follows them. **About:** the version. |
+| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Text sources, Dictionaries, Thanks, Licences. One placeholder section — see *Anumodanā*. |
 
 ### Narrow windows
 
@@ -57,9 +57,11 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
    stay there as the way back when the rail is hidden.
 2. **Two tabs this release** (2026-10-23). Keyboard shortcuts and
    Transliteration are in *Later*; `SettingsTab` takes them without rework.
-3. **Theme shows Light and Dark; Dark is disabled** (2026-10-23), labelled as
-   coming soon. `AppThemeMode.dark` today is the old near-black `AppTheme.dark`,
-   not the warm dark in `docs/todo/theme/warm-dark-theme.md`, which is the next
+3. **Theme shows Light and Dark as icons; Dark is disabled** (2026-10-23),
+   labelled as coming soon. The names are tooltips, which is also what a
+   screen reader announces for a segment. `AppThemeMode.dark` today is the
+   old near-black `AppTheme.dark`, not the warm dark in
+   `docs/todo/theme/warm-dark-theme.md`, which is the next
    piece of work. Enabling it is deleting `enabled: false` and the hint.
 4. **Phones cannot reach Settings this release** (2026-10-23). The way in is a
    Settings item in the bottom navigation bar, which is a separate change
@@ -76,6 +78,16 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
 8. **Rail hidden on desktop.** Settings cannot be reached until the rail is
    shown again; the switch stays in the reader menu. Parked — a Ctrl/Cmd+,
    shortcut would cover it.
+9. **First review round** (2026-10-24). Theme is icons with tooltips; Sinhala
+   Dark is කාළ. Every `SegmentedButton` is a soft rectangle, from
+   `AppSegmentedButtonTheme` in all three themes — except the search Refine
+   dialog's language toggle, which keeps the pill it shares with the filter
+   chips beside it. Content language reads `Pāli | සිංහල`, self-labelled like
+   App language, from the two ARB keys the Refine dialog shares. The
+   Anumodanā tab icon is `Symbols.folded_hands`. Dictionaries are
+   alphabetical, and the hint says so. Open-source licences is demoted from a
+   row to a plain link rather than dropped: the MIT/BSD packages and the
+   bundled Noto faces (OFL) need their text readable somewhere in the app.
 
 ## How it is built
 
@@ -110,7 +122,7 @@ In `lib/presentation/widgets/settings/`:
 ### Reader menu (`settings_menu_button.dart`)
 
 - Theme, App language, Content language, Pali letters and `_VersionFootnote`
-  are removed. The version now lives on Anumodanā.
+  are removed. The version now lives on General, under *About*.
 - Icon `Icons.tune`; tooltip from a new `readerSettings` key.
 - Renamed `ReaderSettingsMenuButton`, moved to
   `widgets/reader/reader_settings_menu_button.dart`. One call site
@@ -133,16 +145,18 @@ unchanged.
 
 ### Anumodanā
 
-Five sections. Proper names, licence names and dictionary names are never
-translated.
+Four sections. Proper names, licence names and dictionary names are never
+translated. A fifth, භාණක පරම්පරාව — the reciters' lineage that carried the
+canon — is written and commented out in `anumodana_page.dart`, waiting on its
+wording; its two ARB keys stay. It returns as the first section, and Text
+sources gives `isFirst` back.
 
 | Section | Rows |
 |---|---|
-| භාණක පරම්පරාව | **Placeholder** — one line for the user to write. The reciters' lineage that carried the canon. |
 | Text sources | Buddha Jayanti Tripiṭaka · tipitaka.lk · SuttaCentral |
-| Dictionaries | A hint line, then the `DictionaryInfo.all` groups |
+| Dictionaries | A hint line, then the `DictionaryInfo.all` groups, alphabetical |
 | Thanks | **Placeholder** — one general line for everyone who helped build the app. |
-| Licences & version | Fonts · Open-source licences · Version |
+| Licences | Fonts, then Open-source licences as a plain link |
 
 Each source row says where it is used in the app and carries its licence.
 Checked against the upstream licence pages 2026-10-23:

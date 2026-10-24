@@ -38,10 +38,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get layoutStacked => 'Stacked';
 
   @override
-  String get paliLanguageLabel => 'Pali';
+  String get paliLanguageLabel => 'Pāli';
 
   @override
-  String get sinhalaLanguageLabel => 'Sinhala';
+  String get sinhalaLanguageLabel => 'සිංහල';
 
   @override
   String get loading => 'Loading...';
@@ -636,7 +636,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anumodanaDictionariesHint =>
-      'Tap a Pali word to look it up, or search under Definitions.';
+      'Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.';
 
   @override
   String get anumodanaDictGroupSinhala => 'Pali – Sinhala';
@@ -656,13 +656,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'To everyone who gave their time, skill and advice to build this app.';
 
   @override
-  String get anumodanaLicences => 'Licences & version';
+  String get anumodanaLicences => 'Licences';
 
   @override
   String get openSourceLicences => 'Open-source licences';
 
   @override
-  String get openSourceLicencesHint => 'The packages the app is built with';
+  String get settingsAbout => 'About';
 
   @override
   String get versionLabel => 'Version';

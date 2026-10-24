@@ -91,8 +91,8 @@ void main() {
 
     // Header is present (mirror of the "hidden when <2 languages" test below).
     expect(find.text('LANGUAGE'), findsOneWidget);
-    expect(find.text('Pali'), findsOneWidget);
-    expect(find.text('Sinhala'), findsOneWidget);
+    expect(find.text('Pāli'), findsOneWidget);
+    expect(find.text('සිංහල'), findsOneWidget);
     expect(
       readToggle(tester).selected,
       {ContentLanguage.pali, ContentLanguage.sinhala},
@@ -110,7 +110,7 @@ void main() {
     );
 
     // Tapping the (selected) Pali segment deselects it → only Sinhala remains.
-    await tester.tap(find.text('Pali'));
+    await tester.tap(find.text('Pāli'));
     await tester.pumpAndSettle();
 
     expect(notifier.languageCalls, isNotEmpty);
@@ -128,7 +128,7 @@ void main() {
       available: const [ContentLanguage.pali, ContentLanguage.sinhala],
     );
 
-    await tester.tap(find.text('Pali'), warnIfMissed: false);
+    await tester.tap(find.text('Pāli'), warnIfMissed: false);
     await tester.pumpAndSettle();
 
     expect(notifier.languageCalls, isEmpty);

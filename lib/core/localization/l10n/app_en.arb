@@ -51,12 +51,12 @@
     "description": "Label for stacked reader layout showing Pali and Sinhala in alternating paragraphs"
   },
 
-  "paliLanguageLabel": "Pali",
+  "paliLanguageLabel": "Pāli",
   "@paliLanguageLabel": {
     "description": "Label for Pali language"
   },
 
-  "sinhalaLanguageLabel": "Sinhala",
+  "sinhalaLanguageLabel": "සිංහල",
   "@sinhalaLanguageLabel": {
     "description": "Label for Sinhala language"
   },
@@ -974,7 +974,7 @@
   "@anumodanaDictionaries": {
     "description": "Settings > Anumodanā: section header above the bundled dictionaries"
   },
-  "anumodanaDictionariesHint": "Tap a Pali word to look it up, or search under Definitions.",
+  "anumodanaDictionariesHint": "Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.",
   "@anumodanaDictionariesHint": {
     "description": "Settings > Anumodanā: where in the app the dictionaries are used"
   },
@@ -998,21 +998,21 @@
   "@anumodanaThanksBody": {
     "description": "Settings > Anumodanā: the general thanks. Placeholder wording, to be reviewed"
   },
-  "anumodanaLicences": "Licences & version",
+  "anumodanaLicences": "Licences",
   "@anumodanaLicences": {
-    "description": "Settings > Anumodanā: section header above the font licence, the open-source licences and the version"
+    "description": "Settings > Anumodanā: section header above the font licence and the open-source licences"
   },
   "openSourceLicences": "Open-source licences",
   "@openSourceLicences": {
-    "description": "Settings > Anumodanā: row that opens Flutter's licence list"
+    "description": "Settings > Anumodanā: link that opens Flutter's licence list"
   },
-  "openSourceLicencesHint": "The packages the app is built with",
-  "@openSourceLicencesHint": {
-    "description": "Settings > Anumodanā: hint under the open-source licences row"
+  "settingsAbout": "About",
+  "@settingsAbout": {
+    "description": "Settings > General: section header above the version"
   },
   "versionLabel": "Version",
   "@versionLabel": {
-    "description": "Settings > Anumodanā: label of the row showing the running build. The number itself is not localized"
+    "description": "Settings > General: label of the row showing the running build. The number itself is not localized"
   },
   "openLinkTo": "Open {name}",
   "@openLinkTo": {

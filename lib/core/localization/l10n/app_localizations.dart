@@ -155,13 +155,13 @@ abstract class AppLocalizations {
   /// Label for Pali language
   ///
   /// In en, this message translates to:
-  /// **'Pali'**
+  /// **'Pāli'**
   String get paliLanguageLabel;
 
   /// Label for Sinhala language
   ///
   /// In en, this message translates to:
-  /// **'Sinhala'**
+  /// **'සිංහල'**
   String get sinhalaLanguageLabel;
 
   /// Loading indicator text
@@ -1229,7 +1229,7 @@ abstract class AppLocalizations {
   /// Settings > Anumodanā: where in the app the dictionaries are used
   ///
   /// In en, this message translates to:
-  /// **'Tap a Pali word to look it up, or search under Definitions.'**
+  /// **'Tap a Pali word to look it up, or search under Definitions. Listed alphabetically.'**
   String get anumodanaDictionariesHint;
 
   /// Settings > Anumodanā: label above the dictionaries that translate Pali into Sinhala
@@ -1262,25 +1262,25 @@ abstract class AppLocalizations {
   /// **'To everyone who gave their time, skill and advice to build this app.'**
   String get anumodanaThanksBody;
 
-  /// Settings > Anumodanā: section header above the font licence, the open-source licences and the version
+  /// Settings > Anumodanā: section header above the font licence and the open-source licences
   ///
   /// In en, this message translates to:
-  /// **'Licences & version'**
+  /// **'Licences'**
   String get anumodanaLicences;
 
-  /// Settings > Anumodanā: row that opens Flutter's licence list
+  /// Settings > Anumodanā: link that opens Flutter's licence list
   ///
   /// In en, this message translates to:
   /// **'Open-source licences'**
   String get openSourceLicences;
 
-  /// Settings > Anumodanā: hint under the open-source licences row
+  /// Settings > General: section header above the version
   ///
   /// In en, this message translates to:
-  /// **'The packages the app is built with'**
-  String get openSourceLicencesHint;
+  /// **'About'**
+  String get settingsAbout;
 
-  /// Settings > Anumodanā: label of the row showing the running build. The number itself is not localized
+  /// Settings > General: label of the row showing the running build. The number itself is not localized
   ///
   /// In en, this message translates to:
   /// **'Version'**

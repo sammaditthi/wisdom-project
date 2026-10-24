@@ -7,13 +7,14 @@ import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/text_entry_theme.dart';
 import '../../../core/theme/theme_notifier.dart';
+import '../../../core/version/app_version.gen.dart';
 import '../../../domain/entities/content/content_language.dart';
 import '../../providers/app_language_provider.dart';
 import '../../providers/content_language_provider.dart';
 import '../../providers/pali_letter_options_provider.dart';
 import 'settings_row.dart';
 
-/// Settings → General: appearance, language and Pali letters.
+/// Settings → General: appearance, language, Pali letters and the version.
 ///
 /// Everything here applies app-wide. The settings you change while reading
 /// (font size, hide navigation bar) stay in the reader's own menu.
@@ -70,6 +71,19 @@ class GeneralSettingsPage extends StatelessWidget {
             _PaliLettersSwitches(),
           ],
         ),
+        SettingsSection(
+          title: l10n.settingsAbout,
+          children: [
+            SettingsRow(
+              label: l10n.versionLabel,
+              trailing: Text(
+                AppVersion.display,
+                style: context.typography.menuSectionLabel,
+              ),
+              showDivider: false,
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -91,15 +105,17 @@ class _ThemeSelector extends ConsumerWidget {
 
     return SegmentedButton<AppThemeMode>(
       segments: [
+        // Icon only: two themes need no words. The name is the tooltip, which
+        // is also what a screen reader announces for the segment.
         ButtonSegment(
           value: AppThemeMode.light,
-          label: Text(l10n.themeLight),
           icon: const Icon(Icons.light_mode_outlined, size: 18),
+          tooltip: l10n.themeLight,
         ),
         ButtonSegment(
           value: AppThemeMode.dark,
-          label: Text(l10n.themeDark),
           icon: const Icon(Icons.dark_mode_outlined, size: 18),
+          tooltip: l10n.themeDark,
           enabled: false,
         ),
         // Carried over from the reader menu this selector came from:

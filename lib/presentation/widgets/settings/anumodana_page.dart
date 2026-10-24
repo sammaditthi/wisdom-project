@@ -36,13 +36,16 @@ class AnumodanaPage extends StatelessWidget {
         28,
       ),
       children: [
-        SettingsSection(
-          title: l10n.anumodanaLineage,
-          isFirst: true,
-          children: [_Prose(l10n.anumodanaLineageBody)],
-        ),
+        // Hidden until the wording is refined. When it comes back it is the
+        // first section again, and Text sources drops `isFirst`.
+        // SettingsSection(
+        //   title: l10n.anumodanaLineage,
+        //   isFirst: true,
+        //   children: [_Prose(l10n.anumodanaLineageBody)],
+        // ),
         SettingsSection(
           title: l10n.anumodanaTextSources,
+          isFirst: true,
           children: [
             SettingsRow(
               label: 'Buddha Jayanti Tripiṭaka',
@@ -89,45 +92,31 @@ class AnumodanaPage extends StatelessWidget {
         ),
         SettingsSection(
           title: l10n.anumodanaLicences,
-          children: [
-            const SettingsRow(
+          children: const [
+            SettingsRow(
               label: 'Noto Sans, Noto Serif, Noto Sans Sinhala, '
                   'Noto Serif Sinhala',
               hint: 'SIL Open Font License 1.1',
               leading: SettingsTile(icon: Icons.text_fields_outlined),
-            ),
-            SettingsRow(
-              label: l10n.openSourceLicences,
-              hint: l10n.openSourceLicencesHint,
-              leading: const SettingsTile(icon: Icons.code_outlined),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => showLicensePage(
-                context: context,
-                applicationName: l10n.appTitle,
-                applicationVersion: AppVersion.display,
-              ),
-            ),
-            SettingsRow(
-              label: l10n.versionLabel,
-              leading: const SettingsTile(icon: Icons.info_outline),
-              trailing: Text(
-                AppVersion.display,
-                style: context.typography.menuSectionLabel,
-              ),
               showDivider: false,
             ),
+            _OpenSourceLicencesLink(),
           ],
         ),
       ],
     );
   }
 
-  /// Every bundled dictionary that translates into [targetLanguage], in
-  /// `DictionaryInfo.all`'s display order.
+  /// Every bundled dictionary that translates into [targetLanguage], by name.
+  ///
+  /// Alphabetical, not `DictionaryInfo.all`'s order — that one ranks them for
+  /// the lookup sheet, and a ranking here would read as a recommendation.
   static List<DictionaryInfo> _dictionariesFor(String targetLanguage) => [
         for (final d in DictionaryInfo.all.values)
           if (d.targetLanguage == targetLanguage) d,
-      ];
+      ]..sort(
+          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+        );
 }
 
 /// One language group of dictionary rows, under a small label.
@@ -159,6 +148,38 @@ class _DictionaryGroup extends StatelessWidget {
             showDivider: d != dictionaries.last,
           ),
       ],
+    );
+  }
+}
+
+/// The open-source licence list, as a plain link under the font licence.
+///
+/// Not a row: the MIT/BSD packages and the bundled Noto fonts (OFL) need
+/// their text to be readable somewhere in the app, which `showLicensePage`
+/// does — but it is the least interesting thing on the page.
+class _OpenSourceLicencesLink extends StatelessWidget {
+  const _OpenSourceLicencesLink();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          textStyle: context.typography.menuSectionLabel,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        onPressed: () => showLicensePage(
+          context: context,
+          applicationName: l10n.appTitle,
+          applicationVersion: AppVersion.display,
+        ),
+        child: Text(l10n.openSourceLicences),
+      ),
     );
   }
 }

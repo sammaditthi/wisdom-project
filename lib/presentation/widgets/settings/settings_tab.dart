@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
 
@@ -9,7 +10,7 @@ import '../../../core/localization/l10n/app_localizations.dart';
 /// switch — which won't compile until it exists.
 enum SettingsTab {
   general(Icons.settings_outlined),
-  anumodana(Icons.volunteer_activism_outlined);
+  anumodana(Symbols.folded_hands);
 
   const SettingsTab(this.icon);
 
