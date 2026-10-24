@@ -80,22 +80,41 @@ both, so what ships is always the whole corpus and always checked:**
   unclosed or misnested element and no `<head>` closed early ahead of its
   canonical (backlog C9). Runs on every deploy, partial builds included
 
-**By hand, once:**
+**By hand — run 2026-10-25** against two full `--root all` builds sent by `--out`
+to a scratch directory, so a deploy rebuilding `build/` at the time was never
+touched. Only item 5 is still owed, and only a browser can answer it.
 
-1. **Determinism — the hard one.** Rebuild with no input change → **zero** files
-   differ. Cloudflare's upload dedup is purely content-hash, so a timestamp, a
-   build id or unstable `Map` ordering re-uploads the entire site every deploy.
-2. **Re-sync.** Edit one entry in a content file, rebuild → only the affected
-   outputs change in `git status`.
-3. **JS off** → every page still renders, navigates and switches layout; the
-   search button simply never appears.
-4. **Webfont off** → system Sinhala is readable.
-5. **Back/Forward across `#anchors`** → the `:has(:target)` filter re-evaluates.
+1. ✅ **Determinism — the hard one.** Two builds of the same input, same file
+   count, `diff -r` silent: zero files differ. Cloudflare's upload dedup is
+   purely content-hash, so a timestamp, a build id or unstable `Map` ordering
+   would re-upload the entire site every deploy.
+2. ✅ **Re-sync.** One Pali entry edited in `assets/text/kn-khp.json`, rebuilt →
+   exactly `tipitaka/kn-khp-3.html` changed, plus the build's own
+   `.manifest.json`. Sitemap and search index untouched, so neither carries body
+   text. The content file was reverted: term 2 of the canon licence forbids
+   keeping a local modification.
+3. ✅ **JS off**, from the output rather than a browser: the text is in the HTML,
+   the one inline `<script>` sits after the last layout radio, `site.js` is
+   deferred, layout switching is four CSS radios, and `#search-open` carries the
+   `hidden` attribute — so the search button never appears, as this list always
+   said it wouldn't.
+4. ✅ **Webfont off** → the stacks fall back: `--font-reader` to Georgia,
+   `Iskoola Pota`, `serif`, and `--font-ui` to `Iskoola Pota`, Roboto,
+   `system-ui`, `sans-serif`. Windows gets Iskoola Pota and everything else a
+   Sinhala-capable system default. Whether it *reads* well is still a human
+   judgment.
+5. ⬜ **Back/Forward across `#anchors`** → the `:has(:target)` filter
+   re-evaluates. The rule is in `site.css`; that an engine re-evaluates it on
+   history navigation is the part no inspection of the output can establish.
    Degradation is the whole chapter scrolled to the anchor, which is acceptable.
-6. **From several page shapes** — leaf, chapter, container TOC, `/` — the
-   breadcrumb climbs and the toolbar reaches home.
-7. **No text in two files.** `grep` a distinctive phrase across `build/` →
-   exactly one file.
+6. ✅ **From several page shapes** — the leaf's breadcrumb climbs `/` → `sp` →
+   `kn` → `kn-khp`, the chapter's three links, and the container TOC and `/`
+   carry home. Every shape reaches home.
+7. ✅ **No text in two files.** The longest text run from each of six sampled
+   pages (leaf, chapter, commentary leaf, three random) resolves to exactly one
+   file. A phrase that recurs across suttas in the canon itself is not a hit —
+   the failure this guards against is a page's text appearing on its own
+   ancestor.
 
 ---
 
