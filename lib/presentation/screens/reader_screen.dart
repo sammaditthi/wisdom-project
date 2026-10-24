@@ -5,7 +5,7 @@ import '../../core/utils/responsive_utils.dart';
 import '../widgets/navigation/tree_navigator_widget.dart';
 import '../widgets/reader/multi_pane_reader_widget.dart';
 import '../widgets/navigation/tab_bar_widget.dart';
-import '../widgets/app/settings_menu_button.dart';
+import '../widgets/reader/reader_settings_menu_button.dart';
 import '../widgets/search/search_bar.dart' as app;
 import '../widgets/search/search_results_panel.dart';
 import '../widgets/common/resizable_divider.dart';
@@ -185,7 +185,7 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
               ),
 
             // Settings menu
-            if (!isSearchMode) const SettingsMenuButton(),
+            if (!isSearchMode) const ReaderSettingsMenuButton(),
           ],
         ),
         body: Stack(

@@ -92,11 +92,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paliTouching => 'Touching letters';
 
   @override
-  String version(String version) {
-    return 'Version $version';
-  }
-
-  @override
   String get appLayout => 'App layout';
 
   @override
@@ -579,4 +574,101 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openAsWebPage => 'Open as web page';
+
+  @override
+  String get readerSettings => 'Reader settings';
+
+  @override
+  String get settingsGeneral => 'General';
+
+  @override
+  String get settingsAnumodana => 'Anumodanā';
+
+  @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsSample => 'Sample';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeDarkComingSoon => 'A dark theme is coming soon.';
+
+  @override
+  String get appLanguageHint => 'Menus, buttons and messages.';
+
+  @override
+  String get contentLanguageHint =>
+      'Names of books and suttas in the navigator, tabs, breadcrumbs and search.';
+
+  @override
+  String get paliLettersHint =>
+      'How joined letters look wherever Pali appears.';
+
+  @override
+  String get anumodanaLineage => 'The Bhāṇaka lineage';
+
+  @override
+  String get anumodanaLineageBody =>
+      'To the lineages of reciters who held the Tipiṭaka in memory and passed it on, generation by generation.';
+
+  @override
+  String get anumodanaTextSources => 'Text sources';
+
+  @override
+  String get anumodanaBjtUse => 'The Pali text and its Sinhala translation.';
+
+  @override
+  String get anumodanaTipitakaLkUse =>
+      'The digital edition the text and commentaries come from. Buddha Jayanti Pali text under CC BY-ND 4.0.';
+
+  @override
+  String get anumodanaSuttaCentralUse =>
+      'The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.';
+
+  @override
+  String get anumodanaDictionaries => 'Dictionaries';
+
+  @override
+  String get anumodanaDictionariesHint =>
+      'Tap a Pali word to look it up, or search under Definitions.';
+
+  @override
+  String get anumodanaDictGroupSinhala => 'Pali – Sinhala';
+
+  @override
+  String get anumodanaDictGroupEnglish => 'Pali – English';
+
+  @override
+  String get anumodanaDpdLicence =>
+      'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
+
+  @override
+  String get anumodanaThanks => 'Thanks';
+
+  @override
+  String get anumodanaThanksBody =>
+      'To everyone who gave their time, skill and advice to build this app.';
+
+  @override
+  String get anumodanaLicences => 'Licences & version';
+
+  @override
+  String get openSourceLicences => 'Open-source licences';
+
+  @override
+  String get openSourceLicencesHint => 'The packages the app is built with';
+
+  @override
+  String get versionLabel => 'Version';
+
+  @override
+  String openLinkTo(String name) {
+    return 'Open $name';
+  }
 }

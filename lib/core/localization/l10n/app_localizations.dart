@@ -260,12 +260,6 @@ abstract class AppLocalizations {
   /// **'Touching letters'**
   String get paliTouching;
 
-  /// Last row of the settings menu: the running build, e.g. "Version 1.0.0 (1)". Shown faint and disabled.
-  ///
-  /// In en, this message translates to:
-  /// **'Version {version}'**
-  String version(String version);
-
   /// Section header for the screen-layout switches in the settings menu (hide navigation bar)
   ///
   /// In en, this message translates to:
@@ -1123,6 +1117,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open as web page'**
   String get openAsWebPage;
+
+  /// Tooltip of the reader toolbar's sliders button, which holds only the settings you change while reading (font size, hide navigation bar)
+  ///
+  /// In en, this message translates to:
+  /// **'Reader settings'**
+  String get readerSettings;
+
+  /// Settings dialog: name of the tab holding appearance, language and Pali letters
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get settingsGeneral;
+
+  /// Settings dialog: name of the credits tab. Pali for rejoicing in another's merit; left untranslated in English
+  ///
+  /// In en, this message translates to:
+  /// **'Anumodanā'**
+  String get settingsAnumodana;
+
+  /// Settings > General: section header above the theme control
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// Settings > General: section header above the app- and content-language controls
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguage;
+
+  /// Settings > General: label above the line of Pali that previews the Pali-letter switches
+  ///
+  /// In en, this message translates to:
+  /// **'Sample'**
+  String get settingsSample;
+
+  /// Settings > General: the dark option of the theme control
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// Settings > General: hint under the theme control explaining why the Dark option cannot be chosen yet
+  ///
+  /// In en, this message translates to:
+  /// **'A dark theme is coming soon.'**
+  String get themeDarkComingSoon;
+
+  /// Settings > General: one-line explanation of what the app-language control changes
+  ///
+  /// In en, this message translates to:
+  /// **'Menus, buttons and messages.'**
+  String get appLanguageHint;
+
+  /// Settings > General: one-line explanation of what the content-language control changes
+  ///
+  /// In en, this message translates to:
+  /// **'Names of books and suttas in the navigator, tabs, breadcrumbs and search.'**
+  String get contentLanguageHint;
+
+  /// Settings > General: one-line explanation of the three Pali-letter switches
+  ///
+  /// In en, this message translates to:
+  /// **'How joined letters look wherever Pali appears.'**
+  String get paliLettersHint;
+
+  /// Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally
+  ///
+  /// In en, this message translates to:
+  /// **'The Bhāṇaka lineage'**
+  String get anumodanaLineage;
+
+  /// Settings > Anumodanā: the thanks to the reciters. Placeholder wording, to be reviewed
+  ///
+  /// In en, this message translates to:
+  /// **'To the lineages of reciters who held the Tipiṭaka in memory and passed it on, generation by generation.'**
+  String get anumodanaLineageBody;
+
+  /// Settings > Anumodanā: section header above the editions the app's text comes from
+  ///
+  /// In en, this message translates to:
+  /// **'Text sources'**
+  String get anumodanaTextSources;
+
+  /// Settings > Anumodanā: what the Buddha Jayanti Tripiṭaka edition supplies
+  ///
+  /// In en, this message translates to:
+  /// **'The Pali text and its Sinhala translation.'**
+  String get anumodanaBjtUse;
+
+  /// Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Pali text only
+  ///
+  /// In en, this message translates to:
+  /// **'The digital edition the text and commentaries come from. Buddha Jayanti Pali text under CC BY-ND 4.0.'**
+  String get anumodanaTipitakaLkUse;
+
+  /// Settings > Anumodanā: what SuttaCentral supplies, and its licence
+  ///
+  /// In en, this message translates to:
+  /// **'The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.'**
+  String get anumodanaSuttaCentralUse;
+
+  /// Settings > Anumodanā: section header above the bundled dictionaries
+  ///
+  /// In en, this message translates to:
+  /// **'Dictionaries'**
+  String get anumodanaDictionaries;
+
+  /// Settings > Anumodanā: where in the app the dictionaries are used
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a Pali word to look it up, or search under Definitions.'**
+  String get anumodanaDictionariesHint;
+
+  /// Settings > Anumodanā: label above the dictionaries that translate Pali into Sinhala
+  ///
+  /// In en, this message translates to:
+  /// **'Pali – Sinhala'**
+  String get anumodanaDictGroupSinhala;
+
+  /// Settings > Anumodanā: label above the dictionaries that translate Pali into English
+  ///
+  /// In en, this message translates to:
+  /// **'Pali – English'**
+  String get anumodanaDictGroupEnglish;
+
+  /// Settings > Anumodanā: the Digital Pali Dictionary's required citation and licence. Proper names and the version are not translated
+  ///
+  /// In en, this message translates to:
+  /// **'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.'**
+  String get anumodanaDpdLicence;
+
+  /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks'**
+  String get anumodanaThanks;
+
+  /// Settings > Anumodanā: the general thanks. Placeholder wording, to be reviewed
+  ///
+  /// In en, this message translates to:
+  /// **'To everyone who gave their time, skill and advice to build this app.'**
+  String get anumodanaThanksBody;
+
+  /// Settings > Anumodanā: section header above the font licence, the open-source licences and the version
+  ///
+  /// In en, this message translates to:
+  /// **'Licences & version'**
+  String get anumodanaLicences;
+
+  /// Settings > Anumodanā: row that opens Flutter's licence list
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licences'**
+  String get openSourceLicences;
+
+  /// Settings > Anumodanā: hint under the open-source licences row
+  ///
+  /// In en, this message translates to:
+  /// **'The packages the app is built with'**
+  String get openSourceLicencesHint;
+
+  /// Settings > Anumodanā: label of the row showing the running build. The number itself is not localized
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get versionLabel;
+
+  /// Accessible name of the button that opens a credited source's website
+  ///
+  /// In en, this message translates to:
+  /// **'Open {name}'**
+  String openLinkTo(String name);
 }
 
 class _AppLocalizationsDelegate

@@ -129,10 +129,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
   /// under a menu option
   final TextStyle menuSectionLabel;
 
-  /// Fainter than [menuSectionLabel]: a menu's closing aside, not a label for
-  /// anything below it. The settings menu's version row.
-  final TextStyle menuFootnote;
-
   /// The layout letter (P, S) in the reader toolbar and its Layout menu
   final TextStyle layoutGlyph;
 
@@ -179,7 +175,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
     required this.treeNodeLabelSelected,
     required this.dialogTitle,
     required this.menuSectionLabel,
-    required this.menuFootnote,
     required this.layoutGlyph,
     required this.searchHint,
     required this.searchInput,
@@ -360,10 +355,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
         height: AppFonts.uiLineHeight,
       ),
       menuSectionLabel: menuSectionLabel,
-      // The same style faded, so the two cannot drift apart.
-      menuFootnote: menuSectionLabel.copyWith(
-        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-      ),
       layoutGlyph: TextStyle(
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
@@ -456,7 +447,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
     TextStyle? treeNodeLabelSelected,
     TextStyle? dialogTitle,
     TextStyle? menuSectionLabel,
-    TextStyle? menuFootnote,
     TextStyle? layoutGlyph,
     TextStyle? searchHint,
     TextStyle? searchInput,
@@ -485,7 +475,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
           treeNodeLabelSelected ?? this.treeNodeLabelSelected,
       dialogTitle: dialogTitle ?? this.dialogTitle,
       menuSectionLabel: menuSectionLabel ?? this.menuSectionLabel,
-      menuFootnote: menuFootnote ?? this.menuFootnote,
       layoutGlyph: layoutGlyph ?? this.layoutGlyph,
       searchHint: searchHint ?? this.searchHint,
       searchInput: searchInput ?? this.searchInput,
@@ -526,7 +515,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
       dialogTitle: TextStyle.lerp(dialogTitle, other.dialogTitle, t)!,
       menuSectionLabel:
           TextStyle.lerp(menuSectionLabel, other.menuSectionLabel, t)!,
-      menuFootnote: TextStyle.lerp(menuFootnote, other.menuFootnote, t)!,
       layoutGlyph: TextStyle.lerp(layoutGlyph, other.layoutGlyph, t)!,
       searchHint: TextStyle.lerp(searchHint, other.searchHint, t)!,
       searchInput: TextStyle.lerp(searchInput, other.searchInput, t)!,

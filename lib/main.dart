@@ -1,5 +1,7 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, LicenseEntryWithLineBreaks, LicenseRegistry;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
@@ -36,7 +38,28 @@ void main() async {
   }
 }
 
+/// Adds the bundled Noto faces to Open-source licences.
+///
+/// Fonts declared in pubspec's `fonts:` carry no licence of their own, so
+/// without this the app's only typefaces are the one thing missing from its
+/// licence list.
+void _registerFontLicences() {
+  LicenseRegistry.addLicense(() async* {
+    yield LicenseEntryWithLineBreaks(
+      const [
+        'Noto Sans',
+        'Noto Serif',
+        'Noto Sans Sinhala',
+        'Noto Serif Sinhala'
+      ],
+      await rootBundle.loadString('assets/fonts/OFL.txt'),
+    );
+  });
+}
+
 Future<void> _start() async {
+  _registerFontLicences();
+
   // Web: Flutter's first frame takes over from #boot in web/index.html, which
   // shows the emblem. Start loading it now so it is more likely there by then:
   // the copy for this screen, the one the widget will ask for.

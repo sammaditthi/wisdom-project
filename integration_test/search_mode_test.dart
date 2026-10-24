@@ -32,7 +32,7 @@ import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/screens/reader_screen.dart';
 import 'package:the_wisdom_project/presentation/widgets/app/overlay_stack_sync.dart';
-import 'package:the_wisdom_project/presentation/widgets/app/settings_menu_button.dart';
+import 'package:the_wisdom_project/presentation/widgets/reader/reader_settings_menu_button.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/breadcrumb_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/recent_search_overlay.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_bar.dart'
@@ -243,7 +243,7 @@ void main() {
       expect(find.byType(BreadcrumbWidget), findsNothing);
       expect(menuButton, findsNothing,
           reason: '2. search mode has no menu button');
-      expect(find.byType(SettingsMenuButton), findsNothing,
+      expect(find.byType(ReaderSettingsMenuButton), findsNothing,
           reason: '2. nor a settings button');
       expect(backArrow, findsOneWidget);
       expect(fieldHasFocus(), isTrue, reason: '2. typing can start at once');

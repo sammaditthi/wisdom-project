@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:the_wisdom_project/presentation/widgets/app/settings_menu_button.dart';
+import 'package:the_wisdom_project/presentation/widgets/reader/reader_settings_menu_button.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
 import 'package:the_wisdom_project/domain/entities/content/content_language.dart';
 import 'package:the_wisdom_project/domain/entities/content/edition.dart';
@@ -14,10 +14,10 @@ import '../../helpers/fake_key_value_store.dart';
 import '../../helpers/pump_app.dart';
 
 void main() {
-  group('SettingsMenuButton', () {
+  group('ReaderSettingsMenuButton', () {
     testWidgets('should render complete settings menu structure',
         (tester) async {
-      await tester.pumpApp(const SettingsMenuButton());
+      await tester.pumpApp(const ReaderSettingsMenuButton());
 
       // Initially menu is closed
       expect(find.byType(PopupMenuItem), findsNothing);
@@ -68,7 +68,7 @@ void main() {
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             home: Scaffold(
-              body: SettingsMenuButton(),
+              body: ReaderSettingsMenuButton(),
             ),
           ),
         ),
@@ -123,7 +123,7 @@ void main() {
           child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            home: Scaffold(body: SettingsMenuButton()),
+            home: Scaffold(body: ReaderSettingsMenuButton()),
           ),
         ),
       );
@@ -163,7 +163,7 @@ void main() {
               locale: locale,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              home: const Scaffold(body: SettingsMenuButton()),
+              home: const Scaffold(body: ReaderSettingsMenuButton()),
             ),
           ),
         );

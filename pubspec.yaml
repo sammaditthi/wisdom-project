@@ -138,6 +138,9 @@ flutter:
     # it stays out of the app (assets/icons/make_icons.sh). Flutter brings its
     # 2.0x/, 3.0x/ and 4.0x/ copies along by itself.
     - assets/icons/emblem.webp
+    # The bundled Noto faces' licence. Read at startup and handed to
+    # LicenseRegistry (main.dart) so they appear in Open-source licences.
+    - assets/fonts/OFL.txt
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

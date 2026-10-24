@@ -92,11 +92,6 @@ class AppLocalizationsSi extends AppLocalizations {
   String get paliTouching => 'පාළි බැඳි අකුරු';
 
   @override
-  String version(String version) {
-    return 'අනුවාදය $version';
-  }
-
-  @override
   String get appLayout => 'යෙදුම';
 
   @override
@@ -580,4 +575,101 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get openAsWebPage => 'වෙබ් පිටුවක් ලෙස විවෘත කරන්න';
+
+  @override
+  String get readerSettings => 'කියවීම් සැකසුම්';
+
+  @override
+  String get settingsGeneral => 'සාමාන්‍ය';
+
+  @override
+  String get settingsAnumodana => 'පුණ්‍යානුමෝදනා';
+
+  @override
+  String get settingsAppearance => 'පෙනුම';
+
+  @override
+  String get settingsLanguage => 'භාෂාව';
+
+  @override
+  String get settingsSample => 'නිදසුන';
+
+  @override
+  String get themeDark => 'අඳුරු';
+
+  @override
+  String get themeDarkComingSoon => 'අඳුරු තේමාව ඉදිරියේදී.';
+
+  @override
+  String get appLanguageHint => 'මෙනු, බොත්තම් සහ පණිවිඩ.';
+
+  @override
+  String get contentLanguageHint =>
+      'සංචාලකයේ, ටැබ්වල, මාර්ගයේ සහ සෙවුමේ පොත් හා සූත්‍ර නාම.';
+
+  @override
+  String get paliLettersHint =>
+      'පාළි පෙළ ඇති සෑම තැනකම බැඳි අකුරු පෙනෙන ආකාරය.';
+
+  @override
+  String get anumodanaLineage => 'භාණක පරම්පරාව';
+
+  @override
+  String get anumodanaLineageBody =>
+      'ත්‍රිපිටකය කටපාඩමින් දරාගෙන පරපුරෙන් පරපුරට පවත්වාගෙන ආ භාණක පරම්පරාවට.';
+
+  @override
+  String get anumodanaTextSources => 'මූලාශ්‍ර';
+
+  @override
+  String get anumodanaBjtUse => 'පාළි පාඨය සහ එහි සිංහල පරිවර්තනය.';
+
+  @override
+  String get anumodanaTipitakaLkUse =>
+      'යෙදුමේ පෙළ සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය. බුද්ධ ජයන්ති පාළි පාඨය CC BY-ND 4.0 යටතේ.';
+
+  @override
+  String get anumodanaSuttaCentralUse =>
+      'ගවේෂණය උපුටා දක්වන ඉංග්‍රීසි පරිවර්තන සහ සෙවුම හඳුනන සූත්‍ර අංක. CC0 1.0.';
+
+  @override
+  String get anumodanaDictionaries => 'ශබ්දකෝෂ';
+
+  @override
+  String get anumodanaDictionariesHint =>
+      'පාළි වචනයක් ස්පර්ශ කර අර්ථය බලන්න, නැතහොත් අර්ථ ටැබයෙන් සොයන්න.';
+
+  @override
+  String get anumodanaDictGroupSinhala => 'පාළි – සිංහල';
+
+  @override
+  String get anumodanaDictGroupEnglish => 'පාළි – ඉංග්‍රීසි';
+
+  @override
+  String get anumodanaDpdLicence =>
+      'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
+
+  @override
+  String get anumodanaThanks => 'ස්තූතිය';
+
+  @override
+  String get anumodanaThanksBody =>
+      'මෙම යෙදුම නිර්මාණය කිරීමට කාලය, කුසලතාව සහ උපදෙස් දුන් සැමට.';
+
+  @override
+  String get anumodanaLicences => 'බලපත්‍ර සහ අනුවාදය';
+
+  @override
+  String get openSourceLicences => 'විවෘත මූලාශ්‍ර බලපත්‍ර';
+
+  @override
+  String get openSourceLicencesHint => 'යෙදුම ගොඩනඟා ඇති පැකේජ';
+
+  @override
+  String get versionLabel => 'අනුවාදය';
+
+  @override
+  String openLinkTo(String name) {
+    return '$name විවෘත කරන්න';
+  }
 }

@@ -55,8 +55,6 @@
 
   "paliTouching": "පාළි බැඳි අකුරු",
 
-  "version": "අනුවාදය {version}",
-
   "appLayout": "යෙදුම",
 
   "hideNavigationBar": "පැති තීරුව සඟවන්න",
@@ -337,5 +335,37 @@
   "moreOptions": "තවත් විකල්ප",
 
   "share": "බෙදාගන්න",
-  "openAsWebPage": "වෙබ් පිටුවක් ලෙස විවෘත කරන්න"
+  "openAsWebPage": "වෙබ් පිටුවක් ලෙස විවෘත කරන්න",
+
+  "readerSettings": "කියවීම් සැකසුම්",
+
+  "settingsGeneral": "සාමාන්‍ය",
+  "settingsAnumodana": "පුණ්‍යානුමෝදනා",
+  "settingsAppearance": "පෙනුම",
+  "settingsLanguage": "භාෂාව",
+  "settingsSample": "නිදසුන",
+  "themeDark": "අඳුරු",
+  "themeDarkComingSoon": "අඳුරු තේමාව ඉදිරියේදී.",
+  "appLanguageHint": "මෙනු, බොත්තම් සහ පණිවිඩ.",
+  "contentLanguageHint": "සංචාලකයේ, ටැබ්වල, මාර්ගයේ සහ සෙවුමේ පොත් හා සූත්‍ර නාම.",
+  "paliLettersHint": "පාළි පෙළ ඇති සෑම තැනකම බැඳි අකුරු පෙනෙන ආකාරය.",
+
+  "anumodanaLineage": "භාණක පරම්පරාව",
+  "anumodanaLineageBody": "ත්‍රිපිටකය කටපාඩමින් දරාගෙන පරපුරෙන් පරපුරට පවත්වාගෙන ආ භාණක පරම්පරාවට.",
+  "anumodanaTextSources": "මූලාශ්‍ර",
+  "anumodanaBjtUse": "පාළි පාඨය සහ එහි සිංහල පරිවර්තනය.",
+  "anumodanaTipitakaLkUse": "යෙදුමේ පෙළ සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය. බුද්ධ ජයන්ති පාළි පාඨය CC BY-ND 4.0 යටතේ.",
+  "anumodanaSuttaCentralUse": "ගවේෂණය උපුටා දක්වන ඉංග්‍රීසි පරිවර්තන සහ සෙවුම හඳුනන සූත්‍ර අංක. CC0 1.0.",
+  "anumodanaDictionaries": "ශබ්දකෝෂ",
+  "anumodanaDictionariesHint": "පාළි වචනයක් ස්පර්ශ කර අර්ථය බලන්න, නැතහොත් අර්ථ ටැබයෙන් සොයන්න.",
+  "anumodanaDictGroupSinhala": "පාළි – සිංහල",
+  "anumodanaDictGroupEnglish": "පාළි – ඉංග්‍රීසි",
+  "anumodanaDpdLicence": "Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.",
+  "anumodanaThanks": "ස්තූතිය",
+  "anumodanaThanksBody": "මෙම යෙදුම නිර්මාණය කිරීමට කාලය, කුසලතාව සහ උපදෙස් දුන් සැමට.",
+  "anumodanaLicences": "බලපත්‍ර සහ අනුවාදය",
+  "openSourceLicences": "විවෘත මූලාශ්‍ර බලපත්‍ර",
+  "openSourceLicencesHint": "යෙදුම ගොඩනඟා ඇති පැකේජ",
+  "versionLabel": "අනුවාදය",
+  "openLinkTo": "{name} විවෘත කරන්න"
 }
