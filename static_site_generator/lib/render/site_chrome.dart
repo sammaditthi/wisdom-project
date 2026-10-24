@@ -159,9 +159,14 @@ String breadcrumb({
 /// 172px of room on a 390px screen — the window less 218px of pinned controls,
 /// which is three layout buttons and not four, side-by-side being
 /// `display: none` below 48rem. What fits in 172px is the emblem and the page's
-/// own name and nothing else. So below 30rem the stylesheet collapses every
-/// ancestor and the parent link goes with them. This anchor is pinned and never
-/// shrinks, which is what keeps the one step a reader always wants on screen.
+/// own name and nothing else. So at and below 31rem the stylesheet collapses
+/// every ancestor and the parent link goes with them. This anchor is pinned and
+/// never shrinks, which is what keeps the one step a reader always wants on
+/// screen.
+///
+/// Rendered on every page with a parent and hidden by width, not branched here:
+/// above 31rem the nearest ancestor is a breadcrumb link, so showing both would
+/// point two controls at one node.
 ///
 /// The app ships no equivalent because it has the navigator tree; P3.5 withdrew
 /// this site's, and nothing took over the job of climbing one level.

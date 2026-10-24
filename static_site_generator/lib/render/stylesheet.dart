@@ -1005,6 +1005,16 @@ void _writeToolbarNav(StringBuffer css) {
   // without this the search button shows for every reader with JS off — the
   // dead control C8 forbids.
   css.writeln('.search-trigger[hidden] { display: none; }');
+  // `.up` only where the trail no longer carries the parent: above
+  // [_trailKeepNone] the nearest ancestor is still a live breadcrumb segment.
+  // `not all and` is the exact complement of the ladder's last step, from the
+  // same constant — `min-width` would match at 31rem too, leaving one width
+  // with neither the parent segment nor the button. The two steps above still
+  // count this 36px, so above 31rem they fire ~46.8px early, which is a step
+  // arriving sooner than needed and nothing a reader can see.
+  css.writeln('@media not all and (max-width: $_trailKeepNone) {');
+  css.writeln('  .up { display: none; }');
+  css.writeln('}');
   css.writeln();
 }
 
