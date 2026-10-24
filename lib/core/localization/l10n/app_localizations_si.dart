@@ -622,11 +622,8 @@ class AppLocalizationsSi extends AppLocalizations {
   String get anumodanaTextSources => 'මූලාශ්‍ර';
 
   @override
-  String get anumodanaBjtUse => 'පාළි පාඨය සහ එහි සිංහල පරිවර්තනය.';
-
-  @override
   String get anumodanaTipitakaLkUse =>
-      'යෙදුමේ පෙළ සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය. බුද්ධ ජයන්ති පාළි පාඨය CC BY-ND 4.0 යටතේ.';
+      'බුද්ධ ජයන්ති පාළි පාඨය, එහි සිංහල පරිවර්තනය සහ අට්ඨකථා ලබාගත් ඩිජිටල් සංස්කරණය. පාළි පාඨය CC BY-ND 4.0 යටතේ.';
 
   @override
   String get anumodanaSuttaCentralUse =>

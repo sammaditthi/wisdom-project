@@ -138,6 +138,10 @@ flutter:
     # it stays out of the app (assets/icons/make_icons.sh). Flutter brings its
     # 2.0x/, 3.0x/ and 4.0x/ copies along by itself.
     - assets/icons/emblem.webp
+    # The credited sources' own logos, for the Anumodanā rows. Same by-name
+    # listing as the emblem, so Flutter picks up 2.0x/ and 3.0x/ itself.
+    - assets/icons/sources/tipitaka_lk.webp
+    - assets/icons/sources/suttacentral.webp
     # The bundled Noto faces' licence. Read at startup and handed to
     # LicenseRegistry (main.dart) so they appear in Open-source licences.
     - assets/fonts/OFL.txt

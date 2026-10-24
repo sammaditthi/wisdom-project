@@ -621,11 +621,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get anumodanaTextSources => 'Text sources';
 
   @override
-  String get anumodanaBjtUse => 'The Pali text and its Sinhala translation.';
-
-  @override
   String get anumodanaTipitakaLkUse =>
-      'The digital edition the text and commentaries come from. Buddha Jayanti Pali text under CC BY-ND 4.0.';
+      'The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.';
 
   @override
   String get anumodanaSuttaCentralUse =>

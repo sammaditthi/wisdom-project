@@ -16,11 +16,13 @@ import 'settings_row.dart';
 class AnumodanaPage extends StatelessWidget {
   const AnumodanaPage({super.key});
 
-  /// The Buddha Jayanti Tripiṭaka is a printed edition; it has no site of its
-  /// own, so its row carries no link.
   static const _tipitakaLkUrl = 'https://tipitaka.lk';
   static const _suttaCentralUrl = 'https://suttacentral.net';
   static const _dpdUrl = 'https://www.dpdict.net';
+
+  /// Each source's own logo, unmodified — see the plan doc for provenance.
+  static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
+  static const _suttaCentralLogo = 'assets/icons/sources/suttacentral.webp';
 
   /// The one dictionary whose licence asks to be cited where it is used.
   static const _dpdId = 'DPD';
@@ -48,14 +50,9 @@ class AnumodanaPage extends StatelessWidget {
           isFirst: true,
           children: [
             SettingsRow(
-              label: 'Buddha Jayanti Tripiṭaka',
-              hint: l10n.anumodanaBjtUse,
-              leading: const SettingsTile(icon: Icons.menu_book_outlined),
-            ),
-            SettingsRow(
               label: 'tipitaka.lk',
               hint: l10n.anumodanaTipitakaLkUse,
-              leading: const SettingsTile(icon: Icons.language_outlined),
+              leading: const SettingsTile(imageAsset: _tipitakaLkLogo),
               trailing: const _OpenLinkButton(
                 name: 'tipitaka.lk',
                 url: _tipitakaLkUrl,
@@ -64,7 +61,7 @@ class AnumodanaPage extends StatelessWidget {
             SettingsRow(
               label: 'SuttaCentral',
               hint: l10n.anumodanaSuttaCentralUse,
-              leading: const SettingsTile(icon: Icons.translate_outlined),
+              leading: const SettingsTile(imageAsset: _suttaCentralLogo),
               trailing: const _OpenLinkButton(
                 name: 'SuttaCentral',
                 url: _suttaCentralUrl,

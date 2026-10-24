@@ -146,21 +146,45 @@ class SettingsRow extends StatelessWidget {
   }
 }
 
-/// The rounded square that carries a row's icon or a dictionary's
-/// abbreviation on the Anumodanā page.
+/// A row's leading mark on the Anumodanā page: a rounded square carrying an
+/// icon or a dictionary's abbreviation, or a source's own logo on its own.
 class SettingsTile extends StatelessWidget {
-  const SettingsTile({super.key, this.icon, this.text})
-      : assert(icon != null || text != null, 'a tile needs an icon or text');
+  const SettingsTile({super.key, this.icon, this.text, this.imageAsset})
+      : assert(
+          icon != null || text != null || imageAsset != null,
+          'a tile needs an icon, text or an image',
+        );
 
   final IconData? icon;
   final String? text;
 
+  /// A credited source's own logo, drawn unrecoloured and without a tile.
+  final String? imageAsset;
+
+  static const _size = 36.0;
+
   @override
   Widget build(BuildContext context) {
+    final imageAsset = this.imageAsset;
+
+    // A logo carries its own shape and colour, so it stands on the page
+    // rather than in a tile — and takes no theme colours, which is why it is
+    // drawn before `Theme.of` is read. It fills the square the tiles occupy:
+    // at anything smaller the lettering inside it turns to noise. The row
+    // already names the source, so the image itself is decorative.
+    if (imageAsset != null) {
+      return Image.asset(
+        imageAsset,
+        width: _size,
+        height: _size,
+        excludeFromSemantics: true,
+      );
+    }
+
     final colors = Theme.of(context).colorScheme;
     return Container(
-      width: 36,
-      height: 36,
+      width: _size,
+      height: _size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: colors.surfaceContainer,

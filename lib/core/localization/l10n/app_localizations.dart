@@ -1202,16 +1202,10 @@ abstract class AppLocalizations {
   /// **'Text sources'**
   String get anumodanaTextSources;
 
-  /// Settings > Anumodanā: what the Buddha Jayanti Tripiṭaka edition supplies
+  /// Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā
   ///
   /// In en, this message translates to:
-  /// **'The Pali text and its Sinhala translation.'**
-  String get anumodanaBjtUse;
-
-  /// Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Pali text only
-  ///
-  /// In en, this message translates to:
-  /// **'The digital edition the text and commentaries come from. Buddha Jayanti Pali text under CC BY-ND 4.0.'**
+  /// **'The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.'**
   String get anumodanaTipitakaLkUse;
 
   /// Settings > Anumodanā: what SuttaCentral supplies, and its licence

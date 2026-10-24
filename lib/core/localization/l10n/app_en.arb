@@ -958,13 +958,9 @@
   "@anumodanaTextSources": {
     "description": "Settings > Anumodanā: section header above the editions the app's text comes from"
   },
-  "anumodanaBjtUse": "The Pali text and its Sinhala translation.",
-  "@anumodanaBjtUse": {
-    "description": "Settings > Anumodanā: what the Buddha Jayanti Tripiṭaka edition supplies"
-  },
-  "anumodanaTipitakaLkUse": "The digital edition the text and commentaries come from. Buddha Jayanti Pali text under CC BY-ND 4.0.",
+  "anumodanaTipitakaLkUse": "The digital edition of the Buddha Jayanti Pali text and its Sinhala translation, and the aṭṭhakathā. Pali text CC BY-ND 4.0.",
   "@anumodanaTipitakaLkUse": {
-    "description": "Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Pali text only"
+    "description": "Settings > Anumodanā: what tipitaka.lk supplies, and its licence. The licence covers the Buddha Jayanti Pali text only, not the Sinhala translation or the aṭṭhakathā"
   },
   "anumodanaSuttaCentralUse": "The English translations Research quotes, and the sutta numbers search understands. CC0 1.0.",
   "@anumodanaSuttaCentralUse": {

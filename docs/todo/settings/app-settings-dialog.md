@@ -153,7 +153,7 @@ sources gives `isFirst` back.
 
 | Section | Rows |
 |---|---|
-| Text sources | Buddha Jayanti Tripiṭaka · tipitaka.lk · SuttaCentral |
+| Text sources | tipitaka.lk · SuttaCentral, each with its own logo |
 | Dictionaries | A hint line, then the `DictionaryInfo.all` groups, alphabetical |
 | Thanks | **Placeholder** — one general line for everyone who helped build the app. |
 | Licences | Fonts, then Open-source licences as a plain link |
@@ -163,9 +163,15 @@ Checked against the upstream licence pages 2026-10-23:
 
 - **tipitaka.lk** — [CC BY-ND 4.0](https://github.com/pathnirvana/tipitaka.lk?tab=License-1-ov-file).
   Term 4 is *"Attribution should be given to tipitaka.lk"*, and term 1 scopes
-  the licence to *"the Buddha Jayanthi Pali text"* — so the row names the Pali
-  text, not the Sinhala translation or the aṭṭhakathā, whose terms are still
-  unanswered (`docs/general/things-to-consider-before-going-live.md`, blocker 1).
+  the licence to *"the Buddha Jayanthi Pali text"* — so the row's licence
+  sentence names the Pali text only, not the Sinhala translation or the
+  aṭṭhakathā, whose terms are still unanswered
+  (`docs/general/things-to-consider-before-going-live.md`, blocker 1).
+  There is no separate Buddha Jayanti Tripiṭaka row: `sync-regen.sh` takes
+  every byte of canon text from this one repo, the licence obliges us to the
+  site rather than the edition, and a row with no link and no licence read as
+  an empty one. The edition is credited in this row's own sentence instead,
+  which is why it names the translation as well as the Pali.
 - **SuttaCentral** — CC0 1.0. `bilara-data` requires every supported
   translation to be CC0. Used by Research, and by the `sc-to-bjt` concordance
   that makes `SN 15.3` resolve. **"File Search" is Gemini's name for the store
@@ -177,6 +183,44 @@ Checked against the upstream licence pages 2026-10-23:
   `docs/todo/dictionary/dpd-provenance-and-refresh.md`); nothing in the repo
   records it, so **re-check this string when the dictionary refreshes**.
 - **Noto fonts** — SIL OFL 1.1.
+
+#### The source logos
+
+`assets/icons/sources/{tipitaka_lk,suttacentral}.webp`, with `2.0x/` and
+`3.0x/` beside them: 36, 72 and 108px, 24 KB for all six. Both are each
+project's own mark, used unmodified to credit them. Masters, if they ever need
+regenerating:
+
+| Row | Master |
+|---|---|
+| tipitaka.lk | `tipitaka.lk-readonly/web/public/static/images/tipitaka.lk-logo.png` |
+| SuttaCentral | `suttacentral/suttacentral` → `client/img/apple-touch-icon.png` |
+
+Two traps, both checked 2026-10-24. tipitaka.lk's `logo-500x500.png` is the
+black Buddha Jayanti seal, not their mark — its ring of Sinhala text turns to
+noise at tile size and the line art disappears on a dark surface; the gold
+wheel above holds up on both. SuttaCentral's `android-chrome-512x512.png` has
+an opaque blue background baked in, so only `apple-touch-icon.png` is
+transparent. They also publish a real SVG (`client/img/sc-icon-home.js`,
+`sc_logo`), unused: the app has no `flutter_svg` dependency and two icons do
+not justify one.
+
+A logo gets no tile at all: `SettingsTile`'s `imageAsset` skips the
+`surfaceContainer` square and fills the whole 36px the other tiles occupy, so
+rows still line up. Both marks read as round, so they sit together without one.
+
+Three things the generation step has to do, each of which showed up as a soft
+or mismatched logo on screen first:
+
+- **Size the variants for 36px, not 24.** Flutter picks a variant by device
+  pixel ratio and assumes the asset is drawn at its nominal size, so a 48px
+  `2.0x` file drawn into 72 device px is upscaled and visibly soft. The
+  variants must be 36 / 72 / 108.
+- **Trim to the alpha bounding box first.** SuttaCentral's icon carries ~12%
+  transparent padding and tipitaka.lk's none, so untrimmed they render
+  noticeably different sizes in the same box.
+- **Unsharp mask after the Lanczos downscale** (radius 0.6, 70%) — a 500px
+  master losing 93% of its width goes soft without it.
 
 ### Licences
 
