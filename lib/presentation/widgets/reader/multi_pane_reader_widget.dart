@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart' show computeHitSlop, kPrimaryButton;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wisdom_shared/wisdom_shared.dart' show beautifyPaliText;
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../models/reader_layout.dart';
 import '../../models/in_page_search_state.dart';
@@ -18,6 +19,7 @@ import '../../providers/dictionary_provider.dart'
         dictionaryHighlightProvider,
         hasActiveSelectionProvider;
 import '../../providers/in_page_search_provider.dart';
+import '../../providers/pali_letter_options_provider.dart';
 import '../../providers/tab_provider.dart'
     show
         activeTabIndexProvider,
@@ -627,12 +629,21 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       );
     }
 
-    // No tab, or a tab with no unit — the first-run hint.
+    // No tab, or a tab with no unit — the homage, then the first-run hint.
     if (unitAsync.hasValue && unitAsync.value == null) {
+      final l10n = AppLocalizations.of(context);
+      // Beautified directly, not through `formatContentLabel`: that seam keys
+      // on Content Language, but which homage shows is decided by App Language
+      // (the Sinhala string is Pali, the English one its translation). The
+      // transformer is a no-op on the English rendering.
       return StatusMessageView(
         variant: StatusVariant.info,
         leading: const AppEmblem(),
-        title: AppLocalizations.of(context).statusSelectSuttaToRead,
+        title: beautifyPaliText(
+          l10n.readerEmptyHomage,
+          ref.watch(paliLetterOptionsProvider),
+        ),
+        description: l10n.statusSelectSuttaToRead,
       );
     }
 

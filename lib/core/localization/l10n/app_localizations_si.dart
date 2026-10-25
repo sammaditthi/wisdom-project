@@ -355,6 +355,9 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
+  String get readerEmptyHomage => 'නමො තස්ස භගවතො අරහතො සම්මාසම්බුද්ධස්ස';
+
+  @override
   String get statusSelectSuttaToRead => 'කියවීම ඇරඹීමට පටුනෙන් පෙළක් තෝරන්න';
 
   @override

@@ -353,6 +353,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get readerEmptyHomage =>
+      'Homage be! To the Fortunate One – the Worthy, Fully Enlightened!';
+
+  @override
   String get statusSelectSuttaToRead =>
       'Select a text from the navigator to begin reading';
 

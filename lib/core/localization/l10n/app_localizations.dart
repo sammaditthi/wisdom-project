@@ -758,6 +758,12 @@ abstract class AppLocalizations {
   /// **'No {category} found'**
   String statusNoResultsForCategory(String category);
 
+  /// Homage shown above the reader's empty state. English rendering by Ven. Katukurunde Ñāṇananda, The Law of Dependent Arising, p. 15 — https://seeingthroughthenet.net/wp-content/uploads/2016/12/The-Law-of-Dependent-Arising_LE_Rev_1.0.pdf
+  ///
+  /// In en, this message translates to:
+  /// **'Homage be! To the Fortunate One – the Worthy, Fully Enlightened!'**
+  String get readerEmptyHomage;
+
   /// Empty state shown in the reader before any text has been selected
   ///
   /// In en, this message translates to:
