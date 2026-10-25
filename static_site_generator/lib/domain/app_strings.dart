@@ -11,6 +11,7 @@ const List<String> appStringKeys = [
   'close',
   'loading',
   'errorLoadingSearch',
+  'readerEmptyHomage',
   'statusSelectSuttaToRead',
   'statusNoTreeContent',
   'navHome',

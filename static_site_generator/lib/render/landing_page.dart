@@ -38,8 +38,8 @@ import 'site_chrome.dart';
 ///
 /// [LandingPage.notFound] renders the not-found page, because a wrong address
 /// wants exactly what the front door offers: the roots, and a way in. Building
-/// it as a second class would have been a second copy of a heading, a hint, a
-/// list and a toolbar, kept in step by hand.
+/// it as a second class would have been a second copy of a heading, a homage, a
+/// hint, a list and a toolbar, kept in step by hand.
 ///
 /// Three things differ, and all three follow from Cloudflare serving this
 /// file's bytes back at whatever address was asked for:
@@ -123,6 +123,18 @@ class LandingPage {
     // The not-found heading is an app string, shown as the app shows it.
     final heading = isNotFound ? title : weldTitle(title);
     body.writeln('<h1 class="page-title">${escapeHtml(heading)}</h1>');
+    // Under the heading and above the hint, which is the app's own order for
+    // the three — there the heading is the emblem. Under both headings, for the
+    // reason the hint is: a veneration is not a statement about the page.
+    //
+    // Pali, so it takes the site's default entry type, `.e-paragraph`, and the
+    // same bake every other Pali string on the site gets (D1).
+    final homage = EntryRenderer.bakeConjuncts(
+      build.strings[_homageKey],
+      isPali: true,
+    );
+    body.writeln('<p class="e-paragraph landing-homage" lang="pi-Sinh">'
+        '${escapeHtml(homage)}</p>');
     // The same hint under both headings, and it is the right sentence twice:
     // what follows is the list of roots either way, and the reader's next move
     // is the same one.
@@ -153,6 +165,13 @@ class LandingPage {
     );
   }
 }
+
+/// ARB key of the homage between the heading and the hint — the same line the
+/// app's empty reader opens with.
+///
+/// The app holds an English rendering of it as well and picks by App Language.
+/// This site has one language, so it reads the Pali and never asks.
+const String _homageKey = 'readerEmptyHomage';
 
 /// ARB key of the hint under the heading — the reader's own empty state,
 /// which asks for a text from the පටුන and is true of this page too.

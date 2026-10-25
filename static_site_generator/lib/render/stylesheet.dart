@@ -1273,25 +1273,38 @@ void _writeSearch(StringBuffer css) {
 
 /// The landing page (`/`).
 ///
+/// The landing page (`/`).
+///
 /// Almost nothing, and that is the point: `/` is a container TOC like any other
 /// (see `landing_page.dart`), so it inherits `.content`, `.page-title` and
-/// `.toc` and needs a rule only for the one element the rest of the site has no
-/// use for — the hint under the heading.
+/// `.toc`, and both rules below place an element the rest of the site has no use
+/// for — the homage under the heading, and the hint under that. Neither says
+/// anything about type: the hint is UI text, the homage is `.e-paragraph`.
 void _writeLandingPage(StringBuffer css) {
   css.writeln('/* Landing page. */');
-  // Sits between the site title and the list it is an instruction for. Centred
-  // to match `.page-title` directly above it — that rule is `text-align: center`
-  // on every page, and a left-aligned line under it would read as a mistake.
+  // The homage takes its type from `.e-paragraph` and only its placing from
+  // here: centred like the title above it, and justified body alignment is
+  // meaningless on one short line.
   //
   // The negative top margin *collapses* against the title's 2rem bottom rather
   // than adding to it: adjacent siblings collapse to
   // `max(positive) + min(negative)`, so 2rem and -1rem leave a 1rem gap. The
   // pair belongs together more closely than the title belongs to body text.
+  // Written after `_writeEntryStyles`, which is what lets these two
+  // declarations win over `.e-paragraph`'s at equal specificity.
+  css.writeln('.landing-homage {');
+  css.writeln('  text-align: center;');
+  css.writeln('  margin: -1rem 0 0.5rem;');
+  css.writeln('}');
+  css.writeln();
+  // Sits between the homage and the list it is an instruction for. Centred for
+  // the same reason, and close under the homage — 0.5rem, the homage's own
+  // bottom margin, since the two collapse to the larger.
   css.writeln('.landing-hint {');
   css.writeln('  font-family: var(--font-ui);');
   css.writeln('  color: var(--c-on-surface-variant);');
   css.writeln('  text-align: center;');
-  css.writeln('  margin: -1rem 0 2rem;');
+  css.writeln('  margin: 0 0 2rem;');
   css.writeln('  line-height: 1.6;');
   css.writeln('}');
   css.writeln();
