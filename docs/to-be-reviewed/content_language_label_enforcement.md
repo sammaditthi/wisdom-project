@@ -2,7 +2,7 @@
 
 **Status:** Open for discussion — *not implemented*.
 **Goal:** A single, enforceable construct so it's obvious (to humans *and* the compiler) which strings are **App-Language driven** vs **Content-Language driven** vs **verbatim content**.
-**Related:** `docs/todo/app_language_and_content_language_plan.md`, `docs/discussion/search_result_titles_content_language.md`.
+**Related:** `docs/todo/app_language_and_content_language_plan.md`, `docs/to-be-reviewed/search_result_titles_content_language.md`.
 
 ---
 
