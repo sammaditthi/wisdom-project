@@ -170,27 +170,43 @@ no lock, and the second wipes `build/` mid-upload.
 
 ## 4. After the first prod deploy
 
-- [ ] `curl -I https://sammaditthi.net/tipitaka/does-not-exist` → **404, not 200**.
-      This is owed from backlog A1: the soft-404 fix shipped but has never been
-      checked against live Pages, and it is the one defect that silently told
-      Google every missing URL was the front page.
-- [ ] `curl -I` an asset → `immutable`; a page → revalidating. The preview server
-      does not apply `_headers` (backlog C4), so this is the first honest test.
-- [ ] A canonical, an `og:url` and a sitemap `<loc>` all name `sammaditthi.net`.
-- [ ] `curl -s https://sammaditthi.net/robots.txt` → exactly the generated file,
-      nothing prepended by the zone.
-- [ ] `curl -I https://www.sammaditthi.net/tipitaka/sp` → `301` to the same path
-      on the apex.
-- [ ] DevTools console on a reading page: no `Refused to` line. `deploy.sh`
-      already checks the CSP header itself; this catches a script the zone
-      injects (Rocket Loader, Web Analytics), which the policy blocks.
+**Walked 2026-10-25, the day of the first `--prod`.** One item failed, and it
+is the one nobody could have caught from a header.
+
+- [x] **404, not 200.** Two different missing paths both answered `404` with
+      `no-store`. Owed from backlog A1: the soft-404 fix had shipped but had
+      never been checked against live Pages, and it is the one defect that
+      silently told Google every missing URL was the front page.
+- [x] **Caching tiers.** `/assets/site.css` → `max-age=31536000, immutable`; a
+      reading page → `max-age=0, must-revalidate`. The preview server does not
+      apply `_headers` (backlog C4), so this was the first honest test.
+- [x] **Origin baked right.** The canonical, the `og:url` and the sitemap
+      `<loc>`s all name `sammaditthi.net`.
+- [x] **`robots.txt` is exactly the generated file**, `Sitemap:` line and all,
+      with nothing prepended by the zone — which also settles the managed-
+      `robots.txt` question for good.
+- [x] **`www` → apex**, `301`, path preserved.
+- [ ] ❌ **DevTools console on a reading page: no `Refused to` line.** This one
+      **fails.** The zone injects Cloudflare's JavaScript Detections script into
+      every page and the CSP refuses it. Found without a browser, by hashing the
+      live page's inline script and comparing it to the CSP's hash — `deploy.sh`
+      compares the *header*, so the pipeline is blind to it. Full finding and
+      the fix (Bot Fight Mode off; no CSP-side fix exists for a static site) in
+      [`things-to-consider-before-going-live.md`](../../general/things-to-consider-before-going-live.md),
+      blocker 2. Re-check this item once that switch is off.
 - [ ] Search Console **and** Bing Webmaster Tools: submit `sitemap.xml`. Copilot,
       and partly ChatGPT search, read Bing's index rather than Google's.
-- [ ] Research Worker released (`scripts/research_server/deploy.sh --prod`), so
-      its CORS list carries `app.sammaditthi.net`; a question asked in the prod
-      app answers.
+- [x] **Research Worker released**, and its CORS list carries
+      `app.sammaditthi.net`: that `Origin` now gets itself back, where before
+      the release it got `allowed[0]`. A question asked in the prod app is still
+      owed — the preflight is not the round trip.
 - [ ] Start watching the 404 logs — they are the trigger for backlog **D3**
       (stub files vs Bulk Redirects). Decide from traffic, not projection.
+- [x] **Every `*.pages.dev` host is `noindex`** — all four, prod and `-test`,
+      site and app. `app-sammaditthi.pages.dev` is reachable and cannot be
+      withdrawn (Pages has no switch for it, unlike `workers.dev`); Research is
+      CORS-blocked there, accepted, with a Bulk Redirect as the fix if the URL
+      ever surfaces.
 
 ---
 

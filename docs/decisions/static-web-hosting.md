@@ -569,8 +569,12 @@ The SSG emits all of it as static files:
   release (`web-release.md`).
 - **Keep the app out of the index — `noindex`, NOT `Disallow` (fixed 2026-07-23):**
   the app project sends `X-Robots-Tag: noindex` on every response, dev and
-  prod alike (one rule in `web/_headers`: `/*` → `X-Robots-Tag: noindex`) and its `robots.txt`
-  **allows** crawling. The earlier `Disallow: /` idea backfires: a robots.txt
+  prod alike (one rule in `web/_headers`: `/*` → `X-Robots-Tag: noindex`) and
+  nothing on the app origin **disallows** crawling. There is no `robots.txt`
+  there at all: `/robots.txt` returns the SPA's `index.html` at 200, like every
+  other unknown path (checked on prod 2026-10-25). A response with no rules in
+  it is an allow-all, so the intent holds — but the file this bullet once
+  claimed does not exist, and `noindex` is doing the work on its own. The earlier `Disallow: /` idea backfires: a robots.txt
   block stops Google from ever *fetching* the page, so it never sees a noindex —
   yet every static page links `https://app.sammaditthi.net/tipitaka/…` ("Open in app"),
   so those URLs could still index as bare "indexed, though blocked by
