@@ -608,7 +608,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get appLanguageHint => 'යෙදුම භාවිතා කිරීමට ඔබ කැමති භාෂාව.';
 
   @override
-  String get contentLanguageHint => 'සූත්‍රනාම ආදිය දිස්වීමට ඔබ කැමති භාෂාව.';
+  String get contentLanguageHint => 'සූත්‍ර නාම ආදිය දිස්වීමට ඔබ කැමති භාෂාව.';
 
   @override
   String get paliLettersHint => 'පාළි බැඳි අකුරු පෙන්වන ආකාරය.';
