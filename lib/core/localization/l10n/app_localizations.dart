@@ -815,13 +815,13 @@ abstract class AppLocalizations {
   /// Placeholder shown in the Q&A dialog before the first question is asked
   ///
   /// In en, this message translates to:
-  /// **'Ask anything about the Pali Canon.'**
+  /// **'Ask a question from the Pali Canon.'**
   String get researchEmptyState;
 
   /// Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings
   ///
   /// In en, this message translates to:
-  /// **'Answered by Google Gemini. Don\'t include anything private.'**
+  /// **'Supported by Google Gemini (free tier). Don\'t include anything private.'**
   String get researchPrivacyNote;
 
   /// Hint text inside the Q&A question input field

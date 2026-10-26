@@ -634,12 +634,12 @@
     "description": "Button that clears the Q&A transcript to start a fresh conversation"
   },
 
-  "researchEmptyState": "Ask anything about the Pali Canon.",
+  "researchEmptyState": "Ask a question from the Pali Canon.",
   "@researchEmptyState": {
     "description": "Placeholder shown in the Q&A dialog before the first question is asked"
   },
 
-  "researchPrivacyNote": "Answered by Google Gemini. Don't include anything private.",
+  "researchPrivacyNote": "Supported by Google Gemini (free tier). Don't include anything private.",
   "@researchPrivacyNote": {
     "description": "Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings"
   },

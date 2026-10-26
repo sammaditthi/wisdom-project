@@ -382,11 +382,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get researchNewChat => 'නව සංවාදය';
 
   @override
-  String get researchEmptyState => 'පාළි ත්‍රිපිටකය පිළිබඳ ඕනෑම දෙයක් අසන්න.';
+  String get researchEmptyState =>
+      'ත්‍රිපිටකයෙන් පිළිතුරු ලබා ගැනීමට ප්‍රශ්නය යොමු කරන්න.';
 
   @override
   String get researchPrivacyNote =>
-      'පිළිතුරු සපයන්නේ Google Gemini මගිනි. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
+      'පිළිතුරු සපයන්නේ Google Gemini (free tier) ආධාරයෙනි. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
 
   @override
   String get researchInputHint => 'සූත්‍ර පිළිබඳ ප්‍රශ්නයක් අසන්න…';
@@ -618,7 +619,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get researchPrivacyDetail =>
-      'ඔබේ ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අපි භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන්ට ඒවා කියවිය හැක. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
+      'ගවේෂණයේදී ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අප භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන් ඒවා කියවීමට ඉඩ ඇත. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
 
   @override
   String get anumodanaLineage => 'භාණක පරම්පරාව';

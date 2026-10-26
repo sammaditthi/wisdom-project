@@ -382,11 +382,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get researchNewChat => 'New chat';
 
   @override
-  String get researchEmptyState => 'Ask anything about the Pali Canon.';
+  String get researchEmptyState => 'Ask a question from the Pali Canon.';
 
   @override
   String get researchPrivacyNote =>
-      'Answered by Google Gemini. Don\'t include anything private.';
+      'Supported by Google Gemini (free tier). Don\'t include anything private.';
 
   @override
   String get researchInputHint => 'Ask a question about the suttas…';
