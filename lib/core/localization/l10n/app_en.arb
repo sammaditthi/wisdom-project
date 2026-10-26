@@ -644,9 +644,9 @@
     "description": "Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings"
   },
 
-  "researchInputHint": "Ask a question about the suttas…",
+  "researchInputHint": "Ask your question",
   "@researchInputHint": {
-    "description": "Hint text inside the Q&A question input field"
+    "description": "Hint text inside the Q&A question input field. Names no part of the corpus — the store holds the commentaries too, and the field shows only once a chat is under way, where it is also the field's accessible name"
   },
 
   "researchSend": "Send",

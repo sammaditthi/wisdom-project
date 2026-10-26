@@ -824,10 +824,10 @@ abstract class AppLocalizations {
   /// **'Supported by Google Gemini (free tier). Don\'t include anything private.'**
   String get researchPrivacyNote;
 
-  /// Hint text inside the Q&A question input field
+  /// Hint text inside the Q&A question input field. Names no part of the corpus — the store holds the commentaries too, and the field shows only once a chat is under way, where it is also the field's accessible name
   ///
   /// In en, this message translates to:
-  /// **'Ask a question about the suttas…'**
+  /// **'Ask your question'**
   String get researchInputHint;
 
   /// Tooltip on the send button in the Q&A dialog

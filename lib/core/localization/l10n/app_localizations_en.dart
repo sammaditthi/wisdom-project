@@ -389,7 +389,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Supported by Google Gemini (free tier). Don\'t include anything private.';
 
   @override
-  String get researchInputHint => 'Ask a question about the suttas…';
+  String get researchInputHint => 'Ask your question';
 
   @override
   String get researchSend => 'Send';
