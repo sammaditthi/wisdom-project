@@ -137,11 +137,6 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
     // keeps its Retry in the error row above.
     final showLimitBanner = state.isAtTurnLimit && !state.isLoading;
 
-    // The empty state already asks for a question, so the composer drops its
-    // hint while that panel is up and takes it back once the chat starts —
-    // the hint is the field's only label from then on.
-    final showEmptyState = state.messages.isEmpty && !state.isLoading;
-
     // A reopened chat whose last question never got an answer: errors are
     // transient state (openChat can't restore [errorType]), so the Retry
     // affordance is derived from the transcript's shape instead, with a
@@ -156,7 +151,7 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
       children: [
         // ── Transcript ──────────────────────────────────────────
         Expanded(
-          child: showEmptyState
+          child: state.messages.isEmpty && !state.isLoading
               ? StatusMessageView(
                   variant: StatusVariant.info,
                   // Matches the assistant avatar's glyph.
@@ -310,8 +305,7 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
                       // would make Shift+Enter send as well.
                       textInputAction: TextInputAction.newline,
                       decoration: InputDecoration(
-                        hintText:
-                            showEmptyState ? null : l10n.researchInputHint,
+                        hintText: l10n.researchInputHint,
                         // The container owns the shape now — no inner outline.
                         border: InputBorder.none,
                         isDense: true,
