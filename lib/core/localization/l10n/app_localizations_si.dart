@@ -390,7 +390,7 @@ class AppLocalizationsSi extends AppLocalizations {
       'පිළිතුරු සපයන්නේ Google Gemini (free tier) ආධාරයෙනි. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
 
   @override
-  String get researchInputHint => 'සූත්‍ර පිළිබඳ ප්‍රශ්නයක් අසන්න…';
+  String get researchInputHint => 'ප්‍රශ්නය යොමු කරන්න';
 
   @override
   String get researchSend => 'යවන්න';
@@ -619,7 +619,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get researchPrivacyDetail =>
-      'ගවේෂණයේදී ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අප භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන් ඒවා කියවීමට ඉඩ ඇත. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
+      'ගවේෂණයේදී ප්‍රශ්නයට පිළිතුරු සෙවීම සඳහා එය Google Gemini වෙත යවනු ලැබේ. අප භාවිතා කරන නොමිලේ ස්ථරය යටතේ, එම තොරතුරු Google හි සේවාවන් වැඩිදියුණු කිරීමට යොදා ගත හැකි අතර, විශ්‍ලේෂකයන් විසින් ඒවා කියවීමට ඉඩ ඇත. පෞද්ගලික තොරතුරු ඇතුළත් නොකරන්න.';
 
   @override
   String get anumodanaLineage => 'භාණක පරම්පරාව';
