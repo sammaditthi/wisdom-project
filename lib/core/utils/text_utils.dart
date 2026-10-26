@@ -36,7 +36,9 @@ final _whitespacePattern = RegExp(r'\s');
 /// Strips zero-width chars and sentence punctuation ([_invalidTextCharsPattern]),
 /// collapses whitespace, trims, and lowercases.
 /// Only strips punctuation that appears between tokens (`.` `;` `!`).
-/// Formatting markers (`**`, `{}`, etc.) are left intact.
+/// Formatting markers (`**`, `{}`, etc.) are left intact — strip them first
+/// with `ContentMarkers.stripMarkers` if you are matching against the FTS
+/// index, which never saw them.
 ///
 /// Returns the normalized string and a position map where
 /// `positionMap[i]` = original index for normalized char `i`.
@@ -87,8 +89,10 @@ final _invalidCharsPattern = RegExp('[$_invalidSearchChars]');
 /// Sentence punctuation stripped from text during search normalization.
 /// Only includes chars that appear between matched tokens in Pali/Sinhala
 /// content (e.g., "16. ස") and would prevent indexOf from finding the query.
-/// Formatting markers (**, {}, etc.) are NOT stripped — they wrap words
-/// rather than separate them, so indexOf still finds matches through them.
+/// Formatting markers (**, {}, etc.) are NOT stripped here. They do split
+/// words the FTS index indexed whole (`**ඡන්දරාගවෙමත්තතා**ති`), so a caller
+/// matching an index hit must strip them before normalizing — see
+/// docs/todo/search/word-joining-characters-in-the-fts-index.md.
 const _invalidTextChars = r'.;!';
 final _invalidTextCharsPattern = RegExp('[$_invalidTextChars]');
 

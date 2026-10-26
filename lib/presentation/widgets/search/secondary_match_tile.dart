@@ -50,7 +50,7 @@ class SecondaryMatchTile extends StatelessWidget {
             if (result.resultType == SearchResultType.fullText &&
                 result.matchedText.isNotEmpty)
               HighlightedFtsSearchText(
-                matchedText: result.matchedText,
+                matchedText: result.plainMatchedText,
                 effectiveQuery: effectiveQuery,
                 isPhraseSearch: isPhraseSearch,
                 isExactMatch: isExactMatch,

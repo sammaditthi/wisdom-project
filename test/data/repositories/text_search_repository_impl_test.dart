@@ -2144,5 +2144,96 @@ void main() {
         )).called(1);
       });
     });
+
+    group('plainMatchedText', () {
+      // Two halves of one contract, and the point is that they differ.
+      //
+      // `matchedText` stays exactly as the corpus stores it — Group 9 of
+      // integration_test/search_flow_integration_test.dart pins it
+      // byte-for-byte to prove the `bjt_content` pipeline loses nothing,
+      // markers included.
+      //
+      // `plainMatchedText` is what a snippet matches against. The FTS index
+      // is built on marker-free text (`cleanTextForIndexing` in
+      // tools/bjt-populate.js), so a word the markers split is ONE token
+      // there; a tile matching the raw string could not locate the hit it had
+      // just been handed, and crashed with "RangeError (length) ... -1".
+      // See docs/todo/search/word-joining-characters-in-the-fts-index.md.
+      const node = TipitakaTreeNode(
+        nodeKey: 'dn-1',
+        paliName: 'Brahmajālasutta',
+        sinhalaName: 'බ්‍රහ්මජාලසූත්‍රය',
+        hierarchyLevel: 2,
+        entryPageIndex: 0,
+        entryIndexInPage: 0,
+        parentNodeKey: null,
+        contentFileId: 'dn-1',
+      );
+
+      /// Runs one full-text hit whose stored entry text is [rawEntryText].
+      Future<SearchResult> searchOneEntry(String rawEntryText) async {
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => const Right([node]));
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => [
+              FTSMatch(
+                editionId: 'bjt',
+                id: 1,
+                filename: 'dn-1',
+                eind: '0-0',
+                language: 'pali',
+                type: 'paragraph',
+                level: 0,
+                nodeKey: 'dn-1',
+              ),
+            ]);
+        when(mockContentDataSource.loadPageSides(any)).thenAnswer((_) async => {
+              (fileId: 'dn-1', pageIndex: 0, language: 'pali'): {
+                'entries': [
+                  {'text': rawEntryText},
+                ],
+              },
+            });
+
+        final result = await repository.searchTopResults(
+          const SearchQuery(queryText: 'ඡන්දරාගවෙමත්තතාති'),
+        );
+        return result.fold(
+          (failure) => fail('Expected success but got $failure'),
+          (categorized) =>
+              categorized.resultsByType[SearchResultType.fullText]!.single,
+        );
+      }
+
+      test('rejoins a word the bold markers split', () async {
+        // atta-sn-3 page 47 entry 0, abridged — the reported crash.
+        const raw = 'පඤ්චක්ඛන්ධෙ මුඤ්චිත්වා උපාදානං නත්ථි. '
+            '**ඡන්දරාගවෙමත්තතා**ති ඡන්දරාගනානත්තං.';
+        final hit = await searchOneEntry(raw);
+
+        expect(hit.matchedText, raw, reason: 'raw text must survive intact');
+        expect(hit.plainMatchedText, isNot(contains('*')));
+        expect(hit.plainMatchedText, contains('ඡන්දරාගවෙමත්තතාති'));
+      });
+
+      test('removes underline markers and footnote references', () async {
+        final hit = await searchOneEntry('විහර__ති__{12} එවං{ab} ඛො{}.');
+
+        expect(hit.plainMatchedText, 'විහරති එවං ඛො.');
+      });
+
+      test('caches, so a tile reading it from build() parses once', () async {
+        final hit = await searchOneEntry('**එවං** මෙ සුතං{1}.');
+
+        expect(hit.plainMatchedText, 'එවං මෙ සුතං.');
+        expect(identical(hit.plainMatchedText, hit.plainMatchedText), isTrue);
+      });
+    });
   });
 }

@@ -81,7 +81,7 @@ class SearchResultTile extends ConsumerWidget {
               searchResult.matchedText.isNotEmpty) ...[
             const SizedBox(height: 4),
             HighlightedFtsSearchText(
-              matchedText: searchResult.matchedText,
+              matchedText: searchResult.plainMatchedText,
               effectiveQuery: effectiveQuery,
               isPhraseSearch: isPhraseSearch,
               isExactMatch: isExactMatch,

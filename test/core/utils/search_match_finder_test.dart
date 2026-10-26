@@ -136,6 +136,16 @@ void main() {
       expect(range.end, 3);
     });
 
+    test('collapses a negative start instead of throwing', () {
+      // Callers pass -1 when a query cannot be located in the text — which
+      // happens whenever the FTS index joined a word across a character the
+      // text still carries. Indexing the position map with it used to raise
+      // "RangeError (length): Not in inclusive range 0..914: -1".
+      final matcher = NormalizedTextMatcher('එවං මෙ සුතං');
+
+      expect(matcher.mapToOriginal(-1, 4), (start: 0, end: 0));
+    });
+
     test('lowercases Latin and preserves Sinhala', () {
       expect(NormalizedTextMatcher('Hello WORLD').normalized, 'hello world');
       const sinhala = 'මෙසේ මා විසින්';

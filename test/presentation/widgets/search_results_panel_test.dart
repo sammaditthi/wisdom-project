@@ -23,8 +23,10 @@ import 'package:the_wisdom_project/presentation/providers/content_language_provi
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
+import 'package:the_wisdom_project/presentation/widgets/search/highlighted_fts_search_text.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/secondary_match_tile.dart';
+import 'package:wisdom_shared/wisdom_shared.dart';
 
 import '../../helpers/fake_search_state_notifier.dart';
 import '../../helpers/pump_app.dart';
@@ -305,6 +307,60 @@ void main() {
 
       expect(find.text('Show less'), findsOneWidget);
       expect(find.byType(SecondaryMatchTile), findsNWidgets(2));
+    });
+
+    testWidgets('neither tile renders a formatting marker', (tester) async {
+      // Both tiles must read `plainMatchedText`, not the raw `matchedText`.
+      // The FTS index never saw the markers, so a tile matching the raw
+      // string cannot locate the hit it was handed — that crashed the tile
+      // with "RangeError (length) ... -1". `matchedText` stays raw on purpose,
+      // so only the tiles' choice of accessor keeps the markers off screen.
+      // docs/todo/search/word-joining-characters-in-the-fts-index.md
+      SearchResult match(int entryIndex) => SearchResult(
+            id: 'fts_dn-1_$entryIndex',
+            editionId: 'bjt',
+            resultType: SearchResultType.fullText,
+            title: 'බ්‍රහ්මජාලසුත්තං',
+            subtitle: 'දීඝනිකායො',
+            matchedText: '**ඡන්දරාගවෙමත්තතා**ති එවං{1} මෙ සුතං',
+            contentFileId: 'dn-1',
+            pageIndex: 0,
+            entryIndex: entryIndex,
+            nodeKey: 'dn-1',
+            language: 'pali',
+          );
+
+      await _pumpPanel(
+        tester,
+        state: SearchState(
+          rawQueryText: 'ඡන්දරාගවෙමත්තතාති',
+          effectiveQueryText: 'ඡන්දරාගවෙමත්තතාති',
+          selectedResultType: SearchResultType.fullText,
+          fullResults: AsyncValue.data([match(0), match(1)]),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Reveal the secondary tile too, so both call sites are covered.
+      await tester.tap(find.text('View 1 more'));
+      await tester.pumpAndSettle();
+
+      final snippets = tester
+          .widgetList<RichText>(find.descendant(
+            of: find.byType(HighlightedFtsSearchText),
+            matching: find.byType(RichText),
+          ))
+          // The pali branch welds conjuncts, which inserts ZWJs — undo that
+          // so the expectation is about markers, not letter shapes.
+          .map((w) => removeConjunctFormatting(w.text.toPlainText()))
+          .toList();
+
+      expect(snippets, hasLength(2), reason: 'primary tile + secondary tile');
+      for (final snippet in snippets) {
+        expect(snippet, isNot(contains('*')));
+        expect(snippet, isNot(contains('{')));
+        expect(snippet, contains('ඡන්දරාගවෙමත්තතාති'));
+      }
     });
 
     // ── Callback wiring ─────────────────────────────────────────────────

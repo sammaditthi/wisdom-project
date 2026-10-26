@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wisdom_shared/wisdom_shared.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../core/utils/pali_conjunct_transformer.dart';
-import '../../../core/utils/pali_letter_options.dart';
 import '../../../core/utils/search_match_finder.dart';
 import '../../../core/utils/text_utils.dart';
 import '../../providers/pali_letter_options_provider.dart';
@@ -15,6 +14,10 @@ import '../../providers/pali_letter_options_provider.dart';
 /// - **Separate words**: Each word highlighted independently
 class HighlightedFtsSearchText extends ConsumerWidget {
   /// The text content to display and highlight matches within.
+  ///
+  /// Must already be marker-free — pass `SearchResult.plainMatchedText`, as
+  /// the reader passes `Entry.plainText`. Markers left in would split words
+  /// the FTS index holds whole, and the hit could not be located.
   final String matchedText;
 
   /// Pre-computed effective query (sanitized + Singlish converted).
@@ -55,26 +58,29 @@ class HighlightedFtsSearchText extends ConsumerWidget {
   /// Main entry point for building highlighted text.
   Widget _buildHighlightedText(
     BuildContext context,
-    String matchedText,
+    String plainText,
     ThemeData theme,
     PaliLetterOptions options,
   ) {
     final baseStyle = context.typography.resultMatchedText;
 
-    // Create snippet centered around match
-    final snippet = _createSnippet(text: matchedText, query: effectiveQuery);
+    // One finder for both jobs: where to centre the snippet, and what to
+    // highlight once it is cut. Using it for both is what keeps the two in
+    // agreement — they used to be separate implementations that had already
+    // drifted to different proximity windows.
+    final finder = SearchMatchFinder(
+      queryText: effectiveQuery,
+      isPhraseSearch: isPhraseSearch,
+      isExactMatch: isExactMatch,
+    );
+
+    final snippet = _createSnippet(plainText, finder);
 
     final highlightStyle = TextStyle(
       backgroundColor: theme.colorScheme.tertiaryContainer,
       color: theme.colorScheme.onPrimaryContainer,
     );
 
-    // Use shared SearchMatchFinder to find highlight ranges on raw snippet
-    final finder = SearchMatchFinder(
-      queryText: effectiveQuery,
-      isPhraseSearch: isPhraseSearch,
-      isExactMatch: isExactMatch,
-    );
     final rawRanges = finder.findMatchRanges(snippet);
 
     // For Pali text, apply conjunct transformation and remap highlight ranges
@@ -103,53 +109,25 @@ class HighlightedFtsSearchText extends ConsumerWidget {
   // SNIPPET CREATION
   // ===========================================================================
 
-  /// Creates text snippet centered around first match.
-  String _createSnippet({
-    required String text,
-    required String query,
+  /// Extracts a window of [text] centred on the first match [finder] reports.
+  ///
+  /// Both ends snap to grapheme cluster boundaries, so a Sinhala combining
+  /// character (virama, vowel sign) is never split at the "..." edges.
+  ///
+  /// With no match it falls back to the head of the entry. That happens when
+  /// the index joined a word across a character the text keeps, such as the
+  /// Pali elision `’` in `තීණි’මානි` — see
+  /// docs/todo/search/word-joining-characters-in-the-fts-index.md.
+  String _createSnippet(
+    String text,
+    SearchMatchFinder finder, {
     int contextBefore = 50,
     int contextAfter = 100,
   }) {
-    final textMatcher = NormalizedTextMatcher(text);
-    final normalizedQuery = normalizeText(query, toLowerCase: true);
-    final words = splitQueryWords(query);
+    final centre = _centreOn(text, finder);
 
-    // Find match position
-    int matchIndex;
-    int matchLength;
-
-    if (isPhraseSearch && isExactMatch) {
-      matchIndex = textMatcher.normalized.indexOf(normalizedQuery);
-      matchLength = normalizedQuery.length;
-
-      // Fallback: FTS returns hyphenated text for space-separated query
-      // e.g., "සීල-සමාධි" matches query "සීල සමාධි"
-      if (matchIndex == -1 &&
-          words.length >= 2 &&
-          (textMatcher.normalized.contains('-') ||
-              textMatcher.normalized.contains(','))) {
-        final result = _findPhrasePosition(textMatcher.normalized, words);
-        matchIndex = result.index;
-        matchLength = result.length;
-      }
-    } else if (words.length >= 2) {
-      final result = _findPhrasePosition(textMatcher.normalized, words);
-      matchIndex = result.index;
-      matchLength = result.length;
-    } else {
-      matchIndex =
-          words.isNotEmpty ? textMatcher.normalized.indexOf(words.first) : -1;
-      matchLength = words.isNotEmpty ? words.first.length : 0;
-    }
-
-    // Map to original positions and extract snippet.
-    // Snap snippet boundaries to grapheme cluster boundaries so we don't
-    // split Sinhala combining characters (virama, vowel signs) and produce
-    // garbled text at the "..." edges.
-    final range =
-        textMatcher.mapToOriginal(matchIndex, matchIndex + matchLength);
-    final rawStart = (range.start - contextBefore).clamp(0, text.length);
-    final rawEnd = (range.end + contextAfter).clamp(0, text.length);
+    final rawStart = (centre.start - contextBefore).clamp(0, text.length);
+    final rawEnd = (centre.end + contextAfter).clamp(0, text.length);
     final snippetStart = snapToGraphemeBoundary(text, rawStart);
     final snippetEnd = snapToGraphemeBoundary(text, rawEnd, forward: true);
 
@@ -160,56 +138,33 @@ class HighlightedFtsSearchText extends ConsumerWidget {
     return snippet;
   }
 
-  /// Finds position where words appear adjacent/close together.
-  ({int index, int length}) _findPhrasePosition(
-    String normalizedText,
-    List<String> words,
-  ) {
-    if (words.isEmpty) return (index: -1, length: 0);
-    if (words.length == 1) {
-      final idx = normalizedText.indexOf(words.first);
-      return (index: idx, length: idx != -1 ? words.first.length : 0);
+  /// Which match the snippet opens on, in [text] coordinates.
+  ///
+  /// Separate-words mode highlights every occurrence of every word, and the
+  /// earliest one can sit far from the cluster that actually made the record
+  /// match. So that mode gets a proximity pass first — same finder, wider
+  /// window — and only falls back to the earliest single match when the words
+  /// never come close together.
+  ({int start, int end}) _centreOn(String text, SearchMatchFinder finder) {
+    if (!isPhraseSearch && splitQueryWords(effectiveQuery).length >= 2) {
+      final clustered = SearchMatchFinder(
+        queryText: effectiveQuery,
+        isPhraseSearch: true,
+        isExactMatch: false,
+        maxGap: _separateWordsGap,
+      ).findMatchRanges(text);
+      if (clustered.isNotEmpty) return clustered.first;
     }
 
-    final firstWord = words.first;
-    int searchStart = 0;
-
-    while (searchStart < normalizedText.length) {
-      final firstWordIndex = normalizedText.indexOf(firstWord, searchStart);
-      if (firstWordIndex == -1) break;
-
-      bool allWordsFound = true;
-      int currentPos = firstWordIndex + firstWord.length;
-      int phraseEndPos = currentPos;
-
-      for (int i = 1; i < words.length; i++) {
-        final maxGap = isPhraseSearch ? 20 : 100;
-        final searchEnd = (currentPos + maxGap).clamp(0, normalizedText.length);
-        final searchWindow = normalizedText.substring(currentPos, searchEnd);
-        final nextWordIndex = searchWindow.indexOf(words[i]);
-
-        if (nextWordIndex == -1) {
-          allWordsFound = false;
-          break;
-        }
-
-        currentPos = currentPos + nextWordIndex + words[i].length;
-        phraseEndPos = currentPos;
-      }
-
-      if (allWordsFound) {
-        return (index: firstWordIndex, length: phraseEndPos - firstWordIndex);
-      }
-      searchStart = firstWordIndex + 1;
-    }
-
-    // Fallback: return first word position
-    final fallbackIndex = normalizedText.indexOf(firstWord);
-    return (
-      index: fallbackIndex,
-      length: fallbackIndex != -1 ? firstWord.length : 0,
-    );
+    // Ranges come back earliest first, so this is the first highlight too.
+    final matches = finder.findMatchRanges(text);
+    return matches.isEmpty ? (start: 0, end: 0) : matches.first;
   }
+
+  /// How far apart separate words may sit and still be read as one hit, for
+  /// snippet centring only. Wider than the phrase-mode window the finder
+  /// defaults to, and independent of the proximity the FTS query used.
+  static const int _separateWordsGap = 100;
 
   // ===========================================================================
   // UTILITIES

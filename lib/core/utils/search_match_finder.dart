@@ -187,12 +187,18 @@ class NormalizedTextMatcher {
   NormalizedTextMatcher._(this.original, this.normalized, this._positionMap);
 
   /// Maps normalized [start, end) range to original text positions.
-  ({int start, int end}) mapToOriginal(int normStart, int normEnd) => (
-        start: _positionMap[normStart],
-        end: normEnd < _positionMap.length
-            ? _positionMap[normEnd]
-            : original.length,
-      );
+  ///
+  /// A negative [normStart] means "not found": it collapses to an empty range
+  /// rather than indexing the position map out of bounds.
+  ({int start, int end}) mapToOriginal(int normStart, int normEnd) {
+    if (normStart < 0) return (start: 0, end: 0);
+    return (
+      start: _positionMap[normStart],
+      end: normEnd < _positionMap.length
+          ? _positionMap[normEnd]
+          : original.length,
+    );
+  }
 }
 
 /// Splits query into normalized non-empty words.

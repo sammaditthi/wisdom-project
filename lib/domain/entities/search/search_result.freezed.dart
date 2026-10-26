@@ -295,7 +295,7 @@ class __$$SearchResultImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$SearchResultImpl implements _SearchResult {
+class _$SearchResultImpl extends _SearchResult {
   const _$SearchResultImpl(
       {required this.id,
       required this.editionId,
@@ -310,7 +310,8 @@ class _$SearchResultImpl implements _SearchResult {
       required this.entryIndex,
       required this.nodeKey,
       required this.language,
-      this.relevanceScore});
+      this.relevanceScore})
+      : super._();
 
   /// Unique identifier for this result
   @override
@@ -434,7 +435,7 @@ class _$SearchResultImpl implements _SearchResult {
       __$$SearchResultImplCopyWithImpl<_$SearchResultImpl>(this, _$identity);
 }
 
-abstract class _SearchResult implements SearchResult {
+abstract class _SearchResult extends SearchResult {
   const factory _SearchResult(
       {required final String id,
       required final String editionId,
@@ -450,6 +451,7 @@ abstract class _SearchResult implements SearchResult {
       required final String nodeKey,
       required final String language,
       final double? relevanceScore}) = _$SearchResultImpl;
+  const _SearchResult._() : super._();
 
   /// Unique identifier for this result
   @override
