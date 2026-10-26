@@ -138,8 +138,11 @@ class StatusMessageView extends StatelessWidget {
             color: colorScheme.onSurface.withValues(alpha: 0.5),
           );
 
+    // Scrolls rather than overflows: with a keyboard up on a short screen the
+    // pane can be shorter than the message. When it fits, the scroll view
+    // shrink-wraps, so the [Center] still centres it and nothing moves.
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: padding,
         child: Column(
           mainAxisSize: MainAxisSize.min,
