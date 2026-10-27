@@ -2,9 +2,9 @@
 
 This is the dark theme for the app: a warm near-black page, off-white text, one sand-gold accent, and highlights you can find at a glance. A second, cooler dark theme (**Graphite**) may come later on the same role map.
 
-Code to paste is in [`warm-dark-code.md`](warm-dark-code.md). The visual reference is the "V4" row of the *Wisdom dark theme* design canvas. Nothing in `lib/` has been changed.
+Code to paste is in [`warm-dark-code.md`](warm-dark-code.md). The visual reference is the "V4" row of the *Wisdom dark theme* design canvas. No colour here has been applied in `lib/` yet.
 
-Status: palette, highlights and picker are settled. Nothing has been built or tested on a device yet.
+Status: palette, highlights and picker are settled, and none of it has run on a device. The one piece of layout built ahead of the theme is the search box (see [Surfaces](#surfaces)).
 
 ## Decisions
 
@@ -45,6 +45,13 @@ Status: palette, highlights and picker are settled. Nothing has been built or te
 | `surfaceBright` | `#FAF9F5` | `#45433F` | Raised chips (after code §7) |
 
 Every neutral has a colour strength (LCh chroma) under 3: warm, but not brown.
+
+The search box is already built this way (2026-10-27): `surfaceContainerHigh`
+at rest, `surfaceContainer` when the reader is scrolled so it merges with the
+app bar, an `outline` hairline, and a `primary` ring when focused. Its fill
+never moves on focus — M3 has no focus container for a text field, only an
+indicator — so a raised pill is settled, not open. The gold ring reads 6.5:1
+on that fill here.
 
 ### Text
 
@@ -184,7 +191,7 @@ The navigator draws unselected icons at 80% alpha and selected icons in `onSurfa
 
 ## Known issues → resolutions
 
-These are from `dark-theme.md`, plus three issues found while designing.
+These are from `dark-theme.md`, plus the ones marked new, found while designing or in later review.
 
 | Issue | Resolution | Code change? |
 |---|---|---|
@@ -194,6 +201,7 @@ These are from `dark-theme.md`, plus three issues found while designing.
 | **White ring on Refine with filters** | Border = sand-gold `primary`, fill = neutral `primaryContainer`. | Theme only. |
 | **Selected row in the match menu barely shows** | Fill → `secondaryContainer` (light greige, dark `#3D3B38`). | `match_options_menu.dart` (code §7). |
 | **Menus merge into panels in dark** (new). The match menu is `surface` on a `surface` panel, and shadows barely show on dark. | Already handled: the menu's shape draws a 1px `outline` border. The translucent `outline` keeps that edge visible in dark. | None. |
+| **Recent-searches card has no edge in dark** (new; 2026-10-27). It is a hand-rolled `Material(elevation: 8)` on `surface` with no border, so the row above does not cover it — that one is about `MenuAnchor`, which gets its edge from `AppMenuTheme`. On the reader page it comes out at 1.12:1, carried by a shadow that barely shows in dark. Light is 1.05:1 but white on cream with a real shadow reads fine. | Undecided, and a border was declined for light. Either give it an `outline` border in dark only, or raise the card: `surfaceContainerHighest` 1.48:1, `surfaceBright` 1.67:1. | `recent_search_overlay.dart`, one line. |
 | **Highlights too dim to find** (new; V4 draft) | Bright mint with dark text, a stronger violet, and gold selection. See [Highlights](#highlights). | `text_entry_widget.dart` (code §6). |
 | **Treatise icon too bright** (new) | Use `onSurfaceVariant`. | `content_icons.dart`, one line (code §7). |
 
@@ -218,7 +226,6 @@ These aren't needed for the theme. The canvas shows them, and each is a small wi
 - **Active tab:** a 2px `primary` underline instead of a `…Highest` fill.
 - **App bar and tab strip** on `surfaceContainerLowest`, so the chrome is one dark frame and the reading page is the lit panel inside it.
 - **Search pane:** drop the filled band behind the filters; rest chips outlined and transparent.
-- **Search field:** inset on `surfaceContainerLowest` with an `outline` hairline, with a `primary` ring when focused.
 - **Current in-page match:** add a 1.5px `primary` ring on top of the mint fill.
 
 ## Optional light-theme notes
@@ -226,7 +233,7 @@ These aren't needed for the theme. The canvas shows them, and each is a small wi
 These aren't applied, and each is independent.
 
 1. **Badge labels in light are low contrast.** On their own 15% tint over white: VRI 1.9, PN 1.5, BUS 2.4, DPD 2.7, CR 3.0, MS 3.1. Deeper tones of the same hues pass AA: for example VRI `#9A4F00` 4.8, PN `#765A00` 5.2, BUS `#276B2B` 5.2.
-2. **`outline` is very soft** at 1.5:1. That's fine for dividers, but low for the in-page search field's border. Fix the field locally if it feels lost.
+2. **`outline` is very soft** at 1.5:1. That's fine for dividers, but low for either search field's border: the in-page one, and the main box since it took an `outline` hairline (1.23:1 in light, 1.57:1 in warm dark — the softer of the two is light). Fix a field locally if it feels lost.
 3. **`shadow`:** `docs/done/theme/light_theme_m3_alignment_plan.md` says `#3A2510`, but the code has `#2A2318`. Align one with the other.
 
 ## Rollout
