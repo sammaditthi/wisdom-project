@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 class CircularToggleButton extends StatelessWidget {
   final bool isActive;
   final IconData icon;
-  final double iconSize;
   final String? tooltip;
   final VoidCallback onPressed;
   final EdgeInsetsGeometry margin;
@@ -15,7 +14,6 @@ class CircularToggleButton extends StatelessWidget {
     required this.isActive,
     required this.icon,
     required this.onPressed,
-    this.iconSize = 24,
     this.tooltip,
     this.margin = const EdgeInsets.only(left: 4),
   });
@@ -26,7 +24,10 @@ class CircularToggleButton extends StatelessWidget {
     return Padding(
       padding: margin,
       child: IconButton(
-        icon: Icon(icon, size: iconSize),
+        icon: Icon(icon),
+        // Announces on/off, as PillChip.refine does for the chip form of the
+        // same control.
+        isSelected: isActive,
         tooltip: tooltip,
         onPressed: onPressed,
         style: IconButton.styleFrom(

@@ -44,10 +44,13 @@ comment in `in_page_search_test.dart`. The migration's bill in miniature.
 - **Active state is a pressed look, not a dot.** The dictionary refine button
   hand-rolled a `Stack` + `Positioned` dot; it now uses `CircularToggleButton`
   like the exact-word toggle beside it, and the Refine chip (`PillChip.refine`)
-  already filled when selected. One implementation, three controls.
-- **Icon buttons in a row share one size.** `CircularToggleButton` defaulted to
-  20 while the plain `IconButton`s around it took Flutter's 24, which read as
-  "that icon is smaller". Default is now 24.
+  already filled when selected — same `primaryContainer` pair in both. Both
+  now carry `Semantics(selected:)` too, so the state is announced, not only
+  coloured. One implementation, three controls.
+- **Icon buttons in a row share one size.** `CircularToggleButton` forced 20
+  while the plain `IconButton`s around it took Flutter's 24, which read as
+  "that icon is smaller". It now passes no size at all, so it inherits the
+  same 24 they do and the row cannot drift apart again.
 
 ### Two traps
 
@@ -77,8 +80,10 @@ Useful consequences:
 
 - Symbols at `wght` 400 is drawn **lighter than classic**, so a Symbols icon
   dropped among classic ones reads thin. `weight: 500` is the usual match.
-  Nothing in `lib/` sets `weight` yet, including `Symbols.match_word` next to
-  classic `Icons.filter_list` in the dictionary sheet header.
+  Nothing in `lib/` sets `weight`: `Symbols.match_word` sits next to classic
+  `Icons.filter_list` in the dictionary sheet header, and on screen on
+  2026-10-27 it read fine at the default 400. Reach for `weight` when a
+  mismatch actually shows, not on principle.
 - A selected state can be `fill: 1` instead of a background colour.
 
 ## Open question: migrate everything to Symbols?
