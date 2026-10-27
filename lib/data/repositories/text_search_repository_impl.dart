@@ -343,9 +343,6 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     // spaced "3. 1. 4. 1" the tree stores both reduce to "3 1 4 1".
     final searchQuery = normalizeForTitleMatch(queryText);
 
-    // Get scope patterns for filtering
-    final scopePatterns = ScopeOperations.getPatternsForScope(scope);
-
     // Helper function to check if a name matches the query
     // isExactMatch=false: contains matching (includes startsWith)
     // isExactMatch=true: word boundary match (query appears as complete word)
@@ -361,13 +358,12 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       }
     }
 
-    // Helper function to check if contentFileId matches any scope pattern
-    // Patterns from getPatternsForScope are prefix-only (e.g., 'dn-')
-    // SQL LIKE wildcard (%) is added by the service layer, not here
-    bool matchesScope(String? contentFileId) {
-      if (scopePatterns.isEmpty) return true; // No filter = match all
-      if (contentFileId == null) return false;
-      return scopePatterns.any((pattern) => contentFileId.startsWith(pattern));
+    // Helper function to check if a node sits inside the selected scope.
+    // Tests the node's own key, like the FTS filter does: a node's text often
+    // lives in an ancestor's file, so contentFileId can't answer this.
+    bool matchesScope(String nodeKey) {
+      if (scope.isEmpty) return true; // No filter = match all
+      return ScopeOperations.findCoveringAncestors(nodeKey, scope).isNotEmpty;
     }
 
     for (final node in nodeMap.values) {
@@ -386,7 +382,7 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       // Check both name match AND scope match
       if ((paliMatched || sinhalaMatched) &&
           node.contentFileId != null &&
-          matchesScope(node.contentFileId)) {
+          matchesScope(node.nodeKey)) {
         // Prefer Sinhala if it matched, otherwise use Pali
         final matchedName = sinhalaMatched
             ? (node.sinhalaName.isNotEmpty ? node.sinhalaName : node.paliName)

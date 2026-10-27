@@ -49,6 +49,11 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 /// someone to remember a flag; `--content-db` points it elsewhere. Until the
 /// table exists it reports SKIPPED and does not vote — a section that cannot
 /// run is not a section that passed.
+///
+/// Section 6 guards the corpus too, and is the one an upstream re-sync is most
+/// likely to break quietly: search scope is a key-prefix rule, so it only
+/// equals the real hierarchy while every child's key extends its parent's.
+/// Where that fails the branch returns nothing, with no error anywhere.
 void main(List<String> args) {
   final assetsFlag = _valueOf(args, '--assets');
   final reader = assetsFlag == null
@@ -64,6 +69,8 @@ void main(List<String> args) {
   final linksOk = _verifyLinks(reader);
   stdout.writeln('');
   final orderOk = _verifyReadingOrder(reader);
+  stdout.writeln('');
+  final scopeOk = _verifyScope(reader);
 
   // Null when no database was named: skipped, which is neither a pass nor a
   // failure and must not read as either.
@@ -85,10 +92,16 @@ void main(List<String> args) {
   }
 
   stdout.writeln('');
-  if (markersOk && treeOk && linksOk && orderOk && contentOk != false) {
+  if (markersOk &&
+      treeOk &&
+      linksOk &&
+      orderOk &&
+      scopeOk &&
+      contentOk != false) {
     stdout.writeln('PASS — extraction identical to the app original (1, 2), '
-        'every URL reads back as its own page (3), and reading order never '
-        'steps backwards inside a content file (4).');
+        'every URL reads back as its own page (3), reading order never '
+        'steps backwards inside a content file (4), and search scope matches '
+        'the hierarchy node for node (6).');
     stdout.writeln(contentOk == null
         ? '       Section 5 did not run — see its SKIPPED line above.'
         : '       The content table matches the JSON, entry for entry (5).');
@@ -980,6 +993,94 @@ void _printSamples(List<String> samples, [String? label]) {
   for (final sample in samples) {
     stdout.writeln('  ! $prefix$sample');
   }
+}
+
+// ---------------------------------------------------------------------------
+// 6. Search scope coverage, over every node in tree.json
+// ---------------------------------------------------------------------------
+
+/// The search scope rule (`ScopePatterns`) against the real hierarchy.
+///
+/// Scope is a string rule: a node covers its own key, and any key carrying it
+/// plus a `-`. That equals real ancestry only while every child's key extends
+/// its parent's — `expandedKeys` is the patch for the places where it doesn't.
+/// An upstream re-sync that keys a new child differently would silently empty
+/// that whole branch's search results, with nothing else to notice. So this
+/// asks two things of every node:
+///
+///   * every real ancestor covers it — nothing in a branch is lost
+///   * a key that merely looks like an ancestor does not — nothing foreign
+///     joins it. Asked of the key's own hyphen-prefixes and of every root,
+///     the two shapes that can over-match.
+bool _verifyScope(CorpusReader reader) {
+  final tree = reader.readTree();
+
+  var nodes = 0;
+  var ancestorPairs = 0;
+  var uncovered = 0; // a real ancestor that fails to cover the node
+  var overReaching = 0; // a non-ancestor that covers it
+  var keysNeedingExpansion = 0; // child keys that don't extend the parent's
+  final samples = <String>[];
+
+  for (final node in tree.allNodes) {
+    nodes++;
+    final key = node.nodeKey;
+
+    // Real ancestry, straight off the parent links.
+    final ancestors = <String>{};
+    for (var cur = node.parentNodeKey;
+        cur != null;
+        cur = tree[cur]?.parentNodeKey) {
+      ancestors.add(cur);
+    }
+
+    final parent = node.parentNodeKey;
+    if (parent != null && !key.startsWith('$parent-')) keysNeedingExpansion++;
+
+    for (final ancestor in ancestors) {
+      ancestorPairs++;
+      if (!ScopePatterns.isNodeCoveredBy(key, ancestor)) {
+        uncovered++;
+        _sample(
+            samples,
+            'uncovered  $key is not covered by $ancestor, '
+            'which is its ancestor — that branch cannot be searched');
+      }
+    }
+
+    // Keys that could plausibly over-match: this key's in-tree hyphen-prefixes,
+    // plus the roots.
+    final candidates = <String>{...tree.rootKeys};
+    final segments = key.split('-');
+    for (var i = 1; i < segments.length; i++) {
+      final prefix = segments.take(i).join('-');
+      if (tree[prefix] != null) candidates.add(prefix);
+    }
+    for (final candidate in candidates.difference(ancestors)) {
+      if (candidate == key) continue;
+      if (ScopePatterns.isNodeCoveredBy(key, candidate)) {
+        overReaching++;
+        _sample(
+            samples,
+            'over-reaching  $candidate covers $key, '
+            'which does not sit under it');
+      }
+    }
+  }
+
+  final expanded = ScopePatterns.expandedKeys.values
+      .fold(0, (sum, keys) => sum + keys.length);
+
+  stdout.writeln('SCOPE');
+  stdout.writeln('  nodes checked          $nodes');
+  stdout.writeln('  ancestor pairs         $ancestorPairs');
+  stdout.writeln('  ancestors not covering $uncovered');
+  stdout.writeln('  non-ancestors covering $overReaching');
+  stdout.writeln('  keys needing expansion $keysNeedingExpansion '
+      '(expandedKeys lists $expanded)');
+  _printSamples(samples);
+
+  return uncovered == 0 && overReaching == 0;
 }
 
 // ---------------------------------------------------------------------------

@@ -11,46 +11,51 @@ class ScopeFilterSql {
   ///
   /// Returns `null` if no filter should be applied (empty scope = search all).
   ///
+  /// Each scope key contributes two tests — the node itself, then its subtree —
+  /// because a container node has rows of its own (its heading) as well as rows
+  /// under it. A lone `LIKE 'key-%'` would drop the former.
+  ///
   /// Example:
   /// ```dart
-  /// buildWhereClause({'dn', 'mn'})
-  /// // Returns: '(m.filename LIKE ? OR m.filename LIKE ?)'
+  /// buildWhereClause({'dn'})
+  /// // Returns: '((m.nodeKey = ? OR m.nodeKey LIKE ?))'
   ///
   /// buildWhereClause({'sp'})
-  /// // Returns: '(m.filename LIKE ? OR ... OR m.filename LIKE ?)'
-  /// // (expanded to 5 patterns for dn, mn, sn, an, kn)
+  /// // Returns the same pair OR-ed five times (dn, mn, sn, an, kn)
   /// ```
   static String? buildWhereClause(
     Set<String> searchScope, {
     String tableAlias = 'm',
-    String columnName = 'filename',
+    String columnName = 'nodeKey',
   }) {
-    if (searchScope.isEmpty) return null;
+    final keys = ScopePatterns.getKeysForScope(searchScope);
+    if (keys.isEmpty) return null;
 
-    final patterns = ScopePatterns.getPatternsForScope(searchScope);
-    if (patterns.isEmpty) return null;
-
-    final conditions =
-        patterns.map((_) => '$tableAlias.$columnName LIKE ?').join(' OR ');
+    final conditions = keys
+        .map((_) => '($tableAlias.$columnName = ? '
+            'OR $tableAlias.$columnName LIKE ?)')
+        .join(' OR ');
 
     return '($conditions)';
   }
 
-  /// Gets the SQL parameters (pattern values with % wildcard) for scope filtering.
+  /// The SQL parameters for scope filtering: per key the exact node key, then
+  /// its subtree pattern. Order must match the pairs [buildWhereClause] emits.
   ///
-  /// Returns empty list if [scope] is empty (no parameters needed).
+  /// No `ESCAPE` clause: node keys are `[a-z0-9.-]` only, so they carry no
+  /// `LIKE` wildcard of their own.
   ///
   /// Example:
   /// ```dart
-  /// getWhereParams({'sp'})
-  /// // Returns: ['dn-%', 'mn-%', 'sn-%', 'an-%', 'kn-%']
+  /// getWhereParams({'dn'})
+  /// // Returns: ['dn', 'dn-%']
   /// ```
-  static List<String> getWhereParams(Set<String> scope) {
-    if (scope.isEmpty) return [];
-    return ScopePatterns.getPatternsForScope(scope)
-        .map((pattern) => '$pattern%')
-        .toList();
-  }
+  static List<String> getWhereParams(Set<String> scope) => [
+        for (final key in ScopePatterns.getKeysForScope(scope)) ...[
+          key,
+          '$key-%',
+        ],
+      ];
 
   /// Builds the SQL WHERE clause fragment for the language filter (the
   /// පාළි / සිංහල search toggle), or `null` when [language] is null

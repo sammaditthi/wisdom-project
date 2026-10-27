@@ -139,6 +139,42 @@ void main() {
     });
   });
 
+  // The scope clause filters on `m.nodeKey`, so a ticked node must bring back
+  // its OWN rows as well as its descendants'. The rows below are the shapes a
+  // prefix-only clause gets wrong: a container keyed exactly like the ticked
+  // node, and a leaf with no descendants to match at all.
+  group('countFullTextMatches scope includes the node itself', () {
+    setUp(() async {
+      // row 3: the 'atta-an-1' heading    row 4: a sutta under it
+      // row 5: 'atta-an-10', the TENTH sibling — not a child of 'atta-an-1'
+      await db.customStatement(
+          "INSERT INTO bjt_fts(rowid, text) VALUES (3, 'dhamma pali');");
+      await db.customStatement("INSERT INTO bjt_meta VALUES "
+          "(3, 'atta-an-1', '0-0', 'pali', 'p', 0, 'atta-an-1');");
+      await db.customStatement(
+          "INSERT INTO bjt_fts(rowid, text) VALUES (4, 'dhamma pali');");
+      await db.customStatement("INSERT INTO bjt_meta VALUES "
+          "(4, 'atta-an-1', '1-0', 'pali', 'p', 0, 'atta-an-1-2');");
+      await db.customStatement(
+          "INSERT INTO bjt_fts(rowid, text) VALUES (5, 'dhamma pali');");
+      await db.customStatement("INSERT INTO bjt_meta VALUES "
+          "(5, 'atta-an-10', '0-0', 'pali', 'p', 0, 'atta-an-10');");
+    });
+
+    test("counts the node's own row and its descendants'", () async {
+      // Both 'atta-an-1' rows, and nothing else: a prefix-only clause returns
+      // 1 (the descendant alone), and dropping the hyphen boundary returns 3
+      // (it swallows the sibling 'atta-an-10').
+      expect(await countScopedLang({'atta-an-1'}, null), 2);
+    });
+
+    test('a node with no descendants still returns its own row', () async {
+      // The reported bug's exact shape: nothing is keyed 'atta-an-10-…', so a
+      // prefix-only clause has nothing to match and the badge reads 0.
+      expect(await countScopedLang({'atta-an-10'}, null), 1);
+    });
+  });
+
   group('countFullTextMatches scope + language (both clauses ANDed)', () {
     test('intersects scope AND language — proves BOTH filters apply', () async {
       // Add a third 'dhamma' row: Pali, but in a DIFFERENT location (mn-1).

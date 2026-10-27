@@ -7,7 +7,7 @@
 
 `packages/wisdom_shared/lib/src/scope/scope_filter_sql.dart`
 
-- `ScopeFilterSql.buildWhereClause(scope, {tableAlias = 'm', columnName = 'filename'})`
+- `ScopeFilterSql.buildWhereClause(scope, {tableAlias = 'm', columnName = 'nodeKey'})`
 - `ScopeFilterSql.buildLanguageClause(language, {tableAlias = 'm', columnName = 'language'})`
 
 (`ScopeFilterService` in `lib/data/services/` just re-exports both for the client.)
@@ -36,7 +36,7 @@ Two architectural facts make the alias/column non-variable:
 2. **The meta schema is uniform across editions.**
    The CTE hardcodes the column set `m.id, m.filename, m.eind, m.language, m.type,
    m.level, m.nodeKey`. All editions are normalized into this schema on import, so
-   `language` (and `filename`) are fixed contracts the whole query depends on — not
+   `language` (and `nodeKey`) are fixed contracts the whole query depends on — not
    per-edition variables → `columnName` is never needed.
 
 ## When it *would* become useful

@@ -1273,28 +1273,29 @@ void main() {
           scope: {TipitakaNodeKeys.suttaPitaka}, // Only search in Sutta Pitaka
         );
 
+        // Scope is decided by the node's own key, so the keys carry the branch.
         final treeWithMultipleScopes = [
           // In Sutta scope - should match
           const TipitakaTreeNode(
-            nodeKey: 'sutta-1',
+            nodeKey: 'dn-1-1',
             paliName: 'Brahmajālasutta',
             sinhalaName: '',
             hierarchyLevel: 2,
             entryPageIndex: 0,
             entryIndexInPage: 0,
             parentNodeKey: null,
-            contentFileId: 'dn-1', // Sutta file
+            contentFileId: 'dn-1',
           ),
           // In Vinaya scope - should NOT match
           const TipitakaTreeNode(
-            nodeKey: 'vinaya-1',
+            nodeKey: 'vp-pv-1',
             paliName: 'Vinayasutta',
             sinhalaName: '',
             hierarchyLevel: 2,
             entryPageIndex: 0,
             entryIndexInPage: 0,
             parentNodeKey: null,
-            contentFileId: 'vin-1', // Vinaya file
+            contentFileId: 'vp-pv',
           ),
         ];
 
@@ -1323,7 +1324,70 @@ void main() {
             // Should only return Sutta scope results
             expect(titleResults.length, equals(1));
             expect(titleResults[0].contentFileId, startsWith('dn-'));
-            expect(titleResults[0].nodeKey, equals('sutta-1'));
+            expect(titleResults[0].nodeKey, equals('dn-1-1'));
+          },
+        );
+      });
+
+      test('scopes a title by its node key, not the file holding its text',
+          () async {
+        // ARRANGE - a commentary branch whose children keep their text in the
+        // ANCESTOR's file, which is most of the corpus. Scoping on
+        // contentFileId dropped them all: 'atta-kn-khp' never starts with
+        // 'atta-kn-khp-'.
+        const query = SearchQuery(
+          queryText: 'වණ්ණනා',
+          scope: {'atta-kn-khp'}, // one ticked row in the Refine dialog
+        );
+
+        final treeSharingOneFile = [
+          // Inside the ticked node; its text lives in the ticked node's file.
+          const TipitakaTreeNode(
+            nodeKey: 'atta-kn-khp-1',
+            paliName: 'කින්තිපඤ්හවණ්ණනා',
+            sinhalaName: '',
+            hierarchyLevel: 3,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'atta-kn-khp',
+          ),
+          // Same shape in a branch that is NOT ticked - must stay out.
+          const TipitakaTreeNode(
+            nodeKey: 'atta-kn-dhp-1',
+            paliName: 'යමකවග්ගවණ්ණනා',
+            sinhalaName: '',
+            hierarchyLevel: 3,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'atta-kn-dhp',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(treeSharingOneFile));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result = await repository.searchTopResults(query);
+
+        // ASSERT
+        expect(result.isRight(), true);
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(titleResults.map((r) => r.nodeKey), ['atta-kn-khp-1']);
           },
         );
       });
@@ -2025,39 +2089,40 @@ void main() {
           searchInSinhala: false,
           scope: {TipitakaNodeKeys.suttaPitaka},
         );
+        // The node key decides scope, so each key names its own branch.
         final treeScoped = [
           // Pali match, in Sutta scope → kept.
           const TipitakaTreeNode(
-            nodeKey: 'keep',
+            nodeKey: 'dn-1-1',
             paliName: 'Mettasutta',
             sinhalaName: '',
             hierarchyLevel: 2,
             entryPageIndex: 0,
             entryIndexInPage: 0,
             parentNodeKey: null,
-            contentFileId: 'dn-1', // Sutta
+            contentFileId: 'dn-1',
           ),
           // Pali match, but Vinaya scope → dropped by scope.
           const TipitakaTreeNode(
-            nodeKey: 'wrong-scope',
+            nodeKey: 'vp-pv-1',
             paliName: 'Mettasutta',
             sinhalaName: '',
             hierarchyLevel: 2,
             entryPageIndex: 0,
             entryIndexInPage: 0,
             parentNodeKey: null,
-            contentFileId: 'vin-1', // Vinaya
+            contentFileId: 'vp-pv',
           ),
           // Sinhala-only match, in Sutta scope → dropped by language.
           const TipitakaTreeNode(
-            nodeKey: 'wrong-lang',
+            nodeKey: 'dn-1-2',
             paliName: 'Karuna',
             sinhalaName: 'Metta',
             hierarchyLevel: 2,
             entryPageIndex: 0,
             entryIndexInPage: 0,
             parentNodeKey: null,
-            contentFileId: 'dn-2', // Sutta
+            contentFileId: 'dn-2',
           ),
         ];
         when(mockTreeRepository.loadNavigationTree())
@@ -2069,7 +2134,7 @@ void main() {
 
         result.fold(
           (failure) => fail('Expected success but got failure'),
-          (categorized) => expect(titleNodeKeys(categorized), {'keep'}),
+          (categorized) => expect(titleNodeKeys(categorized), {'dn-1-1'}),
         );
       });
 

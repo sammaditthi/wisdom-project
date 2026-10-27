@@ -5,7 +5,6 @@ import '../navigation/tipitaka_tree_node.dart';
 /// Consolidated utility class for all search scope operations.
 ///
 /// This is the SINGLE SOURCE OF TRUTH for scope logic, providing:
-/// - Pattern mapping (node key → database filename patterns)
 /// - Hierarchy navigation (ancestor/descendant relationships)
 /// - Chip operations (validation, normalization)
 /// - Key operations (toggle, contains checks)
@@ -16,9 +15,6 @@ import '../navigation/tipitaka_tree_node.dart';
 ///
 /// Example usage:
 /// ```dart
-/// // Get patterns for SQL filtering
-/// final patterns = ScopeOperations.getPatternsForScope({'sp', 'vp'});
-///
 /// // Check if scope needs "custom" indicator in UI
 /// final isCustom = ScopeOperations.hasCustomSelections(scope);
 ///
@@ -58,18 +54,8 @@ class ScopeOperations {
   ];
 
   // ============================================================================
-  // PATTERN METHODS (delegated to shared ScopePatterns)
+  // HIERARCHY METHODS (delegated to shared ScopePatterns)
   // ============================================================================
-
-  /// Converts a tree node key to filename prefix patterns.
-  /// Delegates to [ScopePatterns.getPatternsForNodeKey].
-  static List<String> getPatternsForNodeKey(String nodeKey) =>
-      ScopePatterns.getPatternsForNodeKey(nodeKey);
-
-  /// Converts a set of tree node keys to filename prefix patterns.
-  /// Delegates to [ScopePatterns.getPatternsForScope].
-  static List<String> getPatternsForScope(Set<String> searchScope) =>
-      ScopePatterns.getPatternsForScope(searchScope);
 
   /// Check if [childNodeKey] is covered by [ancestorNodeKey].
   /// Delegates to [ScopePatterns.isNodeCoveredBy].

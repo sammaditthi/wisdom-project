@@ -2,6 +2,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/constants/constants.dart';
 import 'package:the_wisdom_project/data/services/scope_filter_service.dart';
 
+/// One scope key's test: the node itself, then its subtree.
+const kPair = '(m.nodeKey = ? OR m.nodeKey LIKE ?)';
+
 void main() {
   group('ScopeFilterService -', () {
     group('buildWhereClause', () {
@@ -22,7 +25,7 @@ void main() {
         });
 
         // ASSERT
-        expect(whereClause, equals('(m.filename LIKE ?)'));
+        expect(whereClause, equals('($kPair)'));
       });
 
       // Test 3: Multiple node keys generate OR logic
@@ -33,16 +36,11 @@ void main() {
           TipitakaNodeKeys.suttaAtthakatha,
         });
 
-        // ASSERT - 5 patterns for sp + 5 for atta-sp = 10 OR conditions
+        // ASSERT - 5 keys for sp + 5 for atta-sp = 10 OR-ed pairs
         expect(whereClause, contains('OR'));
         expect(
           whereClause,
-          equals(
-            '(m.filename LIKE ? OR m.filename LIKE ? OR m.filename LIKE ? OR '
-            'm.filename LIKE ? OR m.filename LIKE ? OR m.filename LIKE ? OR '
-            'm.filename LIKE ? OR m.filename LIKE ? OR m.filename LIKE ? OR '
-            'm.filename LIKE ?)',
-          ),
+          equals('(${List.filled(10, kPair).join(' OR ')})'),
         );
       });
 
@@ -54,12 +52,9 @@ void main() {
           TipitakaNodeKeys.majjhimaNikaya,
         });
 
-        // ASSERT - 2 patterns = 2 OR conditions
+        // ASSERT - 2 keys = 2 OR-ed pairs
         expect(whereClause, contains('OR'));
-        expect(
-          whereClause,
-          equals('(m.filename LIKE ? OR m.filename LIKE ?)'),
-        );
+        expect(whereClause, equals('($kPair OR $kPair)'));
       });
 
       // Test 5: Custom table alias and column name
@@ -68,11 +63,14 @@ void main() {
         final whereClause = ScopeFilterService.buildWhereClause(
           {TipitakaNodeKeys.vinayaPitaka},
           tableAlias: 'meta',
-          columnName: 'file_path',
+          columnName: 'node_key',
         );
 
         // ASSERT
-        expect(whereClause, equals('(meta.file_path LIKE ?)'));
+        expect(
+          whereClause,
+          equals('((meta.node_key = ? OR meta.node_key LIKE ?))'),
+        );
       });
     });
 
@@ -86,18 +84,18 @@ void main() {
         expect(params, isEmpty);
       });
 
-      // Test 7: Single node key returns params with % wildcard
-      test('should return params with wildcard for single node', () {
+      // Test 7: Single node key returns the key and its subtree pattern
+      test('should return exact key then subtree pattern for single node', () {
         // ACT
         final params = ScopeFilterService.getWhereParams({
           TipitakaNodeKeys.vinayaPitaka,
         });
 
-        // ASSERT
-        expect(params, equals(['vp-%']));
+        // ASSERT - the node's own rows, plus everything under it
+        expect(params, equals(['vp', 'vp-%']));
       });
 
-      // Test 8: Sutta Pitaka expands to nikaya patterns
+      // Test 8: Sutta Pitaka expands to nikaya keys
       test('should return all nikaya params for sp key', () {
         // ACT
         final params = ScopeFilterService.getWhereParams({
@@ -105,11 +103,20 @@ void main() {
         });
 
         // ASSERT
-        expect(params, equals(['dn-%', 'mn-%', 'sn-%', 'an-%', 'kn-%']));
+        expect(
+          params,
+          equals([
+            'dn', 'dn-%', //
+            'mn', 'mn-%',
+            'sn', 'sn-%',
+            'an', 'an-%',
+            'kn', 'kn-%',
+          ]),
+        );
       });
 
       // Test 9: Multiple node keys return all params
-      test('should return all params with wildcards for multiple nodes', () {
+      test('should return all params in pairs for multiple nodes', () {
         // ACT
         final params = ScopeFilterService.getWhereParams({
           TipitakaNodeKeys.dighaNikaya,
@@ -117,11 +124,11 @@ void main() {
         });
 
         // ASSERT
-        expect(params, equals(['dn-%', 'mn-%']));
+        expect(params, equals(['dn', 'dn-%', 'mn', 'mn-%']));
       });
 
       // Test 10: Commentary expansion
-      test('should expand atta-sp to commentary patterns', () {
+      test('should expand atta-sp to commentary params', () {
         // ACT
         final params = ScopeFilterService.getWhereParams({
           TipitakaNodeKeys.suttaAtthakatha,
@@ -131,11 +138,11 @@ void main() {
         expect(
           params,
           equals([
-            'atta-dn-%',
-            'atta-mn-%',
-            'atta-sn-%',
-            'atta-an-%',
-            'atta-kn-%'
+            'atta-dn', 'atta-dn-%', //
+            'atta-mn', 'atta-mn-%',
+            'atta-sn', 'atta-sn-%',
+            'atta-an', 'atta-an-%',
+            'atta-kn', 'atta-kn-%',
           ]),
         );
       });

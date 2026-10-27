@@ -119,85 +119,6 @@ List<TipitakaTreeNode> buildMockTreeRoots() {
 void main() {
   group('ScopeOperations -', () {
     // =========================================================================
-    // PATTERN CONFIGURATION
-    // =========================================================================
-
-    group('getPatternsForScope', () {
-      test('returns empty list when scope set is empty', () {
-        final patterns = ScopeOperations.getPatternsForScope({});
-        expect(patterns, isEmpty);
-      });
-
-      test('returns correct patterns for sutta pitaka (sp)', () {
-        final patterns =
-            ScopeOperations.getPatternsForScope({TipitakaNodeKeys.suttaPitaka});
-        expect(patterns, equals(['dn-', 'mn-', 'sn-', 'an-', 'kn-']));
-      });
-
-      test('combines patterns for multiple node keys', () {
-        final patterns = ScopeOperations.getPatternsForScope({
-          TipitakaNodeKeys.suttaPitaka,
-          TipitakaNodeKeys.vinayaPitaka,
-        });
-        expect(
-            patterns, containsAll(['dn-', 'mn-', 'sn-', 'an-', 'kn-', 'vp-']));
-        expect(patterns.length, equals(6)); // 5 sutta + 1 vinaya
-      });
-
-      test('returns single pattern for specific nikaya', () {
-        final patterns = ScopeOperations.getPatternsForScope(
-            {TipitakaNodeKeys.dighaNikaya, TipitakaNodeKeys.majjhimaNikaya});
-        expect(patterns, equals(['dn-', 'mn-']));
-      });
-
-      test('returns pattern for sub-node key', () {
-        final patterns = ScopeOperations.getPatternsForScope({'dn-1'});
-        expect(patterns, equals(['dn-1-']));
-      });
-
-      test('expands atta-sp to commentary patterns', () {
-        final patterns = ScopeOperations.getPatternsForScope(
-            {TipitakaNodeKeys.suttaAtthakatha});
-        expect(
-            patterns,
-            equals(
-                ['atta-dn-', 'atta-mn-', 'atta-sn-', 'atta-an-', 'atta-kn-']));
-      });
-    });
-
-    group('getPatternsForNodeKey', () {
-      test('expands sp to nikaya patterns', () {
-        final patterns =
-            ScopeOperations.getPatternsForNodeKey(TipitakaNodeKeys.suttaPitaka);
-        expect(patterns, equals(['dn-', 'mn-', 'sn-', 'an-', 'kn-']));
-      });
-
-      test('returns direct pattern for vp', () {
-        final patterns = ScopeOperations.getPatternsForNodeKey(
-            TipitakaNodeKeys.vinayaPitaka);
-        expect(patterns, equals(['vp-']));
-      });
-
-      test('returns direct pattern for ap', () {
-        final patterns = ScopeOperations.getPatternsForNodeKey(
-            TipitakaNodeKeys.abhidhammaPitaka);
-        expect(patterns, equals(['ap-']));
-      });
-
-      test('returns direct pattern for anya', () {
-        final patterns =
-            ScopeOperations.getPatternsForNodeKey(TipitakaNodeKeys.treatises);
-        expect(patterns, equals(['anya-']));
-      });
-
-      test('returns pattern for specific node like dn', () {
-        final patterns =
-            ScopeOperations.getPatternsForNodeKey(TipitakaNodeKeys.dighaNikaya);
-        expect(patterns, equals(['dn-']));
-      });
-    });
-
-    // =========================================================================
     // HIERARCHY NAVIGATION
     // =========================================================================
 
@@ -252,6 +173,20 @@ void main() {
         expect(
           ScopeOperations.isNodeCoveredBy(
               'atta-mn-1', TipitakaNodeKeys.suttaAtthakatha),
+          isTrue,
+        );
+      });
+
+      test('returns false for a key that merely starts the same', () {
+        // The hyphen boundary carries the whole rule. 'atta-an-10' is the tenth
+        // sibling of 'atta-an-1', not a child of it — a bare startsWith would
+        // swallow it, and the corpus has many such pairs.
+        expect(
+          ScopeOperations.isNodeCoveredBy('atta-an-10', 'atta-an-1'),
+          isFalse,
+        );
+        expect(
+          ScopeOperations.isNodeCoveredBy('atta-an-1-2', 'atta-an-1'),
           isTrue,
         );
       });

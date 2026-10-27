@@ -12,7 +12,7 @@ class ScopeFilterService {
   static String? buildWhereClause(
     Set<String> searchScope, {
     String tableAlias = 'm',
-    String columnName = 'filename',
+    String columnName = 'nodeKey',
   }) =>
       ScopeFilterSql.buildWhereClause(
         searchScope,
@@ -20,7 +20,7 @@ class ScopeFilterService {
         columnName: columnName,
       );
 
-  /// Gets the SQL parameters (pattern values with % wildcard) for scope filtering.
+  /// Gets the SQL parameters (exact key + subtree pattern per key).
   /// Returns empty list if [scope] is empty (no parameters needed).
   static List<String> getWhereParams(Set<String> scope) =>
       ScopeFilterSql.getWhereParams(scope);
