@@ -21,7 +21,7 @@ void main() {
 
     /// Opens the in-page search bar.
     ///
-    /// In production this is wired to the [Icons.find_in_page_outlined] button in
+    /// In production this is wired to the `Symbols.find_in_page_sharp` button in
     /// [ReaderActionToolbar], but that button is gated on the reader
     /// having visible content AND the toolbar not being hidden by scrolling
     /// — all wrapped in an [IgnorePointer] / [AnimatedOpacity] pair. Under

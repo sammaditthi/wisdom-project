@@ -68,7 +68,10 @@ class ReaderActionToolbar extends ConsumerWidget {
       [
         _LayoutMenuButton(visible: visible),
         _ToolbarButton.icon(
-          Icons.find_in_page_outlined,
+          Symbols.find_in_page_sharp,
+          // A page and a magnifier in 20px draws finer than the classic
+          // icons beside it; 500 is what Symbols needs to sit among them.
+          weight: 500,
           tooltip: l10n.findInPage,
           onTap: onSearchTap,
         ),
@@ -87,6 +90,7 @@ class ReaderActionToolbar extends ConsumerWidget {
           _ToolbarButton.icon(
             // The tree's icon for a text, in both directions.
             Symbols.description_sharp,
+            weight: 500,
             tooltip: isCommentary ? l10n.rootText : l10n.commentary,
             onTap: () => ref.read(openParallelTextProvider)(
               isPortraitMode:
@@ -301,12 +305,13 @@ class _ToolbarButton extends StatelessWidget {
     required VoidCallback onTap,
     bool? menuOpen,
     FocusNode? focusNode,
+    double? weight,
   }) : this(
           tooltip: tooltip,
           onTap: onTap,
           menuOpen: menuOpen,
           focusNode: focusNode,
-          content: (color) => Icon(icon, size: 20, color: color),
+          content: (color) => Icon(icon, size: 20, weight: weight, color: color),
         );
 
   @override

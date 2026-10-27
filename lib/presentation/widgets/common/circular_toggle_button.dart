@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 class CircularToggleButton extends StatelessWidget {
   final bool isActive;
   final IconData icon;
+
+  /// Stroke weight, for a Symbols glyph that reads heavier than the classic
+  /// icons beside it. Null takes the font's own. No effect on classic.
+  final double? weight;
+
   final String? tooltip;
   final VoidCallback onPressed;
   final EdgeInsetsGeometry margin;
@@ -14,6 +19,7 @@ class CircularToggleButton extends StatelessWidget {
     required this.isActive,
     required this.icon,
     required this.onPressed,
+    this.weight,
     this.tooltip,
     this.margin = const EdgeInsets.only(left: 4),
   });
@@ -24,7 +30,7 @@ class CircularToggleButton extends StatelessWidget {
     return Padding(
       padding: margin,
       child: IconButton(
-        icon: Icon(icon),
+        icon: Icon(icon, weight: weight),
         // Announces on/off, as PillChip.refine does for the chip form of the
         // same control.
         isSelected: isActive,

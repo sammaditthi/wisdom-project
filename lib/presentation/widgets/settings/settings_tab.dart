@@ -10,7 +10,7 @@ import '../../../core/localization/l10n/app_localizations.dart';
 /// switch — which won't compile until it exists.
 enum SettingsTab {
   general(Icons.settings_outlined),
-  anumodana(Symbols.folded_hands);
+  anumodana(Symbols.folded_hands_sharp);
 
   const SettingsTab(this.icon);
 

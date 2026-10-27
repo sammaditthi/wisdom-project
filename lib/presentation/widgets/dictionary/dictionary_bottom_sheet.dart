@@ -366,7 +366,8 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                             ),
                             CircularToggleButton(
                               isActive: isExactMatch,
-                              icon: Symbols.match_word,
+                              icon: Symbols.match_word_sharp,
+                              weight: 500,
                               tooltip: AppLocalizations.of(context)
                                   .isExactMatchToggle,
                               onPressed: () {
