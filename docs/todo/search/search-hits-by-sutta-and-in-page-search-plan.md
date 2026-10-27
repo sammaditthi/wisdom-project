@@ -68,6 +68,12 @@ Started 2026-10-16, decided with the user the same day. Not started.
 - Group in Dart by `unitKey(resolver)`, never `GROUP BY nodeKey` in SQL: the
   stored `nodeKey` names the wrong sutta for some rows (see
   `openTabFromSearchResultProvider`).
+  - One path already breaks that rule: "Anywhere in the same text"
+    (`FtsSameTextSql`) intersects at `GROUP BY nodeKey, language`, so inside a
+    corrected leaf it can span the wrong boundary, and the badge can count two
+    units the tiles then show as one. Measured 2026-10-27: 1,297 of 456,977
+    `bjt_meta` rows sit in a shifted interval, across all 88
+    `correctedTreeCoordinates` leaves. This step removes that grouping.
 - Per sutta: rows sorted by (page, entry), best score, count. Sort suttas by
   best score; ties by the best row's `id`, as `ORDER BY score, id` does now.
 - Extend `GroupedFTSMatch` (first row = the tile, the rest = "more") rather
