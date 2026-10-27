@@ -15,7 +15,7 @@ class CircularToggleButton extends StatelessWidget {
     required this.isActive,
     required this.icon,
     required this.onPressed,
-    this.iconSize = 20,
+    this.iconSize = 24,
     this.tooltip,
     this.margin = const EdgeInsets.only(left: 4),
   });

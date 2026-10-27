@@ -347,14 +347,14 @@ void main() {
         expect(allBadgeTexts.contains('DPD'), isTrue,
             reason: 'DPD should be among the initial results');
 
-        // STEP 2: Tap the tune (refine) icon button on the bottom sheet
-        final tuneButton = find.descendant(
+        // STEP 2: Tap the refine (filter) icon button on the bottom sheet
+        final refineButton = find.descendant(
           of: find.byType(DictionaryBottomSheet),
-          matching: find.byIcon(Icons.tune),
+          matching: find.byIcon(Icons.filter_list),
         );
-        expect(tuneButton, findsOneWidget,
-            reason: 'Tune icon button should be in the sheet header');
-        await tester.tap(tuneButton);
+        expect(refineButton, findsOneWidget,
+            reason: 'Refine icon button should be in the sheet header');
+        await tester.tap(refineButton);
         await pumpForSettle(tester);
 
         // ASSERT: Refine dictionary dialog is visible
@@ -391,7 +391,7 @@ void main() {
         // STEP 4: Open refine dialog again and tap DPD to restore all.
         // Since DPD's entire group (English) is NOT fully selected — only
         // DPD is — tapping DPD deselects it, resulting in empty set = "All".
-        await tester.tap(tuneButton);
+        await tester.tap(refineButton);
         await pumpForSettle(tester);
 
         // Tap "Digital Pali Dictionary" again — this deselects DPD.

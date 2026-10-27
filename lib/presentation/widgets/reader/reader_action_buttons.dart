@@ -68,7 +68,7 @@ class ReaderActionToolbar extends ConsumerWidget {
       [
         _LayoutMenuButton(visible: visible),
         _ToolbarButton.icon(
-          Icons.search,
+          Icons.find_in_page_outlined,
           tooltip: l10n.findInPage,
           onTap: onSearchTap,
         ),

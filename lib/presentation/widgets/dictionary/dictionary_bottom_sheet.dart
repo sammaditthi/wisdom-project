@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/constants/constants.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
@@ -365,10 +366,7 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                             ),
                             CircularToggleButton(
                               isActive: isExactMatch,
-                              icon: Icons.abc,
-                              // Icons.abc has heavy internal padding — bump
-                              // the size so the letters read clearly.
-                              iconSize: 28,
+                              icon: Symbols.match_word,
                               tooltip: AppLocalizations.of(context)
                                   .isExactMatchToggle,
                               onPressed: () {
@@ -379,9 +377,13 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                               },
                             ),
                             // Refine dictionaries button
-                            _DictionaryFilterButton(
-                              filterIds: filterIds,
-                              onTap: () => _openRefineDialog(context),
+                            CircularToggleButton(
+                              isActive:
+                                  !DictionaryFilterOperations.isAllSelected(
+                                      filterIds),
+                              icon: Icons.filter_list,
+                              tooltip: AppLocalizations.of(context).refine,
+                              onPressed: () => _openRefineDialog(context),
                             ),
                             // Chevron toggle: collapsed ↔ fully expanded.
                             // Wrapped so only the icon rebuilds when the
@@ -530,54 +532,6 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Icon button that opens the dictionary refine dialog.
-/// Shows a colored dot indicator when a custom filter is active.
-class _DictionaryFilterButton extends StatelessWidget {
-  final Set<String> filterIds;
-  final VoidCallback onTap;
-
-  const _DictionaryFilterButton({
-    required this.filterIds,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final hasFilter = !DictionaryFilterOperations.isAllSelected(filterIds);
-
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        IconButton(
-          icon: Icon(
-            Icons.tune,
-            color: hasFilter
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurfaceVariant,
-          ),
-          onPressed: onTap,
-          tooltip: AppLocalizations.of(context).refine,
-        ),
-        // Active filter indicator dot
-        if (hasFilter)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-      ],
     );
   }
 }

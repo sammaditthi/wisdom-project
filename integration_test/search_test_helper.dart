@@ -396,10 +396,10 @@ extension SearchTestHelpers on WidgetTester {
   /// fully visible.
   Future<void> refineDictionaries(List<String> dictNames) async {
     // The Refine chip is inside DictionaryFilterChips (only on Definitions tab).
-    // Find the chip with the tune icon.
+    // Find the chip with the filter icon.
     final refineChip = find.descendant(
       of: find.byType(DictionaryFilterChips),
-      matching: find.byIcon(Icons.tune),
+      matching: find.byIcon(Icons.filter_list),
     );
     expect(refineChip, findsOneWidget,
         reason: 'Refine chip should be visible on Definitions tab');

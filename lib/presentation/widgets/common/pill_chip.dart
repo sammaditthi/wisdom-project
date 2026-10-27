@@ -17,8 +17,9 @@ class PillChip extends StatelessWidget {
     required this.onPressed,
   }) : _refine = false;
 
-  /// The "Refine" chip: tune icon and its own colours, as it opens a dialog
-  /// rather than filtering. [selected] means filters from the dialog are on.
+  /// The "Refine" chip: filter icon and its own colours, as it opens a dialog
+  /// rather than filtering on the spot. [selected] means filters from the
+  /// dialog are on.
   const PillChip.refine({
     super.key,
     required this.label,
@@ -93,7 +94,7 @@ class PillChip extends StatelessWidget {
             ? Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.tune, size: 16),
+                  const Icon(Icons.filter_list, size: 16),
                   const SizedBox(width: 6),
                   text,
                 ],

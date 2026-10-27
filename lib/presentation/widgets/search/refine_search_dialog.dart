@@ -152,7 +152,7 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
     return Row(
       children: [
         Icon(
-          Icons.tune,
+          Icons.filter_list,
           color: theme.colorScheme.primary,
         ),
         const SizedBox(width: 8),
