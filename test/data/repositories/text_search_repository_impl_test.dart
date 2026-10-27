@@ -551,6 +551,63 @@ void main() {
         );
       });
 
+      test('finds a numbered heading written either with or without spaces',
+          () async {
+        // The sanitizer turns both "3.1.4.1" and "3. 1. 4. 1" into this.
+        const query = SearchQuery(queryText: '3 1 4 1');
+
+        final treeWithNumberedHeadings = [
+          const TipitakaTreeNode(
+            nodeKey: 'an-3-1-4-1',
+            paliName: '3. 1. 4. 1', // how the Tipitaka tree writes it
+            sinhalaName: '3. 1. 4. 1',
+            hierarchyLevel: 1,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'an-3-1-4-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'atta-an-3-1-4-1',
+            paliName: '3.1.4.1', // how the commentary tree writes it
+            sinhalaName: '3.1.4.1',
+            hierarchyLevel: 1,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'atta-an-3-1-4-1',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(treeWithNumberedHeadings));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result = await repository.searchTopResults(query);
+
+        // ASSERT - one normalizer on both sides, so neither spelling is lost
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              containsAll(<String>['an-3-1-4-1', 'atta-an-3-1-4-1']),
+            );
+          },
+        );
+      });
+
       test('should prefer sinhala name when both pali and sinhala match',
           () async {
         // ARRANGE - Use Sinhala query that matches both names directly
@@ -936,11 +993,12 @@ void main() {
         );
       });
 
-      test(
-          'should NOT match across punctuation without spaces (isExactMatch=true)',
+      test('a period is a word boundary, a hyphen is not (isExactMatch=true)',
           () async {
-        // ARRANGE - Test that punctuation is NOT treated as word boundary
-        // Current implementation only uses spaces as boundaries
+        // ARRANGE - '.' is a separator in the FTS index and, now, on the
+        // title side too. '-' separates in the index as well, but the query
+        // sanitizer deletes it while titles keep it, so the title side still
+        // won't break on a hyphen — a known gap, not the tokenizer's rule.
         const query = SearchQuery(queryText: 'sutta', isExactMatch: true);
 
         final treeWithPunctuation = [
@@ -966,7 +1024,7 @@ void main() {
             parentNodeKey: null,
             contentFileId: 'space-1',
           ),
-          // Should NOT match: period is not a word boundary (no space)
+          // Should match: a period separates words, as it does in the index
           const TipitakaTreeNode(
             nodeKey: 'period-1',
             paliName: 'First.sutta',
@@ -1001,10 +1059,11 @@ void main() {
           (categorized) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
-            // Should only match 'Brahma sutta', not punctuation-separated ones
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].title, equals('Brahma sutta'));
-            expect(titleResults[0].nodeKey, equals('space-1'));
+            // The space and the period both end a word; the hyphen does not.
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              unorderedEquals(<String>['space-1', 'period-1']),
+            );
           },
         );
       });

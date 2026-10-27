@@ -338,8 +338,10 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
   }) {
     final results = <SearchResult>[];
 
-    // Normalize query for matching (caller handles Singlish conversion)
-    final searchQuery = normalizeText(queryText, toLowerCase: true);
+    // Normalize query for matching (caller handles Singlish conversion).
+    // Same normalizer as the names below, so a dotted "3.1.4.1" and the
+    // spaced "3. 1. 4. 1" the tree stores both reduce to "3 1 4 1".
+    final searchQuery = normalizeForTitleMatch(queryText);
 
     // Get scope patterns for filtering
     final scopePatterns = ScopeOperations.getPatternsForScope(scope);
@@ -369,10 +371,8 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     }
 
     for (final node in nodeMap.values) {
-      final paliName =
-          normalizeText(node.paliName, toLowerCase: true).replaceAll('.', '');
-      final sinhalaName = normalizeText(node.sinhalaName, toLowerCase: true)
-          .replaceAll('.', '');
+      final paliName = normalizeForTitleMatch(node.paliName);
+      final sinhalaName = normalizeForTitleMatch(node.sinhalaName);
 
       // Match normalized query against each name, but only when the language
       // scope includes that language. Narrowed to one language, a node that
@@ -416,10 +416,8 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     // 2. Secondary: leaf nodes (individual suttas) before parent nodes
     results.sort((a, b) {
       // Primary sort: startsWith first
-      final titleA =
-          normalizeText(a.title, toLowerCase: true).replaceAll('.', '');
-      final titleB =
-          normalizeText(b.title, toLowerCase: true).replaceAll('.', '');
+      final titleA = normalizeForTitleMatch(a.title);
+      final titleB = normalizeForTitleMatch(b.title);
       final aStartsWith = titleA.startsWith(searchQuery);
       final bStartsWith = titleB.startsWith(searchQuery);
 

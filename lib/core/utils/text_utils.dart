@@ -35,7 +35,8 @@ final _whitespacePattern = RegExp(r'\s');
 ///
 /// Strips zero-width chars and sentence punctuation ([_invalidTextCharsPattern]),
 /// collapses whitespace, trims, and lowercases.
-/// Only strips punctuation that appears between tokens (`.` `;` `!`).
+/// Only strips punctuation that appears between tokens (`;` `!`); `.` becomes
+/// a space instead — see [_splitOnPeriods].
 /// Formatting markers (`**`, `{}`, etc.) are left intact — strip them first
 /// with `ContentMarkers.stripMarkers` if you are matching against the FTS
 /// index, which never saw them.
@@ -56,15 +57,18 @@ final _whitespacePattern = RegExp(r'\s');
     // Skip search-invalid characters (punctuation, but keep - and ,)
     if (_invalidTextCharsPattern.hasMatch(char)) continue;
 
-    // Collapse consecutive whitespace
-    if (_whitespacePattern.hasMatch(char)) {
+    // Collapse consecutive whitespace. A '.' becomes a space, so a dotted
+    // heading splits the way [sanitizeSearchQuery] splits a dotted query.
+    // Other whitespace is written through unchanged — a '\n' is not a ' '.
+    final isPeriod = char == '.';
+    if (isPeriod || _whitespacePattern.hasMatch(char)) {
       if (lastWasSpace) continue;
       lastWasSpace = true;
+      buffer.write(isPeriod ? ' ' : char);
     } else {
       lastWasSpace = false;
+      buffer.write(char);
     }
-
-    buffer.write(char);
     map.add(i);
   }
 
@@ -82,18 +86,33 @@ final _whitespacePattern = RegExp(r'\s');
 }
 
 /// Chars stripped from queries.
-/// Periods/commas/hyphens are also removed to avoid FTS complexity although they appear in titles.
-const _invalidSearchChars = r'"()*{}\[\]@#$%&=+<>\\`|/;\^!.,-';
+/// Commas/hyphens are also removed to avoid FTS complexity although they appear in titles.
+const _invalidSearchChars = r'"()*{}\[\]@#$%&=+<>\\`|/;\^!,-';
 final _invalidCharsPattern = RegExp('[$_invalidSearchChars]');
+
+/// Turns each `.` into a space, then collapses and trims.
+///
+/// The FTS tokenizer already treats `.` as a separator, and a bare `.` is a
+/// syntax error inside an FTS5 query, so it cannot simply be kept. Deleting it
+/// instead was what made "3.1.4.1" miss the node the tree stores as
+/// "3. 1. 4. 1"; spacing keeps both spellings on one string.
+String _splitOnPeriods(String text) =>
+    text.replaceAll('.', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+
+/// Reduces a tree name — or a query matched against one — to the shape
+/// [sanitizeSearchQuery] produces, so the two can be compared directly.
+String normalizeForTitleMatch(String text) =>
+    _splitOnPeriods(normalizeText(text, toLowerCase: true));
 
 /// Sentence punctuation stripped from text during search normalization.
 /// Only includes chars that appear between matched tokens in Pali/Sinhala
-/// content (e.g., "16. ස") and would prevent indexOf from finding the query.
+/// content and would prevent indexOf from finding the query. `.` is not here:
+/// it becomes a space rather than vanishing.
 /// Formatting markers (**, {}, etc.) are NOT stripped here. They do split
 /// words the FTS index indexed whole (`**ඡන්දරාගවෙමත්තතා**ති`), so a caller
 /// matching an index hit must strip them before normalizing — see
 /// docs/todo/search/word-joining-characters-in-the-fts-index.md.
-const _invalidTextChars = r'.;!';
+const _invalidTextChars = r';!';
 final _invalidTextCharsPattern = RegExp('[$_invalidTextChars]');
 
 /// Matches valid content: Sinhala, English, or digits.
@@ -153,7 +172,7 @@ int snapToGraphemeBoundary(String text, int index, {bool forward = false}) {
 String? sanitizeSearchQuery(String query) {
   var sanitized = normalizeText(query);
   sanitized = sanitized.replaceAll(_invalidCharsPattern, '');
-  sanitized = sanitized.replaceAll(RegExp(r'\s+'), ' ').trim();
+  sanitized = _splitOnPeriods(sanitized);
 
   if (!_validContentPattern.hasMatch(sanitized)) {
     return null;

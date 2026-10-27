@@ -69,16 +69,25 @@ void main() {
       expect(result.normalized, '');
     });
 
-    test('strips sentence punctuation (.;!) from text', () {
+    test('a period becomes the space that follows it', () {
       // "16. ස" - period between number and Sinhala character
       const text = '16. ස';
       // Original: 1(0) 6(1) .(2) space(3) ස(4)
-      // Normalized: "16 ස" - period stripped, space kept
+      // Normalized: "16 ස" - the period IS the space; the real one collapses
+      // into it, so the space maps back to index 2.
 
       final result = normalizeSearchText(text);
 
       expect(result.normalized, '16 ස');
-      expect(result.positionMap, [0, 1, 3, 4, 5]);
+      expect(result.positionMap, [0, 1, 2, 4, 5]);
+    });
+
+    test('a period with no space after it still separates', () {
+      // Headings are written both ways in the corpus — "3. 1. 4. 1" and the
+      // compact "4.3.1.6". Both have to normalize to the same spaced form or
+      // in-page search finds one spelling and not the other.
+      expect(normalizeSearchText('4.3.1.6').normalized, '4 3 1 6');
+      expect(normalizeSearchText('4. 3. 1. 6').normalized, '4 3 1 6');
     });
 
     test('strips semicolons and exclamation marks', () {
@@ -87,6 +96,33 @@ void main() {
 
       // Semicolon and ! stripped, whitespace collapsed
       expect(result.normalized, 'abc def ghi');
+    });
+  });
+
+  group('sanitizeSearchQuery', () {
+    test('both spellings of a numbered heading reduce to one query', () {
+      // The tree stores "3. 1. 4. 1"; a reader types it either way.
+      expect(sanitizeSearchQuery('3.1.4.1'), '3 1 4 1');
+      expect(sanitizeSearchQuery('3. 1. 4. 1'), '3 1 4 1');
+      expect(sanitizeSearchQuery('1.16.3.10'), '1 16 3 10');
+    });
+
+    test('still drops the chars FTS5 cannot parse', () {
+      expect(sanitizeSearchQuery('සති(ය)'), 'සතිය');
+      expect(sanitizeSearchQuery('a-b,c'), 'abc');
+    });
+
+    test('a trailing period leaves no trailing space', () {
+      expect(sanitizeSearchQuery('සති.'), 'සති');
+    });
+  });
+
+  group('normalizeForTitleMatch', () {
+    test('meets the query on either spelling of a numbered heading', () {
+      expect(normalizeForTitleMatch('3. 1. 4. 1'), '3 1 4 1');
+      // 19 commentary names are written compact; they matched before this
+      // change and must keep matching.
+      expect(normalizeForTitleMatch('3.3.1.1'), '3 3 1 1');
     });
   });
 
