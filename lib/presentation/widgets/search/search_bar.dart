@@ -102,7 +102,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
   }
 
   void _onFocusChange() async {
-    // Rebuild so fill + focus outline track focus, not just typed text.
+    // Rebuild so the focus outline tracks focus, not just typed text.
     if (mounted) setState(() {});
 
     if (_focusNode.hasFocus) {
@@ -228,19 +228,18 @@ class _SearchBarState extends ConsumerState<SearchBar> {
           height: 40,
           child: Container(
             decoration: BoxDecoration(
-              // Tri-state fill: idle / scrolled (merges with AppBar) / focused.
-              color: _focusNode.hasFocus
-                  ? theme.colorScheme.surfaceContainerHighest
-                  : (scrolledUnder
-                      ? theme.colorScheme.surfaceContainer
-                      : theme.colorScheme.surfaceContainerHigh),
+              // The fill says what the box is, not whether it has focus:
+              // idle, or scrolled so it merges with the AppBar.
+              color: scrolledUnder
+                  ? theme.colorScheme.surfaceContainer
+                  : theme.colorScheme.surfaceContainerHigh,
               borderRadius: BorderRadius.circular(20),
-              // Always 1px (transparent when unfocused) so focus change
-              // doesn't reflow inner content by the stroke width.
+              // Focus is the border, as on the in-page search bar. Always 1px
+              // so the change doesn't reflow inner content by the stroke width.
               border: Border.all(
                 color: _focusNode.hasFocus
                     ? theme.colorScheme.primary
-                    : Colors.transparent,
+                    : theme.colorScheme.outline,
                 width: 1,
               ),
             ),

@@ -63,7 +63,7 @@ class RecentSearchOverlay extends ConsumerWidget {
       child: Material(
         elevation: 8,
         borderRadius: borderRadius,
-        color: theme.colorScheme.surfaceContainer,
+        color: theme.colorScheme.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: ClipRRect(

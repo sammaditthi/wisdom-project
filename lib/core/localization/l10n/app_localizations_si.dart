@@ -116,7 +116,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get close => 'වසන්න';
 
   @override
-  String get searchHint => 'සෙවුම් පදය ඇතුළත් කරන්න';
+  String get searchHint => 'සොයන්න';
 
   @override
   String get isExactMatchToggle => 'එම වචනයම සොයන්න';
