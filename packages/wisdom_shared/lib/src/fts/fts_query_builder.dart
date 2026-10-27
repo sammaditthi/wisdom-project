@@ -15,6 +15,10 @@
 /// - [isAnywhereInText] = false: Use NEAR(terms, n) for proximity
 /// - [isExactMatch] affects whether wildcards are added to each word
 ///
+/// The implicit AND holds only within one indexed row — one entry of one
+/// language side. A multi-word "Anywhere in the same text" search wants a whole
+/// sutta, so it goes through `FtsSameTextSql` instead of this builder.
+///
 /// ## Search Flows Summary (FTS5):
 /// | isPhraseSearch | isAnywhereInText | isExactMatch | FTS5 Query |
 /// |---------------|------------------|--------------|------------|
@@ -36,11 +40,11 @@ String buildFtsQuery(
   }
 
   // Split into words (handles multi-word queries)
-  final words = queryText.split(' ').where((w) => w.isNotEmpty).toList();
+  final words = ftsQueryWords(queryText);
 
   if (words.length == 1) {
     // Single word: simple token matching (no quotes)
-    return isExactMatch ? words[0] : '${words[0]}*';
+    return ftsWordQuery(words[0], isExactMatch: isExactMatch);
   }
 
   // Multi-word handling
@@ -51,7 +55,7 @@ String buildFtsQuery(
       return '"${words.join(' ')}"';
     } else {
       // Not NEAR(…, 1): that allows any order and one word in between.
-      return words.map((w) => '$w*').join(' + ');
+      return words.map(ftsWordQuery).join(' + ');
     }
   } else {
     // Separate-word search
@@ -60,15 +64,25 @@ String buildFtsQuery(
       if (isExactMatch) {
         return words.join(' ');
       } else {
-        return words.map((w) => '$w*').join(' ');
+        return words.map(ftsWordQuery).join(' ');
       }
     } else {
       // Proximity search: words within specific distance
       if (isExactMatch) {
         return 'NEAR(${words.join(' ')}, $proximityDistance)';
       } else {
-        return 'NEAR(${words.map((w) => '$w*').join(' ')}, $proximityDistance)';
+        return 'NEAR(${words.map(ftsWordQuery).join(' ')}, $proximityDistance)';
       }
     }
   }
 }
+
+/// The words an FTS query is built from: split on spaces, empties dropped.
+/// Shared so every search mode splits a query the same way.
+List<String> ftsQueryWords(String queryText) =>
+    queryText.split(' ').where((w) => w.isNotEmpty).toList();
+
+/// One word's FTS expression: a prefix token, or the bare token when
+/// [isExactMatch].
+String ftsWordQuery(String word, {bool isExactMatch = false}) =>
+    isExactMatch ? word : '$word*';

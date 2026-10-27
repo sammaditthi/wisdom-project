@@ -110,6 +110,29 @@ class FTSDataSourceImpl implements FTSDataSource {
       final ftsTable = '${editionId}_fts';
       final metaTable = '${editionId}_meta';
 
+      // "Anywhere in the same text" spans a whole sutta, which one MATCH
+      // cannot express — see FtsSameTextSql.
+      final sameTextWords = FtsSameTextSql.wordQueries(
+        query,
+        isExactMatch: isExactMatch,
+        isPhraseSearch: isPhraseSearch,
+        isAnywhereInText: isAnywhereInText,
+      );
+      if (sameTextWords != null) {
+        final statement = FtsSameTextSql.search(
+          ftsTable: ftsTable,
+          metaTable: metaTable,
+          wordQueries: sameTextWords,
+          scope: scope,
+          language: language,
+          limit: limit,
+          offset: offset,
+        );
+        final rows = await db.rawQuery(statement.sql, statement.args);
+        _log('Results: ${rows.length} matches');
+        return rows.map((row) => FTSMatch.fromMap(row, editionId)).toList();
+      }
+
       // Build FTS query syntax (query already validated by repository)
       final ftsQuery = buildFtsQuery(
         query,
@@ -200,6 +223,25 @@ class FTSDataSourceImpl implements FTSDataSource {
     try {
       final ftsTable = '${editionId}_fts';
       final metaTable = '${editionId}_meta';
+
+      // Same gate as searchFullText, so the badge counts what the list shows.
+      final sameTextWords = FtsSameTextSql.wordQueries(
+        query,
+        isExactMatch: isExactMatch,
+        isPhraseSearch: isPhraseSearch,
+        isAnywhereInText: isAnywhereInText,
+      );
+      if (sameTextWords != null) {
+        final statement = FtsSameTextSql.count(
+          ftsTable: ftsTable,
+          metaTable: metaTable,
+          wordQueries: sameTextWords,
+          scope: scope,
+          language: language,
+        );
+        final rows = await db.rawQuery(statement.sql, statement.args);
+        return rows.first['count'] as int;
+      }
 
       // Build FTS query syntax (query already validated by repository)
       final ftsQuery = buildFtsQuery(
