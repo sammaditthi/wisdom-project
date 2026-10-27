@@ -180,9 +180,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
     final l10n = AppLocalizations.of(context);
 
     final inputStyle = context.typography.searchInput;
-    final hintStyle = inputStyle.copyWith(
-      color: theme.colorScheme.onSurfaceVariant,
-    );
+    final hintStyle = context.typography.searchHint;
 
     // Watch if results panel is visible (query is not empty)
     // When query has any text, the results panel is shown instead
