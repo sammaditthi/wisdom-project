@@ -43,24 +43,3 @@ first-draft Sinhala. Review the titles in `app_si.arb`: `matchOptions`,
 
 Phones show no tooltips, so each title must make sense alone. The least clear
 is ඇරඹෙන වචන ("Starts with").
-
-## R3. Find-in-page can leave its match off screen
-
-Read a few screens into a sutta, then search a word whose first hit is near
-the top. The bar says "1 / N" and the tab is anchored at the hit's row, but the
-view settles below that row and never draws it.
-
-Measured 2026-10-28 on macOS, dn-1-1, "එවං": the first hit is row (0,6). Two
-screens down, searching again leaves the anchor at (0,6) and the offset at 328,
-with the row off screen. The code before the reveal-count fix does exactly the
-same, so this is older than that fix.
-
-Where: the far-row branch of `_revealEntry` (`multi_pane_reader_widget.dart`),
-which anchors at the row and settles it with `ensureVisible` after the frame.
-A lead, not proven: test 3c also returns to a hit near the top and passes, but
-there the tab already had an anchor further down. Here it has none, so the jump
-to offset 0 lands on the sutta's top, where the row is already built in the old
-layout.
-
-Test 3f in `integration_test/in_page_search_test.dart` reproduces it and is
-skipped until this is fixed. Unskip it as part of the fix.

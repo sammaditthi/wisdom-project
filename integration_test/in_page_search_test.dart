@@ -471,8 +471,6 @@ void main() {
             reason: 'Nothing about the match changed, but a new query must '
                 'still bring its first hit into view');
       },
-      // Fails on an older reveal bug: docs/todo/reader/app-reader-backlog.md R3.
-      skip: true,
     );
 
     // ---------------------------------------------------------------

@@ -56,6 +56,10 @@ class AnchoredPageList extends StatelessWidget {
   Widget build(BuildContext context) {
     final pageCount = slice.pages.length;
     final split = _localAnchor();
+    // A new anchor gets new lists. A kept list lays its built rows out from
+    // their old offsets, though each index is now another page, and can
+    // settle past the anchor row without building it.
+    final listKey = ValueKey(split);
 
     if (split == null) {
       return CustomScrollView(
@@ -66,6 +70,7 @@ class AnchoredPageList extends StatelessWidget {
             key: _centerKey,
             padding: padding,
             sliver: SliverList.builder(
+              key: listKey,
               itemCount: pageCount + 1,
               itemBuilder: (context, i) =>
                   i == 0 ? _spacer : _page(context, i - 1),
@@ -84,6 +89,7 @@ class AnchoredPageList extends StatelessWidget {
         SliverPadding(
           padding: padding.copyWith(bottom: 0),
           sliver: SliverList.builder(
+            key: listKey,
             itemCount: ap + 2,
             itemBuilder: (context, i) {
               if (i == ap + 1) return _spacer;
@@ -97,6 +103,7 @@ class AnchoredPageList extends StatelessWidget {
           key: _centerKey,
           padding: padding.copyWith(top: 0),
           sliver: SliverList.builder(
+            key: listKey,
             itemCount: pageCount - ap,
             // The anchor row onward, with no page number.
             itemBuilder: (context, i) => i == 0
