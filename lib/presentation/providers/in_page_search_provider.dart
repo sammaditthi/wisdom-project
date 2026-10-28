@@ -183,7 +183,13 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
     if (tabState.matches.isEmpty) return;
 
     final nextIndex = (tabState.currentMatchIndex + 1) % tabState.matchCount;
-    _setTabState(tabIndex, tabState.copyWith(currentMatchIndex: nextIndex));
+    _setTabState(
+      tabIndex,
+      tabState.copyWith(
+        currentMatchIndex: nextIndex,
+        revealCount: tabState.revealCount + 1,
+      ),
+    );
   }
 
   /// Navigates to the previous match (wraps around).
@@ -196,7 +202,13 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
 
     final prevIndex = (tabState.currentMatchIndex - 1 + tabState.matchCount) %
         tabState.matchCount;
-    _setTabState(tabIndex, tabState.copyWith(currentMatchIndex: prevIndex));
+    _setTabState(
+      tabIndex,
+      tabState.copyWith(
+        currentMatchIndex: prevIndex,
+        revealCount: tabState.revealCount + 1,
+      ),
+    );
   }
 
   /// Removes search state for a closed tab and re-indexes remaining tabs.
@@ -315,11 +327,13 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
 
   /// Installs a match set, parking the cursor on the first hit or nowhere.
   void _setMatches(int tabIndex, List<InPageMatch> matches) {
+    final tabState = _getTabState(tabIndex);
     _setTabState(
       tabIndex,
-      _getTabState(tabIndex).copyWith(
+      tabState.copyWith(
         matches: matches,
         currentMatchIndex: matches.isNotEmpty ? 0 : -1,
+        revealCount: tabState.revealCount + 1,
       ),
     );
   }

@@ -82,10 +82,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   // to the next view's restore.
   BuildContext? _userScrollContext;
 
-  // When true, the layout change listener is suppressed. Set during tab
-  // switches to prevent the layout listener from firing when the "change"
-  // is just a side-effect of switching to a tab with a different layout.
-  bool _suppressLayoutListener = false;
+  // True from a tab switch until the frame after it. The layout and
+  // search-match listeners then see the other tab's values, not a change, and
+  // leave the scroll position to the restore.
+  bool _switchingTabs = false;
 
   // Debounces scroll-position writes into the active tab so a fast scroll
   // doesn't push hundreds of state mutations through Riverpod / disk.
@@ -356,11 +356,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // Listen to active tab changes
     ref.listen<int>(activeTabIndexProvider, (previous, next) {
       if (previous != null && previous != next) {
-        // Suppress the layout listener during tab switches. When tabs have
-        // different layout settings, activeReaderLayoutProvider changes as a
-        // side-effect. Without this guard, the layout listener would override
-        // the scroll position restoration below.
-        _suppressLayoutListener = true;
+        _switchingTabs = true;
 
         // Save the previous tab's offset, by its index. Closing the active
         // tab passes through -1, so a closed tab is never saved. Closing a
@@ -391,11 +387,11 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         // draws one frame at the closed tab's offset.
         if (next >= 0) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            _suppressLayoutListener = false;
+            _switchingTabs = false;
             _restoreScrollWithRetry();
           });
         } else {
-          _suppressLayoutListener = false;
+          _switchingTabs = false;
           // No active tab (all tabs closed) — the reader shows the empty
           // state, so the app bar must not stay tinted.
           ref.read(readerScrolledUnderProvider.notifier).state = false;
@@ -431,7 +427,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // becomes the anchor, so the new layout opens on it and builds nothing
     // above it.
     ref.listen<ReaderLayout>(activeReaderLayoutProvider, (previous, next) {
-      if (previous != null && previous != next && !_suppressLayoutListener) {
+      if (previous != null && previous != next && !_switchingTabs) {
         // Capture top-visible entry from the OLD layout (still mounted)
         final topEntry =
             _entryKeyRegistry.findTopVisibleEntry(_scrollController);
@@ -453,8 +449,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // to bring the toolbar back when find closes.
     ref.listen<InPageSearchState>(activeInPageSearchStateProvider,
         (previous, next) {
-      if (next.currentMatchIndex >= 0 &&
-          next.currentMatchIndex != (previous?.currentMatchIndex ?? -1)) {
+      if (next.currentMatch != null &&
+          next.revealCount != previous?.revealCount &&
+          !_switchingTabs) {
         _scrollToCurrentMatch(next);
       }
       if ((previous?.isVisible ?? false) && !next.isVisible) _showToolbar();

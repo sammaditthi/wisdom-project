@@ -44,6 +44,7 @@ void main() {
           ),
         ],
         currentMatchIndex: 0,
+        revealCount: 3,
       );
 
       final updated = original.copyWith(currentMatchIndex: -1);
@@ -52,6 +53,7 @@ void main() {
       expect(updated.isVisible, true);
       expect(updated.rawQuery, 'ධම්ම');
       expect(updated.matches.length, 1);
+      expect(updated.revealCount, 3);
     });
 
     test('hasActiveQuery requires both visible and non-empty effectiveQuery',

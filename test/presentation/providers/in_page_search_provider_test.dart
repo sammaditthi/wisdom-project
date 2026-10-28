@@ -119,6 +119,25 @@ void main() {
           );
         });
       });
+
+      test('a finished search counts as a reveal, typing alone does not', () {
+        fakeAsync((async) {
+          final notifier = container.read(inPageSearchStatesProvider.notifier);
+          notifier.openSearch();
+          notifier.updateQuery('ධම්ම');
+          expect(
+            container.read(activeInPageSearchStateProvider).revealCount,
+            0,
+          );
+
+          async.elapse(const Duration(milliseconds: 300));
+          expect(
+            container.read(activeInPageSearchStateProvider).revealCount,
+            1,
+            reason: 'Each new match list sends the reader to its first hit',
+          );
+        });
+      });
     });
 
     group('nextMatch / previousMatch', () {
@@ -142,6 +161,20 @@ void main() {
           container.read(activeInPageSearchStateProvider).currentMatchIndex,
           2,
         );
+      });
+
+      test('every press counts, even one that stays on the only match', () {
+        container.dispose();
+        container = _createContainerWithMatches(1);
+        final notifier = container.read(inPageSearchStatesProvider.notifier);
+
+        notifier.nextMatch();
+        notifier.previousMatch();
+
+        final state = container.read(activeInPageSearchStateProvider);
+        expect(state.currentMatchIndex, 0);
+        expect(state.revealCount, 2,
+            reason: 'The reader scrolls back to the match on each press');
       });
 
       test('both do nothing when matches is empty', () {

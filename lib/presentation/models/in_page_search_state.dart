@@ -60,12 +60,18 @@ class InPageSearchState {
   /// Index into [matches] for the current highlighted match (-1 if none)
   final int currentMatchIndex;
 
+  /// Goes up whenever the view should go to [currentMatch]: a new match list,
+  /// next or previous. The match itself may not move ("1 / 1"), so the reader
+  /// scrolls on this rather than on a change of match.
+  final int revealCount;
+
   InPageSearchState({
     this.isVisible = false,
     this.rawQuery = '',
     this.effectiveQuery = '',
     this.matches = const [],
     this.currentMatchIndex = -1,
+    this.revealCount = 0,
   });
 
   InPageSearchState copyWith({
@@ -74,6 +80,7 @@ class InPageSearchState {
     String? effectiveQuery,
     List<InPageMatch>? matches,
     int? currentMatchIndex,
+    int? revealCount,
   }) {
     return InPageSearchState(
       isVisible: isVisible ?? this.isVisible,
@@ -81,6 +88,7 @@ class InPageSearchState {
       effectiveQuery: effectiveQuery ?? this.effectiveQuery,
       matches: matches ?? this.matches,
       currentMatchIndex: currentMatchIndex ?? this.currentMatchIndex,
+      revealCount: revealCount ?? this.revealCount,
     );
   }
 

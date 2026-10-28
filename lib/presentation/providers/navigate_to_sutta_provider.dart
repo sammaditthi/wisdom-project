@@ -45,6 +45,9 @@ final navigateToSuttaProvider =
     );
     final updatedTab = baseTab.copyWith(splitRatio: currentTab.splitRatio);
     ref.read(tabsProvider.notifier).updateTab(activeIndex, updatedTab);
+    // The bar is closed, so this drops the old sutta's matches; reopening
+    // recalculates.
+    ref.read(inPageSearchStatesProvider.notifier).recomputeActiveTabMatches();
 
     // Sync navigator tree to highlight the new sutta
     ref.read(syncNavigatorToActiveTabProvider)();

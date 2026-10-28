@@ -3,7 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/presentation/models/in_page_search_state.dart';
+import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/in_page_search_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/navigate_to_sutta_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/in_page_search_bar.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
@@ -306,6 +309,173 @@ void main() {
     );
 
     // ---------------------------------------------------------------
+    // Test 3c: A new query scrolls to its first hit, even at the same index
+    // ---------------------------------------------------------------
+    testWidgets(
+      '3c. A new query scrolls to its first hit even when the index stays 0',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        // Mahānidāna Sutta: "jaa" (ජා) has hits from the top of the sutta,
+        // "jaaye" (ජායෙ) has a single hit pages further down.
+        final tab = tabFromNode(container, 'dn-2-2');
+        await openTab(tester, container, tab);
+
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'jaa');
+        final first = readSearchState(container, 0).currentMatch!;
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isTrue,
+            reason: '"jaa" should land on its first hit');
+
+        // Typed in one go, so the debounce never searches "jaay" in between:
+        // its zero hits would reset the cursor and hide the bug.
+        await enterSearchQuery(tester, 'jaaye');
+        final state = readSearchState(container, 0);
+        expect(state.currentMatchIndex, 0,
+            reason: 'The cursor is on the first hit for both queries');
+        final hit = state.currentMatch!;
+        expect(isEntryOnScreen(tester, hit.pageIndex, hit.entryIndex), isTrue,
+            reason: 'The cursor index never changed, but the view must still '
+                'move to the new hit');
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isFalse,
+            reason: 'The two hits must not share a screen, or the check above '
+                'would pass without any scroll');
+
+        // And back up: "jaa"'s first hit is again index 0.
+        await enterSearchQuery(tester, 'jaa');
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isTrue,
+            reason: 'Returning to "jaa" should scroll back to its first hit');
+      },
+    );
+
+    // ---------------------------------------------------------------
+    // Test 3d: With one match, next brings it back after scrolling away
+    // ---------------------------------------------------------------
+    testWidgets(
+      '3d. Next on a single match scrolls back to it',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        final tab = tabFromNode(container, 'dn-2-2');
+        await openTab(tester, container, tab);
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'jaaye');
+        final state = readSearchState(container, 0);
+        expect(state.matchCount, 1,
+            reason: 'Needs a word with exactly one hit — if the text was '
+                'rebuilt, pick another');
+        final only = state.currentMatch!;
+
+        // Read on, away from the match.
+        final controller = readerScrollController(tester);
+        controller.jumpTo(
+            controller.offset + controller.position.viewportDimension * 2);
+        await pumpForSettle(tester);
+        expect(
+            isEntryOnScreen(tester, only.pageIndex, only.entryIndex), isFalse,
+            reason: 'The match must be off screen before pressing next');
+
+        await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+        await pumpForSettle(tester);
+        expect(find.text('1 / 1'), findsOneWidget);
+        expect(isEntryOnScreen(tester, only.pageIndex, only.entryIndex), isTrue,
+            reason: 'Next stays on "1 / 1" but must still bring it into view');
+      },
+    );
+
+    // ---------------------------------------------------------------
+    // Test 3e: Switching tabs keeps the tab's place, not its current match
+    // ---------------------------------------------------------------
+    testWidgets(
+      '3e. Switching to a tab with a search restores its scroll position',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        final tabA = tabFromNode(container, 'dn-1-1');
+        await openTab(tester, container, tabA);
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'එවං');
+        // On match 3, so tab A's match number differs from tab B's too.
+        for (var i = 0; i < 2; i++) {
+          await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+          await pumpForSettle(tester);
+        }
+        final matchA = readSearchState(container, 0).currentMatch!;
+
+        // Read on, away from the match.
+        readerScrollController(tester).jumpTo(3000);
+        await pumpForSettle(tester);
+        expect(isEntryOnScreen(tester, matchA.pageIndex, matchA.entryIndex),
+            isFalse,
+            reason: 'Tab A must be scrolled past its current match');
+        final tabABefore = container.read(tabsProvider)[0];
+        final offsetBefore = readerScrollController(tester).offset;
+
+        // Tab B's current match is "1 / N", somewhere else.
+        final tabB = tabFromNode(container, 'dn-1-2');
+        await openTab(tester, container, tabB);
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'එවං');
+        expect(readSearchState(container, 1).currentMatch, isNot(matchA),
+            reason: 'The two tabs need current matches in different places');
+
+        container.read(activeTabIndexProvider.notifier).state = 0;
+        await pumpForSettle(tester);
+
+        final tabAAfter = container.read(tabsProvider)[0];
+        expect(
+          (tabAAfter.anchorPageIndex, tabAAfter.anchorEntryIndex),
+          (tabABefore.anchorPageIndex, tabABefore.anchorEntryIndex),
+          reason: 'A tab switch must not re-anchor Tab A at its match',
+        );
+        expect(
+            readerScrollController(tester).offset, closeTo(offsetBefore, 1.0),
+            reason: 'Tab A should come back where it was left');
+        expect(isEntryOnScreen(tester, matchA.pageIndex, matchA.entryIndex),
+            isFalse,
+            reason: 'Switching back must not jump to Tab A\'s match');
+      },
+    );
+
+    // ---------------------------------------------------------------
+    // Test 3f: A new query scrolls back even to the same first hit
+    // ---------------------------------------------------------------
+    testWidgets(
+      '3f. A new query scrolls to its first hit even when it has not moved',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        final tab = tabFromNode(container, 'dn-1-1');
+        await openTab(tester, container, tab);
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'එවං');
+        final first = readSearchState(container, 0).currentMatch!;
+
+        // Read on, away from the match.
+        final controller = readerScrollController(tester);
+        controller.jumpTo(
+            controller.offset + controller.position.viewportDimension * 2);
+        await pumpForSettle(tester);
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isFalse,
+            reason: 'The match must be off screen before the new query');
+
+        await enterSearchQuery(tester, 'එවං මෙ');
+        expect(readSearchState(container, 0).currentMatch, first,
+            reason: 'Both queries must start on the same hit');
+        expect(
+            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isTrue,
+            reason: 'Nothing about the match changed, but a new query must '
+                'still bring its first hit into view');
+      },
+      // Fails on an older reveal bug: docs/todo/reader/app-reader-backlog.md R3.
+      skip: true,
+    );
+
+    // ---------------------------------------------------------------
     // Test 4: Close search bar hides it but retains query/matches
     // ---------------------------------------------------------------
     testWidgets(
@@ -457,6 +627,43 @@ void main() {
         final allStates = container.read(inPageSearchStatesProvider);
         expect(allStates, isEmpty,
             reason: 'All search state should be cleared when no tabs remain');
+      },
+    );
+
+    // ---------------------------------------------------------------
+    // Test 8: Stepping to the next sutta drops the old sutta's matches
+    // ---------------------------------------------------------------
+    testWidgets(
+      '8. Reopening search after stepping finds the new sutta\'s matches',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        final tab = tabFromNode(container, 'dn-1-1');
+        await openTab(tester, container, tab);
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'එවං');
+        expect(readSearchState(container, 0).hasMatches, isTrue);
+
+        // What the reader's next-sutta button calls. It closes the bar.
+        container.read(navigateToSuttaProvider)(
+          container.read(nodeByKeyProvider('dn-1-2'))!,
+        );
+        await pumpForSettle(tester);
+        await openSearchBar(tester, container);
+
+        final state = readSearchState(container, 0);
+        expect(state.rawQuery, 'එවං', reason: 'The query is kept');
+        expect(state.hasMatches, isTrue);
+        final slice = container.read(activeDocumentSliceProvider)!;
+        final end = slice.absolutePageStart + slice.pages.length;
+        for (final match in state.matches) {
+          expect(
+              match.pageIndex,
+              allOf(
+                  greaterThanOrEqualTo(slice.absolutePageStart), lessThan(end)),
+              reason: 'Every match must be in dn-1-2, not left over from '
+                  'dn-1-1');
+        }
       },
     );
   });
