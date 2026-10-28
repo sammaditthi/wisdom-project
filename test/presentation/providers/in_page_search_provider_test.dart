@@ -62,22 +62,6 @@ void main() {
       });
     });
 
-    group('clearQuery', () {
-      test('resets rawQuery, effectiveQuery, matches, and currentMatchIndex',
-          () {
-        final notifier = container.read(inPageSearchStatesProvider.notifier);
-        notifier.openSearch();
-        notifier.updateQuery('සුතං');
-        notifier.clearQuery();
-
-        final state = container.read(activeInPageSearchStateProvider);
-        expect(state.rawQuery, '');
-        expect(state.effectiveQuery, '');
-        expect(state.matches, isEmpty);
-        expect(state.currentMatchIndex, -1);
-      });
-    });
-
     group('updateQuery', () {
       test('empty query clears immediately, non-empty updates before debounce',
           () {

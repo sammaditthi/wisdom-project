@@ -119,23 +119,6 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
     });
   }
 
-  /// Clears the query and results for the active tab.
-  void clearQuery() {
-    final tabIndex = _ref.read(activeTabIndexProvider);
-    if (tabIndex < 0) return;
-
-    _debounceTimers[tabIndex]?.cancel();
-    _setTabState(
-      tabIndex,
-      _getTabState(tabIndex).copyWith(
-        rawQuery: '',
-        effectiveQuery: '',
-        matches: const [],
-        currentMatchIndex: -1,
-      ),
-    );
-  }
-
   /// Re-runs the match scan for the active tab against its current layout.
   /// Call after a layout change; no-ops if no active query.
   ///

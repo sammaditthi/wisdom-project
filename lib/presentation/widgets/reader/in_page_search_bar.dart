@@ -10,7 +10,7 @@ import '../search/singlish_preview.dart';
 
 /// Chrome-style floating search bar for in-page search.
 ///
-/// Layout: [TextField] [3 of 25] [Up] [Down] [X close]
+/// Layout: [TextField] [3 / 25] | [Up] [Down] [X close]
 /// Auto-focuses when opened and restores the previous query.
 class InPageSearchBar extends ConsumerStatefulWidget {
   const InPageSearchBar({super.key});
@@ -111,8 +111,7 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
         child: Row(
           children: [
             // Search text field + Singlish preview share one area; the
-            // preview's width cap is a share of it. The preview sits after
-            // the clear ✕ on purpose.
+            // preview's width cap is a share of it.
             Expanded(
               child: LayoutBuilder(
                 builder: (context, constraints) => Row(
@@ -133,36 +132,11 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
                             vertical: 8,
                           ),
                           border: InputBorder.none,
-                          // Clear button inside text field
-                          suffixIcon: _controller.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 18),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(
-                                    minWidth: 28,
-                                    minHeight: 28,
-                                  ),
-                                  onPressed: () {
-                                    _controller.clear();
-                                    ref
-                                        .read(
-                                            inPageSearchStatesProvider.notifier)
-                                        .clearQuery();
-                                  },
-                                  tooltip: l10n.clear,
-                                )
-                              : null,
-                          suffixIconConstraints: const BoxConstraints(
-                            minWidth: 28,
-                            minHeight: 28,
-                          ),
                         ),
                         onChanged: (value) {
                           ref
                               .read(inPageSearchStatesProvider.notifier)
                               .updateQuery(value);
-                          // Trigger rebuild so the clear button shows/hides
-                          setState(() {});
                         },
                         onSubmitted: (_) {
                           // Enter key -> go to next match
@@ -186,7 +160,7 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
               ),
             ),
 
-            // Match count display: "3 of 25"
+            // Match count display: "3 / 25"
             if (searchState.rawQuery.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -197,6 +171,19 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
                   style: typography.menuSectionLabel,
                 ),
               ),
+
+            // Thin upright line between the count and the navigation buttons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: SizedBox(
+                height: 20,
+                child: VerticalDivider(
+                  width: 1,
+                  thickness: 1,
+                  color: colorScheme.outline,
+                ),
+              ),
+            ),
 
             // Previous match button
             IconButton(

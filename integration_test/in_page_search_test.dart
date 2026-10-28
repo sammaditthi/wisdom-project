@@ -514,10 +514,10 @@ void main() {
     );
 
     // ---------------------------------------------------------------
-    // Test 5: Clear button clears query/results, bar stays open
+    // Test 5: Reopen selects the query, Backspace clears it, bar stays open
     // ---------------------------------------------------------------
     testWidgets(
-      '5. Clear button clears query and results but keeps bar open',
+      '5. Reopen selects the whole query → Backspace clears it, bar stays open',
       (tester) async {
         final container = await pumpReaderApp(tester);
 
@@ -528,13 +528,37 @@ void main() {
         await enterSearchQuery(tester, 'එවං');
         expect(readSearchState(container, 0).hasMatches, isTrue);
 
-        // Tap the clear button (Icons.clear inside the text field)
-        final clearBtn = find.descendant(
-          of: find.byType(InPageSearchBar),
-          matching: find.byIcon(Icons.clear),
-        );
-        await tester.tap(clearBtn);
+        // Close and reopen: the restored query comes back fully selected,
+        // like Chrome's find bar
+        container.read(inPageSearchStatesProvider.notifier).closeSearch();
         await pumpForSettle(tester);
+        await openSearchBar(tester, container);
+
+        TextEditingController fieldController() => tester
+            .widget<TextField>(find.descendant(
+              of: find.byType(InPageSearchBar),
+              matching: find.byType(TextField),
+            ))
+            .controller!;
+        expect(
+          fieldController().selection,
+          const TextSelection(baseOffset: 0, extentOffset: 'එවං'.length),
+          reason: 'Reopening should select the whole restored query',
+        );
+
+        // One Backspace replaces the selection with nothing. On macOS the
+        // framework lets the key fall through and the OS answers with the
+        // `deleteBackward:` selector, so a simulated key event deletes
+        // nothing — send the selector the OS would have sent.
+        tester
+            .state<EditableTextState>(find.descendant(
+              of: find.byType(InPageSearchBar),
+              matching: find.byType(EditableText),
+            ))
+            .performSelector('deleteBackward:');
+        await pumpForSettle(tester);
+        expect(fieldController().text, isEmpty,
+            reason: 'Backspace should delete the selected query');
 
         // Query and matches should be cleared
         final state = readSearchState(container, 0);

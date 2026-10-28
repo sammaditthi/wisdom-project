@@ -373,7 +373,6 @@ Per `CLAUDE.md`, drive the bug repro by hand:
 
 **Unit — `test/presentation/providers/in_page_search_provider_test.dart`**
 - ✅ `openSearch` toggles `isVisible` and retains query on close
-- ✅ `clearQuery` resets raw/effective/matches/index
 - ✅ Debounce — empty clears immediately, non-empty defers, rapid typing
   keeps only the last
 - ✅ `nextMatch` / `previousMatch` wrap (both directions, no-op when empty)
@@ -396,7 +395,8 @@ Per `CLAUDE.md`, drive the bug repro by hand:
   (paliOnly) layout where the bug doesn't reproduce because pagination
   isn't reset, so it would pass even with the bug. Migration must keep
   this test green.
-- ✅ Close/clear retains-vs-resets behavior (lines 393, 431).
+- ✅ Close retains the query; reopen selects it and Backspace clears it
+  (tests 4, 5).
 - ✅ Tab close cleans search state (lines 468, 513).
 
 **Integration — `integration_test/scroll_restoration_test.dart`**
