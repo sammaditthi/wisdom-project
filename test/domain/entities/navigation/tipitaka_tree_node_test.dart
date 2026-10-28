@@ -36,4 +36,33 @@ void main() {
       expect(n.getDisplayName(ContentLanguage.sinhala), equals('පට්ඨාන'));
     });
   });
+
+  // Title search ranks canon, then commentary, then treatises on these two
+  // getters. Real key shapes, roots included: the treatise root is a bare
+  // 'anya', and canon 'an-' keys share its first two letters.
+  group('TipitakaTreeNode collection -', () {
+    TipitakaTreeNode keyed(String nodeKey) =>
+        node(paliName: '', sinhalaName: '').copyWith(nodeKey: nodeKey);
+
+    test('commentary keys, roots included, are commentary only', () {
+      for (final key in ['atta-vp', 'atta-sp', 'atta-ap', 'atta-dn-1-1']) {
+        expect(keyed(key).isCommentary, isTrue, reason: key);
+        expect(keyed(key).isTreatise, isFalse, reason: key);
+      }
+    });
+
+    test('treatise keys, the bare root included, are treatises only', () {
+      for (final key in ['anya', 'anya-vm']) {
+        expect(keyed(key).isTreatise, isTrue, reason: key);
+        expect(keyed(key).isCommentary, isFalse, reason: key);
+      }
+    });
+
+    test('canon keys are neither', () {
+      for (final key in ['vp', 'sp', 'ap', 'dn-1-1', 'an-1-1']) {
+        expect(keyed(key).isCommentary, isFalse, reason: key);
+        expect(keyed(key).isTreatise, isFalse, reason: key);
+      }
+    });
+  });
 }

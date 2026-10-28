@@ -313,8 +313,12 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
   // PRIVATE HELPER METHODS - Search Logic
   // ============================================================================
 
+  /// Everything before a tree name's first letter: BJT's section numbering,
+  /// the "5 " of "5 මඞ්ගලසුත්තං" once [normalizeForTitleMatch] has run.
+  static final _leadingNumbering = RegExp(r'^\P{L}+', unicode: true);
+
   /// Search for title matches in navigation tree names
-  /// Returns results sorted with leaf nodes (individual suttas) first
+  /// Returns results sorted best match first, canon before commentary
   /// Prefers Sinhala name if both languages match
   /// Supports Singlish (romanized Sinhala) transliteration search
   ///
@@ -407,27 +411,50 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       }
     }
 
-    // Sort with dual criteria:
-    // 1. Primary: startsWith matches before contains-only matches
-    // 2. Secondary: leaf nodes (individual suttas) before parent nodes
+    // Canon first, then commentary, then treatises (anya).
+    int collectionRank(TipitakaTreeNode? node) => switch (node) {
+          TipitakaTreeNode(isCommentary: true) => 1,
+          TipitakaTreeNode(isTreatise: true) => 2,
+          _ => 0,
+        };
+
+    // Rule 1 looks past section numbering, so "5. මඞ්ගලසුත්තං" starts with
+    // මඞ්ගල. The whole name is tried too, for a query typed with its number.
+    bool startsWithQuery(String title) {
+      final name = normalizeForTitleMatch(title);
+      return name.startsWith(searchQuery) ||
+          name.replaceFirst(_leadingNumbering, '').startsWith(searchQuery);
+    }
+
+    // One sort key per result, worked out once. Lower sorts first, rule by
+    // rule, and the first rule that differs decides:
+    // 1. Names starting with the query before contains-only matches
+    // 2. Canon, then commentary, then treatises
+    // 3. Leaf nodes (individual suttas) before parent nodes
+    // 4. Tree order, which results were collected in. List.sort is not
+    //    stable, so without it tied titles would shuffle.
+    List<int> sortKey(int index, SearchResult result) {
+      final node = nodeMap[result.nodeKey];
+      return [
+        startsWithQuery(result.title) ? 0 : 1,
+        collectionRank(node),
+        (node?.isLeafNode ?? true) ? 0 : 1,
+        index,
+      ];
+    }
+
+    final sortKeys = {
+      for (final (index, result) in results.indexed)
+        result.nodeKey: sortKey(index, result),
+    };
+
     results.sort((a, b) {
-      // Primary sort: startsWith first
-      final titleA = normalizeForTitleMatch(a.title);
-      final titleB = normalizeForTitleMatch(b.title);
-      final aStartsWith = titleA.startsWith(searchQuery);
-      final bStartsWith = titleB.startsWith(searchQuery);
-
-      if (aStartsWith && !bStartsWith) return -1;
-      if (!aStartsWith && bStartsWith) return 1;
-
-      // Secondary sort: leaf nodes first
-      final nodeA = nodeMap[a.nodeKey];
-      final nodeB = nodeMap[b.nodeKey];
-      final isLeafA = nodeA?.isLeafNode ?? true;
-      final isLeafB = nodeB?.isLeafNode ?? true;
-
-      if (isLeafA && !isLeafB) return -1;
-      if (!isLeafA && isLeafB) return 1;
+      final keyA = sortKeys[a.nodeKey]!;
+      final keyB = sortKeys[b.nodeKey]!;
+      for (var rule = 0; rule < keyA.length; rule++) {
+        final byRule = keyA[rule].compareTo(keyB[rule]);
+        if (byRule != 0) return byRule;
+      }
       return 0;
     });
 

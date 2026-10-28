@@ -1069,11 +1069,10 @@ void main() {
       });
 
       // ========================================================================
-      // DUAL-CRITERIA SORTING TESTS
+      // TITLE SORTING TESTS
       // ========================================================================
 
-      test(
-          'should sort with dual criteria: startsWith before contains, leaf before parent',
+      test('should sort startsWith before contains, leaf before parent',
           () async {
         // ARRANGE - Create 4 node types to test both sort criteria
         const query = SearchQuery(queryText: 'sutta', isExactMatch: false);
@@ -1258,6 +1257,451 @@ void main() {
             // The contains match should be excluded by limit
             expect(titleResults.map((r) => r.nodeKey),
                 isNot(contains('contains-1')));
+          },
+        );
+      });
+
+      test(
+          'should sort canon before commentary before treatises, '
+          'after match quality but before the leaf rule', () async {
+        // ARRANGE - Tree order is the reverse of the expected order, so only
+        // the canon rule can put them right.
+        const query = SearchQuery(queryText: 'sutta', isExactMatch: false);
+
+        final treeWithCollections = [
+          // Canon, but only a contains match: stays below every startsWith
+          const TipitakaTreeNode(
+            nodeKey: 'dn-2',
+            paliName: 'Brahmasutta',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'dn-2',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'anya-1',
+            paliName: 'Sutta Treatise',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'anya-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'atta-dn-1',
+            paliName: 'Sutta Commentary',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'atta-dn-1',
+          ),
+          // Canon container: beats the commentary and treatise leaves
+          const TipitakaTreeNode(
+            nodeKey: 'dn-1',
+            paliName: 'Sutta Canon',
+            sinhalaName: '',
+            hierarchyLevel: 1,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'dn-1',
+            childNodes: [
+              TipitakaTreeNode(
+                nodeKey: 'dn-1-1',
+                paliName: 'Child',
+                sinhalaName: '',
+                hierarchyLevel: 2,
+                entryPageIndex: 0,
+                entryIndexInPage: 0,
+                parentNodeKey: 'dn-1',
+                contentFileId: 'dn-1',
+              ),
+            ],
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(treeWithCollections));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals(['dn-1', 'atta-dn-1', 'anya-1', 'dn-2']),
+            );
+          },
+        );
+      });
+
+      test('should keep tree order for tied titles', () async {
+        // ARRANGE - 40 titles that tie on every rule. Over 33 items Dart's
+        // List.sort is not stable, so without the tree-order tie-break they
+        // come back shuffled.
+        const query = SearchQuery(queryText: 'sutta', isExactMatch: false);
+
+        final nodeKeys = List.generate(40, (i) => 'dn-$i');
+        final tiedTree = [
+          for (final nodeKey in nodeKeys)
+            TipitakaTreeNode(
+              nodeKey: nodeKey,
+              paliName: 'Sutta $nodeKey',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: nodeKey,
+            ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(tiedTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 40);
+
+        // ASSERT
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(titleResults.map((r) => r.nodeKey), equals(nodeKeys));
+          },
+        );
+      });
+
+      test('should keep reading order for tied titles in nested branches',
+          () async {
+        // ARRANGE - All canon, all starting with the query. Reading order is
+        // depth-first, parent before child: the deep leaf comes before the
+        // shallow one, and sp before its child kn-snp. A breadth-first or
+        // children-first walk of the tree breaks one or the other.
+        const query = SearchQuery(queryText: 'සුත්ත');
+
+        final nestedTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'sp',
+            paliName: 'සුත්තපිටක',
+            sinhalaName: '',
+            hierarchyLevel: 0,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'sp',
+            childNodes: [
+              TipitakaTreeNode(
+                nodeKey: 'kn-snp',
+                paliName: 'සුත්තනිපාතො',
+                sinhalaName: '',
+                hierarchyLevel: 1,
+                entryPageIndex: 0,
+                entryIndexInPage: 0,
+                parentNodeKey: 'sp',
+                contentFileId: 'kn-snp',
+                childNodes: [
+                  TipitakaTreeNode(
+                    nodeKey: 'kn-snp-1-1',
+                    paliName: 'සුත්තසුත්තං',
+                    sinhalaName: '',
+                    hierarchyLevel: 2,
+                    entryPageIndex: 0,
+                    entryIndexInPage: 0,
+                    parentNodeKey: 'kn-snp',
+                    contentFileId: 'kn-snp',
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'ap-vbh-1-1',
+            paliName: 'සුත්තන්තභාජනියං',
+            sinhalaName: '',
+            hierarchyLevel: 0,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'ap-vbh-1-1',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(nestedTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT - Leaves first, then containers, each in reading order
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals(['kn-snp-1-1', 'ap-vbh-1-1', 'sp', 'kn-snp']),
+            );
+          },
+        );
+      });
+
+      test('should rank a Sinhala-only match by its Sinhala name', () async {
+        // ARRANGE - The query is Sinhala spelling, so only the Sinhala names
+        // match. Rule 1 must test the name that matched, after normalizing
+        // (the ZWJ in ත්‍ර): only සූත්‍රනිපාතය starts with the query.
+        const query = SearchQuery(queryText: 'සූත්‍ර');
+
+        final sinhalaOnlyTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'dn-1-1',
+            paliName: 'බ්‍රහ්මජාලසුත්තං',
+            sinhalaName: 'බ්‍රහ්මජාල සූත්‍රය',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'dn-1-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-snp',
+            paliName: 'සුත්තනිපාතො',
+            sinhalaName: 'සූත්‍රනිපාතය',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-snp',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(sinhalaOnlyTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals(['kn-snp', 'dn-1-1']),
+            );
+            expect(
+              titleResults.map((r) => r.language),
+              everyElement(equals('sinhala')),
+            );
+          },
+        );
+      });
+
+      test('should look past section numbering when ranking a title', () async {
+        // ARRANGE - BJT numbers many titles ("5. ", "32-37. ", "1: "). They
+        // still start with the query, so canon-first applies to them: the
+        // unnumbered commentary title and the contains-only match go below.
+        const query = SearchQuery(queryText: 'මඞ්ගල');
+
+        final numberedTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'atta-kn-khp-5-4',
+            paliName: 'මඞ්ගලපඤ්හසමුට්ඨානකථා',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'atta-kn-khp-5-4',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-jat-1',
+            paliName: 'මහාමඞ්ගලජාතකං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-jat-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-khp-5',
+            paliName: '5. මඞ්ගලසුත්තං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-khp-5',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-snp-2-4',
+            paliName: '32-37. මඞ්ගලසුත්තං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-snp-2-4',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-bv-5',
+            paliName: '1: මඞ්ගලබුද්ධවංසො',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-bv-5',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(numberedTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals([
+                'kn-khp-5',
+                'kn-snp-2-4',
+                'kn-bv-5',
+                'atta-kn-khp-5-4',
+                'kn-jat-1',
+              ]),
+            );
+          },
+        );
+      });
+
+      test('should still rank by the number when the query starts with one',
+          () async {
+        // ARRANGE - "15. මඞ්ගල…" contains "5. මඞ්ගල" but does not start with
+        // it. Looking past numbering must not cost a numbered query its
+        // match on the whole name.
+        const query = SearchQuery(queryText: '5. මඞ්ගල');
+
+        final numberedTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'kn-khp-15',
+            paliName: '15. මඞ්ගලසුත්තං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-khp-15',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-khp-5',
+            paliName: '5. මඞ්ගලසුත්තං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-khp-5',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(numberedTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals(['kn-khp-5', 'kn-khp-15']),
+            );
           },
         );
       });
