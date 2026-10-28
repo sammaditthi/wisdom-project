@@ -275,7 +275,7 @@ void main() {
     );
 
     testWidgets(
-      '3.5 "කර්ම ඵල" exact + separate words, anywhere in text → 45 FTS',
+      '3.5 "කර්ම ඵල" exact + separate words, anywhere in text → 248 FTS',
       (tester) async {
         await tester.pumpSearchApp(prefs);
         await tester.searchFor('කර්ම ඵල');
@@ -284,7 +284,9 @@ void main() {
 
         await tester.matchWordsAnywhere();
 
-        tester.expectCounts(fullText: 45);
+        // One per sutta and language side holding both words, not per
+        // paragraph (FtsSameTextSql).
+        tester.expectCounts(fullText: 248);
       },
     );
 
