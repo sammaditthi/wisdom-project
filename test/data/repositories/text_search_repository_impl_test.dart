@@ -1551,6 +1551,159 @@ void main() {
         );
       });
 
+      test('should rank by the Pali name when it starts with the query',
+          () async {
+        // ARRANGE - kn-ud-2 matches on both names. Its Sinhala name only
+        // contains උදාන, but its Pali name starts with it, and a Pali reader
+        // sees the Pali name on the tile. It must outrank the contains-only
+        // kn-ud-1, which comes first in the tree.
+        const query = SearchQuery(queryText: 'උදාන');
+
+        final bothNamesTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'kn-ud-1',
+            paliName: 'පඨමඋදානං',
+            sinhalaName: '',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-ud-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-ud-2',
+            paliName: '8-9. උදානවත්ථු',
+            sinhalaName: '8-9. ආනන්ද තෙරුන්ගේ උදාන ගාථා පුවත',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-ud-2',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(bothNamesTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        // ACT
+        final result =
+            await repository.searchTopResults(query, maxPerCategory: 10);
+
+        // ASSERT - Ranked by its Pali name, still labelled with its Sinhala one
+        result.fold(
+          (failure) => fail('Expected success but got failure'),
+          (categorized) {
+            final titleResults =
+                categorized.resultsByType[SearchResultType.title]!;
+            expect(
+              titleResults.map((r) => r.nodeKey),
+              equals(['kn-ud-2', 'kn-ud-1']),
+            );
+            expect(titleResults.first.language, equals('sinhala'));
+          },
+        );
+      });
+
+      test('should not rank by a name that did not match', () async {
+        // ARRANGE - kn-ud-2's Pali name and kn-ud-3's Sinhala name start with
+        // උදාන; every other name only contains it. A starting name must not
+        // lift its title in a search that leaves it unmatched: one that skips
+        // its language, or exact match, which wants උදාන as a whole word.
+        const cases = [
+          (
+            search: 'Sinhala only',
+            query: SearchQuery(queryText: 'උදාන', searchInPali: false),
+            expected: ['kn-ud-3', 'kn-ud-1', 'kn-ud-2'],
+          ),
+          (
+            search: 'Pali only',
+            query: SearchQuery(queryText: 'උදාන', searchInSinhala: false),
+            expected: ['kn-ud-2', 'kn-ud-1', 'kn-ud-3'],
+          ),
+          (
+            // Only the Sinhala names of kn-ud-1 and kn-ud-2 hold උදාන whole.
+            search: 'exact match',
+            query: SearchQuery(queryText: 'උදාන', isExactMatch: true),
+            expected: ['kn-ud-1', 'kn-ud-2'],
+          ),
+        ];
+
+        final bothNamesTree = [
+          const TipitakaTreeNode(
+            nodeKey: 'kn-ud-1',
+            paliName: 'පඨමඋදානං',
+            sinhalaName: 'පළමුවන උදාන සූත්‍රය',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-ud-1',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-ud-2',
+            paliName: 'උදානවත්ථු',
+            sinhalaName: 'ආනන්ද තෙරුන්ගේ උදාන ගාථා පුවත',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-ud-2',
+          ),
+          const TipitakaTreeNode(
+            nodeKey: 'kn-ud-3',
+            paliName: 'දුතියඋදානං',
+            sinhalaName: 'උදානවස්තුව',
+            hierarchyLevel: 2,
+            entryPageIndex: 0,
+            entryIndexInPage: 0,
+            parentNodeKey: null,
+            contentFileId: 'kn-ud-3',
+          ),
+        ];
+
+        when(mockTreeRepository.loadNavigationTree())
+            .thenAnswer((_) async => Right(bothNamesTree));
+
+        when(mockFTSDataSource.searchFullText(
+          any,
+          editionIds: anyNamed('editionIds'),
+          scope: anyNamed('scope'),
+          isExactMatch: anyNamed('isExactMatch'),
+          language: anyNamed('language'),
+          limit: anyNamed('limit'),
+          offset: anyNamed('offset'),
+        )).thenAnswer((_) async => []);
+
+        for (final (:search, :query, :expected) in cases) {
+          // ACT
+          final result =
+              await repository.searchTopResults(query, maxPerCategory: 10);
+
+          // ASSERT
+          result.fold(
+            (failure) => fail('Expected success but got failure ($search)'),
+            (categorized) {
+              final titleResults =
+                  categorized.resultsByType[SearchResultType.title]!;
+              expect(
+                titleResults.map((r) => r.nodeKey),
+                equals(expected),
+                reason: search,
+              );
+            },
+          );
+        }
+      });
+
       test('should look past section numbering when ranking a title', () async {
         // ARRANGE - BJT numbers many titles ("5. ", "32-37. ", "1: "). They
         // still start with the query, so canon-first applies to them: the

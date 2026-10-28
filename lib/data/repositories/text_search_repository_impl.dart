@@ -322,8 +322,8 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
   /// Prefers Sinhala name if both languages match
   /// Supports Singlish (romanized Sinhala) transliteration search
   ///
-  /// When [isExactMatch] is false (default), uses prefix matching (startsWith).
-  /// When [isExactMatch] is true, requires exact string match.
+  /// When [isExactMatch] is false (default), a name matches if it contains the
+  /// query. When true, the query must appear in it as a whole word.
   ///
   /// [scope] - Tree node keys (e.g., 'sp', 'dn', 'dn-1') for filtering.
   /// Empty set = search all content.
@@ -370,6 +370,17 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       return ScopeOperations.findCoveringAncestors(nodeKey, scope).isNotEmpty;
     }
 
+    // Rule 1 of the sort looks past section numbering, so "5. මඞ්ගලසුත්තං"
+    // starts with මඞ්ගල. The whole name is tried too, for a query typed with
+    // its number. [name] is already normalized.
+    bool startsWithQuery(String name) =>
+        name.startsWith(searchQuery) ||
+        name.replaceFirst(_leadingNumbering, '').startsWith(searchQuery);
+
+    // Results where a matched name starts with the query. Either name counts:
+    // the tile shows the reader's language, which this layer doesn't know.
+    final startsWithMatches = <String>{};
+
     for (final node in nodeMap.values) {
       final paliName = normalizeForTitleMatch(node.paliName);
       final sinhalaName = normalizeForTitleMatch(node.sinhalaName);
@@ -408,6 +419,11 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
             language: matchedLanguage,
           ),
         );
+
+        if ((paliMatched && startsWithQuery(paliName)) ||
+            (sinhalaMatched && startsWithQuery(sinhalaName))) {
+          startsWithMatches.add(node.nodeKey);
+        }
       }
     }
 
@@ -418,17 +434,10 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
           _ => 0,
         };
 
-    // Rule 1 looks past section numbering, so "5. මඞ්ගලසුත්තං" starts with
-    // මඞ්ගල. The whole name is tried too, for a query typed with its number.
-    bool startsWithQuery(String title) {
-      final name = normalizeForTitleMatch(title);
-      return name.startsWith(searchQuery) ||
-          name.replaceFirst(_leadingNumbering, '').startsWith(searchQuery);
-    }
-
     // One sort key per result, worked out once. Lower sorts first, rule by
     // rule, and the first rule that differs decides:
-    // 1. Names starting with the query before contains-only matches
+    // 1. A matched name, in either language, starting with the query, before
+    //    contains-only matches
     // 2. Canon, then commentary, then treatises
     // 3. Leaf nodes (individual suttas) before parent nodes
     // 4. Tree order, which results were collected in. List.sort is not
@@ -436,7 +445,7 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     List<int> sortKey(int index, SearchResult result) {
       final node = nodeMap[result.nodeKey];
       return [
-        startsWithQuery(result.title) ? 0 : 1,
+        startsWithMatches.contains(result.nodeKey) ? 0 : 1,
         collectionRank(node),
         (node?.isLeafNode ?? true) ? 0 : 1,
         index,
