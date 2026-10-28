@@ -85,12 +85,11 @@ error is noise in the one diagnostic channel the products have.
   build-computed `?v=` hash. The app's `/assets/*` is deliberately left
   revalidating — Flutter's asset URLs carry no hash, so an `immutable` manifest
   would pair a new app with an old database (`web-release.md` §6). There is
-  nothing to hash by hand and no header work left.
-- **Service workers.** Flutter's is deprecated and off: the generated
-  `flutter_bootstrap.js` sets `serviceWorkerVersion = null`, and the
-  `flutter_service_worker.js` in the build is a 0-byte file that is never
-  registered. No stale-SW lockout to design against, nothing to strip from the
-  build. Revisit only for a real offline or installable-PWA requirement.
+  nothing to hash by hand and no header work left. This holds only with the
+  zone's Browser Cache TTL on **Respect Existing Headers**, set 2026-10-28:
+  until then the zone gave `.js`, fonts and images 4 hours, so for 4 hours
+  after a deploy a returning visitor could run the old `main.dart.js` against
+  the new `manifest.json`.
 - **CORS allow-list.** Pinned to local, dev and prod web in
   `RESEARCH_CORS_ORIGINS` — exact origin match, no trailing slash. Deployed and
   verified 2026-10-25: `Origin: https://app.sammaditthi.net` now answers with
@@ -146,6 +145,13 @@ error is noise in the one diagnostic channel the products have.
 
 ## Open, not blocking
 
+- **The app can't start offline.** Reopened 2026-10-28 by a real offline
+  requirement. The databases are stored in the browser, but nothing stores the
+  app's own files. Release builds carry Flutter's `flutter_service_worker.js`,
+  a stub that only unregisters itself, and `flutter.js` registers it only where
+  a registration already exists. A missing `flutter_bootstrap.js` or
+  `canvaskit.wasm` also leaves "Getting ready…" up forever. Both are fixed in
+  [`web-app-offline-start.md`](../todo/web-strategy/web-app-offline-start.md).
 - **No error reporting and no analytics.** Nothing in either product. After
   launch the only signal is Cloudflare's request counts — a database install
   that fails on a real network is invisible. The CSP also blocks zone-injected

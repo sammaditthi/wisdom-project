@@ -59,6 +59,12 @@ Everything below is done once, by hand.
 6. **Research CORS.** The research Worker lists both app origins
    (`RESEARCH_CORS_ORIGINS` in `research_server/wrangler.jsonc`). A new
    origin there takes effect when the Worker is released.
+7. **Browser Cache TTL.** sammaditthi.net → Caching → Configuration → Browser
+   Cache TTL → *Respect Existing Headers* (zone-wide, set 2026-10-28). Any
+   other value overrides Pages' `max-age=0` on `.js`, fonts and images, so
+   after a deploy a returning visitor can run an old `main.dart.js` against a
+   new `manifest.json`. The static site's `immutable` tier is longer than any
+   TTL, so it is unaffected.
 
 ## What a deploy does
 

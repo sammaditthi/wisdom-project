@@ -304,7 +304,8 @@ host's half, all in place for dev:
   Flutter's asset URLs carry no hash, so a cached old manifest would pair a new
   app with an old database, and a cached old `tree.json` or `sc-to-bjt.json`
   would outlive the build that changed it. Pages' default (revalidate) is
-  right.
+  right, with the zone's Browser Cache TTL on *Respect Existing Headers*
+  (README one-time setup, step 7).
 - **One R2 file per database version**, never overwritten, old ones kept until
   deleted by hand — a tab on an older build may still be downloading one.
 - **CORS for any origin**: the bucket's rule, plus a response-header rule on
