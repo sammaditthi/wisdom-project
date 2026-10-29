@@ -300,6 +300,36 @@ void main() {
       }
     });
   });
+
+  group('coordinate corrections', () {
+    // The site passes the map explicitly (`corpus_reader.dart`); the app gets
+    // it only through the default. A changed default would leave the site
+    // right and the app showing the wrong text under a sutta's title.
+    test('apply by default, and not with an empty map', () {
+      // Taken from the map, so the test names no key upstream may fix.
+      final key = correctedTreeCoordinates.keys.first;
+      final corrected = correctedTreeCoordinates[key]!;
+      // A raw coordinate no correction can equal.
+      final source = {
+        'p': _row(null),
+        key: _row('p', page: -1, entry: -1),
+      };
+
+      final byDefault = TipitakaTree.fromJson(source)[key]!;
+      expect(
+        (byDefault.entryPageIndex, byDefault.entryIndexInPage),
+        (corrected.page, corrected.entry),
+        reason: 'the app reads the tree with the default',
+      );
+
+      final raw = TipitakaTree.fromJson(source, corrections: const {})[key]!;
+      expect(
+        (raw.entryPageIndex, raw.entryIndexInPage),
+        (-1, -1),
+        reason: 'the tool that writes the map must see the raw row',
+      );
+    }, skip: correctedTreeCoordinates.isEmpty);
+  });
 }
 
 /// One `tree.json` row: `[pali, sinh, level, [page, entry], parent, fileId]`.

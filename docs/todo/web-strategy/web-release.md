@@ -272,6 +272,10 @@ and rollback are in
 points "read in the app" at `app.sammaditthi.net`, and the app's link card and
 shared links point at the apex.
 
+**Before each release, open the two start links** in
+[`deep-linking-and-shareable-urls.md`](deep-linking-and-shareable-urls.md) § D on
+the dev origin: a grouped sutta must open alone. No automated test catches it.
+
 **Three targets**, all in `scripts/app/web/`
 ([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md)):
 

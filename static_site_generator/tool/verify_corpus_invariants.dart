@@ -26,7 +26,7 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 ///
 /// The oracles in sections 1 and 2 are the *pre-extraction* implementations,
 /// copied verbatim:
-///   - `Entry.plainText` / `Entry._computeMarkedRanges` (commit 4bb320c)
+///   - `Entry.plainText` / `Entry._computeMarkedRanges`
 ///   - `TreeLocalDataSourceImpl._buildTreeStructure` / `_extractChildIndex`
 ///
 /// They are frozen. If one needs changing to make this pass, the extraction

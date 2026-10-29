@@ -722,7 +722,7 @@ what keeps `wisdom_shared` single-copy. Merge order is free: static-site landing
 first leaves main with the site's grouping and the app's old reader, which is
 exactly today's state.
 
-**The seam does not wait, and shipped 2026-08-23 (S8).** Its whole purpose is that the app *follows* the site rather than re-deriving it, so building it early is what stopped the two drifting while the reader rework was still queued — and it carried two live fixes with it: the app had never inherited the coordinate corrections, and every link it copied for a folded leaf named a URL the site has no file for. What shipped then is B1's `SitePlan` move, B5's app-side migration, and the link codec; what it deliberately left alone was everything that changes what a reader sees — which is what the rest of Part 4 now picks up. Verification is `docs/todo/web-strategy/testing-the-app-site-seam.md`.
+**The seam does not wait, and shipped 2026-08-23 (S8).** Its whole purpose is that the app *follows* the site rather than re-deriving it, so building it early is what stopped the two drifting while the reader rework was still queued — and it carried two live fixes with it: the app had never inherited the coordinate corrections, and every link it copied for a folded leaf named a URL the site has no file for. What shipped then is B1's `SitePlan` move, B5's app-side migration, and the link codec; what it deliberately left alone was everything that changes what a reader sees — which is what the rest of Part 4 now picks up. Verification is `docs/done/web/testing-the-app-site-seam.md`.
 
 ## The app does not adopt the grouping — decided 2026-09-07
 

@@ -564,7 +564,8 @@ browser-side and nothing but a browser can show it. The app half of these same
 five URLs is covered in code since 2026-08-23: the codec prefers the
 nodeKey-shaped fragment and `SitePlan` decides which page serves it, so each one
 opens the same single sutta in the app that it shows here. On web that held only
-once `DeepLinkListener` read the start URL before the first frame (2026-10-05).
+once `DeepLinkListener` read the start URL before the first frame (2026-10-05) —
+checked by hand, see D.
 
 Grouped pages are exactly the files containing `class="chapter"`; anchor ids are
 always `<pageKey>-<n>`, `n` from 1:
@@ -586,10 +587,31 @@ switching `selectedAppSectionProvider` to `AppSection.reader` and syncing the
 navigator from any section, and `tipitakaLinkUrlBuilderProvider` honouring
 `LINK_BASE_URL`.
 
-**`DeepLinkListener` itself is deliberately untested** unless something breaks:
-mocking the
-`app_links` stream and `Uri.base` is heavy, and its logic is three lines
-(parse → mounted check → fire-and-forget) already covered either side.
+**`DeepLinkListener` has no automated test, and cannot usefully have one yet.**
+It broke once: Flutter web erases the start URL's `#` during start-up, and
+reading it in a post-frame callback opened a grouped sutta's whole vagga (fixed
+2026-10-05 by reading `Uri.base` in `initState`). A Chrome test was built and
+dropped on 2026-10-29:
+
+- `flutter drive --release` ignores `--web-launch-url` (flutter_tools'
+  `run.dart` builds the release options without it); `--profile` honours it.
+- Even then, the integration harness still has the `#` in the address after the
+  first frame, so the pre-fix listener passes too. The harness delivers
+  Flutter's navigation messages later than a real start-up does, so it cannot
+  reproduce the bug.
+
+The guard is a manual check instead, before each web release and after every
+Flutter upgrade, on the app origin (`https://app-sammaditthi-test.pages.dev`;
+prod `https://app.sammaditthi.net`):
+
+| Link | Must open |
+|---|---|
+| `/tipitaka/sn-1-1-7#sn-1-1-7-3` | sutta 3 alone, not the whole vagga |
+| `/tipitaka/vp-pct-1-3-1#vp-pct-1-3-1-1` | the first sekhiya rule, starting at its own opening (a corrected coordinate) |
+
+Revisit the automated test only if a harness booting through the real `main()`
+is shown to erase the `#` before the first post-frame callback — prove that
+first, or the test cannot fail.
 
 ## One command runs the package tests — shipped 2026-08-06
 
