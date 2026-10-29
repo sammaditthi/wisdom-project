@@ -325,6 +325,28 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   activators only, chosen by `defaultTargetPlatform` (on the web, the browser's
   OS): `meta` on macOS and iOS, `control` elsewhere, Esc on both. No `kIsWeb`
   branch. See `docs/todo/reader/keyboard-shortcuts-sheet.md`.
+- **Anumodanā: an අක්ෂර පරිවර්තනය (Transliteration) section.** The app's
+  Singlish converter is not ours. The scheme is UCSC LTRL's SinGlish (2011,
+  <https://www.ucsc.cmb.ac.lk/ltrl/services/feconverter/>), and
+  `singlish_transliterator.dart` is a hand port of
+  [Open-SL/sinhala-unicode-converter](https://github.com/Open-SL/sinhala-unicode-converter)
+  (MIT), whose own README credits UCSC. Two rows, in the page's existing
+  `SettingsRow` + link-button shape: the laboratory for the scheme, the repo
+  for the implementation. **The MIT notice has to live somewhere in the app** —
+  we copied the file by hand, so `showLicensePage` will never list it, because
+  it is not a pubspec dependency. The row must not claim we ship the scheme
+  unchanged: the divergences are listed in the transliterator's own header.
+  Three ARB keys, `en` + `si`; proper names stay untranslated as the rest of
+  the page does. **Name clash to settle first:** the Transliteration *tab*
+  below wants the same Sinhala title, so either these
+  rows belong inside that tab rather than in Anumodanā, or the tab links to
+  them.
+- **Name Path Nirvana Foundation on the tipitaka.lk row.** The row credits the
+  project; the organisation behind it is the Path Nirvana Foundation
+  (<https://pathnirvana.org>) — a US-registered non-profit, *not* "Path to
+  Nirvana". Its licence term 4 asks for attribution to tipitaka.lk, which the
+  row already satisfies, so this is accuracy rather than obligation. Rides
+  with the section above.
 - **Transliteration tab.** Needs its own letter→key list, in alphabet order,
   beside `SinglishTransliterator` in `lib/core/utils/`: the transliterator's
   tables are ordered for matching and some letters have two keys, so they

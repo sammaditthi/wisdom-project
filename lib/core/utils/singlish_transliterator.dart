@@ -7,7 +7,15 @@
 /// - `t` → ට (retroflex)
 /// - `T` → ඨ (retroflex aspirated)
 ///
-/// Based on: https://github.com/Open-SL/sinhala-unicode-converter
+/// The scheme is UCSC LTRL's SinGlish (2011,
+/// https://www.ucsc.cmb.ac.lk/ltrl/services/feconverter/), ported from
+/// https://github.com/Open-SL/sinhala-unicode-converter. The deliberate
+/// divergences, listed here and nowhere else:
+/// - `~` replaces their `\` escape, and `~N` carries the hal.
+/// - `c` is added for romanized Pali.
+/// - `nndh` comes before `nnd`; upstream gets a standalone `nndh` wrong.
+/// - Their `a)` / `/a` forms are dropped (regex patterns upstream, which do
+///   not survive a plain string replace), and so is `\y`, a duplicate of `Y`.
 library;
 
 /// Singlish transliterator for search functionality.
@@ -20,7 +28,8 @@ class SinglishTransliterator {
   SinglishTransliterator._();
 
   // ============== Mappings ==============
-  // From sinhala-unicode-converter, reordered for correct matching
+  // From sinhala-unicode-converter, reordered for correct matching.
+  // Every ZWJ is written `\u200D`: a literal one is invisible in a diff.
 
   /// Vowels with modifiers: [singlish, independent vowel, vowel modifier (pili)]
   /// Order: longer patterns first
@@ -71,6 +80,9 @@ class SinglishTransliterator {
     ['kh', 'ඛ'],
     ['th', 'ත'], // dental
     // Single character (case-sensitive)
+    // Not in the UCSC scheme, which has only ch/Ch — but romanized Pali spells
+    // ච as `c` (cakka, citta, pañca). Below `ch`, so `ch` still wins.
+    ['c', 'ච'],
     ['t', 'ට'], // retroflex
     ['k', 'ක'],
     ['d', 'ඩ'], // retroflex
@@ -78,7 +90,7 @@ class SinglishTransliterator {
     ['p', 'ප'],
     ['b', 'බ'],
     ['m', 'ම'],
-    ['Y', '‍ය'], // yansaya
+    ['Y', '\u200Dය'], // yansaya
     ['y', 'ය'],
     ['j', 'ජ'],
     ['l', 'ල'],
@@ -100,14 +112,20 @@ class SinglishTransliterator {
     ['r', 'ර'],
   ];
 
-  /// Special Pali characters: [singlish, sinhala unicode]
-  /// Used for anusvara, visarga, etc. important in Pali texts
-  /// Uses ~ as escape prefix (similar to \ in TypeScript but Dart-friendly)
+  /// Special characters: [singlish, sinhala unicode]
+  /// Used for anusvara, visarga, repaya, etc.
+  /// Mostly `~`-prefixed, replacing the `\` escape of the scheme this came
+  /// from. Replaced before any other pass, so a `~` form always wins over the
+  /// bare letter below it.
   static const List<List<String>> _specialChars = [
     ['~n', 'ං'], // Anusvara - used in: sanghang, dhammang
     ['~h', 'ඃ'], // Visarga - used in: duhkha
     ['~N', 'ඞ්'], // Velar nasal (ṅ) – always conjunct in Pali Sinhala
     ['~R', 'ඍ'], // Vocalic R (Pali/Sanskrit)
+    // Repaya: ර් drawn as a hook over the next consonant. Typed before that
+    // consonant — `vaRgaya` → වර්\u200Dගය. Must stay below `~R`, which would
+    // otherwise lose its R here.
+    ['R', 'ර්\u200D'],
   ];
 
   /// Special modifiers for ru/ruu sounds
@@ -135,7 +153,7 @@ class SinglishTransliterator {
 
     var text = input;
 
-    // Step 0: Replace special Pali characters (anusvara, visarga, etc.)
+    // Step 0: Replace special characters (anusvara, visarga, repaya, etc.)
     for (final special in _specialChars) {
       text = text.replaceAll(special[0], special[1]);
     }
@@ -147,16 +165,16 @@ class SinglishTransliterator {
       }
     }
 
-    // Step 2: Replace consonant + rakaransha + vowel (e.g., "kra" → "ක්‍ර")
+    // Step 2: Replace consonant + rakaransha + vowel (e.g., "kra" → "ක්\u200Dර")
     for (final cons in _consonants) {
       for (final vowel in _vowels) {
         text = text.replaceAll(
           '${cons[0]}r${vowel[0]}',
-          '${cons[1]}්‍ර${vowel[2]}',
+          '${cons[1]}්\u200Dර${vowel[2]}',
         );
       }
       // Consonant + rakaransha without trailing vowel
-      text = text.replaceAll('${cons[0]}r', '${cons[1]}්‍ර');
+      text = text.replaceAll('${cons[0]}r', '${cons[1]}්\u200Dර');
     }
 
     // Step 3: Replace consonant + vowel (CRITICAL: uses simple string replace)
@@ -180,17 +198,10 @@ class SinglishTransliterator {
     return text;
   }
 
+  static final _latinLetterPattern = RegExp(r'[A-Za-z]');
+
   /// Checks if the query contains ASCII letters (needs transliteration).
   bool isSinglishQuery(String query) {
-    return RegExp(r'[A-Za-z]').hasMatch(query);
-  }
-
-  // ============== Legacy API (for compatibility) ==============
-
-  /// Returns list with single converted result.
-  /// Kept for backward compatibility with existing code.
-  List<String> getPossibleMatches(String input) {
-    final result = convert(input);
-    return result.isEmpty ? [] : [result];
+    return _latinLetterPattern.hasMatch(query);
   }
 }

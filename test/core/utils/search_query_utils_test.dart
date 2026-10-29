@@ -13,6 +13,16 @@ void main() {
       expect(computeEffectiveQuery('tatra'), 'ටට්ර');
     });
 
+    test('the repaya joiner is dropped by the search query', () {
+      // So typing the scheme's R is never worse than typing a plain r: the
+      // preview shows the hook, and both spellings search the same string.
+      expect(singlishPreviewText('vaRgaya'), 'වර්\u200Dගය');
+      expect(
+        computeEffectiveQuery('vaRgaya'),
+        computeEffectiveQuery('vargaya'),
+      );
+    });
+
     test('is null for Sinhala input, even with a trailing space', () {
       // Trimming changes the text, but it is not a conversion.
       expect(singlishPreviewText('සති '), isNull);

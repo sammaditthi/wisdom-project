@@ -112,6 +112,22 @@ void main() {
         }
       });
 
+      test('c is ච, and ch/Ch still win over it', () {
+        // Romanized Pali spells ච as `c` (cakka, citta, pañca). The UCSC
+        // scheme this came from has only ch/Ch, so a bare `c` used to survive
+        // every pass as a Latin letter.
+        final cases = {
+          'ca': 'ච',
+          'cakka': 'චක්ක',
+          'cha': 'ච',
+          'Cha': 'ඡ',
+        };
+        for (final entry in cases.entries) {
+          expect(transliterator.convert(entry.key), entry.value,
+              reason: '${entry.key} should convert to ${entry.value}');
+        }
+      });
+
       test('rakaransha patterns', () {
         expect(transliterator.convert('kra'), 'ක්‍ර');
         expect(transliterator.convert('pra'), 'ප්‍ර');
@@ -152,6 +168,20 @@ void main() {
           expect(result, contains('ඃ'));
         });
 
+        test('repaya (R → the hook over the next consonant)', () {
+          // Typed before the consonant it rides on, and the ZWJ is what makes
+          // a font draw the hook instead of a visible hal.
+          expect(transliterator.convert('vaRgaya'), 'වර්\u200Dගය');
+          // The plain spelling is untouched — and is the same word to search,
+          // which drops the joiner from both sides.
+          expect(transliterator.convert('vargaya'), 'වර්ගය');
+        });
+
+        test('~R keeps its R', () {
+          // `~R` is replaced before the bare `R`, or the escape would lose it.
+          expect(transliterator.convert('~RdhDhi'), 'ඍද්ධි');
+        });
+
         test('standalone special chars', () {
           expect(transliterator.convert('~n'), 'ං');
           expect(transliterator.convert('~h'), 'ඃ');
@@ -173,24 +203,6 @@ void main() {
 
       test('returns true for mixed text', () {
         expect(transliterator.isSinglishQuery('සති sathi'), true);
-      });
-    });
-
-    group('getPossibleMatches()', () {
-      test('returns single-element list with converted result', () {
-        final matches = transliterator.getPossibleMatches('sathi');
-        expect(matches.length, 1);
-        expect(matches[0], 'සති');
-      });
-
-      test('returns empty list for empty input', () {
-        expect(transliterator.getPossibleMatches(''), []);
-      });
-
-      test('returns input as-is for Sinhala text', () {
-        final matches = transliterator.getPossibleMatches('සති');
-        expect(matches.length, 1);
-        expect(matches[0], 'සති');
       });
     });
   });
