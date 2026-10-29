@@ -22,6 +22,7 @@ Two parts, done together:
 
 - `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `resolveToNodeKey` and `nodeKeyForUid` look the ID up in `assets/data/sc-to-bjt.json`.
 - Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview when `parseRef` reads a reference.
+- Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
 - Research: the server (`research_server/`, the live Cloudflare Worker) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet."
 - The research server keeps its own list (`NIKAYAS` in `research_server/src/refs.ts`), and `refFromUid` capitalises every book. So answers show "DHP 1-20" and "THAG 1.1", and Vinaya citations show raw IDs like `pli-tv-bu-vb-pj1`.
 
@@ -59,7 +60,7 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 - Saving a reference as typed loses nothing: running "an 3" again converts it again, while a saved "අන් 3" would lose the jump.
 - Why this is enough (measured 2026-10-10 on `bjt.db`, `dict.db` and `tree.json`, all six match modes): a capitalised book plus a number finds nothing in the default match mode. In "near" and "anywhere" a few do ("A 3.65", "Pe 1"), and those hits still show because the normal search runs. Capital S, M, C, U, V and J have no Singlish letter, so "SN" converts to "Sණ්", which matches nothing. A few rare Singlish words start like a book (AN → ඇණ, Ne → ණෙ, Pe → ඵෙ, Thag → ථග); their preview hides for one keystroke and returns with the next letter. Our search boxes don't turn on auto-capitals, so phones type lowercase. No corpus test needed.
 
-**A5. The research server uses the same table.** `NIKAYAS` and the capitalising in `refFromUid` go. Display names and the prose matcher (which must take "SN 15:3" too, not link it as "SN 15") come from the one table. How is open: see "To decide", item 2. Separate commit; the user decides when to deploy the worker.
+**A5. The research server uses the same table.** `NIKAYAS` and the capitalising in `refFromUid` go. Display names and the prose matcher (which must take "SN 15:3" too, not link it as "SN 15") come from the one table. How is open: see "To decide", item 1. Separate commit; the user decides when to deploy the worker.
 
 ## Part B — the lookup file
 
@@ -107,15 +108,10 @@ The test agent writes the unit tests (CLAUDE.md). Add a handover note under each
 
 ## To decide
 
-1. **Some characters break every search.** Tested 2026-10-11 with sqlite3: a word with `:` fails ("no such column: 15" for `15:3*`), and `'`, `?` and `~` fail with a syntax error. `sanitizeSearchQuery` (`lib/core/utils/text_utils.dart`) strips a fixed list of characters that misses these four, and `buildFtsQuery` (`packages/wisdom_shared/lib/src/fts/fts_query_builder.dart`) sends words without quotes. Not a reference problem, but "SN 15:3" hits it. Two ways:
-   - Add the four to the strip list. Small, but the next missed character breaks search again.
-   - Quote each word in `buildFtsQuery`: `"15:3"*` works, so no character can break a search. One place, and the strip list stops mattering for errors.
-
-   Not yet tried in the running app.
-2. **How the research server shares the one table.** TypeScript can't import Dart. The server uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
+1. **How the research server shares the one table.** TypeScript can't import Dart. The server uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
    - The Dart table stays the source, and a small tool writes a generated TypeScript copy for the worker.
    - The app writes `ref` itself from the `uid` (it already has the table), and finding references in the answer moves to the app too. The server then needs no book names, but the answer format changes.
-3. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the full lookup file will be much bigger than today's seed.
+2. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the full lookup file will be much bigger than today's seed.
 
 ## Not supported
 

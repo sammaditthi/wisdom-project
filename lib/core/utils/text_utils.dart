@@ -9,7 +9,7 @@ String normalizeText(String text, {bool toLowerCase = false}) {
       .replaceAll('\uFEFF', ''); // Byte Order Mark
 
   // Collapse multiple spaces and trim
-  normalized = normalized.replaceAll(RegExp(r'\s+'), ' ').trim();
+  normalized = normalized.replaceAll(_whitespaceRunPattern, ' ').trim();
 
   return toLowerCase ? normalized.toLowerCase() : normalized;
 }
@@ -31,12 +31,15 @@ final sinhalaWordPattern = RegExp('[$sinhalaUnicodeRange\\u200D]+');
 /// Pre-compiled whitespace pattern for search normalization.
 final _whitespacePattern = RegExp(r'\s');
 
+/// Pre-compiled: tree names are normalized on every search.
+final _whitespaceRunPattern = RegExp(r'\s+');
+
 /// Normalizes text for search and builds a position map in a single pass.
 ///
 /// Strips zero-width chars and sentence punctuation ([_invalidTextCharsPattern]),
 /// collapses whitespace, trims, and lowercases.
-/// Only strips punctuation that appears between tokens (`;` `!`); `.` becomes
-/// a space instead — see [_splitOnPeriods].
+/// Only strips punctuation that appears between tokens (`;` `!`);
+/// [_wordBreakChars] become a space instead.
 /// Formatting markers (`**`, `{}`, etc.) are left intact — strip them first
 /// with `ContentMarkers.stripMarkers` if you are matching against the FTS
 /// index, which never saw them.
@@ -57,14 +60,14 @@ final _whitespacePattern = RegExp(r'\s');
     // Skip search-invalid characters (punctuation, but keep - and ,)
     if (_invalidTextCharsPattern.hasMatch(char)) continue;
 
-    // Collapse consecutive whitespace. A '.' becomes a space, so a dotted
-    // heading splits the way [sanitizeSearchQuery] splits a dotted query.
+    // Collapse consecutive whitespace. A word break becomes a space, so text
+    // splits the way [sanitizeSearchQuery] splits a query.
     // Other whitespace is written through unchanged — a '\n' is not a ' '.
-    final isPeriod = char == '.';
-    if (isPeriod || _whitespacePattern.hasMatch(char)) {
+    final isWordBreak = _wordBreakChars.contains(char);
+    if (isWordBreak || _whitespacePattern.hasMatch(char)) {
       if (lastWasSpace) continue;
       lastWasSpace = true;
-      buffer.write(isPeriod ? ' ' : char);
+      buffer.write(isWordBreak ? ' ' : char);
     } else {
       lastWasSpace = false;
       buffer.write(char);
@@ -85,29 +88,36 @@ final _whitespacePattern = RegExp(r'\s');
   return (normalized: normalizedStr.toLowerCase(), positionMap: map);
 }
 
-/// Chars stripped from queries.
+/// Chars stripped from queries. FTS5 rejects `'` in a bare word.
 /// Commas/hyphens are also removed to avoid FTS complexity although they appear in titles.
-const _invalidSearchChars = r'"()*{}\[\]@#$%&=+<>\\`|/;\^!,-';
+const _invalidSearchChars = r'''"()*{}\[\]@#$%&=+<>\\`|/;\^!,'-''';
 final _invalidCharsPattern = RegExp('[$_invalidSearchChars]');
 
-/// Turns each `.` into a space, then collapses and trims.
+/// Chars that end a word the way a space does, in queries, tree names and
+/// text alike.
 ///
-/// The FTS tokenizer already treats `.` as a separator, and a bare `.` is a
-/// syntax error inside an FTS5 query, so it cannot simply be kept. Deleting it
-/// instead was what made "3.1.4.1" miss the node the tree stores as
-/// "3. 1. 4. 1"; spacing keeps both spellings on one string.
-String _splitOnPeriods(String text) =>
-    text.replaceAll('.', ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+/// The FTS tokenizer already treats them as separators, and each breaks an
+/// FTS5 query (`:` reads as a column), so they cannot simply be kept. Deleting
+/// them instead made "3.1.4.1" miss the node the tree stores as "3. 1. 4. 1",
+/// and would read "15:3" as "153"; spacing keeps both spellings on one string.
+const _wordBreakChars = '.:?';
+final _wordBreakPattern = RegExp('[$_wordBreakChars]');
+
+/// Turns each [_wordBreakChars] char into a space, then collapses and trims.
+String _splitOnWordBreaks(String text) => text
+    .replaceAll(_wordBreakPattern, ' ')
+    .replaceAll(_whitespaceRunPattern, ' ')
+    .trim();
 
 /// Reduces a tree name — or a query matched against one — to the shape
 /// [sanitizeSearchQuery] produces, so the two can be compared directly.
 String normalizeForTitleMatch(String text) =>
-    _splitOnPeriods(normalizeText(text, toLowerCase: true));
+    _splitOnWordBreaks(normalizeText(text, toLowerCase: true));
 
 /// Sentence punctuation stripped from text during search normalization.
 /// Only includes chars that appear between matched tokens in Pali/Sinhala
-/// content and would prevent indexOf from finding the query. `.` is not here:
-/// it becomes a space rather than vanishing.
+/// content and would prevent indexOf from finding the query.
+/// [_wordBreakChars] are not here: they become a space rather than vanishing.
 /// Formatting markers (**, {}, etc.) are NOT stripped here. They do split
 /// words the FTS index indexed whole (`**ඡන්දරාගවෙමත්තතා**ති`), so a caller
 /// matching an index hit must strip them before normalizing — see
@@ -172,7 +182,7 @@ int snapToGraphemeBoundary(String text, int index, {bool forward = false}) {
 String? sanitizeSearchQuery(String query) {
   var sanitized = normalizeText(query);
   sanitized = sanitized.replaceAll(_invalidCharsPattern, '');
-  sanitized = _splitOnPeriods(sanitized);
+  sanitized = _splitOnWordBreaks(sanitized);
 
   if (!_validContentPattern.hasMatch(sanitized)) {
     return null;

@@ -99,7 +99,7 @@ class SearchResultsPanel extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     bool isLoading,
-    GroupedSearchResult? categorizedResults,
+    AsyncValue<GroupedSearchResult?> topResults,
     Map<SearchResultType, int> countByResultType,
     String effectiveQuery,
     bool isPhraseSearch,
@@ -111,7 +111,13 @@ class SearchResultsPanel extends ConsumerWidget {
       return const StatusMessageView(variant: StatusVariant.loading);
     }
 
+    // Search failed - same message as the other tabs
+    if (topResults case AsyncError(:final error)) {
+      return _errorView(context, error);
+    }
+
     // Invalid query - didn't search
+    final categorizedResults = topResults.valueOrNull;
     if (categorizedResults == null) {
       return StatusMessageView(
         variant: StatusVariant.invalid,
@@ -233,23 +239,7 @@ class SearchResultsPanel extends ConsumerWidget {
   ) {
     return fullResults.when(
       loading: () => const StatusMessageView(variant: StatusVariant.loading),
-      error: (error, stack) {
-        // Decide between offline (server unreachable) and generic error.
-        // statusVariantForError unwraps Failure and inspects the inner cause.
-        // No Retry button: on web the user can refresh the page; on mobile
-        // assets are bundled, so a retry can't fix an inherent failure.
-        final variant = statusVariantForError(error);
-        final l10n = AppLocalizations.of(context);
-        return StatusMessageView(
-          variant: variant,
-          title: variant == StatusVariant.offline
-              ? l10n.statusOfflineTitle
-              : l10n.errorLoadingSearch,
-          description: variant == StatusVariant.offline
-              ? l10n.statusOfflineDescription
-              : l10n.statusErrorDescription,
-        );
-      },
+      error: (error, stack) => _errorView(context, error),
       data: (results) {
         final l10n = AppLocalizations.of(context);
         // Invalid query - didn't search
@@ -365,6 +355,25 @@ class SearchResultsPanel extends ConsumerWidget {
           },
         );
       },
+    );
+  }
+
+  /// A failed search, for every tab.
+  Widget _errorView(BuildContext context, Object error) {
+    // Decide between offline (server unreachable) and generic error.
+    // statusVariantForError unwraps Failure and inspects the inner cause.
+    // No Retry button: on web the user can refresh the page; on mobile
+    // assets are bundled, so a retry can't fix an inherent failure.
+    final variant = statusVariantForError(error);
+    final l10n = AppLocalizations.of(context);
+    return StatusMessageView(
+      variant: variant,
+      title: variant == StatusVariant.offline
+          ? l10n.statusOfflineTitle
+          : l10n.errorLoadingSearch,
+      description: variant == StatusVariant.offline
+          ? l10n.statusOfflineDescription
+          : l10n.statusErrorDescription,
     );
   }
 

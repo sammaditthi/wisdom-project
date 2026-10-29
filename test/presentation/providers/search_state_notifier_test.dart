@@ -110,7 +110,8 @@ void main() {
         notifier.updateQuery('');
 
         // ASSERT
-        expect(notifier.state.groupedResults, isNull);
+        expect(notifier.state.groupedResults,
+            const AsyncValue<GroupedSearchResult?>.data(null));
         expect(notifier.state.isLoading, isFalse);
       });
 
@@ -728,7 +729,7 @@ void main() {
     });
 
     group('Error handling', () {
-      test('should clear results when categorized search fails', () {
+      test('a failed categorized search keeps its failure', () {
         fakeAsync((async) {
           // ARRANGE
           const failure = Failure.dataLoadFailure(
@@ -741,9 +742,9 @@ void main() {
           notifier.updateQuery('test');
           async.elapse(const Duration(milliseconds: 350)); // Wait for debounce
 
-          // ASSERT
+          // ASSERT - an error, not "didn't search", so the tab says it failed
           expect(notifier.state.isLoading, isFalse);
-          expect(notifier.state.groupedResults, isNull);
+          expect(notifier.state.groupedResults.error, failure);
           expect(notifier.state.rawQueryText,
               equals('test')); // Query text preserved
         });
@@ -831,7 +832,7 @@ void main() {
           notifier.updateQuery('dhamma');
           async.elapse(const Duration(milliseconds: 350));
 
-          expect(notifier.state.groupedResults, isNotNull);
+          expect(notifier.state.groupedResults.valueOrNull, isNotNull);
         });
       });
 

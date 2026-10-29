@@ -90,6 +90,14 @@ void main() {
       expect(normalizeSearchText('4. 3. 1. 6').normalized, '4 3 1 6');
     });
 
+    test('a colon or question mark separates like a period', () {
+      // "කුමක්ද? කියා" must meet the query "කුමක්ද කියා", as it does in FTS.
+      expect(normalizeSearchText('කුමක්ද? කියා').normalized, 'කුමක්ද කියා');
+      expect(normalizeSearchText('ආමන්තා:ති').normalized, 'ආමන්තා ති');
+      // The highlight of "ද" stops before the "?", not after it.
+      expect(normalizeSearchText('ද? ක').positionMap, [0, 1, 3, 4]);
+    });
+
     test('strips semicolons and exclamation marks', () {
       const text = 'abc; def! ghi';
       final result = normalizeSearchText(text);
@@ -110,6 +118,14 @@ void main() {
     test('still drops the chars FTS5 cannot parse', () {
       expect(sanitizeSearchQuery('සති(ය)'), 'සතිය');
       expect(sanitizeSearchQuery('a-b,c'), 'abc');
+      expect(sanitizeSearchQuery("සති'ය"), 'සතිය');
+    });
+
+    test('a colon or question mark becomes a space, like a period', () {
+      expect(sanitizeSearchQuery('?සති'), 'සති');
+      expect(sanitizeSearchQuery('15:3'), '15 3');
+      expect(sanitizeSearchQuery('කුමක්ද?කියා'), 'කුමක්ද කියා');
+      expect(sanitizeSearchQuery('?'), isNull);
     });
 
     test('a trailing period leaves no trailing space', () {
@@ -123,6 +139,14 @@ void main() {
       // 19 commentary names are written compact; they matched before this
       // change and must keep matching.
       expect(normalizeForTitleMatch('3.3.1.1'), '3 3 1 1');
+    });
+
+    test('a numbered name with a colon meets the query typed either way', () {
+      const name = '1: එකකනිද්දෙසවණ්ණනා';
+      expect(normalizeForTitleMatch(name),
+          contains(normalizeForTitleMatch(sanitizeSearchQuery('1: එකක')!)));
+      expect(normalizeForTitleMatch(name),
+          contains(normalizeForTitleMatch(sanitizeSearchQuery('1 එකක')!)));
     });
   });
 

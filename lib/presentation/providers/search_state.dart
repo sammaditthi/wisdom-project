@@ -44,7 +44,10 @@ class SearchState with _$SearchState {
     @Default(SearchResultType.topResults) SearchResultType selectedResultType,
 
     /// Categorized results for "Top Results" tab (grouped by category)
-    GroupedSearchResult? groupedResults,
+    /// null = invalid query (didn't search); an error = the search failed.
+    /// Loading is [isLoading], not this.
+    @Default(AsyncValue.data(null))
+    AsyncValue<GroupedSearchResult?> groupedResults,
 
     /// Full results for the selected category (async state)
     /// null = invalid query (didn't search), [] = valid query with no results
@@ -172,7 +175,7 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       state = state.copyWith(
         rawQueryText: query,
         effectiveQueryText: effectiveQuery,
-        groupedResults: null,
+        groupedResults: const AsyncValue.data(null), // null = didn't search
         fullResults: const AsyncValue.data(null), // null = didn't search
         countByResultType: {},
         isLoading: false,
@@ -240,7 +243,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     final query = _buildSearchQuery();
     if (query == null) {
       if (_searchRequestId == requestId) {
-        state = state.copyWith(isLoading: false, groupedResults: null);
+        state = state.copyWith(
+            isLoading: false, groupedResults: const AsyncValue.data(null));
       }
       return;
     }
@@ -252,10 +256,16 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
 
     result.fold(
       (failure) {
-        state = state.copyWith(isLoading: false, groupedResults: null);
+        state = state.copyWith(
+          isLoading: false,
+          groupedResults: AsyncValue.error(failure, StackTrace.current),
+        );
       },
       (groupedResult) {
-        state = state.copyWith(isLoading: false, groupedResults: groupedResult);
+        state = state.copyWith(
+          isLoading: false,
+          groupedResults: AsyncValue.data(groupedResult),
+        );
       },
     );
   }

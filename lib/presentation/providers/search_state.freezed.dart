@@ -32,7 +32,10 @@ mixin _$SearchState {
   SearchResultType get selectedResultType => throw _privateConstructorUsedError;
 
   /// Categorized results for "Top Results" tab (grouped by category)
-  GroupedSearchResult? get groupedResults => throw _privateConstructorUsedError;
+  /// null = invalid query (didn't search); an error = the search failed.
+  /// Loading is [isLoading], not this.
+  AsyncValue<GroupedSearchResult?> get groupedResults =>
+      throw _privateConstructorUsedError;
 
   /// Full results for the selected category (async state)
   /// null = invalid query (didn't search), [] = valid query with no results
@@ -121,7 +124,7 @@ abstract class $SearchStateCopyWith<$Res> {
       String effectiveQueryText,
       List<RecentSearch> recentSearches,
       SearchResultType selectedResultType,
-      GroupedSearchResult? groupedResults,
+      AsyncValue<GroupedSearchResult?> groupedResults,
       AsyncValue<List<SearchResult>?> fullResults,
       bool isLoading,
       Set<String> selectedEditions,
@@ -136,8 +139,6 @@ abstract class $SearchStateCopyWith<$Res> {
       Map<SearchResultType, int> countByResultType,
       Set<String> expandedFTSGroups,
       Set<String> selectedDictionaryIds});
-
-  $GroupedSearchResultCopyWith<$Res>? get groupedResults;
 }
 
 /// @nodoc
@@ -159,7 +160,7 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
     Object? effectiveQueryText = null,
     Object? recentSearches = null,
     Object? selectedResultType = null,
-    Object? groupedResults = freezed,
+    Object? groupedResults = null,
     Object? fullResults = null,
     Object? isLoading = null,
     Object? selectedEditions = null,
@@ -192,10 +193,10 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
           ? _value.selectedResultType
           : selectedResultType // ignore: cast_nullable_to_non_nullable
               as SearchResultType,
-      groupedResults: freezed == groupedResults
+      groupedResults: null == groupedResults
           ? _value.groupedResults
           : groupedResults // ignore: cast_nullable_to_non_nullable
-              as GroupedSearchResult?,
+              as AsyncValue<GroupedSearchResult?>,
       fullResults: null == fullResults
           ? _value.fullResults
           : fullResults // ignore: cast_nullable_to_non_nullable
@@ -254,20 +255,6 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
               as Set<String>,
     ) as $Val);
   }
-
-  /// Create a copy of SearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $GroupedSearchResultCopyWith<$Res>? get groupedResults {
-    if (_value.groupedResults == null) {
-      return null;
-    }
-
-    return $GroupedSearchResultCopyWith<$Res>(_value.groupedResults!, (value) {
-      return _then(_value.copyWith(groupedResults: value) as $Val);
-    });
-  }
 }
 
 /// @nodoc
@@ -283,7 +270,7 @@ abstract class _$$SearchStateImplCopyWith<$Res>
       String effectiveQueryText,
       List<RecentSearch> recentSearches,
       SearchResultType selectedResultType,
-      GroupedSearchResult? groupedResults,
+      AsyncValue<GroupedSearchResult?> groupedResults,
       AsyncValue<List<SearchResult>?> fullResults,
       bool isLoading,
       Set<String> selectedEditions,
@@ -298,9 +285,6 @@ abstract class _$$SearchStateImplCopyWith<$Res>
       Map<SearchResultType, int> countByResultType,
       Set<String> expandedFTSGroups,
       Set<String> selectedDictionaryIds});
-
-  @override
-  $GroupedSearchResultCopyWith<$Res>? get groupedResults;
 }
 
 /// @nodoc
@@ -320,7 +304,7 @@ class __$$SearchStateImplCopyWithImpl<$Res>
     Object? effectiveQueryText = null,
     Object? recentSearches = null,
     Object? selectedResultType = null,
-    Object? groupedResults = freezed,
+    Object? groupedResults = null,
     Object? fullResults = null,
     Object? isLoading = null,
     Object? selectedEditions = null,
@@ -353,10 +337,10 @@ class __$$SearchStateImplCopyWithImpl<$Res>
           ? _value.selectedResultType
           : selectedResultType // ignore: cast_nullable_to_non_nullable
               as SearchResultType,
-      groupedResults: freezed == groupedResults
+      groupedResults: null == groupedResults
           ? _value.groupedResults
           : groupedResults // ignore: cast_nullable_to_non_nullable
-              as GroupedSearchResult?,
+              as AsyncValue<GroupedSearchResult?>,
       fullResults: null == fullResults
           ? _value.fullResults
           : fullResults // ignore: cast_nullable_to_non_nullable
@@ -425,7 +409,7 @@ class _$SearchStateImpl extends _SearchState {
       this.effectiveQueryText = '',
       final List<RecentSearch> recentSearches = const [],
       this.selectedResultType = SearchResultType.topResults,
-      this.groupedResults,
+      this.groupedResults = const AsyncValue.data(null),
       this.fullResults = const AsyncValue.data(null),
       this.isLoading = false,
       final Set<String> selectedEditions = const {},
@@ -479,8 +463,11 @@ class _$SearchStateImpl extends _SearchState {
   final SearchResultType selectedResultType;
 
   /// Categorized results for "Top Results" tab (grouped by category)
+  /// null = invalid query (didn't search); an error = the search failed.
+  /// Loading is [isLoading], not this.
   @override
-  final GroupedSearchResult? groupedResults;
+  @JsonKey()
+  final AsyncValue<GroupedSearchResult?> groupedResults;
 
   /// Full results for the selected category (async state)
   /// null = invalid query (didn't search), [] = valid query with no results
@@ -716,7 +703,7 @@ abstract class _SearchState extends SearchState {
       final String effectiveQueryText,
       final List<RecentSearch> recentSearches,
       final SearchResultType selectedResultType,
-      final GroupedSearchResult? groupedResults,
+      final AsyncValue<GroupedSearchResult?> groupedResults,
       final AsyncValue<List<SearchResult>?> fullResults,
       final bool isLoading,
       final Set<String> selectedEditions,
@@ -753,8 +740,10 @@ abstract class _SearchState extends SearchState {
   SearchResultType get selectedResultType;
 
   /// Categorized results for "Top Results" tab (grouped by category)
+  /// null = invalid query (didn't search); an error = the search failed.
+  /// Loading is [isLoading], not this.
   @override
-  GroupedSearchResult? get groupedResults;
+  AsyncValue<GroupedSearchResult?> get groupedResults;
 
   /// Full results for the selected category (async state)
   /// null = invalid query (didn't search), [] = valid query with no results

@@ -166,6 +166,42 @@ void main() {
       expect(find.text('Retry'), findsNothing);
     });
 
+    testWidgets('a failed Top results search shows the error, not "invalid"',
+        (tester) async {
+      // "?something" used to fail the FTS query, and this tab showed
+      // "Enter a valid search query" while Full text showed the error.
+      await _pumpPanel(
+        tester,
+        state: SearchState(
+          rawQueryText: 'metta',
+          effectiveQueryText: 'metta',
+          selectedResultType: SearchResultType.topResults,
+          groupedResults: AsyncValue.error(
+            const Failure.dataLoadFailure(message: 'fts'),
+            StackTrace.current,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Error loading results'), findsOneWidget);
+      expect(find.text('Enter a valid search query'), findsNothing);
+    });
+
+    testWidgets('no query on Top results still says "invalid"', (tester) async {
+      await _pumpPanel(
+        tester,
+        state: const SearchState(
+          rawQueryText: '?',
+          selectedResultType: SearchResultType.topResults,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Enter a valid search query'), findsOneWidget);
+      expect(find.text('Error loading results'), findsNothing);
+    });
+
     // ── Badge boundary values ───────────────────────────────────────────
 
     testWidgets('zero count badges show "0" on all 3 category tabs',
@@ -212,7 +248,7 @@ void main() {
         SearchState(
           rawQueryText: 'metta',
           effectiveQueryText: 'metta',
-          groupedResults: const GroupedSearchResult(
+          groupedResults: const AsyncValue.data(GroupedSearchResult(
             resultsByType: {
               SearchResultType.title: [
                 SearchResult(
@@ -230,7 +266,7 @@ void main() {
                 ),
               ],
             },
-          ),
+          )),
           countByResultType: counts,
         );
 
@@ -412,7 +448,7 @@ void main() {
     const state = SearchState(
       rawQueryText: 'metta',
       effectiveQueryText: 'metta',
-      groupedResults: GroupedSearchResult(resultsByType: {}),
+      groupedResults: AsyncValue.data(GroupedSearchResult(resultsByType: {})),
       countByResultType: {
         SearchResultType.title: 12,
         SearchResultType.fullText: 140,
