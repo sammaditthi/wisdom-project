@@ -272,9 +272,15 @@ and rollback are in
 points "read in the app" at `app.sammaditthi.net`, and the app's link card and
 shared links point at the apex.
 
-**Before each release, open the two start links** in
-[`deep-linking-and-shareable-urls.md`](deep-linking-and-shareable-urls.md) § D on
-the dev origin: a grouped sutta must open alone. No automated test catches it.
+**Before each release, and after every Flutter upgrade, open two start links by
+hand** on the dev origin (`https://app-sammaditthi-test.pages.dev`; prod
+`https://app.sammaditthi.net`). No automated test catches this — why is in
+[`deep-linking-and-shareable-urls.md`](deep-linking-and-shareable-urls.md) § D.
+
+| Link | Must open |
+|---|---|
+| `/tipitaka/sn-1-1-7#sn-1-1-7-3` | sutta 3 alone, not the whole vagga |
+| `/tipitaka/vp-pct-1-3-1#vp-pct-1-3-1-1` | the first sekhiya rule, starting at its own opening (a corrected coordinate) |
 
 **Three targets**, all in `scripts/app/web/`
 ([`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md)):

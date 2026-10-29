@@ -11,7 +11,7 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 /// *invariants it proved* survive here.
 ///
 /// The oracle below is the pre-extraction implementation, copied verbatim from
-/// `Entry` as it stood at commit 4bb320c. Nothing in `lib/` may be changed to
+/// `Entry`. Nothing in `lib/` may be changed to
 /// make these pass — the whole point is that the oracle is frozen.
 void main() {
   group('stripMarkers matches the pre-extraction algorithm', () {

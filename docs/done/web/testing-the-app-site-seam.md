@@ -35,7 +35,7 @@ reading unit is the tapped node's own subtree. It uses the plan for links only.
 | One address per node from `urlFor` and `servingLink`, read back by `resolveTarget` | `packages/wisdom_shared/test/pages/site_plan_test.dart` |
 | Search sends a hit to the URL the site writes | `static_site_generator/test/wiring_contract_test.dart` — `hrefFor` is transcribed into Dart, and a test pins the script's text so the copy cannot drift |
 | Copy link and open link in the app, including the plan or tree failing | `test/presentation/providers/deep_link_provider_test.dart` |
-| A web start URL keeps the sutta after its `#` | **manual only** — `docs/todo/web-strategy/deep-linking-and-shareable-urls.md` § D |
+| A web start URL keeps the sutta after its `#` | **manual only** — `docs/todo/web-strategy/web-release.md` § 6 |
 
 `verify_corpus_invariants.dart` and `plan_corpus.dart` run in the corpus lane of
 `scripts/static_site/test.sh`, which `sync-regen.sh` runs after every re-sync

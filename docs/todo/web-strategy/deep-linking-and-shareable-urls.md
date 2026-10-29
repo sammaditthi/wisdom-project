@@ -600,14 +600,8 @@ dropped on 2026-10-29:
   Flutter's navigation messages later than a real start-up does, so it cannot
   reproduce the bug.
 
-The guard is a manual check instead, before each web release and after every
-Flutter upgrade, on the app origin (`https://app-sammaditthi-test.pages.dev`;
-prod `https://app.sammaditthi.net`):
-
-| Link | Must open |
-|---|---|
-| `/tipitaka/sn-1-1-7#sn-1-1-7-3` | sutta 3 alone, not the whole vagga |
-| `/tipitaka/vp-pct-1-3-1#vp-pct-1-3-1-1` | the first sekhiya rule, starting at its own opening (a corrected coordinate) |
+The guard is a manual check instead, listed with the release steps in
+[`web-release.md`](web-release.md) § 6.
 
 Revisit the automated test only if a harness booting through the real `main()`
 is shown to erase the `#` before the first post-frame callback — prove that
