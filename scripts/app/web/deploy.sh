@@ -186,6 +186,16 @@ if [ ! -f "$OUT/_headers" ]; then
   exit 1
 fi
 
+# The bootstrap reads a deprecated Flutter token. A Flutter that drops it
+# leaves the token in the file, a syntax error, and the app never starts; one
+# that fills null stops the offline worker registering.
+if ! grep -q '^const serviceWorkerVersion = "[0-9]' "$OUT/flutter_bootstrap.js"; then
+  echo "error: $OUT/flutter_bootstrap.js has no number for serviceWorkerVersion." >&2
+  echo "       Flutter changed its token; see the comment above it in" >&2
+  echo "       web/flutter_bootstrap.js." >&2
+  exit 1
+fi
+
 # --- The databases: checked against the manifest, then moved out ------------
 # The manifest in the build is what the app reads, so each .db must be the
 # file it describes: a database rebuilt without its manifest (or the reverse)

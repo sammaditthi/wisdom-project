@@ -75,7 +75,9 @@ Everything below is done once, by hand.
 2. Runs `scripts/app/test.sh` (dev can skip it with `--skip-tests`).
 3. `flutter build web --release` with `RESEARCH_BASE_URL`,
    `DATABASE_BASE_URL`, and `LINK_BASE_URL` set to the same target's static
-   site. `_headers` comes from `web/_headers`.
+   site. `_headers` comes from `web/_headers`. Stops if the built
+   `flutter_bootstrap.js` has no number for `serviceWorkerVersion`, a
+   deprecated Flutter token that an upgrade can drop.
 4. Checks each `.db` in the build against `manifest.json`, then takes it out
    of the build.
 5. Uploads each database version the bucket doesn't have yet, as
@@ -94,6 +96,27 @@ be downloading one.
 The app: Pages project → Deployments → the last good deployment → ⋯ →
 *Rollback to this deployment*. It names its own database versions, and those
 are still on R2.
+
+The offline worker (`web/offline_worker.js`) is network-first, so a rollback
+is served as soon as it is live. Rolling back to a build from before the
+worker removes it: that build's `flutter.js` installs Flutter's stub over it,
+which unregisters and reloads each open tab once. The stored files stay
+behind in Cache storage, unused.
+
+To retire the worker, deleting the file is not enough: Pages answers the
+browser's update check with `index.html`, the update fails, and the old
+worker stays. Replace it with this, take the `register()` out of
+`web/flutter_bootstrap.js` in the same deploy, and leave this file in place
+for months, for visitors who come back late:
+
+```js
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (event) => event.waitUntil(
+  caches.delete('app').then(() => self.registration.unregister())));
+```
+
+No reload, unlike Flutter's stub: while the bootstrap still registered it, a
+reload would loop.
 
 A failed database check stops the deploy before the app goes out. Fix what it
 names, then purge that URL, because Cloudflare keeps serving the copy it

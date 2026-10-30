@@ -85,9 +85,10 @@
       from { transform: translateX(-100%); }
       to { transform: translateX(340%); }
     }
-    /* flutter_bootstrap.js adds .failed when Flutter fails to start. Raised
-       above Flutter's view, which may already be on the page, so the button
-       takes the click. */
+    /* flutter_bootstrap.js adds .failed when Flutter fails to start, and the
+       script tag below when the bootstrap fails to load. Raised above
+       Flutter's view, which may already be on the page, so the button takes
+       the click. */
     #boot .error, #boot.failed .loading { display: none; }
     #boot.failed { z-index: 1; }
     #boot.failed .error { display: block; }
@@ -159,11 +160,16 @@
         <p class="lead" lang="en">The download did not finish</p>
         <p class="sub" lang="si">ඔබගේ සම්බන්ධතාවය පරීක්ෂා කර නැවත උත්සාහ කරන්න.</p>
         <p class="sub" lang="en">Check your connection and try again.</p>
-        <button type="button"><span lang="si">නැවත උත්සාහ කරන්න</span><span
-          lang="en">Try again</span></button>
+        <!-- Wired here, not in flutter_bootstrap.js: the button must work
+             when the bootstrap itself failed to load. -->
+        <button type="button" onclick="location.reload()"><span
+          lang="si">නැවත උත්සාහ කරන්න</span><span lang="en">Try again</span></button>
       </div>
     </div>
   </div>
-  <script src="flutter_bootstrap.js" async></script>
+  <!-- Every other error handler lives in the bootstrap, so a failed download
+       of it switches #boot to its error lines here. -->
+  <script src="flutter_bootstrap.js" async
+    onerror="document.getElementById('boot')?.classList.add('failed')"></script>
 </body>
 </html>
