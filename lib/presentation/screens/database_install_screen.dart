@@ -146,6 +146,13 @@ class _Progress extends StatelessWidget {
           style: typography.resultSubtitle,
           textAlign: TextAlign.center,
         ),
+        // Shown in every browser, Chrome included: not worth a browser check.
+        const SizedBox(height: 8),
+        Text(
+          l10n.databaseInstallBrowserHint,
+          style: typography.resultSubtitle,
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }

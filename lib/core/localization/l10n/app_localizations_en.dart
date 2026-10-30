@@ -536,7 +536,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get databaseInstallDescription =>
-      'The texts and the dictionary are saved on this device, so they open quickly and work without an internet connection. The app opens when the download finishes.';
+      'The texts and the dictionary are saved on this device, so you can read offline. The app opens when the download finishes.';
+
+  @override
+  String get databaseInstallBrowserHint => 'Works best in Google Chrome.';
 
   @override
   String get databaseInstallPreparing => 'Getting ready…';
@@ -552,7 +555,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get databaseInstallUnsupportedDescription =>
-      'Chrome and Edge are supported today.';
+      'Chrome is recommended for now.';
 
   @override
   String get databaseInstallOutOfSpaceTitle => 'Not enough space';

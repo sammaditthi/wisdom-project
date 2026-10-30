@@ -265,7 +265,7 @@ class WebDatabaseInstaller {
     return DatabaseInstallFailure(
       DatabaseInstallFailureKind.unsupportedBrowser,
       'This browser is missing ${missing.join(' and ')}. '
-      'Chrome and Edge are supported today.',
+      'Chrome is supported today.',
     );
   }
 

@@ -133,7 +133,7 @@ void main() {
         find.text('This browser cannot store the texts'),
         findsOneWidget,
       );
-      expect(find.text('Chrome and Edge are supported today.'), findsOneWidget);
+      expect(find.text('Chrome is recommended for now.'), findsOneWidget);
       // Nothing would change on a second try.
       expect(find.text('Try again'), findsNothing);
       expect(

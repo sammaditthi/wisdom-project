@@ -1049,8 +1049,14 @@ abstract class AppLocalizations {
   /// Explanation under the first-visit progress bar: why the download is happening, and that the app waits for all of it
   ///
   /// In en, this message translates to:
-  /// **'The texts and the dictionary are saved on this device, so they open quickly and work without an internet connection. The app opens when the download finishes.'**
+  /// **'The texts and the dictionary are saved on this device, so you can read offline. The app opens when the download finishes.'**
   String get databaseInstallDescription;
+
+  /// Line under the first-visit explanation, in every browser (Chrome too): the browser the web app is tested in
+  ///
+  /// In en, this message translates to:
+  /// **'Works best in Google Chrome.'**
+  String get databaseInstallBrowserHint;
 
   /// Shown on the first-visit screen while the browser is checked and old copies are swept, before any download starts
   ///
@@ -1070,10 +1076,10 @@ abstract class AppLocalizations {
   /// **'This browser cannot store the texts'**
   String get databaseInstallUnsupportedTitle;
 
-  /// First-visit failure message naming the browsers that work
+  /// First-visit failure message naming the browser that works
   ///
   /// In en, this message translates to:
-  /// **'Chrome and Edge are supported today.'**
+  /// **'Chrome is recommended for now.'**
   String get databaseInstallUnsupportedDescription;
 
   /// First-visit failure title when the browser refuses the storage the texts need

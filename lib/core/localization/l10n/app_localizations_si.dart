@@ -537,7 +537,11 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get databaseInstallDescription =>
-      'පෙළ සහ ශබ්දකෝෂය මෙම උපාංගයේ ගබඩා වේ. එවිට ඉක්මනින් විවෘත වන අතර අන්තර්ජාලය නැතිවද භාවිතා කළ හැකිය. බාගත කිරීම අවසන් වූ පසු යෙදුම විවෘත වේ.';
+      'පෙළ සහ ශබ්දකෝෂය මෙම උපාංගයේ ගබඩා වන නිසා, අන්තර්ජාලය නැතිවද කියවිය හැකිය. බාගත කිරීම අවසන් වූ පසු යෙදුම විවෘත වේ.';
+
+  @override
+  String get databaseInstallBrowserHint =>
+      'Google Chrome භාවිතා කිරීම වඩාත් සුදුසුයි.';
 
   @override
   String get databaseInstallPreparing => 'සූදානම් වෙමින්…';
@@ -553,7 +557,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get databaseInstallUnsupportedDescription =>
-      'දැනට Chrome සහ Edge සඳහා සහය දක්වයි.';
+      'දැනට Chrome භාවිතා කිරීම නිර්දේශිතයි.';
 
   @override
   String get databaseInstallOutOfSpaceTitle => 'ප්‍රමාණවත් ඉඩක් නැත';
