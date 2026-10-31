@@ -311,7 +311,8 @@ class _ToolbarButton extends StatelessWidget {
           onTap: onTap,
           menuOpen: menuOpen,
           focusNode: focusNode,
-          content: (color) => Icon(icon, size: 20, weight: weight, color: color),
+          content: (color) =>
+              Icon(icon, size: 20, weight: weight, color: color),
         );
 
   @override
