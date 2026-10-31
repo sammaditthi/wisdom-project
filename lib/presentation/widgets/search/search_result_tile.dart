@@ -28,6 +28,10 @@ class SearchResultTile extends ConsumerWidget {
   /// Off when every row in the list is from one edition.
   final bool showEditionBadge;
 
+  /// On when a link row follows, as in `GroupedFTSTile`: the row drops its
+  /// bottom padding so the link sits close to the text.
+  final bool hasLinkBelow;
+
   final VoidCallback? onTap;
 
   const SearchResultTile({
@@ -37,6 +41,7 @@ class SearchResultTile extends ConsumerWidget {
     required this.isPhraseSearch,
     required this.isExactMatch,
     required this.showEditionBadge,
+    this.hasLinkBelow = false,
     this.onTap,
   });
 
@@ -50,8 +55,8 @@ class SearchResultTile extends ConsumerWidget {
     final labels = searchResultLabels(ref, searchResult);
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-          horizontal: ResultBadge.rowPadding, vertical: 8),
+      contentPadding: EdgeInsets.fromLTRB(ResultBadge.rowPadding, 8,
+          ResultBadge.rowPadding, hasLinkBelow ? 0 : 8),
       leading: showEditionBadge
           ? ResultBadge(
               label: searchResult.editionId.toUpperCase(),

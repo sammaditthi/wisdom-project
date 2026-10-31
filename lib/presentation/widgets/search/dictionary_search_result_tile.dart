@@ -64,13 +64,16 @@ class DictionarySearchResultTile extends ConsumerWidget {
           constraints.maxWidth - textStart - ResultBadge.rowPadding;
       final canExpand = isExpanded ||
           _isCut(context, meaning, meaningStyle, math.max(0, meaningWidth));
+      final hasLinks = canExpand || isDpd;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: ResultBadge.rowPadding, vertical: 8),
+            // No bottom padding when the link row follows, so it sits close to
+            // the meaning, as in GroupedFTSTile.
+            contentPadding: EdgeInsets.fromLTRB(ResultBadge.rowPadding, 8,
+                ResultBadge.rowPadding, hasLinks ? 0 : 8),
             leading: ResultBadge(
               label: dictInfo?.abbreviation ?? result.editionId,
               backgroundColor: dictColor.withValues(alpha: 0.15),
@@ -105,7 +108,7 @@ class DictionarySearchResultTile extends ConsumerWidget {
           ),
 
           // "Show more" / "Show less", and DPD's website link
-          if (canExpand || isDpd)
+          if (hasLinks)
             Padding(
               // Lines the first label up with the meaning, as in GroupedFTSTile.
               padding: EdgeInsets.only(

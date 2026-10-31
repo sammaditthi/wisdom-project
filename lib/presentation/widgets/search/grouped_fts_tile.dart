@@ -67,6 +67,7 @@ class GroupedFTSTile extends ConsumerWidget {
           isPhraseSearch: isPhraseSearch,
           isExactMatch: isExactMatch,
           showEditionBadge: showEditionBadge,
+          hasLinkBelow: group.hasSecondaryMatches,
           onTap: () => onPrimaryTap?.call(group.primaryMatch),
         ),
 
