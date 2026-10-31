@@ -29,10 +29,40 @@ deferred, see `docs/done/ops/versioning-system.md`.
 ## The shape of every release
 
 ```
-bump  →  finish  →  push  →  deploy
+bump  →  write the CHANGELOG entry  →  finish  →  push  →  deploy
 ```
 
 You never touch the version while building features. It moves only here.
+
+## The CHANGELOG entry
+
+`CHANGELOG.md` at the repo root is the release notes. The app's "What's new"
+will show it as written, and it pastes into a store's "What's new" as is.
+Write the entry after `bump`, from `git log v<last>..HEAD`.
+
+```markdown
+## 1.1.0 - 2026-11-04
+### New
+- Singlish: R types repaya, and c types ච
+
+### Fixed
+- Searches with : or ? no longer fail
+```
+
+- `## <version> - <YYYY-MM-DD>` starts an entry, newest first, dated the
+  release day.
+- A plain line straight under it is the headline. Write one for x.0.0 only.
+- `### New`, `### Improved`, `### Fixed`, in that order, each with `- ` notes.
+- **At most 5 notes a group, and 500 characters an entry** (Google Play's
+  limit), counted below the `##` line. Merge similar ones: "UI improvements:
+  …" is fine.
+- English only, written for a reader, not copied from commit subjects.
+- Only what an app reader sees, on any platform. A change for one platform
+  says so ("On the web, …"). Website-only changes get no line.
+
+`finish` refuses unless the newest entry is this version, dated, with at least
+one note and within both limits. It checks before writing anything: notes added
+after the tag would move HEAD off it.
 
 ## A bug fix release
 
@@ -40,7 +70,8 @@ Wording, a crash, a layout fix — anything a user would call "a fix".
 
 ```bash
 dart run tools/release.dart bump patch   # 1.0.0+1 → 1.0.1+2
-dart run tools/release.dart finish       # regenerate, commit, tag v1.0.1
+#                                          write the CHANGELOG.md entry
+dart run tools/release.dart finish       # check it, regenerate, commit, tag v1.0.1
 git push && git push --tags
 ./scripts/static_site/deploy.sh --prod   # or whichever product you're shipping
 ```
@@ -51,6 +82,7 @@ Something new that does not break anyone's saved state.
 
 ```bash
 dart run tools/release.dart bump minor   # 1.0.1+2 → 1.1.0+3   (patch zeroed)
+#                                          write the CHANGELOG.md entry
 dart run tools/release.dart finish
 git push && git push --tags
 ./scripts/app/web/deploy.sh --prod
@@ -63,6 +95,7 @@ settings, bookmarks or deep links.
 
 ```bash
 dart run tools/release.dart bump major   # 1.1.0+3 → 2.0.0+4   (minor and patch zeroed)
+#                                          write the CHANGELOG.md entry, with a headline
 dart run tools/release.dart finish
 git push && git push --tags
 ./scripts/app/web/deploy.sh --prod
@@ -84,10 +117,11 @@ dart run tools/release.dart bump major|minor|patch
 #   minor zeroes patch; major zeroes minor and patch.
 
 dart run tools/release.dart finish
-#   Regenerates app_version.gen.dart, commits `chore(release): v1.0.1`
-#   (only those two paths — anything else you have staged stays out),
-#   and makes the annotated tag. Does NOT push.
-#   Refuses unless you are on main with a clean tree apart from those two
+#   Checks the CHANGELOG.md entry, regenerates app_version.gen.dart, commits
+#   `chore(release): v1.0.1` (only the pubspec, the generated file and
+#   CHANGELOG.md — anything else you have staged stays out), and makes the
+#   annotated tag. Does NOT push.
+#   Refuses unless you are on main with a clean tree apart from those three
 #   paths, so it cannot tag a commit the deploy would then reject.
 
 dart run tools/release.dart check
@@ -137,16 +171,6 @@ Where the guard bites today:
 
 The android, ios and macos `deploy.sh` are placeholders and exit 3 before any
 check. Mobile store releases are gated by `docs/todo/mobile-release/`.
-
-## The first release
-
-Nothing is tagged yet, and `1.0.0` is the version to release, so there is no
-bump:
-
-```bash
-dart run tools/release.dart finish   # tag v1.0.0; "commit skipped" if nothing changed
-git push && git push --tags
-```
 
 ## Notes
 

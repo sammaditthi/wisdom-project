@@ -30,12 +30,17 @@ void main(List<String> args) {
 
 const _pubspecPath = 'pubspec.yaml';
 const _generatedPath = 'lib/core/version/app_version.gen.dart';
+const _changelogPath = 'CHANGELOG.md';
 
-/// The only two paths a release writes, and so the only two a release commit
-/// carries — and the only two `_requireCleanTree` tolerates as dirty. A
-/// `CHANGELOG.md` edited between `bump` and `finish` belongs in this list; add
-/// it when the changelog plan lands, or `finish` will refuse the entry.
-const _releasePaths = [_pubspecPath, _generatedPath];
+/// The only paths a release writes, and so the only ones a release commit
+/// carries — and the only ones `_requireCleanTree` tolerates as dirty. The
+/// changelog entry is written between `bump` and `finish`.
+const _releasePaths = [_pubspecPath, _generatedPath, _changelogPath];
+
+/// The newest changelog entry pastes into a store's "What's new" as written:
+/// Google Play takes 500 characters. Five notes a group keeps it a summary.
+const _maxEntryLength = 500;
+const _maxNotesPerGroup = 5;
 
 /// The branch every product releases from: the `*_PROD_BRANCH` values in
 /// `scripts/config/targets.env`, which all say `main`. A tag cut anywhere else
@@ -115,11 +120,12 @@ int _finish(Directory root) {
     );
   }
 
+  _requireChangelogEntry(root, version);
   _writeGenerated(root, version);
 
   stdout.writeln(_commitRelease(root, tag)
       ? 'commit     chore(release): $tag'
-      : 'commit     skipped — both files already match HEAD');
+      : 'commit     skipped — the release files already match HEAD');
 
   _run(root, 'git', ['tag', '-a', tag, '-m', 'Release $version']);
   stdout.writeln('tag        $tag');
@@ -160,7 +166,8 @@ usage: dart run tools/release.dart <command>
 
   status   the version, the last tag, and the commits since it
   bump     major | minor | patch — raises that part, and the build by one
-  finish   regenerate, commit, and tag v<version>. Does not push
+  finish   check $_changelogPath, regenerate, commit, and tag v<version>.
+           Does not push
   check    exit 1 if $_generatedPath drifted; else print the tag
   tag      print the tag name for the current version, and nothing else''');
   return 1;
@@ -249,11 +256,11 @@ void _requireReleaseBranch(Directory root) {
   }
 }
 
-/// Anything dirty beyond the two release paths would be left out of the release
+/// Anything dirty beyond the release paths would be left out of the release
 /// commit, so the tag would name a tree that was never built. `bump` has
-/// already made the pubspec dirty by design, so the two are excluded by
-/// pathspec — git does the matching, rather than this slicing porcelain
-/// columns. `--porcelain` so untracked files count: a never-added file is
+/// already made the pubspec dirty by design, and the changelog entry follows
+/// it, so the release paths are excluded by pathspec — git does the matching,
+/// rather than this slicing porcelain columns. `--porcelain` so untracked files count: a never-added file is
 /// invisible to `git diff` yet part of the build.
 void _requireCleanTree(Directory root) {
   final dirty = _gitOut(root, [
@@ -270,8 +277,65 @@ void _requireCleanTree(Directory root) {
   );
 }
 
-/// Commits exactly the two release paths, leaving anything else staged or dirty
-/// alone. False when neither differs from HEAD: the first release, where the
+/// Any `## ` line starts an entry (`### ` group lines do not match); a
+/// well-formed one reads `## 1.4.0 - 2027-01-15`.
+final _entryHeading = RegExp(r'^## .*$', multiLine: true);
+final _datedHeading = RegExp(r'^## (\d+\.\d+\.\d+) - \d{4}-\d{2}-\d{2}$');
+
+/// The newest `CHANGELOG.md` entry must be this release, within the limits.
+/// Checked before anything is written: notes added after the tag would move
+/// HEAD off it, and the only way out of that is a burnt version.
+void _requireChangelogEntry(Directory root, _Version version) {
+  final text = _changelogText(root);
+  final headings = _entryHeading.allMatches(text).toList();
+  final today = DateTime.now().toIso8601String().substring(0, 10);
+  final expected = 'Write "## ${version.name} - $today" (the release day) at '
+      'the top';
+  if (headings.isEmpty) {
+    throw _Fail('$_changelogPath has no entry. $expected.');
+  }
+  final newest = headings.first;
+  if (_datedHeading.firstMatch(newest[0]!)?[1] != version.name) {
+    throw _Fail(
+      'the newest $_changelogPath entry is "${newest[0]}". $expected.',
+    );
+  }
+
+  // The entry runs from below its heading to the next one.
+  final end = headings.length > 1 ? headings[1].start : text.length;
+  final entry = text.substring(newest.end, end).trim();
+  var notes = 0;
+  var group = '';
+  var inGroup = 0;
+  for (final line in entry.split('\n').map((line) => line.trim())) {
+    if (line.startsWith('### ')) {
+      group = line.substring(4);
+      inGroup = 0;
+    } else if (line.startsWith('- ') && group.isNotEmpty) {
+      notes++;
+      if (++inGroup > _maxNotesPerGroup) {
+        throw _Fail(
+          '"$group" in ${version.name} has more than $_maxNotesPerGroup '
+          'notes. Merge similar ones.',
+        );
+      }
+    }
+  }
+  if (notes == 0) {
+    throw _Fail('the ${version.name} entry in $_changelogPath has no notes.');
+  }
+  if (entry.length > _maxEntryLength) {
+    throw _Fail(
+      'the ${version.name} entry is ${entry.length} characters; a store takes '
+      '$_maxEntryLength. Merge or cut notes.',
+    );
+  }
+  stdout.writeln(
+      'changelog  ${version.name}: $notes notes, ${entry.length} characters');
+}
+
+/// Commits exactly the release paths, leaving anything else staged or dirty
+/// alone. False when none differs from HEAD: the first release, where the
 /// pubspec already carries the version being tagged.
 bool _commitRelease(Directory root, String tag) {
   if (_gitOut(root, ['status', '--porcelain', '--', ..._releasePaths])
@@ -304,6 +368,12 @@ File _generatedFile(Directory root) => File('${root.path}/$_generatedPath');
 /// `''` when the file is absent, which reads as drift.
 String _generatedText(Directory root) {
   final file = _generatedFile(root);
+  return file.existsSync() ? file.readAsStringSync() : '';
+}
+
+/// `''` when the file is absent, which reads as no entry.
+String _changelogText(Directory root) {
+  final file = File('${root.path}/$_changelogPath');
   return file.existsSync() ? file.readAsStringSync() : '';
 }
 
