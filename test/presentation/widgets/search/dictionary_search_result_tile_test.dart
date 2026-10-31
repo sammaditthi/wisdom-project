@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result_type.dart';
+import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/search_state.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/dictionary_search_result_tile.dart';
 
-import '../../../helpers/fake_key_value_store.dart';
+import '../../../helpers/fake_search_state_notifier.dart';
+import '../../../helpers/pump_app.dart';
 
 void main() {
   // Test data - a dictionary search result
@@ -24,51 +25,37 @@ void main() {
     language: 'en',
   );
 
-  /// Helper to wrap the widget in a MaterialApp.
-  ///
-  /// DictionarySearchResultTile is now a ConsumerWidget that reads
-  /// `paliLetterOptionsProvider`, so it must be pumped inside a ProviderScope.
-  /// We override `keyValueStoreProvider` with an in-memory store so the
-  /// settings notifiers hydrate to their defaults without touching disk.
-  Widget buildTestWidget({
-    required SearchResult result,
-    VoidCallback? onTap,
-  }) {
-    return ProviderScope(
-      overrides: [
-        keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore()),
-      ],
-      child: MaterialApp(
-        home: Scaffold(
-          body: DictionarySearchResultTile(
-            result: result,
-            onTap: onTap,
-          ),
-        ),
-      ),
+  /// Pumps the tile with a fake search state, which holds its expanded flag.
+  Future<FakeSearchStateNotifier> pumpTile(
+    WidgetTester tester,
+    SearchResult result,
+  ) async {
+    final notifier = FakeSearchStateNotifier(const SearchState());
+    await tester.pumpApp(
+      DictionarySearchResultTile(result: result),
+      overrides: [searchStateProvider.overrideWith((ref) => notifier)],
     );
+    return notifier;
   }
 
   group('DictionarySearchResultTile', () {
     testWidgets('renders word, dictionary name, and meaning', (tester) async {
-      // Act
-      await tester.pumpWidget(buildTestWidget(result: testResult));
+      await pumpTile(tester, testResult);
 
-      // Assert
       // Word (title)
       expect(find.text('buddha'), findsOneWidget);
       // Dictionary name (subtitle)
       expect(find.text('Digital Pali Dictionary'), findsOneWidget);
-      // Meaning is stripped of HTML and shown
+      // Meaning is shown without its HTML tags
       expect(find.textContaining('awakened'), findsOneWidget);
       expect(find.textContaining('enlightened'), findsOneWidget);
+      // It fits in two lines, so there is nothing to expand
+      expect(find.text('Show more'), findsNothing);
     });
 
     testWidgets('shows badge with correct abbreviation', (tester) async {
-      // Act
-      await tester.pumpWidget(buildTestWidget(result: testResult));
+      await pumpTile(tester, testResult);
 
-      // Assert
       // DPD abbreviation should be shown in badge
       expect(find.text('DPD'), findsOneWidget);
 
@@ -81,22 +68,38 @@ void main() {
       expect(badgeFinder, findsWidgets);
     });
 
-    testWidgets('triggers onTap callback when tapped', (tester) async {
-      // Arrange
-      var tapped = false;
+    testWidgets('"Show more" shows a meaning cut at two lines in full',
+        (tester) async {
+      // Three lines of meaning, so two lines cut it short.
+      final notifier = await pumpTile(
+        tester,
+        testResult.copyWith(matchedText: 'first<br>second<br>third'),
+      );
+      int? meaningMaxLines() =>
+          tester.widget<Text>(find.textContaining('third')).maxLines;
 
-      // Act
-      await tester.pumpWidget(buildTestWidget(
-        result: testResult,
-        onTap: () => tapped = true,
-      ));
+      expect(meaningMaxLines(), 2);
 
-      // Find and tap the ListTile
-      await tester.tap(find.byType(ListTile));
-      await tester.pumpAndSettle();
+      await tester.tap(find.text('Show more'));
+      await tester.pump();
 
-      // Assert
-      expect(tapped, isTrue);
+      expect(notifier.state.expandedDefinitions, {'dict-1'});
+      expect(meaningMaxLines(), isNull);
+      expect(find.text('Show less'), findsOneWidget);
+    });
+
+    testWidgets('a DPD entry links to dpdict.net, not "Read more"',
+        (tester) async {
+      await pumpTile(
+        tester,
+        testResult.copyWith(
+          matchedText: 'awakened<br>'
+              '<a href="https://www.dpdict.net/?q=buddha">Read more</a>',
+        ),
+      );
+
+      expect(find.text('dpdict.net'), findsOneWidget);
+      expect(find.textContaining('Read more'), findsNothing);
     });
   });
 }

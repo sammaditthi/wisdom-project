@@ -401,10 +401,16 @@ abstract class AppLocalizations {
   /// Expand link revealing additional secondary matches from the same text
   ///
   /// In en, this message translates to:
-  /// **'View {count} more'**
+  /// **'Show {count} more'**
   String viewMore(int count);
 
-  /// Collapse link that hides the expanded secondary matches again
+  /// Expand link under a definition cut to two lines; shows its full meaning
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// Collapse link that hides the expanded secondary matches, or a definition's full meaning, again
   ///
   /// In en, this message translates to:
   /// **'Show less'**
@@ -709,12 +715,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
-
-  /// Label for the DPD dictionary 'Read more' link
-  ///
-  /// In en, this message translates to:
-  /// **'Read more'**
-  String get readMore;
 
   /// Error message shown when a URL cannot be launched
   ///

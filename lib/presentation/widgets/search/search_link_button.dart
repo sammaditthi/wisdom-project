@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_typography.dart';
 
-/// Text button with a small trailing icon: "See all →" and "View N more ⌄"
-/// in the results list. 40px tall, so it is easy to tap.
+/// Text button with a small trailing icon: "See all →", "Show N more ⌄",
+/// "Show more ⌄" and "dpdict.net ↗". 40px tall, so it is easy to tap.
 class SearchLinkButton extends StatelessWidget {
   /// Space before the label. Callers subtract it to line the label up with
   /// the text above.

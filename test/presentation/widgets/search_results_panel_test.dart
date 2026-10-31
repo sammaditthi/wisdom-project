@@ -306,9 +306,9 @@ void main() {
       expect(tester.widget<TabBar>(find.byType(TabBar)).controller!.index, 1);
     });
 
-    // ── "View N more" in a full-text group ──────────────────────────────
+    // ── "Show N more" in a full-text group ──────────────────────────────
 
-    testWidgets('"View 2 more" shows the hidden matches and "Show less"',
+    testWidgets('"Show 2 more" shows the hidden matches and "Show less"',
         (tester) async {
       // Three matches in one sutta: one primary row and two hidden ones.
       SearchResult match(int entryIndex) => SearchResult(
@@ -338,7 +338,7 @@ void main() {
 
       expect(find.byType(SecondaryMatchTile), findsNothing);
 
-      await tester.tap(find.text('View 2 more'));
+      await tester.tap(find.text('Show 2 more'));
       await tester.pumpAndSettle();
 
       expect(find.text('Show less'), findsOneWidget);
@@ -378,7 +378,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Reveal the secondary tile too, so both call sites are covered.
-      await tester.tap(find.text('View 1 more'));
+      await tester.tap(find.text('Show 1 more'));
       await tester.pumpAndSettle();
 
       final snippets = tester

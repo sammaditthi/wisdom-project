@@ -109,6 +109,9 @@ class SearchState with _$SearchState {
     /// Used to show/hide secondary matches in grouped FTS results
     @Default({}) Set<String> expandedFTSGroups,
 
+    /// Definition results showing their full meaning (by result id)
+    @Default({}) Set<String> expandedDefinitions,
+
     /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
     /// Empty set = "All" (no filter applied).
     ///
@@ -542,23 +545,29 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   }
 
   // ============================================================================
-  // FTS GROUP EXPANSION
+  // RESULT EXPANSION (FTS groups, definitions)
   // ============================================================================
 
   /// Toggle expansion state of an FTS result group.
   /// Used to show/hide secondary matches in grouped FTS results.
   void toggleFTSGroupExpansion(String nodeKey) {
-    final current = state.expandedFTSGroups;
-    final updated = current.contains(nodeKey)
-        ? ({...current}..remove(nodeKey))
-        : {...current, nodeKey};
-    state = state.copyWith(expandedFTSGroups: updated);
+    state = state.copyWith(
+        expandedFTSGroups: _toggled(state.expandedFTSGroups, nodeKey));
   }
 
   /// Collapse all expanded FTS groups.
   void collapseAllFTSGroups() {
     state = state.copyWith(expandedFTSGroups: {});
   }
+
+  /// Show or hide a definition result's full meaning.
+  void toggleDefinitionExpansion(String resultId) {
+    state = state.copyWith(
+        expandedDefinitions: _toggled(state.expandedDefinitions, resultId));
+  }
+
+  static Set<String> _toggled(Set<String> set, String key) =>
+      set.contains(key) ? ({...set}..remove(key)) : {...set, key};
 
   /// Refresh search if query is active
   /// Used when filters change (scope, language, etc.)

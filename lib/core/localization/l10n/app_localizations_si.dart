@@ -166,6 +166,9 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
+  String get showMore => 'දිගහරින්න';
+
+  @override
   String get showLess => 'හකුළන්න';
 
   @override
@@ -326,9 +329,6 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get done => 'හරි';
-
-  @override
-  String get readMore => 'තව කියවන්න';
 
   @override
   String get couldNotOpenLink => 'සබැඳිය විවෘත කළ නොහැකිය';

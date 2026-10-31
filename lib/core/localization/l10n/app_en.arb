@@ -256,7 +256,7 @@
     "description": "Tooltip on the ✕ that deletes one entry from the recent searches list"
   },
 
-  "viewMore": "View {count} more",
+  "viewMore": "Show {count} more",
   "@viewMore": {
     "description": "Expand link revealing additional secondary matches from the same text",
     "placeholders": {
@@ -266,9 +266,14 @@
     }
   },
 
+  "showMore": "Show more",
+  "@showMore": {
+    "description": "Expand link under a definition cut to two lines; shows its full meaning"
+  },
+
   "showLess": "Show less",
   "@showLess": {
-    "description": "Collapse link that hides the expanded secondary matches again"
+    "description": "Collapse link that hides the expanded secondary matches, or a definition's full meaning, again"
   },
 
   "seeAll": "See all",
@@ -542,11 +547,6 @@
   "done": "Done",
   "@done": {
     "description": "Button label to dismiss a dialog after completing changes"
-  },
-
-  "readMore": "Read more",
-  "@readMore": {
-    "description": "Label for the DPD dictionary 'Read more' link"
   },
 
   "couldNotOpenLink": "Could not open link",

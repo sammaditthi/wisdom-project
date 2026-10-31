@@ -16,9 +16,11 @@ import '../../../domain/entities/dictionary/dictionary_info.dart';
 import '../../../domain/entities/dictionary/dictionary_params.dart';
 import '../../../core/utils/search_query_utils.dart';
 import '../../providers/dictionary_provider.dart';
+import '../../utils/dictionary_meaning_spans.dart';
 import '../common/circular_toggle_button.dart';
 import '../common/status_message_view.dart';
-import 'dpd_read_more_link.dart';
+import '../search/search_link_button.dart';
+import 'dpd_website_link.dart';
 import 'refine_dictionary_dialog.dart';
 
 /// Non-modal bottom sheet that displays dictionary definitions for a word.
@@ -546,6 +548,7 @@ class _DictionaryEntryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dictInfo = DictionaryInfo.getById(entry.dictionaryId);
+    final isDpd = entry.dictionaryId == 'DPD';
     final theme = Theme.of(context);
     final typography = context.typography;
     // Badge colour from the theme's shared dictionary badge palette.
@@ -595,118 +598,22 @@ class _DictionaryEntryTile extends StatelessWidget {
           SelectionArea(
             child: Text.rich(
               TextSpan(
-                children: _parseHtmlToTextSpans(entry.meaning, theme),
+                children:
+                    dictionaryMeaningSpans(entry.meaning, dropLinkText: isDpd),
               ),
               style: typography.definitionBody,
             ),
           ),
-          // "Read more" link rendered outside SelectionArea so tap gestures
+          // Website link rendered outside SelectionArea so tap gestures
           // aren't intercepted by the text selection handler (especially on
           // desktop where mouse clicks trigger selection, not tap recognizers).
-          if (entry.dictionaryId == 'DPD') DpdReadMoreLink(html: entry.meaning),
+          // Pulled left so its label lines up with the meaning.
+          if (isDpd)
+            Transform.translate(
+              offset: const Offset(-SearchLinkButton.padding, 0),
+              child: DpdWebsiteLink(html: entry.meaning),
+            ),
         ],
-      ),
-    );
-  }
-
-  /// Parses simple HTML content into TextSpans
-  /// Handles: <b>, <i>, <br>, basic tags
-  List<InlineSpan> _parseHtmlToTextSpans(String html, ThemeData theme) {
-    final spans = <InlineSpan>[];
-
-    // Replace <br> and <br/> with newlines, decode HTML entities
-    var text = html
-        .replaceAll(RegExp(r'<br\s*/?>'), '\n')
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll('&lt;', '<')
-        .replaceAll('&gt;', '>')
-        .replaceAll('&amp;', '&')
-        .replaceAll('&quot;', '"');
-
-    // Process text with basic tag handling
-    final buffer = StringBuffer();
-    var isBold = false;
-    var isItalic = false;
-    var isInsideLink = false;
-
-    int i = 0;
-    while (i < text.length) {
-      if (text[i] == '<') {
-        // Found a tag - flush buffer first
-        if (buffer.isNotEmpty) {
-          spans.add(_createTextSpan(buffer.toString(), isBold, isItalic));
-          buffer.clear();
-        }
-
-        // Find end of tag
-        final tagEnd = text.indexOf('>', i);
-        if (tagEnd == -1) {
-          buffer.write(text[i]);
-          i++;
-          continue;
-        }
-
-        final tag = text.substring(i + 1, tagEnd).toLowerCase().trim();
-        i = tagEnd + 1;
-
-        // Handle tags
-        if (tag == 'b' || tag == 'strong') {
-          isBold = true;
-        } else if (tag == '/b' || tag == '/strong') {
-          isBold = false;
-        } else if (tag == 'i' || tag == 'em') {
-          isItalic = true;
-        } else if (tag == '/i' || tag == '/em') {
-          isItalic = false;
-        } else if (tag.startsWith('a ')) {
-          // Skip link content — rendered as a separate widget below
-          isInsideLink = true;
-        } else if (tag == '/a') {
-          isInsideLink = false;
-        } else if (tag.startsWith('r ') || tag == 'r') {
-          // Custom <r> tags used in Sinhala dictionaries
-          // Just render the content without special styling
-        } else if (tag == '/r') {
-          // End of <r> tag
-        }
-        // Ignore other tags
-      } else {
-        if (!isInsideLink) {
-          buffer.write(text[i]);
-        }
-        i++;
-      }
-    }
-
-    // Flush remaining buffer
-    if (buffer.isNotEmpty) {
-      spans.add(_createTextSpan(buffer.toString(), isBold, isItalic));
-    }
-
-    // Trim trailing whitespace/newlines from the last span (e.g. a <br>
-    // before a stripped <a> tag would leave a dangling newline).
-    if (spans.isNotEmpty && spans.last is TextSpan) {
-      final last = spans.last as TextSpan;
-      if (last.text != null) {
-        final trimmed = last.text!.trimRight();
-        if (trimmed != last.text) {
-          spans[spans.length - 1] = TextSpan(
-            text: trimmed,
-            style: last.style,
-          );
-        }
-      }
-    }
-
-    return spans.isEmpty ? [const TextSpan(text: '')] : spans;
-  }
-
-  TextSpan _createTextSpan(String text, bool isBold, bool isItalic) {
-    return TextSpan(
-      text: text,
-      style: TextStyle(
-        fontWeight: isBold ? FontWeight.bold : null,
-        fontStyle: isItalic ? FontStyle.italic : null,
       ),
     );
   }

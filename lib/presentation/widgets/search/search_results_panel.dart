@@ -7,8 +7,6 @@ import '../../../domain/entities/search/grouped_fts_match.dart';
 import '../../../domain/entities/search/grouped_search_result.dart';
 import '../../../domain/entities/search/search_result_type.dart';
 import '../../../domain/entities/search/search_result.dart';
-import '../../providers/dictionary_provider.dart'
-    show selectedDictionaryWordProvider;
 import '../../providers/reader_unit_provider.dart';
 import '../../providers/reference_search_provider.dart';
 import '../../providers/search_provider.dart';
@@ -175,7 +173,6 @@ class SearchResultsPanel extends ConsumerWidget {
                 else if (resultType == SearchResultType.definition)
                   ...results.map((result) => DictionarySearchResultTile(
                         result: result,
-                        onTap: () => _showDictionaryBottomSheet(ref, result),
                       ))
                 else
                   ...results.map((result) => SearchResultTile(
@@ -193,11 +190,6 @@ class SearchResultsPanel extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  /// Shows a dictionary bottom sheet with the word from a definition result
-  void _showDictionaryBottomSheet(WidgetRef ref, SearchResult result) {
-    ref.read(selectedDictionaryWordProvider.notifier).state = result.title;
   }
 
   /// Builds grouped FTS result tiles from a list of search results
@@ -322,7 +314,6 @@ class SearchResultsPanel extends ConsumerWidget {
 
               return DictionarySearchResultTile(
                 result: results[index],
-                onTap: () => _showDictionaryBottomSheet(ref, results[index]),
               );
             },
           );

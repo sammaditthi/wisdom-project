@@ -37,6 +37,16 @@ class FakeSearchStateNotifier extends StateNotifier<SearchState>
   }
 
   @override
+  void toggleDefinitionExpansion(String resultId) {
+    final ids = state.expandedDefinitions;
+    state = state.copyWith(
+      expandedDefinitions: ids.contains(resultId)
+          ? ({...ids}..remove(resultId))
+          : {...ids, resultId},
+    );
+  }
+
+  @override
   void setMatchOptions({
     bool? isExactMatch,
     bool? isPhraseSearch,

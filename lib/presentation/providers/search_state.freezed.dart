@@ -99,6 +99,9 @@ mixin _$SearchState {
   /// Used to show/hide secondary matches in grouped FTS results
   Set<String> get expandedFTSGroups => throw _privateConstructorUsedError;
 
+  /// Definition results showing their full meaning (by result id)
+  Set<String> get expandedDefinitions => throw _privateConstructorUsedError;
+
   /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
   /// Empty set = "All" (no filter applied).
   ///
@@ -138,6 +141,7 @@ abstract class $SearchStateCopyWith<$Res> {
       bool isExactMatch,
       Map<SearchResultType, int> countByResultType,
       Set<String> expandedFTSGroups,
+      Set<String> expandedDefinitions,
       Set<String> selectedDictionaryIds});
 }
 
@@ -174,6 +178,7 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
     Object? isExactMatch = null,
     Object? countByResultType = null,
     Object? expandedFTSGroups = null,
+    Object? expandedDefinitions = null,
     Object? selectedDictionaryIds = null,
   }) {
     return _then(_value.copyWith(
@@ -249,6 +254,10 @@ class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
           ? _value.expandedFTSGroups
           : expandedFTSGroups // ignore: cast_nullable_to_non_nullable
               as Set<String>,
+      expandedDefinitions: null == expandedDefinitions
+          ? _value.expandedDefinitions
+          : expandedDefinitions // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
       selectedDictionaryIds: null == selectedDictionaryIds
           ? _value.selectedDictionaryIds
           : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
@@ -284,6 +293,7 @@ abstract class _$$SearchStateImplCopyWith<$Res>
       bool isExactMatch,
       Map<SearchResultType, int> countByResultType,
       Set<String> expandedFTSGroups,
+      Set<String> expandedDefinitions,
       Set<String> selectedDictionaryIds});
 }
 
@@ -318,6 +328,7 @@ class __$$SearchStateImplCopyWithImpl<$Res>
     Object? isExactMatch = null,
     Object? countByResultType = null,
     Object? expandedFTSGroups = null,
+    Object? expandedDefinitions = null,
     Object? selectedDictionaryIds = null,
   }) {
     return _then(_$SearchStateImpl(
@@ -393,6 +404,10 @@ class __$$SearchStateImplCopyWithImpl<$Res>
           ? _value._expandedFTSGroups
           : expandedFTSGroups // ignore: cast_nullable_to_non_nullable
               as Set<String>,
+      expandedDefinitions: null == expandedDefinitions
+          ? _value._expandedDefinitions
+          : expandedDefinitions // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
       selectedDictionaryIds: null == selectedDictionaryIds
           ? _value._selectedDictionaryIds
           : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
@@ -423,12 +438,14 @@ class _$SearchStateImpl extends _SearchState {
       this.isExactMatch = false,
       final Map<SearchResultType, int> countByResultType = const {},
       final Set<String> expandedFTSGroups = const {},
+      final Set<String> expandedDefinitions = const {},
       final Set<String> selectedDictionaryIds = const {}})
       : _recentSearches = recentSearches,
         _selectedEditions = selectedEditions,
         _scope = scope,
         _countByResultType = countByResultType,
         _expandedFTSGroups = expandedFTSGroups,
+        _expandedDefinitions = expandedDefinitions,
         _selectedDictionaryIds = selectedDictionaryIds,
         super._();
 
@@ -594,6 +611,19 @@ class _$SearchStateImpl extends _SearchState {
     return EqualUnmodifiableSetView(_expandedFTSGroups);
   }
 
+  /// Definition results showing their full meaning (by result id)
+  final Set<String> _expandedDefinitions;
+
+  /// Definition results showing their full meaning (by result id)
+  @override
+  @JsonKey()
+  Set<String> get expandedDefinitions {
+    if (_expandedDefinitions is EqualUnmodifiableSetView)
+      return _expandedDefinitions;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_expandedDefinitions);
+  }
+
   /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
   /// Empty set = "All" (no filter applied).
   ///
@@ -617,7 +647,7 @@ class _$SearchStateImpl extends _SearchState {
 
   @override
   String toString() {
-    return 'SearchState(rawQueryText: $rawQueryText, effectiveQueryText: $effectiveQueryText, recentSearches: $recentSearches, selectedResultType: $selectedResultType, groupedResults: $groupedResults, fullResults: $fullResults, isLoading: $isLoading, selectedEditions: $selectedEditions, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, isPanelDismissed: $isPanelDismissed, isExactMatch: $isExactMatch, countByResultType: $countByResultType, expandedFTSGroups: $expandedFTSGroups, selectedDictionaryIds: $selectedDictionaryIds)';
+    return 'SearchState(rawQueryText: $rawQueryText, effectiveQueryText: $effectiveQueryText, recentSearches: $recentSearches, selectedResultType: $selectedResultType, groupedResults: $groupedResults, fullResults: $fullResults, isLoading: $isLoading, selectedEditions: $selectedEditions, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, isPanelDismissed: $isPanelDismissed, isExactMatch: $isExactMatch, countByResultType: $countByResultType, expandedFTSGroups: $expandedFTSGroups, expandedDefinitions: $expandedDefinitions, selectedDictionaryIds: $selectedDictionaryIds)';
   }
 
   @override
@@ -661,6 +691,8 @@ class _$SearchStateImpl extends _SearchState {
             const DeepCollectionEquality()
                 .equals(other._expandedFTSGroups, _expandedFTSGroups) &&
             const DeepCollectionEquality()
+                .equals(other._expandedDefinitions, _expandedDefinitions) &&
+            const DeepCollectionEquality()
                 .equals(other._selectedDictionaryIds, _selectedDictionaryIds));
   }
 
@@ -685,6 +717,7 @@ class _$SearchStateImpl extends _SearchState {
         isExactMatch,
         const DeepCollectionEquality().hash(_countByResultType),
         const DeepCollectionEquality().hash(_expandedFTSGroups),
+        const DeepCollectionEquality().hash(_expandedDefinitions),
         const DeepCollectionEquality().hash(_selectedDictionaryIds)
       ]);
 
@@ -717,6 +750,7 @@ abstract class _SearchState extends SearchState {
       final bool isExactMatch,
       final Map<SearchResultType, int> countByResultType,
       final Set<String> expandedFTSGroups,
+      final Set<String> expandedDefinitions,
       final Set<String> selectedDictionaryIds}) = _$SearchStateImpl;
   const _SearchState._() : super._();
 
@@ -817,6 +851,10 @@ abstract class _SearchState extends SearchState {
   /// Used to show/hide secondary matches in grouped FTS results
   @override
   Set<String> get expandedFTSGroups;
+
+  /// Definition results showing their full meaning (by result id)
+  @override
+  Set<String> get expandedDefinitions;
 
   /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
   /// Empty set = "All" (no filter applied).

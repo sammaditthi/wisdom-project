@@ -103,6 +103,8 @@
 
   "viewMore": "තවත් ගැළපීම් {count}ක් ඇත",
 
+  "showMore": "දිගහරින්න",
+
   "showLess": "හකුළන්න",
 
   "seeAll": "සියල්ල බලන්න",
@@ -204,8 +206,6 @@
   "dictRefineSectionLabel": "ශබ්දකෝෂ",
 
   "done": "හරි",
-
-  "readMore": "තව කියවන්න",
 
   "couldNotOpenLink": "සබැඳිය විවෘත කළ නොහැකිය",
 

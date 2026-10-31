@@ -81,7 +81,7 @@ class GroupedFTSTile extends ConsumerWidget {
     );
   }
 
-  /// Builds the "View X more" / "Show less" button
+  /// Builds the "Show N more" / "Show less" button
   Widget _buildExpandCollapseLink(
     BuildContext context,
     WidgetRef ref,
