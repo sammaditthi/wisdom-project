@@ -1,25 +1,21 @@
 import 'dart:io';
 
 /// The repo's one version command. The `version:` line of `pubspec.yaml` is the
-/// source; `lib/core/version/app_version.gen.dart` and the git tag come from it.
+/// source; `lib/core/version/app_version.gen.dart` comes from it, and
+/// `scripts/deploy.sh` tags the release once every test passes.
 ///
 ///     dart run tools/release.dart status
-///     dart run tools/release.dart bump major|minor|patch
-///     dart run tools/release.dart finish
+///     dart run tools/release.dart cut major|minor|patch
 ///     dart run tools/release.dart check
-///     dart run tools/release.dart tag
 ///
-/// Each command is a short sequence of named steps so another step can be
-/// slotted in — the changelog work extends these rather than replacing them.
+/// `scripts/release.sh` is the one you type; it runs `status` or `cut`.
 void main(List<String> args) {
   final root = File.fromUri(Platform.script).parent.parent;
   try {
     exit(switch (args.isEmpty ? '' : args.first) {
       'status' => _status(root),
-      'bump' => _bump(root, args.length > 1 ? args[1] : ''),
-      'finish' => _finish(root),
+      'cut' => _cut(root, args.length > 1 ? args[1] : ''),
       'check' => _check(root),
-      'tag' => _tag(root),
       final given => _usage(given),
     });
   } on _Fail catch (failure) {
@@ -32,21 +28,20 @@ const _pubspecPath = 'pubspec.yaml';
 const _generatedPath = 'lib/core/version/app_version.gen.dart';
 const _changelogPath = 'CHANGELOG.md';
 
-/// The only paths a release writes, and so the only ones a release commit
-/// carries — and the only ones `_requireCleanTree` tolerates as dirty. The
-/// changelog entry is written between `bump` and `finish`.
+/// The only paths a release writes, and so the only ones its commit carries.
 const _releasePaths = [_pubspecPath, _generatedPath, _changelogPath];
+
+/// Where the notes collect until `cut` dates them (Keep a Changelog).
+const _unreleased = '## Unreleased';
 
 /// The newest changelog entry pastes into a store's "What's new" as written:
 /// Google Play takes 500 characters. Five notes a group keeps it a summary.
 const _maxEntryLength = 500;
 const _maxNotesPerGroup = 5;
 
-/// The branch every product releases from: the `*_PROD_BRANCH` values in
-/// `scripts/config/targets.env`, which all say `main`. A tag cut anywhere else
-/// stops being at the branch's HEAD the moment it merges, which is precisely
-/// what the deploy guard refuses.
-const _releaseBranch = 'main';
+/// How a drifted version file is found: by hand, since it was edited by hand.
+const _findHandEdit =
+    'git diff, or git log -p -- $_pubspecPath $_generatedPath';
 
 // ============================================
 // Commands
@@ -72,15 +67,34 @@ int _status(Directory root) {
         ])} since $tag');
   }
 
-  final drifted = _generatedText(root) != _render(version);
-  stdout
-      .writeln('generated  ${drifted ? 'DRIFTED — run finish' : 'up to date'}');
+  if (_generatedText(root) == _render(version)) {
+    stdout.writeln('generated  up to date');
+  } else {
+    stdout.writeln('generated  DRIFTED — undo the hand edit, then commit. Find '
+        'it with\n           $_findHandEdit');
+  }
+  stdout.writeln(_tagExists(root, 'v${version.name}')
+      ? 'next       notes under "$_unreleased" in $_changelogPath, then\n'
+          '           ./scripts/release.sh patch|minor|major'
+      : 'next       ./scripts/deploy.sh --prod   (v${version.name} is not '
+          'tagged yet)');
   return 0;
 }
 
-int _bump(Directory root, String part) {
-  final text = _pubspecText(root);
-  final before = _readVersion(text);
+/// Raises the version, dates the `## Unreleased` notes, regenerates, commits.
+/// Every check runs before anything is written. No tag: `scripts/deploy.sh`
+/// makes it once every test passes, so a red test costs no version.
+int _cut(Directory root, String part) {
+  _requireCleanTree(root);
+
+  final pubspec = _pubspecText(root);
+  final before = _readVersion(pubspec);
+  if (!_tagExists(root, 'v${before.name}')) {
+    throw _Fail(
+      '${before.name} was never released (no tag v${before.name}), and a '
+      'second bump would skip it. Release it: ./scripts/deploy.sh --prod',
+    );
+  }
   final after = switch (part) {
     'major' => _Version(before.major + 1, 0, 0, before.build + 1),
     'minor' => _Version(before.major, before.minor + 1, 0, before.build + 1),
@@ -90,86 +104,95 @@ int _bump(Directory root, String part) {
         before.patch + 1,
         before.build + 1,
       ),
-    _ => throw _Fail('bump takes major, minor or patch (got "$part").'),
+    _ => throw _Fail('cut takes major, minor or patch (got "$part").'),
   };
-
-  // The one line, rewritten in place: a YAML round-trip would strip the
-  // pubspec's comments.
-  _pubspecFile(root)
-      .writeAsStringSync(text.replaceFirst(_versionLine, 'version: $after'));
-
-  stdout.writeln('pubspec    $before → $after');
-  stdout.writeln('next       dart run tools/release.dart finish');
-  return 0;
-}
-
-int _finish(Directory root) {
-  // The same two preconditions the deploy guard applies. Checked here because
-  // the only way out of a tag on the wrong commit is to burn a version: the
-  // guard would reject the dirty tree, committing the rest would move HEAD off
-  // the tag, and then the guard would reject the missing tag.
-  _requireReleaseBranch(root);
-  _requireCleanTree(root);
-
-  final version = _readVersion(_pubspecText(root));
-  final tag = 'v${version.name}';
-  if (_tagExists(root, tag)) {
+  final changelog = _changelogText(root);
+  final heading = _entryHeading.firstMatch(changelog);
+  if (heading == null || heading[0]!.trim() != _unreleased) {
     throw _Fail(
-      'tag $tag already exists. Bump a part first, or delete the tag if the '
-      'release was never pushed.',
+      'write the notes under "$_unreleased" at the top of $_changelogPath'
+      '${_newest(heading)}.',
     );
   }
+  _requireNotes(changelog, heading);
+  final generated = _generatedText(root);
 
-  _requireChangelogEntry(root, version);
-  _writeGenerated(root, version);
-
-  stdout.writeln(_commitRelease(root, tag)
-      ? 'commit     chore(release): $tag'
-      : 'commit     skipped — the release files already match HEAD');
-
-  _run(root, 'git', ['tag', '-a', tag, '-m', 'Release $version']);
-  stdout.writeln('tag        $tag');
-  stdout.writeln('next       git push && git push --tags');
+  final today = DateTime.now().toIso8601String().substring(0, 10);
+  final dated = '## ${after.name} - $today';
+  final tag = 'v${after.name}';
+  try {
+    // The one line, rewritten in place: a YAML round-trip would strip the
+    // pubspec's comments.
+    _pubspecFile(root).writeAsStringSync(
+        pubspec.replaceFirst(_versionLine, 'version: $after'));
+    stdout.writeln('pubspec    $before → $after');
+    _changelogFile(root).writeAsStringSync(
+        changelog.replaceRange(heading.start, heading.end, dated));
+    stdout.writeln('changelog  $_unreleased → $dated');
+    _writeGenerated(root, after);
+    // Exactly the release paths, leaving anything else staged alone.
+    _run(root, 'git', [
+      'commit',
+      '-m',
+      'chore(release): $tag',
+      '--',
+      ..._releasePaths,
+    ]);
+  } catch (_) {
+    // A hook or a signing error can refuse the commit. Put all three back, so
+    // a re-run starts where this one did and no note is lost.
+    _pubspecFile(root).writeAsStringSync(pubspec);
+    _changelogFile(root).writeAsStringSync(changelog);
+    _generatedFile(root).writeAsStringSync(generated);
+    stdout.writeln('undone     the three files are back as they were');
+    rethrow;
+  }
+  stdout.writeln('commit     chore(release): $tag');
+  stdout.writeln('next       ./scripts/deploy.sh --prod');
   return 0;
 }
 
-/// Success ends with the tag name, so `require_release_commit` gets both facts
-/// it needs — no drift, and what the tag must be called — from one VM start.
-/// The `tag` label is how the guard finds the line; the changelog work will add
-/// lines here, so it must not be found by position.
+/// Fails on a drifted version file, or when the newest `CHANGELOG.md` entry is
+/// not this version's (`cut` checked the notes, but they can be edited after).
+/// Success ends with the tag name, so `require_release_tree` gets every fact it
+/// needs from one VM start. The `tag` label is how the guard finds the line.
 int _check(Directory root) {
   final version = _readVersion(_pubspecText(root));
-  if (_generatedText(root) == _render(version)) {
-    stdout.writeln('check      $_generatedPath matches $version');
-    stdout.writeln('tag        v${version.name}');
-    return 0;
+  if (_generatedText(root) != _render(version)) {
+    stderr.writeln('error: $_generatedPath does not match pubspec $version.');
+    stderr
+        .writeln('       The version moves only through ./scripts/release.sh.');
+    stderr.writeln('       Undo the hand edit, then commit. Find it with');
+    stderr.writeln('       $_findHandEdit');
+    return 1;
   }
-  stderr.writeln('error: $_generatedPath does not match pubspec $version.');
-  stderr.writeln('       It is generated and must never be hand-edited:');
-  stderr.writeln('       dart run tools/release.dart finish');
-  return 1;
-}
+  stdout.writeln('check      $_generatedPath matches $version');
 
-/// The tag name on its own, for a script that wants it without `check`'s drift
-/// gate. The shell cannot read YAML safely — a trailing comment or a two-part
-/// version both slip past `sed`. The deploy guard takes the name from `check`
-/// instead, so a deploy pays one VM start rather than two.
-int _tag(Directory root) {
-  stdout.writeln('v${_readVersion(_pubspecText(root)).name}');
+  final changelog = _changelogText(root);
+  final heading = _entryHeading.firstMatch(changelog);
+  if (heading == null || !heading[0]!.startsWith('## ${version.name} - ')) {
+    throw _Fail(
+      '$_changelogPath has no "## ${version.name} - <date>" entry on top'
+      '${_newest(heading)}. Notes under "$_unreleased" get their version '
+      'from ./scripts/release.sh.',
+    );
+  }
+  _requireNotes(changelog, heading);
+  stdout.writeln('tag        v${version.name}');
   return 0;
 }
 
 int _usage(String given) {
   if (given.isNotEmpty) stderr.writeln('unknown command: $given\n');
   stderr.writeln('''
-usage: dart run tools/release.dart <command>
+usage: dart run tools/release.dart <command>   (you type ./scripts/release.sh)
 
-  status   the version, the last tag, and the commits since it
-  bump     major | minor | patch — raises that part, and the build by one
-  finish   check $_changelogPath, regenerate, commit, and tag v<version>.
-           Does not push
-  check    exit 1 if $_generatedPath drifted; else print the tag
-  tag      print the tag name for the current version, and nothing else''');
+  status   the version, the last tag, the commits since it, and what's next
+  cut      major | minor | patch — raises that part and the build by one,
+           dates the "$_unreleased" notes in $_changelogPath, commits.
+           No tag: ./scripts/deploy.sh --prod tags once every test passes
+  check    exit 1 if $_generatedPath drifted or $_changelogPath has no
+           valid entry for this version; else print the tag''');
   return 1;
 }
 
@@ -246,64 +269,45 @@ void _writeGenerated(Directory root, _Version version) {
   stdout.writeln('generated  $_generatedPath');
 }
 
-void _requireReleaseBranch(Directory root) {
-  final branch = _gitOut(root, ['rev-parse', '--abbrev-ref', 'HEAD']);
-  if (branch != _releaseBranch) {
-    throw _Fail(
-      'a release must be cut from $_releaseBranch (on "$branch"). Merge '
-      'first: a tag made here would not be at $_releaseBranch\'s HEAD.',
-    );
-  }
-}
-
-/// Anything dirty beyond the release paths would be left out of the release
-/// commit, so the tag would name a tree that was never built. `bump` has
-/// already made the pubspec dirty by design, and the changelog entry follows
-/// it, so the release paths are excluded by pathspec — git does the matching,
-/// rather than this slicing porcelain columns. `--porcelain` so untracked files count: a never-added file is
-/// invisible to `git diff` yet part of the build.
+/// The release commit takes `pubspec.yaml` whole, so any other edit in it would
+/// ride along; and the deploy refuses a dirty tree anyway. The changelog is the
+/// one exception: its notes are written just before `cut`. `--porcelain` so
+/// untracked files count. Not trimmed in front: that would eat the first line's
+/// status column.
 void _requireCleanTree(Directory root) {
-  final dirty = _gitOut(root, [
+  final dirty = (_run(root, 'git', [
     'status',
     '--porcelain',
     '--',
     '.',
-    for (final path in _releasePaths) ':(exclude)$path',
-  ]);
+    ':(exclude)$_changelogPath',
+  ]).stdout as String)
+      .trimRight();
   if (dirty.isEmpty) return;
   throw _Fail(
-    'working tree is dirty — commit or stash first, or the tag will name a '
-    'tree nobody can rebuild:\n       ${dirty.split('\n').join('\n       ')}',
+    'working tree is dirty — commit or stash first; only $_changelogPath may '
+    'be:\n       ${dirty.split('\n').join('\n       ')}',
   );
 }
 
-/// Any `## ` line starts an entry (`### ` group lines do not match); a
-/// well-formed one reads `## 1.4.0 - 2027-01-15`.
+/// Any `## ` line starts an entry (`### ` group lines do not match).
 final _entryHeading = RegExp(r'^## .*$', multiLine: true);
-final _datedHeading = RegExp(r'^## (\d+\.\d+\.\d+) - \d{4}-\d{2}-\d{2}$');
 
-/// The newest `CHANGELOG.md` entry must be this release, within the limits.
-/// Checked before anything is written: notes added after the tag would move
-/// HEAD off it, and the only way out of that is a burnt version.
-void _requireChangelogEntry(Directory root, _Version version) {
-  final text = _changelogText(root);
-  final headings = _entryHeading.allMatches(text).toList();
-  final today = DateTime.now().toIso8601String().substring(0, 10);
-  final expected = 'Write "## ${version.name} - $today" (the release day) at '
-      'the top';
-  if (headings.isEmpty) {
-    throw _Fail('$_changelogPath has no entry. $expected.');
-  }
-  final newest = headings.first;
-  if (_datedHeading.firstMatch(newest[0]!)?[1] != version.name) {
-    throw _Fail(
-      'the newest $_changelogPath entry is "${newest[0]}". $expected.',
-    );
-  }
+/// `' (the newest is "…")'`, for a refusal that names the wrong heading.
+String _newest(Match? heading) => heading == null
+    ? ' (it has no "## " entry)'
+    : ' (the newest is "${heading[0]!.trim()}")';
 
-  // The entry runs from below its heading to the next one.
-  final end = headings.length > 1 ? headings[1].start : text.length;
-  final entry = text.substring(newest.end, end).trim();
+/// Checks the entry below [heading], up to the next one: every note in a
+/// `### ` group, at most five a group, 500 characters in all.
+void _requireNotes(String text, Match heading) {
+  final next = text.indexOf(_entryHeading, heading.end);
+  // A CRLF checkout counts as LF: the store counts the text, not line endings.
+  final entry = text
+      .substring(heading.end, next < 0 ? text.length : next)
+      .replaceAll('\r\n', '\n')
+      .trim();
+  final title = heading[0]!.trim();
   var notes = 0;
   var group = '';
   var inGroup = 0;
@@ -311,48 +315,32 @@ void _requireChangelogEntry(Directory root, _Version version) {
     if (line.startsWith('### ')) {
       group = line.substring(4);
       inGroup = 0;
-    } else if (line.startsWith('- ') && group.isNotEmpty) {
+    } else if (line.startsWith('- ')) {
+      if (group.isEmpty) {
+        throw _Fail(
+          'a note under "$title" sits above every group: "$line". Put it '
+          'under ### New, ### Improved or ### Fixed.',
+        );
+      }
       notes++;
       if (++inGroup > _maxNotesPerGroup) {
         throw _Fail(
-          '"$group" in ${version.name} has more than $_maxNotesPerGroup '
-          'notes. Merge similar ones.',
+          '"$group" under "$title" has more than $_maxNotesPerGroup notes. '
+          'Merge similar ones.',
         );
       }
     }
   }
   if (notes == 0) {
-    throw _Fail('the ${version.name} entry in $_changelogPath has no notes.');
+    throw _Fail('"$title" in $_changelogPath has no notes.');
   }
   if (entry.length > _maxEntryLength) {
     throw _Fail(
-      'the ${version.name} entry is ${entry.length} characters; a store takes '
+      '"$title" is ${entry.length} characters; a store takes '
       '$_maxEntryLength. Merge or cut notes.',
     );
   }
-  stdout.writeln(
-      'changelog  ${version.name}: $notes notes, ${entry.length} characters');
-}
-
-/// Commits exactly the release paths, leaving anything else staged or dirty
-/// alone. False when none differs from HEAD: the first release, where the
-/// pubspec already carries the version being tagged.
-bool _commitRelease(Directory root, String tag) {
-  if (_gitOut(root, ['status', '--porcelain', '--', ..._releasePaths])
-      .isEmpty) {
-    return false;
-  }
-  // `add` first — a pathspec commit cannot name a file git has never seen,
-  // which is what the generated file is on the first release.
-  _run(root, 'git', ['add', ..._releasePaths]);
-  _run(root, 'git', [
-    'commit',
-    '-m',
-    'chore(release): $tag',
-    '--',
-    ..._releasePaths,
-  ]);
-  return true;
+  stdout.writeln('changelog  $notes notes, ${entry.length} characters');
 }
 
 // ============================================
@@ -371,9 +359,11 @@ String _generatedText(Directory root) {
   return file.existsSync() ? file.readAsStringSync() : '';
 }
 
+File _changelogFile(Directory root) => File('${root.path}/$_changelogPath');
+
 /// `''` when the file is absent, which reads as no entry.
 String _changelogText(Directory root) {
-  final file = File('${root.path}/$_changelogPath');
+  final file = _changelogFile(root);
   return file.existsSync() ? file.readAsStringSync() : '';
 }
 

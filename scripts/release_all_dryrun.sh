@@ -11,8 +11,7 @@
 #   -h, --help
 #
 # Never a release: it always passes --dry-run and takes no target, so it cannot
-# upload. To release, run that target's own deploy.sh, e.g.
-# ./scripts/static_site/deploy.sh --prod.
+# upload. To release: ./scripts/release.sh <part>, then ./scripts/deploy.sh --prod.
 #
 # Keeps going after a failure and prints PASS, FAIL or NOT SET UP (a
 # placeholder's exit 3) for each target; exits 1 only on a FAIL. An exit that
@@ -143,8 +142,8 @@ case "$#:${1-}" in
   1:-h|1:--help)    usage ;;
   *)
     echo "error: release_all_dryrun.sh takes no target and no flags but --list." >&2
-    echo "       To release, run the target's own deploy.sh, e.g." >&2
-    echo "       ./scripts/static_site/deploy.sh --prod" >&2
+    echo "       To release: ./scripts/release.sh <part>, then" >&2
+    echo "       ./scripts/deploy.sh --prod" >&2
     exit 1
     ;;
 esac

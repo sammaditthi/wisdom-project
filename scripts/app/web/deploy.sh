@@ -6,7 +6,9 @@
 #   ./scripts/app/web/deploy.sh --dev --dry-run    # test, build + check, DON'T upload
 #   ./scripts/app/web/deploy.sh --prod             # release to app.sammaditthi.net
 #
-#   --skip-tests       dev: don't run scripts/app/test.sh first
+#   --skip-tests       Don't run scripts/app/test.sh first. In prod the tag it
+#                      requires already proves them (scripts/deploy.sh), but
+#                      not databases rebuilt since: they are gitignored
 #   --yes              Skip the release confirmation prompt (--prod only, for CI)
 #
 # Status: dev=live prod=live
@@ -15,8 +17,8 @@
 # (ops) account — R2 is paid, so there is one bucket and every web build reads
 # it. The app goes to its target's Pages project: dev's in the dev account,
 # prod's in ops beside the bucket. Every token is checked before the tests, so
-# a bad one stops the deploy in seconds. A release is cut from a clean
-# APP_WEB_PROD_BRANCH and always runs the tests.
+# a bad one stops the deploy in seconds. A release is cut from a clean, tagged
+# APP_WEB_PROD_BRANCH.
 #
 # One R2 file per database version, `<db>-<first 16 hex of its SHA-256>.db.gz`,
 # named from the build's own manifest.json — the same name the app asks for.
@@ -63,11 +65,6 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-
-if [ "$TARGET" = "prod" ] && [ "$SKIP_TESTS" = true ]; then
-  echo "error: --skip-tests is dev-only. A release always runs the tests." >&2
-  exit 1
-fi
 
 # LINK_BASE_URL is where the reader's copied links and "Open as web page"
 # point: the same target's static site, as scripts/static_site/deploy.sh

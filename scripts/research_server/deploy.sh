@@ -9,7 +9,8 @@
 #   ./scripts/research_server/deploy.sh --prod --dry-run # test, build + validate, DON'T upload
 #   ./scripts/research_server/deploy.sh [--dev]          # not set up: exits 3
 #
-#   --skip-tests       dry run only: don't run scripts/research_server/test.sh first
+#   --skip-tests       Don't run scripts/research_server/test.sh first. A real
+#                      run's required tag already proves them (scripts/deploy.sh)
 #   --yes              Skip the release confirmation (for CI)
 #
 # Status: dev=placeholder prod=live
@@ -72,12 +73,6 @@ if [ "$TARGET" = "dev" ]; then
   exit 3
 fi
 
-# The typecheck in test.sh is the only one: wrangler strips types unchecked.
-if [ "$SKIP_TESTS" = true ] && [ "$DRY_RUN" = false ]; then
-  echo "error: --skip-tests is for a dry run only. A release always runs the tests." >&2
-  exit 1
-fi
-
 URL=$(target RESEARCH_BASE_URL)
 RELEASE_BRANCH=$(target RESEARCH_PROD_BRANCH)
 
@@ -99,6 +94,7 @@ else
 fi
 
 # --- Tests ------------------------------------------------------------------
+# The typecheck in test.sh is the only one: wrangler strips types unchecked.
 # Without the deploy token: no test needs it.
 if [ "$SKIP_TESTS" = false ]; then
   if ! env -u CLOUDFLARE_API_TOKEN -u CLOUDFLARE_ACCOUNT_ID \

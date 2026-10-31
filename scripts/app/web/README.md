@@ -70,9 +70,10 @@ Everything below is done once, by hand.
 
 1. Checks the tokens (dev uses both accounts, prod only ops), the Pages
    project's branch, and that the bucket can be listed — before the tests, so
-   a bad one stops it in seconds. A release also refuses anything but a clean
-   `main`.
-2. Runs `scripts/app/test.sh` (dev can skip it with `--skip-tests`).
+   a bad one stops it in seconds. A release also refuses anything but a clean,
+   tagged `main`.
+2. Runs `scripts/app/test.sh`, unless `--skip-tests`. A release normally comes
+   from `scripts/deploy.sh --prod`, which ran every test before it tagged.
 3. `flutter build web --release` with `RESEARCH_BASE_URL`,
    `DATABASE_BASE_URL`, and `LINK_BASE_URL` set to the same target's static
    site. `_headers` comes from `web/_headers`. Stops if the built

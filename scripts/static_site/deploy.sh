@@ -18,7 +18,8 @@
 #   ./scripts/static_site/deploy.sh --dry-run              # build + check, DON'T upload
 #
 #   --yes              Skip the release confirmation prompt (--prod only, for CI)
-#   --skip-tests       dev: don't run scripts/static_site/test.sh first
+#   --skip-tests       Don't run scripts/static_site/test.sh first. In prod the
+#                      tag it requires already proves them (scripts/deploy.sh)
 #
 # Status: dev=live prod=live
 #
@@ -148,10 +149,6 @@ if [ "$TARGET" = "prod" ]; then
     echo "error: --skip-build is dev-only. A release always rebuilds, so what" >&2
     echo "       ships is what the commit produces — not whatever build/ holds" >&2
     echo "       from the last dev test." >&2
-    exit 1
-  fi
-  if [ "$SKIP_TESTS" = true ]; then
-    echo "error: --skip-tests is dev-only. A release always runs the tests." >&2
     exit 1
   fi
   # Direct upload has no Git integration: merging to main deploys nothing.

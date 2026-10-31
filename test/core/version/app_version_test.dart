@@ -29,8 +29,8 @@ void main() {
       [AppVersion.name, AppVersion.build],
       [match![1], int.parse(match[2]!)],
       reason: 'lib/core/version/app_version.gen.dart has drifted from '
-          'pubspec.yaml. It is generated and must never be hand-edited: '
-          'dart run tools/release.dart finish',
+          'pubspec.yaml. It is generated and must never be hand-edited; '
+          'the version moves only through ./scripts/release.sh.',
     );
   });
 

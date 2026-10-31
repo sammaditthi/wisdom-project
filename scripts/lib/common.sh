@@ -261,17 +261,14 @@ expect_http() {
   return 1
 }
 
-# `require_release_commit BRANCH` — fails unless HEAD is BRANCH, the tree is
-# clean, the version constant matches the pubspec, and HEAD carries that
-# version's tag. `git status --porcelain` rather than `git diff`, so staged and
-# untracked files count too: a never-added file is invisible to `git diff` yet
-# part of the build.
-#
-# One repo version covers every product, so a site-only or Worker-only release
-# needs a tag too. `bump patch` + `finish` is the intended cost. A shallow
-# checkout has no tags, so CI must fetch them.
-require_release_commit() {
-  local branch tag release_out
+# `require_release_tree BRANCH` — fails unless HEAD is BRANCH, the tree is
+# clean, the version constant matches the pubspec and CHANGELOG.md's newest
+# entry is this version's (those two via `check`). Sets RELEASE_TAG to the
+# tag this version releases under. `git status --porcelain` rather than
+# `git diff`, so staged and untracked files count too: a never-added file is
+# invisible to `git diff` yet part of the build.
+require_release_tree() {
+  local branch release_out
   branch=$(git -C "$WISDOM_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)
   if [ "$branch" != "$1" ]; then
     echo "error: a release must be cut from '$1' (on '$branch')." >&2
@@ -295,19 +292,35 @@ require_release_commit() {
   # The tool owns the version format. `sed` cannot read YAML: a trailing
   # comment yields the version anyway and a two-part version yields a bare
   # "v", both of which release.dart refuses outright. Read by label, not
-  # position — the changelog work is expected to add lines to `check`.
-  tag=$(printf '%s\n' "$release_out" | sed -n 's/^tag  *//p')
-  if [ -z "$tag" ]; then
+  # position, so `check` can gain lines.
+  RELEASE_TAG=$(printf '%s\n' "$release_out" | sed -n 's/^tag  *//p')
+  if [ -z "$RELEASE_TAG" ]; then
     echo "error: tools/release.dart check printed no tag line — has its output" >&2
     echo "       changed? Without the name there is nothing to check HEAD for." >&2
     echo "$release_out" >&2
     return 1
   fi
-  # -F so the name is matched literally: as a regex, `v1.0.0` also matches a
-  # tag named `v1b0c0`.
-  if ! git -C "$WISDOM_ROOT" tag --points-at HEAD | grep -qxF "$tag"; then
-    echo "error: HEAD carries no tag $tag — a reported version must lead to one commit." >&2
-    echo "       dart run tools/release.dart bump <part> && dart run tools/release.dart finish" >&2
+}
+
+# `release_tag_at_head` — succeeds when HEAD carries RELEASE_TAG. -F so the
+# name is matched literally: as a regex, `v1.0.0` also matches `v1b0c0`.
+release_tag_at_head() {
+  git -C "$WISDOM_ROOT" tag --points-at HEAD | grep -qxF "$RELEASE_TAG"
+}
+
+# `require_release_commit BRANCH` — require_release_tree, and HEAD carries the
+# tag. Only scripts/deploy.sh makes that tag, after every test passed, so a
+# tagged HEAD is a tested one: a product's prod deploy may skip its tests.
+# The tag covers committed files only, so not the gitignored databases.
+#
+# One repo version covers every product, so a site-only or Worker-only release
+# needs a tag too: ./scripts/release.sh patch, then ./scripts/deploy.sh --prod.
+# A shallow checkout has no tags, so CI must fetch them.
+require_release_commit() {
+  require_release_tree "$1" || return 1
+  if ! release_tag_at_head; then
+    echo "error: HEAD carries no tag $RELEASE_TAG — a reported version must lead to one commit." >&2
+    echo "       ./scripts/deploy.sh --prod tags it once every test passes." >&2
     return 1
   fi
 }

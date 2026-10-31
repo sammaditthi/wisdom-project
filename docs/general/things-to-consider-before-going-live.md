@@ -247,7 +247,7 @@ be read from the `tree.json` diff inside `sync-regen.sh` (the GitHub compare API
 caps its file list at 300 and these six commits exceed it), and a sync that
 orphans indexed URLs is what makes backlog **D3** — stubs vs Bulk Redirects —
 a decision rather than a deferral. Take the sync deliberately, review that diff,
-then `bump patch` and re-release.
+then `./scripts/release.sh patch` and `./scripts/deploy.sh --prod`.
 
 Mobile stays gated by `docs/todo/mobile-release/`; the android, ios and macos
 `deploy.sh` are placeholders that exit 3.

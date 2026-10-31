@@ -54,7 +54,8 @@ by hand in the Cloudflare dashboard — is in its own README:
 - [Research server](scripts/research_server/README.md)
 - [App on the web](scripts/app/web/README.md)
 
-A release is always the product's own `deploy.sh --prod`.
+A release is two commands, `./scripts/release.sh <part>` then
+`./scripts/deploy.sh --prod`: see [How to release](docs/general/how-to-release.md).
 
 ## Docs
 

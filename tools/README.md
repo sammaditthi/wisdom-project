@@ -92,13 +92,13 @@ Check that the script completed without errors. It writes the database there dir
 from it and must never be hand-edited.
 
 ```bash
-dart run tools/release.dart status        # version, last tag, commits since it
-dart run tools/release.dart bump minor    # major | minor | patch, and build +1
-dart run tools/release.dart finish        # regenerate, commit, tag. No push
-dart run tools/release.dart check         # exit 1 if drifted; else print the tag
-dart run tools/release.dart tag           # print `v<name>`, and nothing else
+dart run tools/release.dart status        # version, last tag, commits since it, what's next
+dart run tools/release.dart cut minor     # major | minor | patch: bump, date the notes, commit
+dart run tools/release.dart check         # exit 1 if drifted or no valid CHANGELOG entry; else print the tag
 ```
 
+You type `./scripts/release.sh` (`status`, or `cut <part>`) and then
+`./scripts/deploy.sh --prod`, which tags once every test passes.
 `require_release_commit` in `scripts/lib/common.sh` runs `check` and demands the
 tag it names be at HEAD, so every prod deploy needs a release. How to cut one:
 `docs/general/how-to-release.md`. Why it is built this way:
