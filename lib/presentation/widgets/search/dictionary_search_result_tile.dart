@@ -59,9 +59,9 @@ class DictionarySearchResultTile extends ConsumerWidget {
       final meaningStyle = DefaultTextStyle.of(context)
           .style
           .merge(typography.resultMatchedText);
-      final meaningWidth = constraints.maxWidth -
-          ResultBadge.textStart(true) -
-          ResultBadge.rowPadding;
+      final textStart = ResultBadge.textStart(context, true);
+      final meaningWidth =
+          constraints.maxWidth - textStart - ResultBadge.rowPadding;
       final canExpand = isExpanded ||
           _isCut(context, meaning, meaningStyle, math.max(0, meaningWidth));
 
@@ -109,7 +109,7 @@ class DictionarySearchResultTile extends ConsumerWidget {
             Padding(
               // Lines the first label up with the meaning, as in GroupedFTSTile.
               padding: EdgeInsets.only(
-                left: ResultBadge.textStart(true) - SearchLinkButton.padding,
+                left: textStart - SearchLinkButton.padding,
                 bottom: 4,
               ),
               child: Wrap(

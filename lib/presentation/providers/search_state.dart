@@ -182,6 +182,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
         fullResults: const AsyncValue.data(null), // null = didn't search
         countByResultType: {},
         isLoading: false,
+        expandedFTSGroups: const {},
+        expandedDefinitions: const {},
       );
       return;
     }
@@ -190,11 +192,14 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     // IMPORTANT: Must also reset fullResults to loading state!
     // The Full Text tab uses fullResults.when() which doesn't check isLoading.
     // Without this, old results render with new effectiveQueryText → RangeError
+    // Close every row: the same keys come back in a new search.
     state = state.copyWith(
       rawQueryText: query,
       effectiveQueryText: effectiveQuery,
       isLoading: true,
       fullResults: const AsyncValue.loading(),
+      expandedFTSGroups: const {},
+      expandedDefinitions: const {},
     );
 
     _debounceTimer = Timer(_debounceDelay, _performSearch);
@@ -361,6 +366,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       effectiveQueryText: effectiveQuery,
       isLoading: true,
       fullResults: const AsyncValue.loading(),
+      expandedFTSGroups: const {},
+      expandedDefinitions: const {},
     );
 
     // Debounce not needed for direct selection
@@ -553,11 +560,6 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   void toggleFTSGroupExpansion(String nodeKey) {
     state = state.copyWith(
         expandedFTSGroups: _toggled(state.expandedFTSGroups, nodeKey));
-  }
-
-  /// Collapse all expanded FTS groups.
-  void collapseAllFTSGroups() {
-    state = state.copyWith(expandedFTSGroups: {});
   }
 
   /// Show or hide a definition result's full meaning.

@@ -91,8 +91,8 @@ class GroupedFTSTile extends ConsumerWidget {
     return Padding(
       // Lines the button's label up with the tile text.
       padding: EdgeInsets.only(
-        left:
-            ResultBadge.textStart(showEditionBadge) - SearchLinkButton.padding,
+        left: ResultBadge.textStart(context, showEditionBadge) -
+            SearchLinkButton.padding,
         bottom: 4,
       ),
       child: SearchLinkButton(

@@ -262,7 +262,7 @@ class SearchResultsPanel extends ConsumerWidget {
         final showEditionBadge =
             selectedResultType != SearchResultType.definition &&
                 _hasMixedEditions(results);
-        final dividerIndent = ResultBadge.textStart(showEditionBadge);
+        final dividerIndent = ResultBadge.textStart(context, showEditionBadge);
 
         // Use grouped tiles for fullText tab
         if (selectedResultType == SearchResultType.fullText) {
@@ -304,7 +304,7 @@ class SearchResultsPanel extends ConsumerWidget {
             itemCount: hasMoreResults ? results.length + 1 : results.length,
             separatorBuilder: (context, index) => Divider(
               height: 1,
-              indent: ResultBadge.textStart(true),
+              indent: ResultBadge.textStart(context, true),
               color: theme.colorScheme.outlineVariant,
             ),
             itemBuilder: (context, index) {

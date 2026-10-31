@@ -13,9 +13,12 @@ class ResultBadge extends StatelessWidget {
   /// Where the badge ends.
   static const double end = rowPadding + _size;
 
-  /// Where a row's text starts: after the badge and `ListTile`'s 16px gap,
-  /// or at the row padding when there is no badge.
-  static double textStart(bool hasBadge) => hasBadge ? end + 16 : rowPadding;
+  /// Where a row's text starts: after the badge and `ListTile`'s gap (16,
+  /// less at compact density, as on desktop), or at the row padding when there
+  /// is no badge.
+  static double textStart(BuildContext context, bool hasBadge) => hasBadge
+      ? end + 16 + Theme.of(context).visualDensity.horizontal * 2
+      : rowPadding;
 
   final String label;
   final Color backgroundColor;
