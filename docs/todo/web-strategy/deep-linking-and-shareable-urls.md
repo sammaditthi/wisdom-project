@@ -419,6 +419,21 @@ resolver plan §B.4 / findings doc).
      closes an open sheet today, and that must keep working.
 
   Lean: 1. It stays inside the tab code and touches no browser history.
+- **Back leaves the app (found 2026-11-01, not fixed).** Back first closes
+  what is open (a menu, the dictionary, find in page, search — the `PopScope`
+  in `reader_screen.dart`). With nothing open, the browser leaves the app and
+  loads the page before it in that tab: a fresh start, as on a reload. The
+  address never changes inside the app (no router), so the browser has no
+  in-app steps to go back through. Neither fix for the reload bug above
+  changes this.
+
+  If that earlier page is on another address, it downloads the texts again:
+  each address keeps its own copy. Seen going Back from prod to the dev site.
+  Expected, not an installer bug.
+
+  A fix needs a browser history entry per in-app move, which is what
+  go_router's back/forward adds (see "go_router (optional, later)" above).
+  Not decided.
 - Deep-link opens reuse the tab machinery, so navigator tree sync
   (`syncNavigatorToActiveTabProvider`) behaves as with any other open.
 - When Universal Links ship, verify cold-start launches preserve query strings
