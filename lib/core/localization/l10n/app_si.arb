@@ -324,9 +324,9 @@
 
   "databaseInstallProgress": "{percent}% · MB {total} න් MB {received}",
 
-  "databaseInstallUnsupportedTitle": "මෙම බ්‍රව්සරයට පෙළ ගබඩා කළ නොහැක",
+  "databaseInstallUnsupportedTitle": "පෙළ මෙහි ගබඩා කළ නොහැකි විය",
 
-  "databaseInstallUnsupportedDescription": "දැනට Chrome භාවිතා කිරීම නිර්දේශිතයි.",
+  "databaseInstallUnsupportedDescription": "නැවත උත්සාහ කිරීමෙන් සාර්ථක නොවුවහොත්, Google Chrome භාවිතා කරන්න.",
 
   "databaseInstallOutOfSpaceTitle": "ප්‍රමාණවත් ඉඩක් නැත",
 

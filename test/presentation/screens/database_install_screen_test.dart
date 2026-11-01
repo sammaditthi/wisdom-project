@@ -116,8 +116,10 @@ void main() {
       expect(retries, 1);
     });
 
-    testWidgets('an unsupported browser gets no button and no detail',
+    testWidgets(
+        'an unsupported browser can be tried again, and shows no detail',
         (tester) async {
+      var retries = 0;
       await _pumpScreen(
         tester,
         const DatabaseInstallStatus(
@@ -127,19 +129,26 @@ void main() {
             'This browser is missing OPFS with synchronous locks.',
           ),
         ),
+        onRetry: () => retries++,
       );
 
       expect(
-        find.text('This browser cannot store the texts'),
+        find.text('The texts could not be saved here'),
         findsOneWidget,
       );
-      expect(find.text('Chrome is recommended for now.'), findsOneWidget);
-      // Nothing would change on a second try.
-      expect(find.text('Try again'), findsNothing);
+      expect(
+        find.text("If trying again doesn't help, use Google Chrome."),
+        findsOneWidget,
+      );
       expect(
         find.text('This browser is missing OPFS with synchronous locks.'),
         findsNothing,
       );
+
+      // drift's storage test can fail once in Chrome, e.g. just after its
+      // site data was deleted, so a second try can succeed.
+      await tester.tap(find.text('Try again'));
+      expect(retries, 1);
     });
 
     testWidgets('a full device says so, and can be tried again',

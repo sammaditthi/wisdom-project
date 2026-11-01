@@ -557,12 +557,11 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get databaseInstallUnsupportedTitle =>
-      'මෙම බ්‍රව්සරයට පෙළ ගබඩා කළ නොහැක';
+  String get databaseInstallUnsupportedTitle => 'පෙළ මෙහි ගබඩා කළ නොහැකි විය';
 
   @override
   String get databaseInstallUnsupportedDescription =>
-      'දැනට Chrome භාවිතා කිරීම නිර්දේශිතයි.';
+      'නැවත උත්සාහ කිරීමෙන් සාර්ථක නොවුවහොත්, Google Chrome භාවිතා කරන්න.';
 
   @override
   String get databaseInstallOutOfSpaceTitle => 'ප්‍රමාණවත් ඉඩක් නැත';

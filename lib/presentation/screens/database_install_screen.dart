@@ -261,15 +261,11 @@ class _Failure extends StatelessWidget {
           style: typography.resultSubtitle,
           textAlign: TextAlign.center,
         ),
-        // Nothing about this browser would change on a second try, so it gets
-        // no button. Everything else does.
-        if (kind != DatabaseInstallFailureKind.unsupportedBrowser) ...[
-          const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: Text(l10n.databaseInstallRetry),
-          ),
-        ],
+        const SizedBox(height: 16),
+        OutlinedButton(
+          onPressed: onRetry,
+          child: Text(l10n.databaseInstallRetry),
+        ),
         // The raw message, for the reader who reports what they saw. Left out
         // where the message above already says everything.
         if (failure != null && _showsDetail(kind)) ...[

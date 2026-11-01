@@ -97,11 +97,10 @@ class WebDatabaseInstaller {
 
   /// Starts again from the top after a failure.
   ///
-  /// An unsupported browser is not retried — nothing about it would change.
+  /// An unsupported browser too: drift's storage test can fail once in a
+  /// browser that has OPFS, e.g. just after its site data was deleted.
   Future<void> retry() {
-    if (_status.phase != DatabaseInstallPhase.failed ||
-        _status.failure?.kind ==
-            DatabaseInstallFailureKind.unsupportedBrowser) {
+    if (_status.phase != DatabaseInstallPhase.failed) {
       return Future<void>.value();
     }
     _installed = null;
@@ -240,8 +239,7 @@ class WebDatabaseInstaller {
   /// Drift decides OPFS is available by creating a file in it and swallows
   /// whatever goes wrong, so a worker that never started and a device with no
   /// room both arrive looking like a browser without OPFS. Only one of the
-  /// three is worth telling someone to change browsers over; the other two are
-  /// worth a retry button.
+  /// three is worth telling someone to change browsers over.
   Future<DatabaseInstallFailure> _storageUnavailable(
     WasmProbeResult probe,
     List<String> missing,

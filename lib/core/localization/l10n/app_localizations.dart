@@ -1076,16 +1076,16 @@ abstract class AppLocalizations {
   /// **'{percent}% · {received} MB of {total} MB'**
   String databaseInstallProgress(int percent, int received, int total);
 
-  /// First-visit failure title when the browser lacks the storage features the databases need
+  /// First-visit failure title when the storage the databases need is unavailable: a browser without it, or one whose storage check failed once
   ///
   /// In en, this message translates to:
-  /// **'This browser cannot store the texts'**
+  /// **'The texts could not be saved here'**
   String get databaseInstallUnsupportedTitle;
 
-  /// First-visit failure message naming the browser that works
+  /// First-visit failure message: a retry may work, otherwise switch to the browser that works
   ///
   /// In en, this message translates to:
-  /// **'Chrome is recommended for now.'**
+  /// **'If trying again doesn\'t help, use Google Chrome.'**
   String get databaseInstallUnsupportedDescription;
 
   /// First-visit failure title when the browser refuses the storage the texts need

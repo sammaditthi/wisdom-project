@@ -20,8 +20,7 @@ class DatabaseInstallNotifier extends StateNotifier<DatabaseInstallStatus> {
   final DatabaseInstallation _installation;
   late final StreamSubscription<DatabaseInstallStatus> _changes;
 
-  /// Starts the install again after a failure. An unsupported browser is not
-  /// retried.
+  /// Starts the install again after a failure.
   Future<void> retry() => _installation.retry();
 
   @override

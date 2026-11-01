@@ -9,8 +9,8 @@ library;
 /// How far the install has got.
 enum DatabaseInstallPhase { checking, installing, ready, failed }
 
-/// Why an install stopped. The kind decides what the screen offers: a retry
-/// button, a "free some space" message, or a plain "use Chrome".
+/// Why an install stopped. The kind picks the screen's message, and whether
+/// it shows the raw detail line.
 enum DatabaseInstallFailureKind {
   unsupportedBrowser,
   outOfSpace,

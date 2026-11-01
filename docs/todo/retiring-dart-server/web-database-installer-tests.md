@@ -33,8 +33,8 @@ same rules apply.
   - `open(db)` refuses a name outside `databases`, then waits for `_install()`
     and opens `opfsLocks` with `enableMigrations: false`. A failed install
     throws on every `open` until `retry()`.
-  - `retry()` starts again from the top, except for an unsupported browser,
-    which it leaves alone. It never takes the reload shortcut.
+  - `retry()` starts again from the top, for every failure kind. It never
+    takes the reload shortcut.
   - `status` starts at `checking`, which only `retry()` sends again; `changes`
     reports `installing → ready`, or `failed` with a `DatabaseInstallFailure`
     whose `kind` is what a first-visit screen branches on. **One status for the whole install:** `received` and `total`

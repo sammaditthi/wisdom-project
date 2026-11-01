@@ -556,11 +556,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get databaseInstallUnsupportedTitle =>
-      'This browser cannot store the texts';
+      'The texts could not be saved here';
 
   @override
   String get databaseInstallUnsupportedDescription =>
-      'Chrome is recommended for now.';
+      'If trying again doesn\'t help, use Google Chrome.';
 
   @override
   String get databaseInstallOutOfSpaceTitle => 'Not enough space';
