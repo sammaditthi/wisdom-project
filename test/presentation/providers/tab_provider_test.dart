@@ -1,10 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/core/constants/constants.dart';
+import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
+import 'package:the_wisdom_project/core/storage/shared_preferences_key_value_store.dart';
+import 'package:the_wisdom_project/core/storage/storage_keys.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result_type.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result.dart';
 import 'package:the_wisdom_project/presentation/providers/in_page_search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/parallel_text_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_lifecycle_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
@@ -277,6 +282,201 @@ void main() {
 
       expect(index, -1);
       expect(container.read(tabsProvider), isEmpty);
+    });
+  });
+
+  group('tab limit -', () {
+    late ProviderContainer container;
+    final node = TestData.leafNodeWithContent;
+
+    // The number the user chose, written out rather than read from
+    // `maxOpenTabs`, so changing the limit has to change this test too.
+    const limit = 50;
+
+    setUp(() async {
+      container = createTestContainer(overrides: [
+        navigationTreeProvider.overrideWith((ref) async => [node]),
+        // An empty tree: a search hit falls back to its own node key.
+        sharedTreeProvider
+            .overrideWith((ref) async => TipitakaTree.fromJson(const {})),
+      ]);
+      await container.read(navigationTreeProvider.future);
+      // Fill up the way the user would, one open at a time.
+      for (var i = 0; i < limit; i++) {
+        container.read(openTabFromNodeKeyProvider)(node.nodeKey);
+      }
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('opens up to the limit without a message', () {
+      expect(container.read(tabsProvider).length, limit);
+      expect(container.read(activeTabIndexProvider), limit - 1);
+      expect(container.read(tabLimitReachedProvider), 0,
+          reason: 'No open up to the limit is refused');
+    });
+
+    test('one more is refused, and the reader stays where it was', () {
+      container.read(activeTabIndexProvider.notifier).state = 7;
+
+      final index = container.read(openTabFromNodeKeyProvider)(node.nodeKey);
+
+      expect(index, -1);
+      expect(container.read(tabsProvider).length, limit);
+      expect(container.read(activeTabIndexProvider), 7);
+      expect(container.read(tabLimitReachedProvider), 1,
+          reason: 'The refusal is what puts the message up');
+    });
+
+    test('every refusal ticks, so the message shows each time', () {
+      container.read(openTabFromNodeKeyProvider)(node.nodeKey);
+      container.read(openTabFromNodeKeyProvider)(node.nodeKey);
+
+      expect(container.read(tabLimitReachedProvider), 2);
+    });
+
+    test('a search result is refused the same way', () async {
+      final index = await container.read(openTabFromSearchResultProvider)(
+        _createTestSearchResult(nodeKey: 'mn-1', contentFileId: 'mn-1'),
+      );
+
+      expect(index, -1);
+      expect(container.read(tabsProvider).length, limit);
+      expect(container.read(tabLimitReachedProvider), 1);
+    });
+
+    test('closing a tab makes room for one more', () {
+      container.read(closeTabProvider)(0);
+
+      final index = container.read(openTabFromNodeKeyProvider)(node.nodeKey);
+
+      expect(index, limit - 1);
+      expect(container.read(tabsProvider).length, limit);
+      expect(container.read(activeTabIndexProvider), limit - 1);
+      expect(container.read(tabLimitReachedProvider), 0);
+    });
+  });
+
+  group('openParallelTextProvider -', () {
+    late ProviderContainer container;
+    // The other side of the link. Which node that is belongs to
+    // `crossLinkTargetKey`; here it is simply given.
+    final target = TestData.leafNodeWithContent;
+
+    setUp(() async {
+      container = createTestContainer(overrides: [
+        navigationTreeProvider.overrideWith((ref) async => [target]),
+        parallelTextNodeProvider.overrideWith((ref) => target),
+      ]);
+      await container.read(navigationTreeProvider.future);
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('opens the parallel text in a new tab and focuses it', () {
+      container.read(tabsProvider.notifier).addTab(
+            _createTestReaderTab(nodeKey: 'atta-dn-1'),
+          );
+      container.read(activeTabIndexProvider.notifier).state = 0;
+
+      container.read(openParallelTextProvider)();
+
+      final tabs = container.read(tabsProvider);
+      expect(tabs.length, 2);
+      expect(tabs[1].nodeKey, target.nodeKey);
+      expect(tabs[1].sinhalaName, target.sinhalaName);
+      expect(container.read(activeTabIndexProvider), 1);
+    });
+
+    test('is refused at the limit like every other opener', () {
+      final notifier = container.read(tabsProvider.notifier);
+      for (var i = 0; i < 50; i++) {
+        notifier.addTab(_createTestReaderTab(nodeKey: 'dn-$i'));
+      }
+      container.read(activeTabIndexProvider.notifier).state = 3;
+      // What the reader had open in the tree. A navigator sync would collapse
+      // it, which a tap that opened nothing has no reason to do.
+      const expanded = {'sp', 'dn'};
+      container.read(expandedNodesProvider.notifier).state = expanded;
+
+      container.read(openParallelTextProvider)();
+
+      expect(container.read(tabsProvider).length, 50);
+      expect(container.read(activeTabIndexProvider), 3);
+      expect(container.read(tabLimitReachedProvider), 1);
+      expect(container.read(expandedNodesProvider), expanded);
+    });
+  });
+
+  group('tab persistence -', () {
+    // The real store over shared_preferences' in-memory platform, the layer
+    // that is localStorage on web. `reload()` re-reads that layer, so a pass
+    // means the write left the cache.
+    late SharedPreferences prefs;
+
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      prefs = await SharedPreferences.getInstance();
+    });
+
+    /// One app run: a container over the shared storage.
+    ProviderContainer startApp() {
+      final container = createTestContainer(overrides: [
+        keyValueStoreProvider
+            .overrideWithValue(SharedPreferencesKeyValueStore(prefs)),
+      ]);
+      addTearDown(container.dispose);
+      return container;
+    }
+
+    /// The node keys in storage, once the 500 ms save debounce has passed.
+    /// Waiting it out, not disposing: dispose's own flush would hide a
+    /// broken save.
+    Future<List<String?>> savedNodeKeys() async {
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+      await prefs.reload();
+      final saved = SharedPreferencesKeyValueStore(prefs)
+              .getJsonList(StorageKeys.openTabs) ??
+          const [];
+      return [for (final tab in saved) (tab as Map)['nodeKey'] as String?];
+    }
+
+    test('a closed tab leaves storage and stays gone after a restart',
+        () async {
+      final app = startApp();
+      final notifier = app.read(tabsProvider.notifier);
+      notifier.addTab(_createTestReaderTab(nodeKey: 'dn-1'));
+      notifier.addTab(_createTestReaderTab(nodeKey: 'mn-1'));
+      notifier.addTab(_createTestReaderTab(nodeKey: 'sn-1'));
+      app.read(activeTabIndexProvider.notifier).state = 2;
+      expect(await savedNodeKeys(), ['dn-1', 'mn-1', 'sn-1'],
+          reason: 'Precondition: open tabs are saved');
+
+      app.read(closeTabProvider)(1);
+
+      expect(await savedNodeKeys(), ['dn-1', 'sn-1']);
+      final restarted = startApp();
+      expect(
+          restarted.read(tabsProvider).map((t) => t.nodeKey), ['dn-1', 'sn-1']);
+    });
+
+    test('closing the last tab leaves no tabs in storage', () async {
+      final app = startApp();
+      app.read(tabsProvider.notifier).addTab(
+            _createTestReaderTab(nodeKey: 'dn-1'),
+          );
+      app.read(activeTabIndexProvider.notifier).state = 0;
+      expect(await savedNodeKeys(), ['dn-1'],
+          reason: 'Precondition: the open tab is saved');
+
+      app.read(closeTabProvider)(0);
+
+      expect(await savedNodeKeys(), isEmpty);
+      expect(startApp().read(tabsProvider), isEmpty);
     });
   });
 

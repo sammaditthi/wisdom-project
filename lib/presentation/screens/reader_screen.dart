@@ -46,12 +46,14 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     // name the tab the user came from.
     final tabIndex = await ref.read(openTabFromSearchResultProvider)(result,
         isPortraitMode: isPortraitMode);
-    if (!mounted) return;
+    // -1 is a refusal at the tab limit: the results stay up, so the reader can
+    // close a tab and tap the same hit again.
+    if (!mounted || tabIndex < 0) return;
 
     // Set per-tab FTS highlight for the newly created tab.
     // Non-FTS tabs (Title, Definition) simply won't have a map entry,
     // so they won't show highlights — no explicit clearing needed.
-    if (tabIndex >= 0 && result.resultType == SearchResultType.fullText) {
+    if (result.resultType == SearchResultType.fullText) {
       final searchState = ref.read(searchStateProvider);
       ref.read(ftsHighlightProvider.notifier).setForTab(
             tabIndex,

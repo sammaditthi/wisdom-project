@@ -438,6 +438,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkCopied => 'Link copied';
 
   @override
+  String tabLimitReached(int count) {
+    return 'You have $count tabs open. Close one before opening another.';
+  }
+
+  @override
   String get researchRetry => 'Retry';
 
   @override

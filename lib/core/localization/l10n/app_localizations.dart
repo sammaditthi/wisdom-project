@@ -920,6 +920,12 @@ abstract class AppLocalizations {
   /// **'Link copied'**
   String get linkCopied;
 
+  /// Snackbar when opening a reader tab is refused because the most tabs allowed are already open
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count} tabs open. Close one before opening another.'**
+  String tabLimitReached(int count);
+
   /// Button to re-send the last question after a retriable Q&A error
   ///
   /// In en, this message translates to:

@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // `TipitakaNodeKeys` comes from here, not the app's constants.dart, which
 // re-exports the same shared one — importing both is what the analyzer flags.
 import 'package:wisdom_shared/wisdom_shared.dart';
-import '../models/reader_tab.dart';
-import 'last_reader_layout_provider.dart';
 import 'navigation_tree_provider.dart';
 import 'navigator_sync_provider.dart';
 import 'tab_provider.dart';
@@ -57,12 +55,11 @@ final parallelTextNodeProvider = Provider.autoDispose((ref) {
   return ref.watch(nodeByKeyProvider(targetKey));
 });
 
-/// Action provider to open the parallel text in a new tab.
-/// Creates a new tab from the target node and makes it active.
+/// Action provider to open the parallel text in a new tab and focus it.
 ///
-/// Callers pass [isPortraitMode] (derived from BuildContext) since providers
-/// can't access context — used only as the fallback when the user has no saved
-/// layout preference yet.
+/// Goes through [openTabFromNodeKeyProvider] like the tree and breadcrumb, so
+/// it shares their layout seeding and the tab limit. Callers pass
+/// [isPortraitMode] since providers can't access context.
 final openParallelTextProvider =
     Provider<void Function({bool isPortraitMode})>((ref) {
   return ({bool isPortraitMode = false}) {
@@ -71,24 +68,14 @@ final openParallelTextProvider =
       return;
     }
 
-    // Seed the new tab's layout from the user's last selection, falling back to
-    // the orientation default. Shared with the tree/breadcrumb/search paths via
-    // the single [resolveSeedLayout] helper.
-    final layout = resolveSeedLayout(ref, isPortraitMode: isPortraitMode);
-
-    // Create a new tab from the target node
-    final newTab = ReaderTab.fromNode(
-      nodeKey: targetNode.nodeKey,
-      paliName: targetNode.paliName,
-      sinhalaName: targetNode.sinhalaName,
-      layout: layout,
+    final index = ref.read(openTabFromNodeKeyProvider)(
+      targetNode.nodeKey,
+      isPortraitMode: isPortraitMode,
     );
+    // Refused at the tab limit: leave the tree as the reader had it.
+    if (index < 0) return;
 
-    // Add tab and make it active
-    final newIndex = ref.read(tabsProvider.notifier).addTab(newTab);
-    ref.read(activeTabIndexProvider.notifier).state = newIndex;
-
-    // Sync navigator to the new active tab
+    // Sync navigator to the new active tab.
     ref.read(syncNavigatorToActiveTabProvider)();
   };
 });

@@ -439,6 +439,11 @@ class AppLocalizationsSi extends AppLocalizations {
   String get linkCopied => 'සබැඳිය පිටපත් විය';
 
   @override
+  String tabLimitReached(int count) {
+    return 'ටැබ් $countක් විවෘතව ඇත. අලුතෙන් ටැබ් එකක් විවෘත කිරීමට පෙර එකක් වසන්න.';
+  }
+
+  @override
   String get researchRetry => 'නැවත උත්සාහ කරන්න';
 
   @override

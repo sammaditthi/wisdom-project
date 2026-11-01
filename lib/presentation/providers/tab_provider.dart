@@ -345,8 +345,8 @@ final openTabFromSearchResultProvider =
       ),
     );
 
-    // Sync navigator to the new active tab
-    ref.read(syncNavigatorToActiveTabProvider)();
+    // Sync navigator to the new active tab. A refusal leaves the tree alone.
+    if (newIndex >= 0) ref.read(syncNavigatorToActiveTabProvider)();
     return newIndex;
   };
 });
@@ -354,18 +354,20 @@ final openTabFromSearchResultProvider =
 /// Opens a new tab for the given tree node key.
 ///
 /// Centralizes the tab-from-node creation used by the tree navigator,
-/// breadcrumb widget and deep links. Callers pass [isPortraitMode] (derived
-/// from BuildContext) since providers can't access context.
+/// breadcrumb widget, deep links and the parallel-text button. Callers pass
+/// [isPortraitMode] (derived from BuildContext) since providers can't access
+/// context.
 ///
 /// [pageIndex]/[entryStart] optionally name the row to anchor at — used by
 /// deep links carrying an entry-level position (`?e=<page>.<entry>`). They
 /// never decide *which* unit opens; that is always [nodeKey]'s own.
 ///
-/// Returns the new tab index, or -1 if the node is not in the tree.
+/// Returns the new tab index, or -1 if the node is not in the tree or
+/// [maxOpenTabs] are already open.
 ///
-/// **Side effects NOT included** (caller-specific):
-/// - Tree navigator: calls `selectNodeProvider` before, closes nav on mobile after
-/// - Breadcrumb: calls `syncNavigatorToActiveTabProvider` after
+/// **Side effects NOT included** (caller-specific, and skipped on -1):
+/// - Tree navigator: `selectNodeProvider`, then closes nav on mobile
+/// - Breadcrumb, parallel text, deep links: `syncNavigatorToActiveTabProvider`
 final openTabFromNodeKeyProvider = Provider<
     int Function(String nodeKey,
         {bool isPortraitMode, int? pageIndex, int? entryStart})>((ref) {
@@ -406,8 +408,20 @@ Future<ReaderUnitResolver?> _resolver(Ref ref) async {
   }
 }
 
-/// Appends [tab] and focuses it. The last two lines of every producer.
+/// Most reader tabs open at once. One more is refused, with a message.
+const maxOpenTabs = 50;
+
+/// Ticks each time an open is refused at [maxOpenTabs]. `TabLimitMessage`
+/// listens and shows the message, so every opener gets it without its own UI.
+final tabLimitReachedProvider = StateProvider<int>((ref) => 0);
+
+/// Appends [tab] and focuses it — every producer's way in. At [maxOpenTabs]
+/// nothing opens: it ticks [tabLimitReachedProvider] and returns -1.
 int _openTab(Ref ref, ReaderTab tab) {
+  if (ref.read(tabsProvider).length >= maxOpenTabs) {
+    ref.read(tabLimitReachedProvider.notifier).state++;
+    return -1;
+  }
   final newIndex = ref.read(tabsProvider.notifier).addTab(tab);
   ref.read(activeTabIndexProvider.notifier).state = newIndex;
   return newIndex;

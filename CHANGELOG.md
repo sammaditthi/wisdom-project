@@ -7,7 +7,7 @@
 
 ### Improved
 - Search finds words anywhere in a sutta, not just in one paragraph
-- UI improvements: clearer icons, steadier find in page
+- Clearer icons, steadier find in page, a 50-tab limit
 
 ### Fixed
 - On the web, the app opens with no connection after one online visit

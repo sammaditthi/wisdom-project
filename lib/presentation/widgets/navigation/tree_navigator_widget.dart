@@ -191,15 +191,16 @@ class TreeNodeWidget extends ConsumerWidget {
             // animationDuration: zero above (that only swaps the selected bg).
             hoverDuration: const Duration(milliseconds: 150),
             onTap: () {
-              ref.read(selectNodeProvider)(node.nodeKey);
-
               final shouldUseSingleColumn =
                   ResponsiveUtils.shouldDefaultToSingleColumn(context);
-              ref.read(openTabFromNodeKeyProvider)(
+              final index = ref.read(openTabFromNodeKeyProvider)(
                 node.nodeKey,
                 isPortraitMode: shouldUseSingleColumn,
               );
+              // Refused at the tab limit: the tree keeps showing the open tab.
+              if (index < 0) return;
 
+              ref.read(selectNodeProvider)(node.nodeKey);
               if (shouldUseSingleColumn) {
                 ref.read(navigatorVisibleProvider.notifier).state = false;
               }

@@ -73,10 +73,12 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
         // Parent segment — clickable
         final recognizer = TapGestureRecognizer()
           ..onTap = () {
-            ref.read(openTabFromNodeKeyProvider)(
+            final index = ref.read(openTabFromNodeKeyProvider)(
               segments[i].nodeKey,
               isPortraitMode: isPortrait,
             );
+            // Refused at the tab limit: leave the tree as the reader had it.
+            if (index < 0) return;
             ref.read(syncNavigatorToActiveTabProvider)();
           };
         _recognizers.add(recognizer);

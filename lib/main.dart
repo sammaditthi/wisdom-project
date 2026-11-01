@@ -24,6 +24,7 @@ import 'presentation/providers/navigation_rail_provider.dart'
     show navigationRailHiddenPersistenceProvider;
 import 'presentation/widgets/app/deep_link_listener.dart';
 import 'presentation/widgets/app/overlay_stack_sync.dart';
+import 'presentation/widgets/app/tab_limit_message.dart';
 import 'core/theme/theme_notifier.dart';
 
 void main() async {
@@ -271,11 +272,15 @@ class _MyAppState extends ConsumerState<MyApp> {
       // DeepLinkListener wraps everything: it receives incoming links
       // (sammaditthi:// scheme, future Universal/App Links, and the web
       // start URL) and opens the linked sutta in a reader tab.
+      // TabLimitMessage shows a refused tab open; here, so it also shows over
+      // the install gate.
       builder: (context, child) {
         return DeepLinkListener(
           child: AppShortcuts(
             child: OverlayStackSync(
-              child: child ?? const SizedBox.shrink(),
+              child: TabLimitMessage(
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         );
