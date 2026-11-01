@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2026-11-01
 ### New
 - Singlish: R types repaya, and c types ච
 - Definitions in search results open in full with Show more

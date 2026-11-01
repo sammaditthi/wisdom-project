@@ -4,9 +4,9 @@
 class AppVersion {
   const AppVersion._();
 
-  static const String name = '1.0.0';
-  static const int build = 1;
+  static const String name = '1.1.0';
+  static const int build = 2;
 
-  /// `1.0.0 (1)` — what the settings menu shows.
+  /// `1.1.0 (2)` — what the settings menu shows.
   static const String display = '$name ($build)';
 }
