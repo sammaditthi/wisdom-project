@@ -140,18 +140,19 @@ error is noise in the one diagnostic channel the products have.
 - **Rollback** is the Pages dashboard: project → Deployments → the last good one
   → *Rollback to this deployment*. It names its own database versions and those
   are still on R2 (`scripts/app/web/README.md`).
+- **The app starts offline.** Once a visit has installed the databases, a
+  reload with no connection opens the app. `web/offline_worker.js` stores the
+  app's own files, network first, so an online load is always the newest
+  deploy. A missing `flutter_bootstrap.js` or `canvaskit.wasm` shows the error
+  lines instead of "Getting ready…" forever. Checked on dev 2026-10-31 and
+  2026-11-01, Chrome and Safari; prod gets it with the next release. Kill
+  switch: `scripts/app/web/README.md`, Rollback.
+  [`web-app-offline-start.md`](../done/web/web-app-offline-start.md).
 
 ---
 
 ## Open, not blocking
 
-- **The app can't start offline.** Reopened 2026-10-28 by a real offline
-  requirement. The databases are stored in the browser, but nothing stores the
-  app's own files. Release builds carry Flutter's `flutter_service_worker.js`,
-  a stub that only unregisters itself, and `flutter.js` registers it only where
-  a registration already exists. A missing `flutter_bootstrap.js` or
-  `canvaskit.wasm` also leaves "Getting ready…" up forever. Both are fixed in
-  [`web-app-offline-start.md`](../todo/web-strategy/web-app-offline-start.md).
 - **No error reporting and no analytics.** Nothing in either product. After
   launch the only signal is Cloudflare's request counts — a database install
   that fails on a real network is invisible. The CSP also blocks zone-injected

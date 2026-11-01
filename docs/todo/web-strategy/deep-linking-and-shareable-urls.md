@@ -404,6 +404,21 @@ resolver plan §B.4 / findings doc).
   out of range (page count is unknown at open time). Do this when links go
   public and re-pagination between releases makes stale links a real
   population.
+- **Each reload of a link adds a tab (found 2026-11-01, not fixed).** Tabs
+  are restored on start, and the address bar keeps the link the app was
+  opened with (no router), so every reload opens that link as one more tab.
+  Two ways out:
+  1. **Reuse an open tab.** In `openTipitakaLinkProvider`, focus a tab already
+     on that node instead of adding one. A few lines. Open question: a link
+     with `?e=` moves that tab to its entry, or keeps where the reader was.
+     A reload after moving to another tab still jumps back to the linked one.
+  2. **Clear the link once opened.** Set the address bar back to the app's
+     root, so a reload restores the saved tabs and nothing else. The bar no
+     longer shows the link; Share covers copying it. Check first how Flutter
+     web's own history handling takes a URL change without a router: Back
+     closes an open sheet today, and that must keep working.
+
+  Lean: 1. It stays inside the tab code and touches no browser history.
 - Deep-link opens reuse the tab machinery, so navigator tree sync
   (`syncNavigatorToActiveTabProvider`) behaves as with any other open.
 - When Universal Links ship, verify cold-start launches preserve query strings

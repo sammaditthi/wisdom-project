@@ -317,10 +317,29 @@ every file but the page, as Pages does.
   phone the navigator covers the reader). CanvasKit still came over the
   network. An iPad run failed because the Mac's disk was full.
 
-Still owed on the dev deploy: Cloudflare's real headers and injected script,
-desktop Chrome with Wi-Fi off (check 3), check 4 with a profile that really
-installed the databases before the deploy, and Safari with the network
-really off (check 7).
+### Checked on dev (2026-10-31)
+
+`app-sammaditthi-test.pages.dev`, headless Chrome 156 driven over the
+DevTools protocol, one profile per check. Offline as in the local checks:
+every host failing (`--host-resolver-rules`).
+
+- Headers: as listed above. Cloudflare injects no `/cdn-cgi/` script on the
+  dev project, so that part shows only on prod.
+- Check 1: `offline_worker.js` activated. 39 stored: the list above, plus the
+  favicon, an icon and the emblem. No `.db`, nothing under `/cdn-cgi/`.
+- Check 2: the app opens offline, isolated. A deep link (`/tipitaka/dn-1-2`)
+  shows the sutta, and search answers titles, full text and definitions.
+- Check 4: a profile that installed the databases from the build before the
+  worker. One online visit, then offline: a deep link (`mn-1-1-1`) opens and
+  search answers. `sc-to-bjt.json` wasn't stored, because that visit didn't
+  search (a known limit above). Only a reference search needs it.
+- Check 5: a second `deploy.sh --dev --skip-tests`. The first normal load ran
+  the new build, and the stored copy is the new one.
+- Check 6: all four rows as wanted, *Try again* included.
+
+- Checks 3 and 7, by the developer (2026-11-01): desktop Chrome with Wi-Fi
+  off, deep link included, and Safari on a real device in airplane mode. Both
+  as wanted.
 
 ## Repeated installs: a tester's report (2026-10-29, open)
 
@@ -391,4 +410,8 @@ Also ask whether the screen showed the MB count (a real download) or only
   users, offline, rollback, slow Windows laptops). One fix: the bootstrap's
   top-level `navigator.serviceWorker` read is in a `try`, since a throw there
   would leave "Getting ready…" up forever. **Next:** unchanged.
+- 2026-10-31: deployed to dev. Checks 1, 2, 4, 5 and 6 pass there (above).
+- 2026-11-01: checks 3 and 7 pass. Every check is done, and "When done" with
+  it. Prod gets the worker with the next release. Repeated installs stay open
+  above.
 - Repeated installs: waiting on the tester's checks.
