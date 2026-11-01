@@ -16,9 +16,14 @@ import 'settings_row.dart';
 class AnumodanaPage extends StatelessWidget {
   const AnumodanaPage({super.key});
 
+  // More about tipitaka.lk: https://pathnirvana.github.io/tipitaka.lk/
   static const _tipitakaLkUrl = 'https://tipitaka.lk';
   static const _suttaCentralUrl = 'https://suttacentral.net';
   static const _dpdUrl = 'https://www.dpdict.net';
+  static const _ucscLtrlUrl = 'https://ltrl.ucsc.lk/ltrl/';
+  static const _sinhalaUnicodeConverterUrl =
+      'https://github.com/Open-SL/sinhala-unicode-converter';
+  static const _paliConverterUrl = 'https://github.com/pnfo/pali-converter';
 
   /// Each source's own logo, unmodified — see the plan doc for provenance.
   static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
@@ -80,6 +85,40 @@ class AnumodanaPage extends StatelessWidget {
             _DictionaryGroup(
               label: l10n.anumodanaDictGroupEnglish,
               dictionaries: _dictionariesFor('en'),
+            ),
+          ],
+        ),
+        // The scheme and code behind Singlish search, and the converter that
+        // put DPD's headwords into Sinhala letters at build time.
+        SettingsSection(
+          title: l10n.anumodanaTransliteration,
+          children: [
+            SettingsRow(
+              label: 'UCSC LTRL',
+              hint: l10n.anumodanaUcscSinglishUse,
+              leading: const SettingsTile(icon: Icons.keyboard_outlined),
+              trailing: const _OpenLinkButton(
+                name: 'UCSC LTRL',
+                url: _ucscLtrlUrl,
+              ),
+            ),
+            SettingsRow(
+              label: 'sinhala-unicode-converter',
+              hint: l10n.anumodanaSinhalaUnicodeConverterUse,
+              leading: const SettingsTile(icon: Icons.code_outlined),
+              trailing: const _OpenLinkButton(
+                name: 'sinhala-unicode-converter',
+                url: _sinhalaUnicodeConverterUrl,
+              ),
+            ),
+            SettingsRow(
+              label: 'pali-converter',
+              hint: l10n.anumodanaPaliConverterUse,
+              leading: const SettingsTile(icon: Icons.translate_outlined),
+              trailing: const _OpenLinkButton(
+                name: 'pali-converter',
+                url: _paliConverterUrl,
+              ),
             ),
           ],
         ),

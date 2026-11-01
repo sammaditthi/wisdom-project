@@ -1005,6 +1005,22 @@
   "@anumodanaDpdLicence": {
     "description": "Settings > Anumodanā: the Digital Pali Dictionary's required citation and licence. Proper names and the version are not translated"
   },
+  "anumodanaTransliteration": "Transliteration",
+  "@anumodanaTransliteration": {
+    "description": "Settings > Anumodanā: section header above the credits for converting between letters — the Singlish scheme, the code our Singlish search is adapted from, and the Pali script converter. A future Singlish key-chart tab takes a typing name, not this one"
+  },
+  "anumodanaUcscSinglishUse": "The SinGlish scheme for typing Sinhala in English letters.",
+  "@anumodanaUcscSinglishUse": {
+    "description": "Settings > Anumodanā: what the UCSC Language Technology Research Laboratory supplies. SinGlish is their name for the scheme and is not translated"
+  },
+  "anumodanaSinhalaUnicodeConverterUse": "The code Singlish search is adapted from.\nMIT.",
+  "@anumodanaSinhalaUnicodeConverterUse": {
+    "description": "Settings > Anumodanā: what Open-SL's sinhala-unicode-converter supplies, and its licence. Say 'adapted', never that we use it unchanged: the divergences are listed in singlish_transliterator.dart. The MIT notice itself is registered in main.dart"
+  },
+  "anumodanaPaliConverterUse": "Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.",
+  "@anumodanaPaliConverterUse": {
+    "description": "Settings > Anumodanā: what pali-converter does for the app (at build time, in tools/dict-populate.js), who made it, and on what terms. Its source header requires the author's permission for any use, which the project holds in writing. Proper names are not translated"
+  },
   "anumodanaContributors": "Those who contributed",
   "@anumodanaContributors": {
     "description": "Settings > Anumodanā: section header above the thanks to everyone who helped build the app"

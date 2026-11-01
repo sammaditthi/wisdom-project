@@ -1268,6 +1268,30 @@ abstract class AppLocalizations {
   /// **'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.'**
   String get anumodanaDpdLicence;
 
+  /// Settings > Anumodanā: section header above the credits for converting between letters — the Singlish scheme, the code our Singlish search is adapted from, and the Pali script converter. A future Singlish key-chart tab takes a typing name, not this one
+  ///
+  /// In en, this message translates to:
+  /// **'Transliteration'**
+  String get anumodanaTransliteration;
+
+  /// Settings > Anumodanā: what the UCSC Language Technology Research Laboratory supplies. SinGlish is their name for the scheme and is not translated
+  ///
+  /// In en, this message translates to:
+  /// **'The SinGlish scheme for typing Sinhala in English letters.'**
+  String get anumodanaUcscSinglishUse;
+
+  /// Settings > Anumodanā: what Open-SL's sinhala-unicode-converter supplies, and its licence. Say 'adapted', never that we use it unchanged: the divergences are listed in singlish_transliterator.dart. The MIT notice itself is registered in main.dart
+  ///
+  /// In en, this message translates to:
+  /// **'The code Singlish search is adapted from.\nMIT.'**
+  String get anumodanaSinhalaUnicodeConverterUse;
+
+  /// Settings > Anumodanā: what pali-converter does for the app (at build time, in tools/dict-populate.js), who made it, and on what terms. Its source header requires the author's permission for any use, which the project holds in writing. Proper names are not translated
+  ///
+  /// In en, this message translates to:
+  /// **'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.'**
+  String get anumodanaPaliConverterUse;
+
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
   ///
   /// In en, this message translates to:

@@ -26,7 +26,7 @@ tabs and its phone screens are in *Later*.
 | Tab | Holds |
 |---|---|
 | General | **Appearance:** Theme (two icons, Dark disabled — see Decisions 3). **Language:** App language (English \| සිංහල) and Content language (Pali \| සිංහල), each with a one-line hint. **Pali letters:** the three switches, under a sample line that follows them. **Privacy:** what Research sends to Google — see Decisions 10. **About:** the version. |
-| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Text sources, Dictionaries, Those who contributed, Licences — see *Anumodanā*. |
+| Anumodanā (Sinhala: පුණ්‍යානුමෝදනා) | Text sources, Dictionaries, Transliteration, Those who contributed, Licences — see *Anumodanā*. |
 
 ### Narrow windows
 
@@ -55,8 +55,8 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
    Theme, App language, Content language, Pali letters. The reader menu holds
    what you change while reading: Font size, and Hide navigation bar, which must
    stay there as the way back when the rail is hidden.
-2. **Two tabs this release** (2026-10-23). Keyboard shortcuts and
-   Transliteration are in *Later*; `SettingsTab` takes them without rework.
+2. **Two tabs this release** (2026-10-23). Keyboard shortcuts and the Singlish
+   key chart are in *Later*; `SettingsTab` takes them without rework.
 3. **Theme shows Light and Dark as icons; Dark is disabled** (2026-10-23),
    labelled as coming soon. The names are tooltips, which is also what a
    screen reader announces for a segment. `AppThemeMode.dark` today is the
@@ -122,6 +122,9 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
     *unpaid*-tier terms, checked 2026-10-24; the key's ARB description says to
     re-check it if the Worker ever moves to the paid tier, where Google does
     not use prompts to improve its products.
+11. **Transliteration credits live in Anumodanā** (2026-11-01), as a section
+    named අක්ෂර පරිවර්තනය / Transliteration. The future Singlish key-chart tab
+    takes a typing name instead, so the two never share a title.
 
 ## How it is built
 
@@ -194,8 +197,8 @@ Switch 2 look broken.
 
 ### Anumodanā
 
-Four sections. Proper names, licence names and dictionary names are never
-translated. A fifth, භාණක පරම්පරාව — the reciters' lineage that carried the
+Five sections. Proper names, licence names and dictionary names are never
+translated. A sixth, භාණක පරම්පරාව — the reciters' lineage that carried the
 canon — is written and commented out in `anumodana_page.dart`, waiting on its
 wording; its two ARB keys stay. It returns as the first section, and Text
 sources gives `isFirst` back.
@@ -204,13 +207,16 @@ sources gives `isFirst` back.
 |---|---|
 | Text sources | tipitaka.lk · SuttaCentral, each with its own logo |
 | Dictionaries | A hint line, then the `DictionaryInfo.all` groups, alphabetical |
+| Transliteration | UCSC LTRL · sinhala-unicode-converter · pali-converter, generic icons |
 | Those who contributed | One line of thanks, ending in an aspiration for them. |
 | Licences | Fonts, then Open-source licences as a plain link |
 
 Each source row says where it is used in the app and carries its licence.
-Checked against the upstream licence pages 2026-10-23:
+Checked against the upstream licence pages 2026-10-23 (the Transliteration
+rows 2026-11-01):
 
 - **tipitaka.lk** — [CC BY-ND 4.0](https://github.com/pathnirvana/tipitaka.lk?tab=License-1-ov-file).
+  More about the project: <https://pathnirvana.github.io/tipitaka.lk/>.
   Term 4 is *"Attribution should be given to tipitaka.lk"*, and term 1 scopes
   the licence to *"the Buddha Jayanthi Pali text"* — so the row's licence
   sentence names the Pali text only, not the Sinhala translation or the
@@ -233,6 +239,32 @@ Checked against the upstream licence pages 2026-10-23:
   The shipped version is `v0.2.20250709` (`ver2.3`, per
   `docs/todo/dictionary/dpd-provenance-and-refresh.md`); nothing in the repo
   records it, so **re-check this string when the dictionary refreshes**.
+- **UCSC LTRL** — the SinGlish scheme (2011). A scheme, not code: credit
+  only, no licence line. The row links the lab's About page,
+  <https://ltrl.ucsc.lk/ltrl/>, not the scheme's own page
+  (`ucsc.cmb.ac.lk/ltrl/services/feconverter/`): the lab has moved to the
+  new domain and the old one's `/ltrl/` already redirects there, so the
+  converter page is the one likely to vanish.
+- **sinhala-unicode-converter** (Open-SL) — MIT. `singlish_transliterator.dart`
+  is a hand port, so the row says *adapted from*, never that we ship it
+  unchanged; the divergences are listed in that file's header. Checked
+  2026-11-01 against upstream's `singlish_to_unicode.ts`: 45 of 46 consonants
+  and all 19 of our vowels are theirs, and every difference is one the header
+  lists. Upstream has no LICENSE file — only `package.json`'s
+  `"license": "MIT"`, author Janaka Chathuranga, first commit 2020 — so
+  `main.dart` carries the standard MIT text with that copyright line.
+- **pali-converter** (Path Nirvana Foundation) — runs at build time only, in
+  `tools/dict-populate.js`, turning DPD and DPDC's romanized headwords (and
+  DPDC's word breakdowns) into Sinhala letters. Its code never ships
+  (`tools/node_modules` is gitignored); its output does, in `dict.db`. Its
+  licence signals disagree: GitHub says GPL-3.0, `package.json` says ISC, and
+  the `index.js` header says *no commercial use, and permission from the
+  author for all other purposes*. The header is the author's own and the
+  strictest, so it governs. Permission is held in writing (confirmed
+  2026-11-01), hence "Used with permission".
+  **pnfo/singlish-search is not used** — checked 2026-11-01: the app's tables
+  match Open-SL's, and the one echo of its API, a `getPossibleMatches()`
+  wrapper, was deleted in `ffc477f`. The audio plan may use it later (MIT).
 - **Noto fonts** — SIL OFL 1.1.
 
 #### The source logos
@@ -276,7 +308,10 @@ or mismatched logo on screen first:
 ### Licences
 
 `assets/fonts/OFL.txt` (new) is registered with `LicenseRegistry.addLicense` in
-`main.dart`, so the bundled Noto faces appear in Open-source licences.
+`main.dart`, so the bundled Noto faces appear in Open-source licences. The
+sinhala-unicode-converter MIT notice is registered beside it, as a `const` in
+`main.dart` rather than a new asset: we copied that code by hand, so pubspec
+would never list it.
 
 ### Colours
 
@@ -307,7 +342,7 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   `paliLettersHint`, `settingsPrivacy`, `researchPrivacyDetail`.
 - Research: `researchPrivacyNote`.
 - Reader menu: `readerSettings`.
-- Anumodanā: its five section names, the three source descriptions, the
+- Anumodanā: its six section names, the six source descriptions, the
   dictionary hint, the two group labels, the contributors line,
   `openSourceLicences` and its hint, `versionLabel`, `openLinkTo`.
 
@@ -325,32 +360,11 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   activators only, chosen by `defaultTargetPlatform` (on the web, the browser's
   OS): `meta` on macOS and iOS, `control` elsewhere, Esc on both. No `kIsWeb`
   branch. See `docs/todo/reader/keyboard-shortcuts-sheet.md`.
-- **Anumodanā: an අක්ෂර පරිවර්තනය (Transliteration) section.** The app's
-  Singlish converter is not ours. The scheme is UCSC LTRL's SinGlish (2011,
-  <https://www.ucsc.cmb.ac.lk/ltrl/services/feconverter/>), and
-  `singlish_transliterator.dart` is a hand port of
-  [Open-SL/sinhala-unicode-converter](https://github.com/Open-SL/sinhala-unicode-converter)
-  (MIT), whose own README credits UCSC. Two rows, in the page's existing
-  `SettingsRow` + link-button shape: the laboratory for the scheme, the repo
-  for the implementation. **The MIT notice has to live somewhere in the app** —
-  we copied the file by hand, so `showLicensePage` will never list it, because
-  it is not a pubspec dependency. The row must not claim we ship the scheme
-  unchanged: the divergences are listed in the transliterator's own header.
-  Three ARB keys, `en` + `si`; proper names stay untranslated as the rest of
-  the page does. **Name clash to settle first:** the Transliteration *tab*
-  below wants the same Sinhala title, so either these
-  rows belong inside that tab rather than in Anumodanā, or the tab links to
-  them.
-- **Name Path Nirvana Foundation on the tipitaka.lk row.** The row credits the
-  project; the organisation behind it is the Path Nirvana Foundation
-  (<https://pathnirvana.org>) — a US-registered non-profit, *not* "Path to
-  Nirvana". Its licence term 4 asks for attribution to tipitaka.lk, which the
-  row already satisfies, so this is accuracy rather than obligation. Rides
-  with the section above.
-- **Transliteration tab.** Needs its own letter→key list, in alphabet order,
-  beside `SinglishTransliterator` in `lib/core/utils/`: the transliterator's
-  tables are ordered for matching and some letters have two keys, so they
-  cannot be shown directly. A unit test converts every key in the list and
+- **Singlish key-chart tab.** Not titled Transliteration — that is the
+  Anumodanā section's name (Decisions 11). Needs its own letter→key list, in
+  alphabet order, beside `SinglishTransliterator` in `lib/core/utils/`: the
+  transliterator's tables are ordered for matching and some letters have two
+  keys, so they cannot be shown directly. A unit test converts every key in the list and
   checks the letter. This is the bulk of the remaining work.
 - **The phone entry point** — a Settings item in the bottom navigation bar
   (`docs/todo/reader/phone-chrome-auto-hide.md`), and whether the drill-down

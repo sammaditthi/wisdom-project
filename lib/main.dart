@@ -38,12 +38,13 @@ void main() async {
   }
 }
 
-/// Adds the bundled Noto faces to Open-source licences.
+/// Adds what pubspec can't to Open-source licences: the bundled Noto faces,
+/// and the converter `SinglishTransliterator` is ported from.
 ///
-/// Fonts declared in pubspec's `fonts:` carry no licence of their own, so
-/// without this the app's only typefaces are the one thing missing from its
-/// licence list.
-void _registerFontLicences() {
+/// Fonts declared in pubspec's `fonts:` carry no licence of their own, and the
+/// converter was copied by hand rather than depended on, so neither would be
+/// listed otherwise.
+void _registerLicences() {
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks(
       const [
@@ -54,11 +55,40 @@ void _registerFontLicences() {
       ],
       await rootBundle.loadString('assets/fonts/OFL.txt'),
     );
+    yield const LicenseEntryWithLineBreaks(
+      ['sinhala-unicode-converter'],
+      _sinhalaUnicodeConverterLicence,
+    );
   });
 }
 
+/// Upstream ships no LICENSE file; its package.json declares MIT, author
+/// Janaka Chathuranga, first published 2020.
+const _sinhalaUnicodeConverterLicence = '''
+MIT License
+
+Copyright (c) 2020 Janaka Chathuranga
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.''';
+
 Future<void> _start() async {
-  _registerFontLicences();
+  _registerLicences();
 
   // Web: Flutter's first frame takes over from #boot in web/index.html, which
   // shows the emblem. Start loading it now so it is more likely there by then:

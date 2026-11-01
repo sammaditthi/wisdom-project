@@ -661,6 +661,21 @@ class AppLocalizationsSi extends AppLocalizations {
       'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
 
   @override
+  String get anumodanaTransliteration => 'අක්ෂර පරිවර්තනය';
+
+  @override
+  String get anumodanaUcscSinglishUse =>
+      'ඉංග්‍රීසි අකුරින් සිංහල ලිවීමේ SinGlish ක්‍රමය.';
+
+  @override
+  String get anumodanaSinhalaUnicodeConverterUse =>
+      'Singlish සෙවුම සඳහා අනුවර්තනය කළ කේතය.\nMIT.';
+
+  @override
+  String get anumodanaPaliConverterUse =>
+      'රෝම අකුරින් ඇති පාළි පද සිංහල අකුරට හැරවීම.\nPath Nirvana Foundation. අවසර ඇතිව භාවිතා කෙරේ.';
+
+  @override
   String get anumodanaContributors => 'දායක වූ සැම';
 
   @override

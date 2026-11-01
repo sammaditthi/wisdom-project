@@ -9,8 +9,10 @@
 ///
 /// The scheme is UCSC LTRL's SinGlish (2011,
 /// https://www.ucsc.cmb.ac.lk/ltrl/services/feconverter/), ported from
-/// https://github.com/Open-SL/sinhala-unicode-converter. The deliberate
-/// divergences, listed here and nowhere else:
+/// https://github.com/Open-SL/sinhala-unicode-converter — Copyright (c) 2020
+/// Janaka Chathuranga, MIT; the full notice is registered in `main.dart` and
+/// credited in Settings > Anumodanā. The deliberate divergences, listed here
+/// and nowhere else:
 /// - `~` replaces their `\` escape, and `~N` carries the hal.
 /// - `c` is added for romanized Pali.
 /// - `nndh` comes before `nnd`; upstream gets a standalone `nndh` wrong.

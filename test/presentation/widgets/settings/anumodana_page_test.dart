@@ -193,9 +193,9 @@ void main() {
       expect(find.text(l10n.anumodanaDpdLicence), findsOneWidget);
       expect(find.byTooltip(l10n.openLinkTo(dpd.name)), findsOneWidget);
 
-      // Three links in all: the two sources and DPD. No other dictionary has
-      // one, so the open-link buttons are exactly those.
-      expect(find.byIcon(Icons.open_in_new), findsNWidgets(3));
+      // Six links in all: the two sources, DPD and the three Transliteration
+      // rows. No other dictionary has one, so DPD's is the only one among them.
+      expect(find.byIcon(Icons.open_in_new), findsNWidgets(6));
     });
   });
 

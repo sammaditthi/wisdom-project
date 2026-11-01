@@ -660,6 +660,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Bodhirasa Bhikkhu, Digital Pāḷi Dictionary v0.2.20250709. CC BY-NC-SA 4.0.';
 
   @override
+  String get anumodanaTransliteration => 'Transliteration';
+
+  @override
+  String get anumodanaUcscSinglishUse =>
+      'The SinGlish scheme for typing Sinhala in English letters.';
+
+  @override
+  String get anumodanaSinhalaUnicodeConverterUse =>
+      'The code Singlish search is adapted from.\nMIT.';
+
+  @override
+  String get anumodanaPaliConverterUse =>
+      'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.';
+
+  @override
   String get anumodanaContributors => 'Those who contributed';
 
   @override
