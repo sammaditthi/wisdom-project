@@ -68,7 +68,7 @@ class ReaderActionToolbar extends ConsumerWidget {
       [
         _LayoutMenuButton(visible: visible),
         _ToolbarButton.icon(
-          Symbols.find_in_page_sharp,
+          Symbols.document_search_sharp,
           // A page and a magnifier in 20px draws finer than the classic
           // icons beside it; 500 is what Symbols needs to sit among them.
           weight: 500,
