@@ -821,7 +821,7 @@ abstract class AppLocalizations {
   /// Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings
   ///
   /// In en, this message translates to:
-  /// **'Supported by Google Gemini (free tier). Don\'t include anything private.'**
+  /// **'Supported by Google Gemini (free tier). Do not include any personal information.'**
   String get researchPrivacyNote;
 
   /// Hint text inside the Q&A question input field, shown on every turn. Names no part of the corpus — the store holds the commentaries too. The field has no labelText, so this doubles as its accessible name and must not be empty
@@ -1211,7 +1211,7 @@ abstract class AppLocalizations {
   /// Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products
   ///
   /// In en, this message translates to:
-  /// **'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.'**
+  /// **'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Do not include any personal information.'**
   String get researchPrivacyDetail;
 
   /// Settings > Anumodanā: section header above the thanks to the reciters who preserved the canon orally

@@ -639,7 +639,7 @@
     "description": "Placeholder shown in the Q&A dialog before the first question is asked"
   },
 
-  "researchPrivacyNote": "Supported by Google Gemini (free tier). Don't include anything private.",
+  "researchPrivacyNote": "Supported by Google Gemini (free tier). Do not include any personal information.",
   "@researchPrivacyNote": {
     "description": "Research: the faint second line under the empty state, saying where a question goes before one is typed. Short on purpose — the fuller statement is researchPrivacyDetail in Settings"
   },
@@ -970,7 +970,7 @@
   "@settingsPrivacy": {
     "description": "Settings > General: section header above what Research sends to Google"
   },
-  "researchPrivacyDetail": "Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don't type anything private.",
+  "researchPrivacyDetail": "Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Do not include any personal information.",
   "@researchPrivacyDetail": {
     "description": "Settings > General > Privacy: what Google's unpaid-tier terms allow it to do with a question. Checked against ai.google.dev/gemini-api/terms on 2026-10-24; re-check if the Worker ever moves to the paid tier, where Google does not use prompts to improve its products"
   },

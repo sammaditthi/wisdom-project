@@ -386,7 +386,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get researchPrivacyNote =>
-      'Supported by Google Gemini (free tier). Don\'t include anything private.';
+      'Supported by Google Gemini (free tier). Do not include any personal information.';
 
   @override
   String get researchInputHint => 'Ask your question';
@@ -627,7 +627,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get researchPrivacyDetail =>
-      'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Don\'t type anything private.';
+      'Research sends your question to Google Gemini to answer it. On the free service we use, Google may use that information to improve its services, and reviewers may read it. Do not include any personal information.';
 
   @override
   String get anumodanaLineage => 'The Bhāṇaka lineage';
