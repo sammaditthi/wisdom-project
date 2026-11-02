@@ -12,7 +12,8 @@ import 'search_section_header.dart';
 
 /// Simplified overlay that only shows recent searches
 /// Displayed when search bar is focused with an empty query.
-/// Shows the newest few; "Show N more" opens the rest in place.
+/// Shows the newest few; the last row holds "Show N more", which opens the
+/// rest in place, and "Clear all", under the ✕ column.
 class RecentSearchOverlay extends ConsumerStatefulWidget {
   /// Callback when the overlay should be dismissed
   final VoidCallback onDismiss;
@@ -35,11 +36,19 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
   /// Rows shown before "Show N more".
   static const _collapsedCount = 5;
 
-  // Row geometry, pinned on each row (Material 3's defaults) so "Show N more"
-  // lines up with the query text.
+  // Row geometry, pinned on each row (Material 3's defaults) so the last
+  // row's links line up with the query text and the ✕ icons.
   static const double _rowPadding = 16;
+  static const double _rowEndPadding = 24;
   static const double _leadingWidth = 24;
   static const double _titleGap = 16;
+  static const double _closeIconSize = 18;
+
+  /// The ✕ button: Material 3's 40px at the compact density set on it.
+  static const double _closeButtonSize = 32;
+
+  /// Icons.close draws its cross 5/24 of its size inside its box.
+  static const double _closeGlyphInset = _closeIconSize * 5 / 24;
 
   /// Local, so each open starts collapsed.
   bool _expanded = false;
@@ -51,6 +60,16 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       _leadingWidth +
       _titleGap +
       Theme.of(context).visualDensity.horizontal * 2;
+
+  /// Distance from the card's end to the ✕ cross's end. Touch platforms pad
+  /// the ✕ button out to a 48px tap target, which moves the icon inwards.
+  static double _closeIconEnd(BuildContext context) {
+    final button =
+        Theme.of(context).materialTapTargetSize == MaterialTapTargetSize.padded
+            ? kMinInteractiveDimension
+            : _closeButtonSize;
+    return _rowEndPadding + (button - _closeIconSize) / 2 + _closeGlyphInset;
+  }
 
   /// Calculate max height based on screen size.
   ///
@@ -118,31 +137,42 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SearchSectionHeader(
-          label: l10n.recentSearches,
-          action: SearchLinkButton(
-            label: l10n.clearAll,
-            onPressed: () =>
-                ref.read(searchStateProvider.notifier).clearRecentSearches(),
+        SearchSectionHeader(label: l10n.recentSearches),
+        ...visible.map((search) => _buildRow(context, search)),
+        Padding(
+          // Labels line up with the query text and with the ✕ icons.
+          padding: EdgeInsetsDirectional.only(
+            start: _textStart(context) - SearchLinkButton.padding,
+            end: _closeIconEnd(context) - SearchLinkButton.padding,
+            bottom: 4,
+          ),
+          child: Row(
+            children: [
+              // Gone once deleting leaves nothing hidden.
+              if (hiddenCount > 0)
+                Expanded(
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: SearchLinkButton(
+                      onPressed: () => setState(() => _expanded = !_expanded),
+                      icon: _expanded ? Icons.expand_less : Icons.expand_more,
+                      label: _expanded
+                          ? l10n.showLess
+                          : l10n.showMoreRecentSearches(hiddenCount),
+                    ),
+                  ),
+                )
+              else
+                const Spacer(),
+              SearchLinkButton(
+                label: l10n.clearAll,
+                onPressed: () => ref
+                    .read(searchStateProvider.notifier)
+                    .clearRecentSearches(),
+              ),
+            ],
           ),
         ),
-        ...visible.map((search) => _buildRow(context, search)),
-        // Gone once deleting leaves nothing hidden.
-        if (hiddenCount > 0)
-          Padding(
-            // Lines the label up with the query text, as in GroupedFTSTile.
-            padding: EdgeInsetsDirectional.only(
-              start: _textStart(context) - SearchLinkButton.padding,
-              bottom: 4,
-            ),
-            child: SearchLinkButton(
-              onPressed: () => setState(() => _expanded = !_expanded),
-              icon: _expanded ? Icons.expand_less : Icons.expand_more,
-              label: _expanded
-                  ? l10n.showLess
-                  : l10n.showMoreRecentSearches(hiddenCount),
-            ),
-          ),
       ],
     );
   }
@@ -157,8 +187,8 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
     return ListTile(
       key: ValueKey(queryText),
       dense: true,
-      contentPadding:
-          const EdgeInsetsDirectional.only(start: _rowPadding, end: 24),
+      contentPadding: const EdgeInsetsDirectional.only(
+          start: _rowPadding, end: _rowEndPadding),
       minLeadingWidth: _leadingWidth,
       horizontalTitleGap: _titleGap,
       leading: Icon(
@@ -173,7 +203,7 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
         overflow: TextOverflow.ellipsis,
       ),
       trailing: IconButton(
-        icon: const Icon(Icons.close, size: 18),
+        icon: const Icon(Icons.close, size: _closeIconSize),
         color: theme.colorScheme.onSurfaceVariant,
         visualDensity: VisualDensity.compact,
         tooltip: l10n.removeRecentSearch,

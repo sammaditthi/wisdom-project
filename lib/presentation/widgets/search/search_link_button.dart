@@ -31,7 +31,8 @@ class SearchLinkButton extends StatelessWidget {
       onPressed: onPressed,
       icon: icon == null ? null : Icon(icon, size: 16),
       iconAlignment: IconAlignment.end,
-      label: Text(label),
+      // One line: where space runs short the label ends in "…", the icon stays.
+      label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: TextButton.styleFrom(
         // A button ignores textStyle's colour; without this it paints primary.
         foregroundColor: context.typography.linkLabel.color,
