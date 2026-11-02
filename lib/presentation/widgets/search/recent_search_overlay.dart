@@ -7,10 +7,13 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../providers/search_provider.dart';
 import '../../../domain/entities/search/recent_search.dart';
+import 'search_link_button.dart';
+import 'search_section_header.dart';
 
 /// Simplified overlay that only shows recent searches
-/// Displayed when search bar is focused with an empty query
-class RecentSearchOverlay extends ConsumerWidget {
+/// Displayed when search bar is focused with an empty query.
+/// Shows the newest few; "Show N more" opens the rest in place.
+class RecentSearchOverlay extends ConsumerStatefulWidget {
   /// Callback when the overlay should be dismissed
   final VoidCallback onDismiss;
 
@@ -22,6 +25,32 @@ class RecentSearchOverlay extends ConsumerWidget {
     required this.onDismiss,
     this.width = 350,
   });
+
+  @override
+  ConsumerState<RecentSearchOverlay> createState() =>
+      _RecentSearchOverlayState();
+}
+
+class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
+  /// Rows shown before "Show N more".
+  static const _collapsedCount = 5;
+
+  // Row geometry, pinned on each row (Material 3's defaults) so "Show N more"
+  // lines up with the query text.
+  static const double _rowPadding = 16;
+  static const double _leadingWidth = 24;
+  static const double _titleGap = 16;
+
+  /// Local, so each open starts collapsed.
+  bool _expanded = false;
+
+  /// Where a row's query text starts. ListTile's gap shrinks at compact
+  /// density, as on desktop.
+  static double _textStart(BuildContext context) =>
+      _rowPadding +
+      _leadingWidth +
+      _titleGap +
+      Theme.of(context).visualDensity.horizontal * 2;
 
   /// Calculate max height based on screen size.
   ///
@@ -45,7 +74,7 @@ class RecentSearchOverlay extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     // Only the list, so unrelated search-state changes don't rebuild the rows.
     final recentSearches =
         ref.watch(searchStateProvider.select((s) => s.recentSearches));
@@ -59,7 +88,7 @@ class RecentSearchOverlay extends ConsumerWidget {
     const borderRadius = BorderRadius.all(Radius.circular(12));
 
     return SizedBox(
-      width: width,
+      width: widget.width,
       child: Material(
         elevation: 8,
         borderRadius: borderRadius,
@@ -69,7 +98,7 @@ class RecentSearchOverlay extends ConsumerWidget {
           child: ClipRRect(
             borderRadius: borderRadius,
             child: SingleChildScrollView(
-              child: _buildRecentSearches(context, ref, recentSearches),
+              child: _buildRecentSearches(context, recentSearches),
             ),
           ),
         ),
@@ -79,123 +108,85 @@ class RecentSearchOverlay extends ConsumerWidget {
 
   Widget _buildRecentSearches(
     BuildContext context,
-    WidgetRef ref,
     List<RecentSearch> recentSearches,
   ) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final hiddenCount = recentSearches.length - _collapsedCount;
+    final visible =
+        _expanded ? recentSearches : recentSearches.take(_collapsedCount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(context, ref, l10n.recentSearches.toUpperCase()),
-        ...recentSearches.map((search) {
-          // Singlish searches are saved as their Sinhala
-          // (saveRecentSearchAndDismiss), so the saved text is what we show.
-          final queryText = search.queryText;
-
-          return ListTile(
-            dense: true,
-            leading: Icon(
-              Icons.history,
-              size: 20,
-              color: theme.colorScheme.onSurfaceVariant,
+        SearchSectionHeader(
+          label: l10n.recentSearches,
+          action: SearchLinkButton(
+            label: l10n.clearAll,
+            onPressed: () =>
+                ref.read(searchStateProvider.notifier).clearRecentSearches(),
+          ),
+        ),
+        ...visible.map((search) => _buildRow(context, search)),
+        // Gone once deleting leaves nothing hidden.
+        if (hiddenCount > 0)
+          Padding(
+            // Lines the label up with the query text, as in GroupedFTSTile.
+            padding: EdgeInsetsDirectional.only(
+              start: _textStart(context) - SearchLinkButton.padding,
+              bottom: 4,
             ),
-            title: Text(
-              queryText,
-              style: context.typography.listRowTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: SearchLinkButton(
+              onPressed: () => setState(() => _expanded = !_expanded),
+              icon: _expanded ? Icons.expand_less : Icons.expand_more,
+              label: _expanded
+                  ? l10n.showLess
+                  : l10n.showMoreRecentSearches(hiddenCount),
             ),
-            trailing: IconButton(
-              icon: const Icon(Icons.close, size: 18),
-              color: theme.colorScheme.onSurfaceVariant,
-              visualDensity: VisualDensity.compact,
-              tooltip: l10n.removeRecentSearch,
-              onPressed: () {
-                ref
-                    .read(searchStateProvider.notifier)
-                    .removeRecentSearch(queryText);
-              },
-            ),
-            onTap: () {
-              // Dismiss overlay first
-              onDismiss();
-              // Then trigger search with this query
-              ref
-                  .read(searchStateProvider.notifier)
-                  .selectRecentSearch(queryText);
-            },
-          );
-        }),
+          ),
       ],
     );
   }
 
-  Widget _sectionHeader(BuildContext context, WidgetRef ref, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: context.typography.sectionHeaderFor(title),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          _ClearAllButton(
-            onTap: () {
-              ref.read(searchStateProvider.notifier).clearRecentSearches();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// "Clear all" action in the recent-searches header.
-///
-/// Idle: muted `linkLabel` color (onSurfaceVariant) — reads as quiet helper text.
-/// Hover: pill-shaped highlight + label recolored to `primary` so it reads
-/// as an actionable affordance.
-class _ClearAllButton extends StatefulWidget {
-  final VoidCallback onTap;
-
-  const _ClearAllButton({required this.onTap});
-
-  @override
-  State<_ClearAllButton> createState() => _ClearAllButtonState();
-}
-
-class _ClearAllButtonState extends State<_ClearAllButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildRow(BuildContext context, RecentSearch search) {
     final theme = Theme.of(context);
-    final baseStyle = context.typography.linkLabel;
-    // Large radius makes the InkWell's hover overlay + splash clip to a
-    // stadium (pill) shape instead of the default rectangle.
-    final pillRadius = BorderRadius.circular(100);
+    final l10n = AppLocalizations.of(context);
+    // Singlish searches are saved as their Sinhala
+    // (saveRecentSearchAndDismiss), so the saved text is what we show.
+    final queryText = search.queryText;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: pillRadius,
-        onHover: (h) => setState(() => _hovered = h),
-        onTap: widget.onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: Text(
-            AppLocalizations.of(context).clearAll,
-            style: _hovered
-                ? baseStyle.copyWith(color: theme.colorScheme.primary)
-                : baseStyle,
-          ),
-        ),
+    return ListTile(
+      key: ValueKey(queryText),
+      dense: true,
+      contentPadding:
+          const EdgeInsetsDirectional.only(start: _rowPadding, end: 24),
+      minLeadingWidth: _leadingWidth,
+      horizontalTitleGap: _titleGap,
+      leading: Icon(
+        Icons.history,
+        size: 20,
+        color: theme.colorScheme.onSurfaceVariant,
       ),
+      title: Text(
+        queryText,
+        style: context.typography.listRowTitle,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.close, size: 18),
+        color: theme.colorScheme.onSurfaceVariant,
+        visualDensity: VisualDensity.compact,
+        tooltip: l10n.removeRecentSearch,
+        onPressed: () {
+          ref.read(searchStateProvider.notifier).removeRecentSearch(queryText);
+        },
+      ),
+      onTap: () {
+        // Read before dismissing: dismissing disposes this state and its ref.
+        final notifier = ref.read(searchStateProvider.notifier);
+        widget.onDismiss();
+        notifier.selectRecentSearch(queryText);
+      },
     );
   }
 }

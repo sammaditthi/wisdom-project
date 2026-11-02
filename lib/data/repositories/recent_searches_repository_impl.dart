@@ -16,7 +16,7 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
   RecentSearchesRepositoryImpl(this._prefs);
 
   @override
-  Future<List<RecentSearch>> getRecentSearches({int limit = 5}) async {
+  Future<List<RecentSearch>> getRecentSearches({int? limit}) async {
     final jsonString = _prefs.getString(_key);
     if (jsonString == null || jsonString.isEmpty) {
       return [];
@@ -28,8 +28,8 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
           .map((e) => RecentSearch.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      // Return most recent first, limited
-      return searches.take(limit).toList();
+      // Stored most recent first
+      return limit == null ? searches : searches.take(limit).toList();
     } catch (e) {
       // If parsing fails, clear corrupted data and return empty
       await _prefs.remove(_key);
@@ -44,7 +44,7 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
     final trimmed = query.replaceAll('\u200B', '').trim();
     if (trimmed.isEmpty) return;
 
-    final existing = await _getAllSearches();
+    final existing = await getRecentSearches();
 
     // Remove duplicate if exists (will be re-added at top). Case matters:
     // in Singlish "kana" (කන) and "kaNa" (කණ) are different words.
@@ -67,7 +67,7 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
 
   @override
   Future<void> removeRecentSearch(String query) async {
-    final existing = await _getAllSearches();
+    final existing = await getRecentSearches();
     existing.removeWhere((s) => s.queryText == query);
     await _saveSearches(existing);
   }
@@ -75,23 +75,6 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
   @override
   Future<void> clearRecentSearches() async {
     await _prefs.remove(_key);
-  }
-
-  /// Get all stored searches (no limit)
-  Future<List<RecentSearch>> _getAllSearches() async {
-    final jsonString = _prefs.getString(_key);
-    if (jsonString == null || jsonString.isEmpty) {
-      return [];
-    }
-
-    try {
-      final list = jsonDecode(jsonString) as List;
-      return list
-          .map((e) => RecentSearch.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      return [];
-    }
   }
 
   /// Save searches to SharedPreferences

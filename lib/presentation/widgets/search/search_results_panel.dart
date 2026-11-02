@@ -22,6 +22,7 @@ import 'result_badge.dart';
 import 'scope_filter_chips.dart';
 import 'search_link_button.dart';
 import 'search_result_tile.dart';
+import 'search_section_header.dart';
 
 /// Slide-out panel for displaying full search results
 /// Used as a side panel on desktop and full-screen overlay on mobile
@@ -150,14 +151,18 @@ class SearchResultsPanel extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SectionHeader(
+                SearchSectionHeader(
                   label: searchResultTypeLabel(
                       resultType, AppLocalizations.of(context)),
                   // Hidden until counts load, and when the section shows them all.
-                  onSeeAll: count != null && count > results.length
-                      ? () => ref
-                          .read(searchStateProvider.notifier)
-                          .selectResultType(resultType)
+                  action: count != null && count > results.length
+                      ? SearchLinkButton(
+                          onPressed: () => ref
+                              .read(searchStateProvider.notifier)
+                              .selectResultType(resultType),
+                          icon: Icons.arrow_forward,
+                          label: AppLocalizations.of(context).seeAll,
+                        )
                       : null,
                 ),
                 // Use appropriate tile type for each result type
@@ -413,46 +418,6 @@ bool _hasMixedEditions(Iterable<SearchResult> results) {
     if (result.editionId != first) return true;
   }
   return false;
-}
-
-/// Top results section header: "TITLES", plus "See all →" when [onSeeAll]
-/// is set.
-class _SectionHeader extends StatelessWidget {
-  final String label;
-  final VoidCallback? onSeeAll;
-
-  const _SectionHeader({required this.label, this.onSeeAll});
-
-  @override
-  Widget build(BuildContext context) {
-    final onSeeAll = this.onSeeAll;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 8, 0),
-      // Same height with or without "See all"; grows with large text.
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 40),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                label.toUpperCase(),
-                style: context.typography.sectionHeaderFor(label),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (onSeeAll != null)
-              SearchLinkButton(
-                onPressed: onSeeAll,
-                icon: Icons.arrow_forward,
-                label: AppLocalizations.of(context).seeAll,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 /// The panel's top row: the match options button, then the filter chips

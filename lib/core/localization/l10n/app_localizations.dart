@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'Remove from recent searches'**
   String get removeRecentSearch;
 
+  /// Link under the recent searches list that shows the older entries hidden below the first few
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} more'**
+  String showMoreRecentSearches(int count);
+
   /// Expand link revealing additional secondary matches from the same text
   ///
   /// In en, this message translates to:
@@ -410,7 +416,7 @@ abstract class AppLocalizations {
   /// **'Show more'**
   String get showMore;
 
-  /// Collapse link that hides the expanded secondary matches, or a definition's full meaning, again
+  /// Collapse link that hides the expanded secondary matches, a definition's full meaning, or the older recent searches, again
   ///
   /// In en, this message translates to:
   /// **'Show less'**
