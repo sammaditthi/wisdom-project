@@ -161,11 +161,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get removeRecentSearch => 'Remove from recent searches';
 
   @override
-  String showMoreRecentSearches(int count) {
-    return 'Show $count more';
-  }
-
-  @override
   String viewMore(int count) {
     return 'Show $count more';
   }

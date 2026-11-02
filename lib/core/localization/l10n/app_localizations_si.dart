@@ -161,11 +161,6 @@ class AppLocalizationsSi extends AppLocalizations {
   String get removeRecentSearch => 'මෑත සෙවුම්වලින් ඉවත් කරන්න';
 
   @override
-  String showMoreRecentSearches(int count) {
-    return 'තවත් $countක් පෙන්වන්න';
-  }
-
-  @override
   String viewMore(int count) {
     return 'තවත් ගැළපීම් $countක් ඇත';
   }

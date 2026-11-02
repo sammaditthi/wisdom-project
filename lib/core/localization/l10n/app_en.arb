@@ -256,16 +256,6 @@
     "description": "Tooltip on the ✕ that deletes one entry from the recent searches list"
   },
 
-  "showMoreRecentSearches": "Show {count} more",
-  "@showMoreRecentSearches": {
-    "description": "Link under the recent searches list that shows the older entries hidden below the first few",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-
   "viewMore": "Show {count} more",
   "@viewMore": {
     "description": "Expand link revealing additional secondary matches from the same text",
@@ -278,7 +268,7 @@
 
   "showMore": "Show more",
   "@showMore": {
-    "description": "Expand link under a definition cut to two lines; shows its full meaning"
+    "description": "Expand link under a definition cut to two lines, showing its full meaning, or under the recent searches, showing the older ones"
   },
 
   "showLess": "Show less",

@@ -12,7 +12,7 @@ import 'search_section_header.dart';
 
 /// Simplified overlay that only shows recent searches
 /// Displayed when search bar is focused with an empty query.
-/// Shows the newest few; the last row holds "Show N more", which opens the
+/// Shows the newest few; the last row holds "Show more", which opens the
 /// rest in place, and "Clear all", under the ✕ column.
 class RecentSearchOverlay extends ConsumerStatefulWidget {
   /// Callback when the overlay should be dismissed
@@ -33,15 +33,13 @@ class RecentSearchOverlay extends ConsumerStatefulWidget {
 }
 
 class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
-  /// Rows shown before "Show N more".
+  /// Rows shown before "Show more".
   static const _collapsedCount = 5;
 
-  // Row geometry, pinned on each row (Material 3's defaults) so the last
-  // row's links line up with the query text and the ✕ icons.
+  // Row padding, pinned on each row (Material 3's defaults) so the last
+  // row's links line up with the history icons and the ✕ icons.
   static const double _rowPadding = 16;
   static const double _rowEndPadding = 24;
-  static const double _leadingWidth = 24;
-  static const double _titleGap = 16;
   static const double _closeIconSize = 18;
 
   /// The ✕ button: Material 3's 40px at the compact density set on it.
@@ -52,14 +50,6 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
 
   /// Local, so each open starts collapsed.
   bool _expanded = false;
-
-  /// Where a row's query text starts. ListTile's gap shrinks at compact
-  /// density, as on desktop.
-  static double _textStart(BuildContext context) =>
-      _rowPadding +
-      _leadingWidth +
-      _titleGap +
-      Theme.of(context).visualDensity.horizontal * 2;
 
   /// Distance from the card's end to the ✕ cross's end. Touch platforms pad
   /// the ✕ button out to a 48px tap target, which moves the icon inwards.
@@ -140,9 +130,11 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
         SearchSectionHeader(label: l10n.recentSearches),
         ...visible.map((search) => _buildRow(context, search)),
         Padding(
-          // Labels line up with the query text and with the ✕ icons.
+          // List-wide links, so on the list's edges: under the history icons
+          // (where the header starts) and under the ✕ icons. A result tile's
+          // "Show more" sits under its text instead: it opens that text.
           padding: EdgeInsetsDirectional.only(
-            start: _textStart(context) - SearchLinkButton.padding,
+            start: _rowPadding - SearchLinkButton.padding,
             end: _closeIconEnd(context) - SearchLinkButton.padding,
             bottom: 4,
           ),
@@ -156,9 +148,7 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
                     child: SearchLinkButton(
                       onPressed: () => setState(() => _expanded = !_expanded),
                       icon: _expanded ? Icons.expand_less : Icons.expand_more,
-                      label: _expanded
-                          ? l10n.showLess
-                          : l10n.showMoreRecentSearches(hiddenCount),
+                      label: _expanded ? l10n.showLess : l10n.showMore,
                     ),
                   ),
                 )
@@ -189,8 +179,6 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       dense: true,
       contentPadding: const EdgeInsetsDirectional.only(
           start: _rowPadding, end: _rowEndPadding),
-      minLeadingWidth: _leadingWidth,
-      horizontalTitleGap: _titleGap,
       leading: Icon(
         Icons.history,
         size: 20,
