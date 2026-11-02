@@ -28,6 +28,8 @@ class SearchLinkButton extends StatelessWidget {
       iconAlignment: IconAlignment.end,
       label: Text(label),
       style: TextButton.styleFrom(
+        // A button ignores textStyle's colour; without this it paints primary.
+        foregroundColor: context.typography.linkLabel.color,
         textStyle: context.typography.linkLabel,
         minimumSize: const Size(0, 40),
         padding: const EdgeInsets.symmetric(horizontal: padding),
