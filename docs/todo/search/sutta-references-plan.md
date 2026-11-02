@@ -96,7 +96,7 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 
 - Every value must be a key in `tree.json`. The check goes in `static_site_generator/tool/verify_corpus_invariants.dart`.
 - `wisdom_shared` unit tests use a few copied rows, not the asset, so the package keeps building on its own.
-- Re-run the builder when SuttaCentral's numbering changes (a bilara-data sync, see `sc-sync-ingest.md`) and when `tree.json` node keys change (a canon sync).
+- Re-run the builder when `tree.json` node keys change (a canon sync). The research store is pinned to one SuttaCentral snapshot, so run its structural check before any rebuild: a uid the store cites must stay a key here (`docs/done/canon-sources/sc-sync-ingest.md` §3).
 
 ## Steps
 

@@ -227,9 +227,9 @@ checks its links, uploads nothing (Step 6 has just run the tests, and this step 
 skipped when they failed). Releasing is a separate `scripts/static_site/deploy.sh`.
 
 > The **RAG / research corpus is NOT rebuilt here.** It comes from a *different
-> source* (SuttaCentral `bilara-data`, not the tipitaka.lk canon), so it has its own
-> sync source and its own script — see
-> [sc-sync-ingest.md](./sc-sync-ingest.md).
+> source* (SuttaCentral `bilara-data`, not the tipitaka.lk canon) and is pinned
+> to one snapshot, not re-synced. See
+> [sc-sync-ingest.md](../../done/canon-sources/sc-sync-ingest.md).
 
 ### Step 8 — Write the provenance receipt (the missing piece)
 
