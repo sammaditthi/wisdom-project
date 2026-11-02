@@ -79,6 +79,8 @@ tools/package-lock.json
 # Generated databases (large files - regenerate with scripts)
 tools/*.db
 tools/*.csv
+# SuttaCentral clones the map builder reads (tools/suttacentral_map/sc_source.py)
+tools/suttacentral_map/.cache/
 assets/databases/*.db
 # Their SHA-256s, written by tools/db-finalize.js; travels with the databases
 assets/databases/manifest.json

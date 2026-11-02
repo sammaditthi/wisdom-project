@@ -1,0 +1,21 @@
+# Not in sc-to-bjt.json, with the reason. Written by build_map.py.
+# Texts the research store can cite (Sujato, Brahmali):
+research	pli-tv-bi-pm
+research	pli-tv-bi-vb-pj1-4
+research	pli-tv-bu-pm
+# By book:
+sn	sn-4-3-2-1	BJT only: no SuttaCentral text on its page (460)
+sn	sn-4-3-3-1	BJT only: no SuttaCentral text on its page (466)
+ja	kn-jat-22-9-1	BJT only: no SuttaCentral text on its page (294)
+ja	kn-jat-22-9-2	BJT only: no SuttaCentral text on its page (294)
+ja	kn-jat-22-9-3	BJT only: no SuttaCentral text on its page (294)
+ja	kn-jat-22-9-4	BJT only: no SuttaCentral text on its page (294)
+ja	kn-jat-22-9-5	BJT only: no SuttaCentral text on its page (294)
+ja	kn-jat-22-9-6	BJT only: no SuttaCentral text on its page (298)
+ja	kn-jat-22-9-7	BJT only: no SuttaCentral text on its page (304)
+ja	kn-jat-22-9-10	BJT only: no SuttaCentral text on its page (304)
+ja	kn-jat-22-9-11	BJT only: no SuttaCentral text on its page (306)
+ja	kn-jat-22-9-12	BJT only: no SuttaCentral text on its page (308)
+ja	kn-jat-22-9-13	BJT only: no SuttaCentral text on its page (308)
+pli-tv-bi-vb	pli-tv-bi-vb-pj1-4	no BJT node on its page (no page)
+vb	ap-vbh-18-1	BJT only: no SuttaCentral text on its page (276)
