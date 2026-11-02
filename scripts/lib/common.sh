@@ -308,10 +308,49 @@ release_tag_at_head() {
   git -C "$WISDOM_ROOT" tag --points-at HEAD | grep -qxF "$RELEASE_TAG"
 }
 
+# `github_tag_id` — prints the id GitHub holds for RELEASE_TAG. Returns 2 when
+# GitHub has no such tag (ls-remote's own 2) and 1 when it can't be asked, so
+# a network failure never reads as "the tag never reached GitHub".
+github_tag_id() {
+  local line
+  line=$(git -C "$WISDOM_ROOT" ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG")
+  case $? in
+    0) printf '%s' "${line%%[[:space:]]*}" ;;
+    2) return 2 ;;
+    *)
+      echo "error: could not ask GitHub whether $RELEASE_TAG is there (network?)." >&2
+      return 1
+      ;;
+  esac
+}
+
+# `release_tag_on_github` — succeeds when GitHub holds the same RELEASE_TAG as
+# this machine, so prod never runs a commit that exists only here.
+release_tag_on_github() {
+  local remote
+  remote=$(github_tag_id)
+  case $? in
+    0) ;;
+    2)
+      echo "error: $RELEASE_TAG is not on GitHub, so prod would run a commit only this" >&2
+      echo "       machine has. Run ./scripts/deploy.sh --prod: it pushes before it deploys." >&2
+      return 1
+      ;;
+    *) return 1 ;;
+  esac
+  # The tag's own id, not its commit: release_tag_at_head already tied it to HEAD.
+  if [ "$remote" != "$(git -C "$WISDOM_ROOT" rev-parse "refs/tags/$RELEASE_TAG")" ]; then
+    echo "error: GitHub's $RELEASE_TAG is not the one on HEAD here. A pushed tag" >&2
+    echo "       never moves: ./scripts/release.sh patch, then ./scripts/deploy.sh --prod." >&2
+    return 1
+  fi
+}
+
 # `require_release_commit BRANCH` — require_release_tree, and HEAD carries the
-# tag. Only scripts/deploy.sh makes that tag, after every test passed, so a
-# tagged HEAD is a tested one: a product's prod deploy may skip its tests.
-# The tag covers committed files only, so not the gitignored databases.
+# tag, as GitHub has it. Only scripts/deploy.sh makes that tag, after every
+# test passed, so a tagged HEAD is a tested one: a product's prod deploy may
+# skip its tests. The tag covers committed files only, so not the gitignored
+# databases.
 #
 # One repo version covers every product, so a site-only or Worker-only release
 # needs a tag too: ./scripts/release.sh patch, then ./scripts/deploy.sh --prod.
@@ -323,6 +362,7 @@ require_release_commit() {
     echo "       ./scripts/deploy.sh --prod tags it once every test passes." >&2
     return 1
   fi
+  release_tag_on_github || return 1
 }
 
 # `confirm_release QUESTION` — asks QUESTION [y/N] and exits unless the answer

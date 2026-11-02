@@ -90,9 +90,7 @@ if release_tag_at_head; then
 elif git rev-parse --verify --quiet "refs/tags/$RELEASE_TAG" >/dev/null; then
   AT=$(git rev-parse --short "$RELEASE_TAG^{commit}")
   # A failed push leaves the tag here only, and the pull after it moves HEAD on.
-  # ls-remote exits 2 for "no such ref"; any other failure is the network, and
-  # must not read as "drop the tag".
-  git ls-remote --exit-code --tags origin "refs/tags/$RELEASE_TAG" >/dev/null
+  github_tag_id >/dev/null
   case $? in
     0) ;;
     2)
@@ -100,10 +98,7 @@ elif git rev-parse --verify --quiet "refs/tags/$RELEASE_TAG" >/dev/null; then
       echo "       Drop it, then run this again: git tag -d $RELEASE_TAG" >&2
       exit 1
       ;;
-    *)
-      echo "error: could not ask GitHub whether $RELEASE_TAG is there (network?)." >&2
-      exit 1
-      ;;
+    *) exit 1 ;;   # github_tag_id said why
   esac
   echo "error: $RELEASE_TAG is already released, at $AT." >&2
   echo "       A new release needs a new version: ./scripts/release.sh patch" >&2

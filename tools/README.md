@@ -100,7 +100,7 @@ dart run tools/release.dart check         # exit 1 if drifted or no valid CHANGE
 You type `./scripts/release.sh` (`status`, or `cut <part>`) and then
 `./scripts/deploy.sh --prod`, which tags once every test passes.
 `require_release_commit` in `scripts/lib/common.sh` runs `check` and demands the
-tag it names be at HEAD, so every prod deploy needs a release. How to cut one:
+tag it names be at HEAD and on GitHub, so every prod deploy needs a release. How to cut one:
 `docs/general/how-to-release.md`. Why it is built this way:
 `docs/done/ops/versioning-system.md`.
 
