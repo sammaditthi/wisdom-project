@@ -1055,7 +1055,7 @@ abstract class AppLocalizations {
   /// Explanation under the first-visit progress bar: why the download is happening, and that the app waits for all of it
   ///
   /// In en, this message translates to:
-  /// **'The texts and the dictionary are saved on this device, so you can read offline. The app opens when the download finishes.'**
+  /// **'The texts and the dictionary are saved on this device for offline reading. The app opens when the download finishes.'**
   String get databaseInstallDescription;
 
   /// Line under the first-visit explanation, in every browser (Chrome too): the browser the web app is tested in

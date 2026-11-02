@@ -541,7 +541,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get databaseInstallDescription =>
-      'The texts and the dictionary are saved on this device, so you can read offline. The app opens when the download finishes.';
+      'The texts and the dictionary are saved on this device for offline reading. The app opens when the download finishes.';
 
   @override
   String get databaseInstallBrowserHint => 'Works best in Google Chrome.';
