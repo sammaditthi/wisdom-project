@@ -1,23 +1,52 @@
-/// Resolves a canonical SuttaCentral reference to our BJT tree node key.
+/// Resolves a canonical SuttaCentral reference to our BJT tree node key, and a
+/// BJT node back to its SuttaCentral page.
 ///
-/// Two pure steps, both cheap and I/O-free:
-///   1. [parseRef]        — "SN 15.3" / "sn15.3"  ->  canonical uid "sn15.3"
-///   2. [resolveToNodeKey] — "sn15.3"             ->  BJT node "sn-2-3-1-3"
+/// Pure and I/O-free: the concordance (`assets/data/sc-to-bjt.json`, built by
+/// `tools/suttacentral_map/`) is injected, so this stays plain Dart.
+///   1. [parseRef]         — "SN 15.3" / "sn15.3"  ->  canonical uid "sn15.3"
+///   2. [resolveToNodeKey] — "sn15.3"              ->  BJT node "sn-2-3-1-3"
+///   3. [suttaCentralUrl]  — BJT node              ->  its page on SuttaCentral
 ///
-/// The concordance [Map] is *injected* (the app/server loads it from the
-/// committed `assets/data/sc-to-bjt.json`), so this class stays pure Dart — no
-/// Flutter, trivially table-testable.
-///
-/// Why a map and not a formula? BJT nests and *bundles* saṁyuttas differently
-/// from SuttaCentral's flat numbering (e.g. SN 12+13 share one node), so both
-/// saṁyutta titles and positions diverge — only leaf sutta titles align the two
-/// editions. The mapping is therefore authored data. Full reasoning + evidence:
-/// `docs/todo/search/sutta-references-plan.md` (Part B).
+/// Why a map and not a formula: `docs/todo/search/sutta-references-plan.md`.
 class SuttaCentralRefResolver {
   /// SuttaCentral uid (e.g. `sn15.3`) -> BJT node key (e.g. `sn-2-3-1-3`).
   final Map<String, String> _scToNode;
 
-  const SuttaCentralRefResolver(this._scToNode);
+  /// BJT node key -> the SuttaCentral uid its link opens.
+  final Map<String, String> _nodeToSc;
+
+  /// SuttaCentral uid -> the translator whose English the link opens.
+  final Map<String, String> _translators;
+
+  const SuttaCentralRefResolver(
+    this._scToNode, {
+    Map<String, String> nodeToSc = const {},
+    Map<String, String> translators = const {},
+  })  : _nodeToSc = nodeToSc,
+        _translators = translators;
+
+  /// Reads the asset's shape: `map` (uid -> node), `reverse` (node -> uid where
+  /// the first uid naming a node isn't the one to open) and `english`
+  /// (translator -> the uids opened in their translation).
+  factory SuttaCentralRefResolver.fromJson(Map<String, dynamic> json) {
+    final map = _strings(json['map']);
+    final nodeToSc = <String, String>{};
+    map.forEach((uid, node) => nodeToSc.putIfAbsent(node, () => uid));
+    nodeToSc.addAll(_strings(json['reverse']));
+    final english = (json['english'] as Map<String, dynamic>?) ?? const {};
+    return SuttaCentralRefResolver(
+      map,
+      nodeToSc: nodeToSc,
+      translators: {
+        for (final entry in english.entries)
+          for (final uid in (entry.value as List<dynamic>).cast<String>())
+            uid: entry.key,
+      },
+    );
+  }
+
+  static Map<String, String> _strings(Object? value) =>
+      ((value as Map<String, dynamic>?) ?? const {}).cast<String, String>();
 
   /// Book / nikāya abbreviations we accept as a *reference* (lowercased).
   ///
@@ -91,6 +120,22 @@ class SuttaCentralRefResolver {
   /// Direct uid -> node key, for callers that already hold a canonical uid
   /// (e.g. RAG citations). `null` if not in the concordance.
   String? nodeKeyForUid(String uid) => _scToNode[uid];
+
+  /// The SuttaCentral uid a BJT node links to, or `null` where the two
+  /// editions don't line up (never the nearest one instead).
+  String? uidForNodeKey(String nodeKey) => _nodeToSc[nodeKey];
+
+  /// The node's page on SuttaCentral: the preferred English translation when
+  /// there is one, else SuttaCentral's own page for that text or division.
+  Uri? suttaCentralUrl(String nodeKey) {
+    final uid = _nodeToSc[nodeKey];
+    if (uid == null) return null;
+    final translator = _translators[uid];
+    return Uri.https(
+      'suttacentral.net',
+      translator == null ? '/$uid' : '/$uid/en/$translator',
+    );
+  }
 
   /// True once the concordance is non-empty. Lets a caller skip the reference
   /// check entirely before the asset has finished loading.

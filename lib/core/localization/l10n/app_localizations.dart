@@ -1142,6 +1142,12 @@ abstract class AppLocalizations {
   /// **'Open as web page'**
   String get openAsWebPage;
 
+  /// Item in the reader's Share menu that opens the text being read on suttacentral.net, in its English translation where there is one. SuttaCentral is a name: never translated
+  ///
+  /// In en, this message translates to:
+  /// **'Open on SuttaCentral'**
+  String get openOnSuttaCentral;
+
   /// Tooltip of the reader toolbar's sliders button, which holds only the settings you change while reading (font size, hide navigation bar)
   ///
   /// In en, this message translates to:

@@ -6,6 +6,7 @@ import '../../domain/entities/search/search_result.dart';
 import '../../domain/entities/search/search_result_type.dart';
 import 'navigation_tree_provider.dart';
 import 'search_provider.dart';
+import 'tab_provider.dart' show activeNodeKeyProvider;
 
 /// Datasource that loads the committed SuttaCentral→BJT concordance asset.
 final suttaCentralConcordanceDataSourceProvider =
@@ -20,8 +21,18 @@ final suttaCentralConcordanceDataSourceProvider =
 /// the reference feature degrades to nothing rather than blocking search.
 final suttaCentralRefResolverProvider =
     FutureProvider<SuttaCentralRefResolver>((ref) async {
-  final map = await ref.watch(suttaCentralConcordanceDataSourceProvider).load();
-  return SuttaCentralRefResolver(map);
+  final json =
+      await ref.watch(suttaCentralConcordanceDataSourceProvider).load();
+  return SuttaCentralRefResolver.fromJson(json);
+});
+
+/// The active tab's page on SuttaCentral, or null when the tab's node has no
+/// counterpart there (or the concordance hasn't loaded).
+final activeSuttaCentralUrlProvider = Provider<Uri?>((ref) {
+  final nodeKey = ref.watch(activeNodeKeyProvider);
+  final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+  if (nodeKey == null || resolver == null) return null;
+  return resolver.suttaCentralUrl(nodeKey);
 });
 
 /// A single, high-priority "jump to this sutta" hit, produced when the current

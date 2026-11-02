@@ -5,10 +5,12 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/utils/url_launcher_utils.dart';
 import '../../providers/deep_link_provider.dart';
+import '../../providers/reference_search_provider.dart';
 import '../../providers/tab_provider.dart';
 
 // The reader's outward actions (deep-linking doc, Section B): Copy link, in
-// the Share menu where sharing grows, and on the web Open as web page.
+// the Share menu where sharing grows, Open on SuttaCentral, and on the web
+// Open as web page.
 
 /// Copies the active tab's shareable link and confirms with a SnackBar.
 Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
@@ -27,6 +29,15 @@ Future<void> openAsWebPage(BuildContext context, WidgetRef ref) async {
   if (link == null) return;
   final url = await ref.read(tipitakaLinkUrlBuilderProvider)(link);
   if (!context.mounted) return;
+  await UrlLauncherUtils.launchInAppBrowser(context, url.toString());
+}
+
+/// Opens the active tab's text on SuttaCentral: Bhikkhu Bodhi's translation
+/// when SuttaCentral has it, else Bhikkhu Sujato's (Ajahn Brahmali's for the
+/// Vinaya). The Share menu leaves the row out when there is no counterpart.
+Future<void> openOnSuttaCentral(BuildContext context, WidgetRef ref) async {
+  final url = ref.read(activeSuttaCentralUrlProvider);
+  if (url == null) return;
   await UrlLauncherUtils.launchInAppBrowser(context, url.toString());
 }
 

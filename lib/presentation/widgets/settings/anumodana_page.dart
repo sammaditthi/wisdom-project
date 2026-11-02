@@ -27,7 +27,9 @@ class AnumodanaPage extends StatelessWidget {
 
   /// Each source's own logo, unmodified — see the plan doc for provenance.
   static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
-  static const _suttaCentralLogo = 'assets/icons/sources/suttacentral.webp';
+
+  /// Also the Share menu's mark for Open on SuttaCentral.
+  static const suttaCentralLogo = 'assets/icons/sources/suttacentral.webp';
 
   /// The one dictionary whose licence asks to be cited where it is used.
   static const _dpdId = 'DPD';
@@ -66,7 +68,7 @@ class AnumodanaPage extends StatelessWidget {
             SettingsRow(
               label: 'SuttaCentral',
               hint: l10n.anumodanaSuttaCentralUse,
-              leading: const SettingsTile(imageAsset: _suttaCentralLogo),
+              leading: const SettingsTile(imageAsset: suttaCentralLogo),
               trailing: const _OpenLinkButton(
                 name: 'SuttaCentral',
                 url: _suttaCentralUrl,

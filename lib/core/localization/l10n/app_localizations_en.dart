@@ -592,6 +592,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get openAsWebPage => 'Open as web page';
 
   @override
+  String get openOnSuttaCentral => 'Open on SuttaCentral';
+
+  @override
   String get readerSettings => 'Reader settings';
 
   @override
