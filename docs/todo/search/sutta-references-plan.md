@@ -1,18 +1,19 @@
 # Sutta references — plan
 
-Started 2026-10-11. Not started; nothing built yet.
+Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A and A5 not started.
 
 Typing "SN 15.3" opens that sutta, and research answers link their sources the same way. This doc holds everything about it. It replaces Task 11 of `search-pane-redesign-plan.md`, `sutta-references-standards-report.md` (2026-10-10) and `suttacentral-bjt-concordance-findings.md` (2026-06-27). The last two are deleted.
 
-Two parts, done together:
+Three parts:
 
 - **Part A — read the reference.** Turn what people type ("SN 15.3", "Dhp 5", "AN 3:65") into a SuttaCentral ID (`sn15.3`).
-- **Part B — the lookup file.** Turn that ID into our BJT page. Today it covers SN 15 only, so every other reference opens nothing. Part A alone changes little for users; Part B is what makes references open.
+- **Part B — the lookup file.** Turn that ID into our BJT page, for the whole canon. Done: research citations open in the reader.
+- **Part C — the way back.** The reader opens the text it shows on SuttaCentral, from the Share menu. Done.
 
 ## Rules (decided)
 
 - **One numbering: SuttaCentral's.** A reference opens the BJT sutta that SuttaCentral's number points to. Bodhi's translations use the same numbers. Old PTS numbers for a few SN and AN suttas are ignored.
-- **One table of book names for the whole project:** the app, the research server and anything later. No other list anywhere.
+- **One table of book names for the whole project:** the app, the research Worker and anything later. No other list anywhere.
 - **The normal search always runs.** A reference only adds the jump row on top; a local result is never lost. No "reference mode" (2026-10-10).
 - **A reference with no BJT page opens nothing.** Never the nearest page instead.
 - The table is a `const` in `wisdom_shared`, not a JSON asset: no new static files on the app side (2026-10-06).
@@ -20,11 +21,11 @@ Two parts, done together:
 
 ## How it works today
 
-- `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `resolveToNodeKey` and `nodeKeyForUid` look the ID up in `assets/data/sc-to-bjt.json`.
+- `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `resolveToNodeKey` and `nodeKeyForUid` look the ID up in `assets/data/sc-to-bjt.json`; `suttaCentralUrl` goes the other way (Part C). `SuttaCentralRefResolver.fromJson` reads the asset.
 - Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview when `parseRef` reads a reference.
 - Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
-- Research: the server (`research_server/`, the live Cloudflare Worker) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet."
-- The research server keeps its own list (`NIKAYAS` in `research_server/src/refs.ts`), and `refFromUid` capitalises every book. So answers show "DHP 1-20" and "THAG 1.1", and Vinaya citations show raw IDs like `pli-tv-bu-vb-pj1`.
+- Research: the research Worker (`research_server/`, on Cloudflare) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet." Since Part B that is only `unmatched.txt`'s research list.
+- The research Worker keeps its own list (`NIKAYAS` in `research_server/src/refs.ts`), and `refFromUid` capitalises every book. So answers show "DHP 1-20" and "THAG 1.1", and Vinaya citations show raw IDs like `pli-tv-bu-vb-pj1`.
 
 ## Part A — read the reference
 
@@ -60,57 +61,64 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 - Saving a reference as typed loses nothing: running "an 3" again converts it again, while a saved "අන් 3" would lose the jump.
 - Why this is enough (measured 2026-10-10 on `bjt.db`, `dict.db` and `tree.json`, all six match modes): a capitalised book plus a number finds nothing in the default match mode. In "near" and "anywhere" a few do ("A 3.65", "Pe 1"), and those hits still show because the normal search runs. Capital S, M, C, U, V and J have no Singlish letter, so "SN" converts to "Sණ්", which matches nothing. A few rare Singlish words start like a book (AN → ඇණ, Ne → ණෙ, Pe → ඵෙ, Thag → ථග); their preview hides for one keystroke and returns with the next letter. Our search boxes don't turn on auto-capitals, so phones type lowercase. No corpus test needed.
 
-**A5. The research server uses the same table.** `NIKAYAS` and the capitalising in `refFromUid` go. Display names and the prose matcher (which must take "SN 15:3" too, not link it as "SN 15") come from the one table. How is open: see "To decide", item 1. Separate commit; the user decides when to deploy the worker.
+**A5. The research Worker uses the same table.** `NIKAYAS` and the capitalising in `refFromUid` go. Display names and the prose matcher (which must take "SN 15:3" too, not link it as "SN 15") come from the one table. How is open: see "To decide", item 1. Separate commit; the user decides when to deploy the worker.
 
 ## Part B — the lookup file
 
-`assets/data/sc-to-bjt.json`: SuttaCentral ID → BJT node key. Today it holds SN 15, checked by hand. Part B builds it for the whole canon with a tool, `tools/suttacentral_map/`, modelled on `tools/mahamevnawa_map/build_map.py`: propose pairs by position, confirm each one against an independent signal, drop any pair the signal contradicts, and write the rest to `unmatched.txt` with a reason.
+`assets/data/sc-to-bjt.json`, built by `python3 tools/suttacentral_map/build_map.py`. Nothing in it is hand-edited: change the builder and re-run it.
 
 **Why it can't be a formula.**
 
 - No source has the mapping. The tipitaka.lk project has no SuttaCentral IDs, and neither has our `tree.json`.
-- Each book nests differently in BJT:
-  - SN: book → saṁyutta → vagga → sutta (`sn-2` → `sn-2-3` → `sn-2-3-1` → `sn-2-3-1-3`). The vagga level inside each saṁyutta is always there.
-  - DN: vagga → sutta (`dn-1-1`). MN: paṇṇāsaka → vagga → sutta.
-  - Dhp: each chapter is one page (`kn-dhp-1`).
-  - AN 1: BJT splits finer than SuttaCentral (`an-1-1-1`, `an-1-1-2` … where SuttaCentral has `an1.1-10`).
-- BJT puts SN 12 and SN 13 in one node, `sn-2-1`. It is titled අභිසමයසංයුත්තං (SN 13) but starts with පටිච්චසමුප්පාදසුත්තං (SN 12.1), and SN 13 is its tenth vagga. So from SN 14 on the positions shift by one, and saṁyutta titles can't be trusted.
-- Expect drift where the text abbreviates repeats (peyyāla), as the Mahamevnawa build does.
-- Sutta titles are the reliable check, but not exact. Two of SN 15's suttas have other names in BJT: SN 15.4 Khīra is මාතුථඤ්ඤසුත්තං, SN 15.10 Puggala is එකපුග්ගලසුත්තං. So keep a short hand-made list of such pairs, and flag a near-miss for review instead of dropping it.
+- Each book nests differently in BJT: SN has book → saṁyutta → vagga → sutta (`sn-2-3-1-3`), DN vagga → sutta (`dn-1-1`), MN paṇṇāsaka → vagga → sutta. A Dhp chapter is one node (`kn-dhp-1`). AN 1 splits finer than SuttaCentral (`an-1-1-1` … where SuttaCentral has `an1.1-10`).
+- BJT puts SN 12 and SN 13 in one node, `sn-2-1`, titled for SN 13 but starting with SN 12.1. So positions shift, and saṁyutta titles can't be trusted.
+- Peyyāla: SuttaCentral often abbreviates a run of suttas into one range (`sn24.20-35`) that BJT spells out node by node, and sometimes the other way round.
+- Titles differ between the editions more than expected (SN 15.4 Khīra is මාතුථඤ්ඤසුත්තං in BJT), so they can't be the main signal.
 
-**What the builder reads.**
+**How it pairs (decided 2026-11-02).** SuttaCentral does publish BJT page numbers: bilara-data's `reference/` files mark each BJT page break on its segments, `bj<volume>.<page>` (`bj17.1.2` for a split volume), and those pages are the `pageNum`s in our `assets/text` files. That is the independent signal, so no title list is needed:
 
-- BJT: `assets/data/tree.json`, a flat map nodeKey → `[paliTitle, sinhalaTitle, level, [page, entry], parentKey, contentFileId]`. The Pali title is in Sinhala script. `parentKey` is `root` at the top. A leaf is a node that no other node names as its parent (`TipitakaTree.isLeaf`); `contentFileId` is set on every node, so it can't tell them apart.
-- Gotchas: sort children by the number at the end, not as text (`-10` sorts before `-2`). Titles hold ZWJ (U+200D): strip it before comparing. Commentary nodes start with `atta-`: map to the plain node.
-- SuttaCentral: the IDs, ranges and Pali titles of every book, Abhidhamma and Vinaya included, from `suttacentral.net/api/suttaplex/<book>`. The local `~/Desktop/Dev/bilara-data-readonly` has only the translations. SuttaCentral's titles are in Roman letters, BJT's in Sinhala script, so convert one before comparing.
-- Check first: does SuttaCentral publish BJT page numbers (bilara-data's `reference/` folder)? An older plan said so; it was never checked. If it does, that is a stronger signal than titles.
+- Per book, SuttaCentral's texts in its order are aligned with BJT's text-bearing nodes in reading order: the heaviest chain of pairs whose pages agree, titles breaking ties. A range gets one slot per sutta it covers, so it has to line up with BJT's spelled-out nodes.
+- A text's page is the marker on its first segment, or the page the text before it ended on. A text with no marker of its own that opens a new volume may also start on the page before its first marker.
+- Between pairs: a text runs on over the BJT nodes after it while they sit within its pages (or as many as its range counts). A text with no node of its own sits inside the node before it, if its page agrees. What is left pairs on page and title regardless of order; Jātaka 542 and 543 are ordered differently in the two editions.
+- BJT keeps text in some parents too (a Vinaya rule before its case stories), so a parent whose own text runs past its heading counts as a node.
+- A SuttaCentral division (vagga, saṁyutta, nipāta, the book) maps to the BJT node holding exactly its texts. A BJT-only sutta inside doesn't stop it; a node mixing two divisions (`sn-2-1`) gets none.
+
+**What the builder reads.** All pinned, so two runs give the same bytes:
+
+- bilara-data at the research store's snapshot (`published@ce5b98f`, `docs/done/canon-sources/sc-sync-ingest.md`): the page markers, the Pali names of texts and divisions, and the file lists of the root text and the two ingested translations.
+- sc-data (pinned in `sc_source.py`): SuttaCentral's navigation tree, and its legacy translations, where Bhikkhu Bodhi's are.
+- Ours: `tree.json` and `assets/text`. It clones what it needs into `tools/suttacentral_map/.cache/` (ignored), so it needs nothing on the Desktop.
 
 **What the file holds.**
 
-- Keys are SuttaCentral IDs exactly as SuttaCentral writes them, ranges included (`dhp1-20`). Research citations carry these IDs, so they open directly.
-- The value is the BJT node that holds the text. A range maps to the node that holds the whole range.
-- No BJT node holds it → no entry.
-- Root text only, never an `atta-` node.
+- `map`: SuttaCentral ID → BJT node, texts and divisions, in SuttaCentral's order. A range maps to the node holding the whole range when one does, else to where it starts. Root text only, never an `atta-` node. No BJT node holds it → no entry.
+- `reverse`: BJT node → SuttaCentral ID, for the nodes `map` doesn't name the right way round (a node inside a range, or one a division shares with its single text, where the text wins).
+- `english`: the uids whose link opens a translation, by translator. The reader prefers Bhikkhu Bodhi, then Bhikkhu Sujato, or Ajahn Brahmali for the Vinaya. Anything else opens SuttaCentral's own page for it.
+- `tools/suttacentral_map/unmatched.txt` lists what is in neither, with the reason, the research store's uids first. `review.txt` lists pairs whose titles differ, for a human to glance at.
 
 **Keeping it right.**
 
-- Every value must be a key in `tree.json`. The check goes in `static_site_generator/tool/verify_corpus_invariants.dart`.
-- `wisdom_shared` unit tests use a few copied rows, not the asset, so the package keeps building on its own.
-- Re-run the builder when `tree.json` node keys change (a canon sync). The research store is pinned to one SuttaCentral snapshot, so run its structural check before any rebuild: a uid the store cites must stay a key here (`docs/done/canon-sources/sc-sync-ingest.md` §3).
+- `verify_corpus_invariants.dart` section 7: every node the file names is in `tree.json`. It runs at every canon sync; re-run the builder when it fails.
+- `.github/workflows/suttacentral-check.yml`, every Monday (and from the Actions tab): `check_upstream.py` reads SuttaCentral's file lists as they are today and fails when an ID the file names, or a translation the reader opens, is gone. Research citations keep working either way, because the store and this file are pinned together; what breaks is the reader's link. Then fix it in the builder (an alias for the moved ID), not by moving the pin.
+- Moving the bilara-data pin only goes with a re-ingest of the store (`sc-sync-ingest.md` §2).
+
+## Part C — the way back
+
+The reader's Share menu has "Open on SuttaCentral" when the active tab's node has a counterpart there (`activeSuttaCentralUrlProvider`, `openOnSuttaCentral` in `reader_link_actions.dart`). It opens `suttacentral.net/<uid>/en/<translator>` for a text with a translation, else `suttacentral.net/<uid>`, which for a division is SuttaCentral's list of its suttas. No counterpart, a commentary tab, or a BJT node mixing two of SuttaCentral's divisions: the row isn't shown. Never the nearest page instead.
 
 ## Steps
 
-1. A1, A2 and A4: the table, the new forms, the preview rule.
-2. Part B: the builder and the full lookup file, with A3 in the resolver.
-3. A5: the research server on the one table. Its own commit.
+1. A1, A2, A3 and A4: the table, the new forms, a number inside a range, the preview rule. A3 moved here from step 2: research citations carry exact IDs, so only typed references need it.
+2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson`, `uidForNodeKey` and `suttaCentralUrl`; no unit tests for them yet.
+3. A5: the research Worker on the one table. Its own commit.
 
 The test agent writes the unit tests (CLAUDE.md). Add a handover note under each step when it's done.
 
 ## To decide
 
-1. **How the research server shares the one table.** TypeScript can't import Dart. The server uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
+1. **How the research Worker shares the one table.** TypeScript can't import Dart. The Worker uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
    - The Dart table stays the source, and a small tool writes a generated TypeScript copy for the worker.
-   - The app writes `ref` itself from the `uid` (it already has the table), and finding references in the answer moves to the app too. The server then needs no book names, but the answer format changes.
+   - The app writes `ref` itself from the `uid` (it already has the table), and finding references in the answer moves to the app too. The Worker then needs no book names, but the answer format changes.
 2. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the full lookup file will be much bigger than today's seed.
 
 ## Not supported
@@ -122,7 +130,8 @@ Edge cases, left out on purpose: old PTS numbers, PTS volume/page references ("S
 - [ ] "SN 15.3", "sn15.3", "SN 15:3", "Dhp 5", "Tha Ap 1" and "AN 3.65" show no preview, are saved as typed, and open their BJT page.
 - [ ] "SN", "Dhp" and "Thag" alone show no preview. "an", "sn", "a", "s", "m" and "KN" alone show theirs.
 - [ ] `displayRef('kp1')` is "Kp 1". Research answers show "Dhp 1-20", not "DHP 1-20", and "Bu Pj 1", not `pli-tv-bu-vb-pj1`.
-- [ ] The lookup file covers Sutta, Abhidhamma and Vinaya, apart from what `unmatched.txt` lists with a reason. Every value exists in `tree.json`.
+- [x] The lookup file covers Sutta, Abhidhamma and Vinaya, apart from what `unmatched.txt` lists with a reason. Every value exists in `tree.json`.
+- [x] The reader opens the text it shows on SuttaCentral, Bhikkhu Bodhi's translation first, and a weekly check says when SuttaCentral moves a page it links to.
 - [ ] No list of book names exists outside the one table.
 
 ## Appendix: abbreviations by source

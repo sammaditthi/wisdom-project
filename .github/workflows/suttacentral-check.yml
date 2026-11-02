@@ -1,0 +1,26 @@
+# Weekly: does every SuttaCentral page the reader links to still exist?
+# Read-only. A red run emails whoever last edited the schedule below; its log and
+# summary list the sutta IDs. What to do then: docs/todo/search/sutta-references-plan.md.
+name: SuttaCentral check
+
+on:
+  schedule:
+    - cron: '23 4 * * 1' # Mondays, 04:23 UTC
+  workflow_dispatch: # the "Run workflow" button
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            assets/data/sc-to-bjt.json
+            tools/suttacentral_map
+          sparse-checkout-cone-mode: false
+      - name: Compare with SuttaCentral today
+        run: python3 tools/suttacentral_map/check_upstream.py
