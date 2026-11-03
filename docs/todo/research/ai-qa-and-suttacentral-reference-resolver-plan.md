@@ -1,13 +1,11 @@
 # AI Q&A Integration & SuttaCentral Reference Resolver — Design & Plan
 
 > **Status:** Steps 1–5 **BUILT**, backend now **LIVE end-to-end** (2026-06-27) — Q&A stub vertical → Python
-> `/research` backend → remote wiring → resolver core → search-by-reference; the last
-> two on a **3-entry verified seed** (`sn15.1–3`). **Part D (RAG deep-links) in
-> progress since 2026-07-06** under the rewritten
+> `/research` backend → remote wiring → resolver core → search-by-reference.
+> **Part D (RAG deep-links) in progress since 2026-07-06** under the rewritten
 > [`deep-linking-and-shareable-urls.md`](./deep-linking-and-shareable-urls.md)
-> plan (seed growing to all of SN 15). **Deferred:** the full concordance
-> **build tool** (`tools/suttacentral_map/`) that grows the seed to
-> all suttas. Per-step state is in the Build-order
+> plan. The concordance build tool (`tools/suttacentral_map/`) maps the whole
+> canon since 2026-11-02. Per-step state is in the Build-order
 > section; concordance evidence in
 > [`sutta-references-plan.md`](../search/sutta-references-plan.md) (Part B).
 > **Captured:** 2026-06-27.
@@ -318,7 +316,7 @@ a **concordance**, built once, shipped as data.
 | Piece | Location | Mirrors |
 |---|---|---|
 | Build-time map generator (Python) | `tools/suttacentral_map/build_map.py` | `tools/mahamevnawa_map/build_map.py` |
-| Committed concordance asset | `tools/suttacentral_map/sc-to-bjt.json` → shipped as `assets/data/` | `bjt-to-mahamevnawa.json` |
+| Committed concordance asset | `assets/data/sc-to-bjt.json`, written by the builder | `bjt-to-mahamevnawa.json` |
 | Pure-Dart runtime resolver | `packages/wisdom_shared/lib/src/refs/` | existing `wisdom_shared` parsers |
 
 Putting the resolver in **`wisdom_shared`** (not in a RAG-private helper) is
@@ -326,7 +324,7 @@ deliberate: it is consumed by **both** the Flutter client (search + deep-links)
 and could later serve the Python backend's linkifier or the planned static HTML
 site — it is shared canon-addressing logic, exactly what `wisdom_shared` is for.
 
-### B.3 The runtime API (two clean steps)
+### B.3 The runtime API (three steps)
 
 ```dart
 // packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart
@@ -338,16 +336,20 @@ String? parseRef(String input);
 
 /// Step 2 — resolve a uid to our BJT tree node key via the concordance.
 /// "sn15.3"  →  "sn-2-3-1-3"   (null if not in the map)
-String? resolveToNodeKey(String uid);
+String? nodeKeyForUid(String uid);
+
+/// Step 3 — the way back: a BJT node's page on SuttaCentral (the reader's
+/// Open on SuttaCentral). Null where the two editions don't line up.
+Uri? suttaCentralUrl(String nodeKey);
 ```
 
 - **`parseRef`** is pure and free (a small regex over the known nikāya/book
   abbreviations — the same set the design doc's linkifier uses:
   `SN MN DN AN KN Snp Dhp Ud Iti Thag Thig …`, plus Vinaya `pli-tv-*`).
-- **`resolveToNodeKey`** is an O(1) lookup into the loaded concordance map.
-- The map is **bidirectional/injective** (like the Mahamevnawa map), so the
-  reverse (`bjtNodeKey → scUid`) is available for "this page is **SN 15.3**"
-  labels and for the backend to know what to cite.
+- **`nodeKeyForUid`** is an O(1) lookup into the loaded concordance map.
+- The map is **not** one-to-one: one BJT node can hold several SuttaCentral
+  texts. The way back takes the first uid naming a node, unless the asset's
+  `reverse` names another (`sutta-references-plan.md`, Part B).
 
 ### B.4 Building the concordance (`tools/suttacentral_map/`)
 
@@ -385,7 +387,7 @@ route.
    anticipates growth (`definition` is marked "future feature").
 2. In the search flow (`SearchStateNotifier` / `searchTopResults`), **before**
    firing FTS: `final uid = parseRef(query); if (uid != null) { final node =
-   resolveToNodeKey(uid); … }`. On a hit, prepend a single high-priority
+   nodeKeyForUid(uid); … }`. On a hit, prepend a single high-priority
    `SearchResult(resultType: reference, nodeKey: node, title: "SN 15.3", …)`.
 3. Normal FTS still runs underneath, so a literal-text match isn't lost.
 
@@ -412,7 +414,8 @@ Decisions locked 2026-07-06 — see the rewritten
   citation still behaves identically to a shared link.
 - **UI:** tapping a cited source opens a **bottom sheet** (ref + title +
   snippet) with **Open in reader** when the uid resolves; a graceful
-  "not linked yet" note otherwise (seed coverage grows over time).
+  "not linked yet" note otherwise (since 2026-11-02, only the research uids in
+  `tools/suttacentral_map/unmatched.txt`).
 - **Granularity:** v1 is **sutta-level** (open the file/page for SN 15.3).
   Segment-level (`sn15.3:1.4` → the exact BJT paragraph) is genuinely hard —
   BJT paragraphs ≠ SC segments and our BJT entries aren't SC-segment-tagged yet
@@ -441,9 +444,9 @@ never**, and the resolver should add **zero** runtime DB load.
 - **The resolver concordance** is a **committed JSON asset** loaded once into an
   in-memory map — the same idiom as `file-map.json` and `bjt-to-mahamevnawa.json`
   — **not** a SQLite table, and **not** a new column inside the FTS/dict DBs
-  (which would couple the content pipeline to a cross-edition concern). Map at
-  the saṁyutta/vagga level and resolve the sutta leaf positionally underneath, so
-  the asset stays a few KB.
+  (which would couple the content pipeline to a cross-edition concern). Every
+  text has its own row; nothing is guessed by position
+  (`sutta-references-plan.md`, Part B).
 - **The FTS4 hybrid** (design §5.6 — merge File Search with our FTS index for
   exact proper nouns) is **deferred to v1.1**, and when it lands it must
   **reuse the existing `FTSDataSource` / `CachingTextSearchRepository`** rather
@@ -474,7 +477,7 @@ Net: chat → `shared_preferences`; resolver → in-memory JSON map; hybrid (lat
 5. **i18n.** All dialog strings through ARB, per `CLAUDE.md`.
 6. **Tests.** Per `CLAUDE.md`, none are written unless requested. Natural seams
    when wanted: the datasource (HTTP→model), the repository (exception→`Either`),
-   and — highest value — `parseRef` / `resolveToNodeKey` (pure functions, easy
+   and — highest value — `parseRef` / `nodeKeyForUid` (pure functions, easy
    to table-test, and the resolver is correctness-critical for both consumers).
 7. **Bonus synergy.** Because `/research` is just an HTTP contract and the resolver
    lives in `wisdom_shared`, both can later serve the planned static HTML site
@@ -501,16 +504,14 @@ Net: chat → `shared_preferences`; resolver → in-memory JSON map; hybrid (lat
    `_to_citations`. *(separate deployable)*
 3. ✅ **DONE — Swap stub → remote** — `researchDataSourceProvider` selects
    `ResearchRemoteDataSourceImpl` (default `http://localhost:8081`). *(Part A complete)*
-4. ◑ **PARTIAL — Resolver core** — the **runtime** half is done: pure `parseRef`
-   / `resolveToNodeKey` (+ `nodeKeyForUid` / `displayRef`) in `wisdom_shared`,
-   loaded from a committed `assets/data/sc-to-bjt.json`. The **build tool**
-   `tools/suttacentral_map/` is **deferred**; `sc-to-bjt.json` ships as a 3-entry
-   hand-verified **seed** (`sn15.1–3 → sn-2-3-1-{1,2,3}`). Growing it is data
-   only — no code change. *(Part B)*
+4. ✅ **DONE — Resolver core** — pure `parseRef` / `nodeKeyForUid` /
+   `displayRef` / `suttaCentralUrl` in `wisdom_shared`, loaded from the committed
+   `assets/data/sc-to-bjt.json`, which `tools/suttacentral_map/` builds for the
+   whole canon (2026-11-02). *(Part B)*
 5. ✅ **DONE — Search by reference** — `SearchResultType.reference` (excluded
    from the tab bar) + a pinned in-memory reference tile above FTS results
    (`referenceSearchResultProvider` + `_ReferenceResultRow`), reusing the normal
-   tap→open path. Resolves any uid in the seed. *(Part C — ships independently of RAG)*
+   tap→open path. Resolves any uid in the map. *(Part C — ships independently of RAG)*
 6. ◑ **IN PROGRESS (2026-07-06) — RAG deep-links** — citation `uid` resolved
    client-side → `TipitakaLink` → LinkOpener → reader tab; bottom-sheet citation UI;
    universal `/tipitaka/<nodeKey>` URLs + `app_links`/`Uri.base` receiving; seed
@@ -533,9 +534,6 @@ Net: chat → `shared_preferences`; resolver → in-memory JSON map; hybrid (lat
 - **Resolver output identity** — node key (`sn-2-3-1-3`) for search vs `textId`
   (`sn1-1`) for routing; confirm the existing nodeKey↔textId mapping covers both
   consumers or add a thin adapter.
-- **Concordance coverage policy** — what to do for uids with no clean BJT target
-  (the Mahamevnawa build shows ~bundled/peyyāla regions will exist): drop, or
-  resolve to the nearest containing node?
 
 ---
 
