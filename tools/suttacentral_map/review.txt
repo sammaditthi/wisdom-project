@@ -925,8 +925,7 @@ pp	pp2.7	ap-pug-2-7	Sattakapuggalapaññatti	සත්තක නිද්දෙ�
 pp	pp2.8	ap-pug-2-8	Aṭṭhakapuggalapaññatti	අට්ඨක නිද්දෙසො
 pp	pp2.9	ap-pug-2-9	Navakapuggalapaññatti	නවක නිද්දෙසො
 pp	pp2.10	ap-pug-2-10	Dasakapuggalapaññatti	දසක නිද්දෙසො
-kv	kv16.10	ap-kvu-16-10	Rūpārūpadhātupariyāpannakathā	රූපරාගො රූපධාතුපරියාපන්නො
-අරූපරාගො අරූපධාතුපරියාපන්නොති කථා
+kv	kv16.10	ap-kvu-16-10	Rūpārūpadhātupariyāpannakathā	රූපරාගො රූපධාතුපරියාපන්නො අරූපරාගො අරූපධාතුපරියාපන්නොති කථා
 ya	ya1.1.1	ap-yam-1-1	Mūlavārauddesa	පඤ්ඤත්ති උද්දෙසවාරො
 ya	ya1.2.1	ap-yam-1-2	Mūlavāraniddesa	නිද්දෙසවාරො
 ya	ya4.1.1	ap-yam-4-1	Paṇṇattivārauddesa	උද්දෙසවාරො

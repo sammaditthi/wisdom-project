@@ -5,7 +5,8 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/utils/url_launcher_utils.dart';
 import '../../providers/deep_link_provider.dart';
-import '../../providers/reference_search_provider.dart';
+import '../../providers/suttacentral_provider.dart'
+    show activeSuttaCentralUrlProvider;
 import '../../providers/tab_provider.dart';
 
 // The reader's outward actions (deep-linking doc, Section B): Copy link, in

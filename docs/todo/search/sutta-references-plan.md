@@ -21,7 +21,7 @@ Three parts:
 
 ## How it works today
 
-- `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `resolveToNodeKey` and `nodeKeyForUid` look the ID up in `assets/data/sc-to-bjt.json`; `suttaCentralUrl` goes the other way (Part C). `SuttaCentralRefResolver.fromJson` reads the asset.
+- `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `nodeKeyForUid` looks the ID up in `assets/data/sc-to-bjt.json`; `suttaCentralUrl` goes the other way (Part C). `SuttaCentralRefResolver.fromJson` reads the asset. The app loads it once (`suttacentral_provider.dart`) for search, research and the reader.
 - Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview when `parseRef` reads a reference.
 - Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
 - Research: the research Worker (`research_server/`, on Cloudflare) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet." Since Part B that is only `unmatched.txt`'s research list.
@@ -98,7 +98,8 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 
 **Keeping it right.**
 
-- `verify_corpus_invariants.dart` section 7: every node the file names is in `tree.json`. It runs at every canon sync; re-run the builder when it fails.
+- `verify_corpus_invariants.dart` section 7: every node the file names is in `tree.json`. It runs at every canon sync, but it can't see a key that still exists and now names another sutta.
+- So when a sync changes `tree.json`, `sync-regen.sh` asks for a rebuild: re-run the builder and review the git diff of the file. The build is exact, so an empty diff means nothing moved.
 - `.github/workflows/suttacentral-check.yml`, every Monday (and from the Actions tab): `check_upstream.py` reads SuttaCentral's file lists as they are today and fails when an ID the file names, or a translation the reader opens, is gone. Research citations keep working either way, because the store and this file are pinned together; what breaks is the reader's link. Then fix it in the builder (an alias for the moved ID), not by moving the pin.
 - Moving the bilara-data pin only goes with a re-ingest of the store (`sc-sync-ingest.md` §2).
 
@@ -109,7 +110,7 @@ The reader's Share menu has "Open on SuttaCentral" when the active tab's node ha
 ## Steps
 
 1. A1, A2, A3 and A4: the table, the new forms, a number inside a range, the preview rule. A3 moved here from step 2: research citations carry exact IDs, so only typed references need it.
-2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson`, `uidForNodeKey` and `suttaCentralUrl`; no unit tests for them yet.
+2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson` and `suttaCentralUrl`, and lost the unused `resolveToNodeKey` and `isReady`; no unit tests for the new two yet.
 3. A5: the research Worker on the one table. Its own commit.
 
 The test agent writes the unit tests (CLAUDE.md). Add a handover note under each step when it's done.

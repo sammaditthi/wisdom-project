@@ -169,7 +169,8 @@ class Bjt:
         return self._files[file_id]['pages'][node[3][0]]['pageNum']
 
     def title(self, key):
-        return re.sub(r'^[\d.\s]+', '', self.tree[key][0])
+        # A few tree.json titles hold a line break or a double space.
+        return ' '.join(re.sub(r'^[\d.\s]+', '', self.tree[key][0]).split())
 
 
 # ── Pairing one book ─────────────────────────────────────────────────────────

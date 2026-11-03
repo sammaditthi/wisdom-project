@@ -3,9 +3,9 @@
 ///
 /// Pure and I/O-free: the concordance (`assets/data/sc-to-bjt.json`, built by
 /// `tools/suttacentral_map/`) is injected, so this stays plain Dart.
-///   1. [parseRef]         — "SN 15.3" / "sn15.3"  ->  canonical uid "sn15.3"
-///   2. [resolveToNodeKey] — "sn15.3"              ->  BJT node "sn-2-3-1-3"
-///   3. [suttaCentralUrl]  — BJT node              ->  its page on SuttaCentral
+///   1. [parseRef]        — "SN 15.3" / "sn15.3"  ->  canonical uid "sn15.3"
+///   2. [nodeKeyForUid]   — "sn15.3"              ->  BJT node "sn-2-3-1-3"
+///   3. [suttaCentralUrl] — BJT node              ->  its page on SuttaCentral
 ///
 /// Why a map and not a formula: `docs/todo/search/sutta-references-plan.md`.
 class SuttaCentralRefResolver {
@@ -45,8 +45,9 @@ class SuttaCentralRefResolver {
     );
   }
 
+  /// A typed copy, so a malformed asset fails here, at load.
   static Map<String, String> _strings(Object? value) =>
-      ((value as Map<String, dynamic>?) ?? const {}).cast<String, String>();
+      Map<String, String>.from((value as Map<String, dynamic>?) ?? const {});
 
   /// Book / nikāya abbreviations we accept as a *reference* (lowercased).
   ///
@@ -109,24 +110,13 @@ class SuttaCentralRefResolver {
     return '$book ${match.group(2)!}';
   }
 
-  /// Step 2 (combined) — resolve any reference string straight to a BJT node
-  /// key, or `null` if it isn't a reference or the concordance doesn't cover it.
-  String? resolveToNodeKey(String input) {
-    final uid = parseRef(input);
-    if (uid == null) return null;
-    return _scToNode[uid];
-  }
-
-  /// Direct uid -> node key, for callers that already hold a canonical uid
-  /// (e.g. RAG citations). `null` if not in the concordance.
+  /// Canonical uid (from [parseRef] or a research citation) -> BJT node key.
+  /// `null` if not in the concordance.
   String? nodeKeyForUid(String uid) => _scToNode[uid];
-
-  /// The SuttaCentral uid a BJT node links to, or `null` where the two
-  /// editions don't line up (never the nearest one instead).
-  String? uidForNodeKey(String nodeKey) => _nodeToSc[nodeKey];
 
   /// The node's page on SuttaCentral: the preferred English translation when
   /// there is one, else SuttaCentral's own page for that text or division.
+  /// `null` where the two editions don't line up (never the nearest one).
   Uri? suttaCentralUrl(String nodeKey) {
     final uid = _nodeToSc[nodeKey];
     if (uid == null) return null;
@@ -136,8 +126,4 @@ class SuttaCentralRefResolver {
       translator == null ? '/$uid' : '/$uid/en/$translator',
     );
   }
-
-  /// True once the concordance is non-empty. Lets a caller skip the reference
-  /// check entirely before the asset has finished loading.
-  bool get isReady => _scToNode.isNotEmpty;
 }

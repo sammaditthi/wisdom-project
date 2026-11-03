@@ -267,7 +267,7 @@ refactor doc.
 
 `suttaCentralRefResolverProvider` calls the datasource `.load()` directly and
 swallows errors via `valueOrNull`
-(`lib/presentation/providers/reference_search_provider.dart:21-25, 45`). Elsewhere
+(`lib/presentation/providers/suttacentral_provider.dart`). Elsewhere
 data flows through repositories returning `Either<Failure,T>`. For a tiny
 best-effort asset that degrades gracefully this is acceptable — flag it as a
 conscious choice.

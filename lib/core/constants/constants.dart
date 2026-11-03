@@ -2,6 +2,16 @@
 // Re-exported here so all existing imports continue to work.
 export 'package:wisdom_shared/wisdom_shared.dart' show TipitakaNodeKeys;
 
+/// Each text source's own logo, unmodified: the Anumodanā page, and the
+/// reader's Share menu for Open on SuttaCentral. Provenance:
+/// `docs/todo/settings/app-settings-dialog.md`, "The source logos".
+class SourceLogos {
+  SourceLogos._();
+
+  static const tipitakaLk = 'assets/icons/sources/tipitaka_lk.webp';
+  static const suttaCentral = 'assets/icons/sources/suttacentral.webp';
+}
+
 /// Constants for pane width constraints used in the reader layout.
 /// These control the resizable navigator sidebar and search panel.
 class PaneWidthConstants {

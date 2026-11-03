@@ -58,6 +58,8 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 /// Section 7 guards `data/sc-to-bjt.json` (`tools/suttacentral_map/`): every
 /// node it names must still be in the tree, or a research citation or the
 /// reader's SuttaCentral link opens nothing after a re-sync moved the key.
+/// A key that still exists but now names another sutta passes; rebuilding the
+/// map and reading its diff catches that (`sync-regen.sh` says so).
 void main(List<String> args) {
   final assetsFlag = _valueOf(args, '--assets');
   final reader = assetsFlag == null

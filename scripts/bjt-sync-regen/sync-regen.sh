@@ -532,6 +532,15 @@ if [ "$BJT_OK" = false ]; then
   hr
   exit 1
 fi
+if [ "$TREE_CHANGED" = 1 ]; then
+  # The corpus checks only see a key that vanished, not one that now names
+  # another sutta. The map's build is exact, so its diff shows every move.
+  echo "${BOLD}tree.json changed: rebuild the SuttaCentral map and review its git diff.${RESET}"
+  echo "An empty diff means no search jump, citation or SuttaCentral link moved."
+  echo "  python3 tools/suttacentral_map/build_map.py"
+  echo "  git diff -- assets/data/sc-to-bjt.json tools/suttacentral_map/"
+  echo
+fi
 echo "Done. Review the report above, then commit when happy:"
 echo "  git add assets/ scripts/bjt-sync-regen/bjt-provenance.json && git commit -m \"chore(canon): sync BJT text to ${NEW_SHA:0:12}\""
 hr

@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../core/constants/constants.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_menu_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../models/reader_layout.dart';
 import '../../providers/parallel_text_provider.dart';
-import '../../providers/reference_search_provider.dart'
+import '../../providers/suttacentral_provider.dart'
     show activeSuttaCentralUrlProvider;
 import '../../providers/tab_provider.dart'
     show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
 import '../common/dismissible_menu_anchor.dart';
-import '../settings/anumodana_page.dart' show AnumodanaPage;
 import 'reader_link_actions.dart';
 
 /// Where a step button goes, named by the sutta it steps to.
@@ -214,8 +214,7 @@ class _ShareMenuButton extends ConsumerWidget {
         ),
         if (onSuttaCentral)
           _MenuRow(
-            icon: Image.asset(AnumodanaPage.suttaCentralLogo,
-                width: 20, height: 20),
+            icon: Image.asset(SourceLogos.suttaCentral, width: 20, height: 20),
             label: l10n.openOnSuttaCentral,
             onSelected: () => openOnSuttaCentral(context, ref),
           ),
