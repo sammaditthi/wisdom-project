@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_typography.dart';
 
 /// Uppercase header over a group of search rows ("RECENT SEARCHES",
-/// "TITLES"), with an optional link at the end ("Clear all", "See all →").
+/// "TITLES"), with an optional link at the end ("See all →").
 class SearchSectionHeader extends StatelessWidget {
   final String label;
 

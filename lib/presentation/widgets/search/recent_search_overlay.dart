@@ -38,12 +38,14 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
 
   // Row padding, pinned on each row (Material 3's defaults) so the last
   // row's links line up with the history icons and the ✕ icons.
-  static const double _rowPadding = 16;
+  static const double _rowStartPadding = 16;
   static const double _rowEndPadding = 24;
   static const double _closeIconSize = 18;
+  static const _closeDensity = VisualDensity.compact;
 
-  /// The ✕ button: Material 3's 40px at the compact density set on it.
-  static const double _closeButtonSize = 32;
+  /// The ✕ button: its icon plus IconButton's 8px a side. Density lowers
+  /// only its 40px minimum (to 32), never the side padding.
+  static const double _closeButtonSize = _closeIconSize + 2 * 8;
 
   /// Icons.close draws its cross 5/24 of its size inside its box.
   static const double _closeGlyphInset = _closeIconSize * 5 / 24;
@@ -52,11 +54,13 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
   bool _expanded = false;
 
   /// Distance from the card's end to the ✕ cross's end. Touch platforms pad
-  /// the ✕ button out to a 48px tap target, which moves the icon inwards.
+  /// the ✕ button out to a tap target, 48px less the same density, which
+  /// moves the icon inwards.
   static double _closeIconEnd(BuildContext context) {
     final button =
         Theme.of(context).materialTapTargetSize == MaterialTapTargetSize.padded
-            ? kMinInteractiveDimension
+            ? math.max(_closeButtonSize,
+                kMinInteractiveDimension + _closeDensity.baseSizeAdjustment.dx)
             : _closeButtonSize;
     return _rowEndPadding + (button - _closeIconSize) / 2 + _closeGlyphInset;
   }
@@ -120,7 +124,7 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
     List<RecentSearch> recentSearches,
   ) {
     final l10n = AppLocalizations.of(context);
-    final hiddenCount = recentSearches.length - _collapsedCount;
+    final canExpand = recentSearches.length > _collapsedCount;
     final visible =
         _expanded ? recentSearches : recentSearches.take(_collapsedCount);
 
@@ -134,14 +138,14 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
           // (where the header starts) and under the ✕ icons. A result tile's
           // "Show more" sits under its text instead: it opens that text.
           padding: EdgeInsetsDirectional.only(
-            start: _rowPadding - SearchLinkButton.padding,
+            start: _rowStartPadding - SearchLinkButton.padding,
             end: _closeIconEnd(context) - SearchLinkButton.padding,
             bottom: 4,
           ),
           child: Row(
             children: [
-              // Gone once deleting leaves nothing hidden.
-              if (hiddenCount > 0)
+              // Gone once deleting leaves nothing to hide.
+              if (canExpand)
                 Expanded(
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
@@ -178,7 +182,7 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       key: ValueKey(queryText),
       dense: true,
       contentPadding: const EdgeInsetsDirectional.only(
-          start: _rowPadding, end: _rowEndPadding),
+          start: _rowStartPadding, end: _rowEndPadding),
       leading: Icon(
         Icons.history,
         size: 20,
@@ -193,7 +197,7 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       trailing: IconButton(
         icon: const Icon(Icons.close, size: _closeIconSize),
         color: theme.colorScheme.onSurfaceVariant,
-        visualDensity: VisualDensity.compact,
+        visualDensity: _closeDensity,
         tooltip: l10n.removeRecentSearch,
         onPressed: () {
           ref.read(searchStateProvider.notifier).removeRecentSearch(queryText);
