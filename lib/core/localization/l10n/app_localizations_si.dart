@@ -593,7 +593,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get openAsWebPage => 'සරල වෙබ් පිටුවට';
 
   @override
-  String get openOnSuttaCentral => 'SuttaCentral හි විවෘත කරන්න';
+  String get openOnSuttaCentral => 'SuttaCentral වෙත';
 
   @override
   String get readerSettings => 'කියවීම් සැකසුම්';

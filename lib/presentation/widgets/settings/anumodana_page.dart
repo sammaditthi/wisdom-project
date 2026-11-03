@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/constants/constants.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/url_launcher_utils.dart';
@@ -25,6 +24,11 @@ class AnumodanaPage extends StatelessWidget {
   static const _sinhalaUnicodeConverterUrl =
       'https://github.com/Open-SL/sinhala-unicode-converter';
   static const _paliConverterUrl = 'https://github.com/pnfo/pali-converter';
+
+  /// Each source's own logo, unmodified — see the plan doc for provenance.
+  /// The one place in the app that shows them.
+  static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
+  static const _suttaCentralLogo = 'assets/icons/sources/suttacentral.webp';
 
   /// The one dictionary whose licence asks to be cited where it is used.
   static const _dpdId = 'DPD';
@@ -54,7 +58,7 @@ class AnumodanaPage extends StatelessWidget {
             SettingsRow(
               label: 'tipitaka.lk',
               hint: l10n.anumodanaTipitakaLkUse,
-              leading: const SettingsTile(imageAsset: SourceLogos.tipitakaLk),
+              leading: const SettingsTile(imageAsset: _tipitakaLkLogo),
               trailing: const _OpenLinkButton(
                 name: 'tipitaka.lk',
                 url: _tipitakaLkUrl,
@@ -63,7 +67,7 @@ class AnumodanaPage extends StatelessWidget {
             SettingsRow(
               label: 'SuttaCentral',
               hint: l10n.anumodanaSuttaCentralUse,
-              leading: const SettingsTile(imageAsset: SourceLogos.suttaCentral),
+              leading: const SettingsTile(imageAsset: _suttaCentralLogo),
               trailing: const _OpenLinkButton(
                 name: 'SuttaCentral',
                 url: _suttaCentralUrl,

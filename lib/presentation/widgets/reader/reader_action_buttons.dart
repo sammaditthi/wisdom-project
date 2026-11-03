@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../core/constants/constants.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_menu_theme.dart';
 import '../../../core/theme/app_typography.dart';
@@ -214,7 +213,7 @@ class _ShareMenuButton extends ConsumerWidget {
         ),
         if (onSuttaCentral)
           _MenuRow(
-            icon: Image.asset(SourceLogos.suttaCentral, width: 20, height: 20),
+            icon: Icon(Icons.open_in_new, size: 20, color: primary),
             label: l10n.openOnSuttaCentral,
             onSelected: () => openOnSuttaCentral(context, ref),
           ),
