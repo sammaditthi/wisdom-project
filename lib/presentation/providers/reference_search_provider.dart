@@ -1,28 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
 
-import '../../data/datasources/suttacentral_concordance_datasource.dart';
 import '../../domain/entities/search/search_result.dart';
 import '../../domain/entities/search/search_result_type.dart';
 import 'navigation_tree_provider.dart';
 import 'search_provider.dart';
-
-/// Datasource that loads the committed SuttaCentral→BJT concordance asset.
-final suttaCentralConcordanceDataSourceProvider =
-    Provider<SuttaCentralConcordanceDataSource>(
-  (ref) => SuttaCentralConcordanceDataSourceImpl(),
-);
-
-/// The pure [SuttaCentralRefResolver], built once from the loaded concordance.
-///
-/// Async because the asset load is async. Consumers treat "not loaded yet" (or
-/// a load error) as "no reference search" — FTS keeps working regardless, so
-/// the reference feature degrades to nothing rather than blocking search.
-final suttaCentralRefResolverProvider =
-    FutureProvider<SuttaCentralRefResolver>((ref) async {
-  final map = await ref.watch(suttaCentralConcordanceDataSourceProvider).load();
-  return SuttaCentralRefResolver(map);
-});
+import 'suttacentral_provider.dart' show suttaCentralRefResolverProvider;
 
 /// A single, high-priority "jump to this sutta" hit, produced when the current
 /// search query is a canonical reference (e.g. "SN 15.3") that resolves to a

@@ -78,6 +78,17 @@ Check that the script completed without errors. It writes the database there dir
 
 ---
 
+## SuttaCentral map
+
+`suttacentral_map/` builds `assets/data/sc-to-bjt.json`, SuttaCentral uid ↔ BJT node, from SuttaCentral's data at the research store's pinned snapshot. Python 3, standard library only; it clones what it reads into `suttacentral_map/.cache/`.
+
+```bash
+python3 tools/suttacentral_map/build_map.py       # rebuild the map, unmatched.txt and review.txt
+python3 tools/suttacentral_map/check_upstream.py  # what the weekly GitHub Action runs
+```
+
+Re-run the builder after a canon sync moves node keys. How it pairs and why: `docs/todo/search/sutta-references-plan.md`, Part B.
+
 ## Release checks
 
 `validate-release.sh` is retired (`deprecated/tools/`). The app's release gate is

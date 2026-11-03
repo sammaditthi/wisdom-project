@@ -54,6 +54,12 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 /// likely to break quietly: search scope is a key-prefix rule, so it only
 /// equals the real hierarchy while every child's key extends its parent's.
 /// Where that fails the branch returns nothing, with no error anywhere.
+///
+/// Section 7 guards `data/sc-to-bjt.json` (`tools/suttacentral_map/`): every
+/// node it names must still be in the tree, or a research citation or the
+/// reader's SuttaCentral link opens nothing after a re-sync moved the key.
+/// A key that still exists but now names another sutta passes; rebuilding the
+/// map and reading its diff catches that (`sync-regen.sh` says so).
 void main(List<String> args) {
   final assetsFlag = _valueOf(args, '--assets');
   final reader = assetsFlag == null
@@ -71,6 +77,8 @@ void main(List<String> args) {
   final orderOk = _verifyReadingOrder(reader);
   stdout.writeln('');
   final scopeOk = _verifyScope(reader);
+  stdout.writeln('');
+  final suttaCentralOk = _verifySuttaCentral(reader);
 
   // Null when no database was named: skipped, which is neither a pass nor a
   // failure and must not read as either.
@@ -97,11 +105,13 @@ void main(List<String> args) {
       linksOk &&
       orderOk &&
       scopeOk &&
+      suttaCentralOk &&
       contentOk != false) {
     stdout.writeln('PASS — extraction identical to the app original (1, 2), '
         'every URL reads back as its own page (3), reading order never '
-        'steps backwards inside a content file (4), and search scope matches '
-        'the hierarchy node for node (6).');
+        'steps backwards inside a content file (4), search scope matches '
+        'the hierarchy node for node (6), and every node the SuttaCentral '
+        'map names is in the tree (7).');
     stdout.writeln(contentOk == null
         ? '       Section 5 did not run — see its SKIPPED line above.'
         : '       The content table matches the JSON, entry for entry (5).');
@@ -1081,6 +1091,43 @@ bool _verifyScope(CorpusReader reader) {
   _printSamples(samples);
 
   return uncovered == 0 && overReaching == 0;
+}
+
+// ---------------------------------------------------------------------------
+// 7. The SuttaCentral map names only nodes the tree has
+// ---------------------------------------------------------------------------
+
+bool _verifySuttaCentral(CorpusReader reader) {
+  final tree = reader.readTree();
+  final file = File('${reader.assetsPath}/data/sc-to-bjt.json');
+  final asset = json.decode(file.readAsStringSync()) as Map<String, dynamic>;
+  final map = (asset['map'] as Map<String, dynamic>).cast<String, String>();
+  final reverse =
+      (asset['reverse'] as Map<String, dynamic>).cast<String, String>();
+
+  final samples = <String>[];
+  var missing = 0;
+  void check(String key, String why) {
+    if (tree[key] != null) return;
+    missing++;
+    _sample(samples, 'missing  $key ($why) is not in the tree');
+  }
+
+  map.forEach((uid, key) => check(key, 'map: $uid'));
+  reverse.forEach((key, uid) => check(key, 'reverse: $uid'));
+  for (final uid in reverse.values) {
+    if (!map.containsKey(uid)) {
+      missing++;
+      _sample(samples, 'missing  $uid (reverse) is not a key of the map');
+    }
+  }
+
+  stdout.writeln('SUTTACENTRAL');
+  stdout.writeln('  uids                   ${map.length}');
+  stdout.writeln('  reverse links          ${reverse.length}');
+  stdout.writeln('  missing                $missing');
+  _printSamples(samples);
+  return missing == 0;
 }
 
 // ---------------------------------------------------------------------------

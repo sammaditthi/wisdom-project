@@ -9,6 +9,8 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../models/reader_layout.dart';
 import '../../providers/parallel_text_provider.dart';
+import '../../providers/suttacentral_provider.dart'
+    show activeSuttaCentralUrlProvider;
 import '../../providers/tab_provider.dart'
     show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
 import '../common/dismissible_menu_anchor.dart';
@@ -186,7 +188,8 @@ class _LayoutMenuButton extends ConsumerWidget {
   }
 }
 
-/// Share ▾: Copy link and, on the web, Open as web page.
+/// Share ▾: Copy link, Open on SuttaCentral where the text has a counterpart
+/// there, and on the web Open as web page.
 class _ShareMenuButton extends ConsumerWidget {
   final bool visible;
 
@@ -196,6 +199,7 @@ class _ShareMenuButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final primary = Theme.of(context).colorScheme.primary;
+    final onSuttaCentral = ref.watch(activeSuttaCentralUrlProvider) != null;
 
     return DismissibleMenuAnchor(
       overlayId: 'reader-share-menu',
@@ -207,6 +211,12 @@ class _ShareMenuButton extends ConsumerWidget {
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
         ),
+        if (onSuttaCentral)
+          _MenuRow(
+            icon: Icon(Icons.open_in_new, size: 20, color: primary),
+            label: l10n.openOnSuttaCentral,
+            onSelected: () => openOnSuttaCentral(context, ref),
+          ),
         if (kIsWeb)
           _MenuRow(
             icon: Icon(Icons.open_in_new, size: 20, color: primary),

@@ -66,6 +66,12 @@ re-ingest only if the text itself must change.
 Last run 2026-11-02 against `e8690f3`, 195 commits ahead: 1005 files changed
 upstream, none in our two folders.
 
+**Weekly, automatically:** `.github/workflows/suttacentral-check.yml` runs
+`tools/suttacentral_map/check_upstream.py` every Monday. It covers what the
+reader links to on SuttaCentral (every ID in `sc-to-bjt.json`, and the
+translations it opens), and lists suttas added to our two folders without
+failing on them. This section stays the by-hand check before a rebuild.
+
 ## 4. The read-only mirror
 
 `~/Desktop/Dev/bilara-data-readonly` is shallow, blobless and sparse, covering

@@ -26,6 +26,7 @@ class AnumodanaPage extends StatelessWidget {
   static const _paliConverterUrl = 'https://github.com/pnfo/pali-converter';
 
   /// Each source's own logo, unmodified — see the plan doc for provenance.
+  /// The one place in the app that shows them.
   static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
   static const _suttaCentralLogo = 'assets/icons/sources/suttacentral.webp';
 

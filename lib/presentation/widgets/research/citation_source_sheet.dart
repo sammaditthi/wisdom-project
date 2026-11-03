@@ -9,8 +9,9 @@ import '../../../domain/entities/research/citation.dart';
 import '../../providers/deep_link_provider.dart';
 import '../../providers/document_provider.dart';
 import '../../providers/navigation_tree_provider.dart';
-import '../../providers/reference_search_provider.dart';
 import '../../providers/research_provider.dart';
+import '../../providers/suttacentral_provider.dart'
+    show suttaCentralRefResolverProvider;
 import '../reader/reader_entry_builder.dart';
 
 /// Bottom-sheet "peek" for one cited source. Two complementary blocks:
