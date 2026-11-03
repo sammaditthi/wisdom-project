@@ -186,7 +186,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get clear => 'ඉවත් කරන්න';
 
   @override
-  String get clearAll => 'සියල්ල මකන්න';
+  String get clearAll => 'සියල්ල ඉවත් කරන්න';
 
   @override
   String get scopeAll => 'සියල්ල';

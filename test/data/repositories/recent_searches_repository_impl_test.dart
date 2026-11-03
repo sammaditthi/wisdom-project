@@ -43,7 +43,8 @@ void main() {
         expect(result[0].queryText, equals('newest'));
       });
 
-      test('should respect limit parameter', () async {
+      // The overlay shows five and opens the rest, so a read is never capped.
+      test('should return every stored search', () async {
         final now = DateTime.now();
         final searches = List.generate(
           10,
@@ -56,12 +57,10 @@ void main() {
         await prefs.setString('recent_searches', jsonEncode(jsonList));
         repository = RecentSearchesRepositoryImpl(prefs);
 
-        final result = await repository.getRecentSearches(limit: 3);
+        final result = await repository.getRecentSearches();
 
-        expect(result.length, equals(3));
-        expect(result[0].queryText, equals('search0'));
-        expect(result[1].queryText, equals('search1'));
-        expect(result[2].queryText, equals('search2'));
+        expect(result.map((s) => s.queryText),
+            equals([for (var i = 0; i < 10; i++) 'search$i']));
       });
 
       test('should handle corrupted data gracefully', () async {
@@ -112,7 +111,7 @@ void main() {
           await repository.addRecentSearch('search$i');
         }
 
-        final result = await repository.getRecentSearches(limit: 20);
+        final result = await repository.getRecentSearches();
 
         expect(result.length, equals(10));
         expect(result[0].queryText, equals('search11'));

@@ -16,7 +16,7 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
   RecentSearchesRepositoryImpl(this._prefs);
 
   @override
-  Future<List<RecentSearch>> getRecentSearches({int? limit}) async {
+  Future<List<RecentSearch>> getRecentSearches() async {
     final jsonString = _prefs.getString(_key);
     if (jsonString == null || jsonString.isEmpty) {
       return [];
@@ -24,12 +24,10 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
 
     try {
       final list = jsonDecode(jsonString) as List;
-      final searches = list
+      // Stored most recent first
+      return list
           .map((e) => RecentSearch.fromJson(e as Map<String, dynamic>))
           .toList();
-
-      // Stored most recent first
-      return limit == null ? searches : searches.take(limit).toList();
     } catch (e) {
       // If parsing fails, clear corrupted data and return empty
       await _prefs.remove(_key);
