@@ -32,5 +32,14 @@ void main() {
       expect(singlishPreviewText('SN 15.3'), isNull);
       expect(singlishPreviewText('sn15.3'), isNull);
     });
+
+    test('is null for a book name with a capital, shown when all lowercase',
+        () {
+      expect(singlishPreviewText('SN'), isNull);
+      expect(singlishPreviewText('Dhp'), isNull);
+      // All lowercase is Singlish.
+      expect(singlishPreviewText('sn'), isNotNull);
+      expect(singlishPreviewText('dhp'), isNotNull);
+    });
   });
 }

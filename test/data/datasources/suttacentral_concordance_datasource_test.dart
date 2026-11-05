@@ -1,5 +1,9 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/data/datasources/suttacentral_concordance_datasource.dart';
+import 'package:wisdom_shared/wisdom_shared.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -26,4 +30,28 @@ void main() {
     // Mixes two SuttaCentral divisions, so there is no single counterpart.
     expect(resolver.suttaCentralUrl('sn-2-1'), isNull);
   });
+
+  // A book in canonBooks that opens nothing would hide the Singlish preview
+  // for no jump.
+  test('every book in canonBooks has a numbered uid in the map', () async {
+    final json = jsonDecode(
+      await rootBundle
+          .loadString(SuttaCentralConcordanceDataSourceImpl.assetPath),
+    ) as Map<String, dynamic>;
+    final uids = (json['map'] as Map<String, dynamic>).keys;
+
+    for (final book in canonBooks) {
+      final prefix = book.uidPrefix;
+      expect(
+        uids.any(
+          (uid) =>
+              uid.startsWith(prefix) && uid.startsWith(_digit, prefix.length),
+        ),
+        isTrue,
+        reason: book.name,
+      );
+    }
+  });
 }
+
+final _digit = RegExp('[0-9]');
