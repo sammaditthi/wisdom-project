@@ -1,3 +1,5 @@
+import 'canon_books.dart';
+
 /// Resolves a canonical SuttaCentral reference to our BJT tree node key, and a
 /// BJT node back to its SuttaCentral page.
 ///
@@ -49,70 +51,87 @@ class SuttaCentralRefResolver {
   static Map<String, String> _strings(Object? value) =>
       Map<String, String>.from((value as Map<String, dynamic>?) ?? const {});
 
-  /// Book / nikāya abbreviations we accept as a *reference* (lowercased).
-  ///
-  /// This only gates what *looks* like a canonical reference so that ordinary
-  /// search words ("metta123") don't parse as one; whether it actually resolves
-  /// still depends on the concordance. Matches the linkifier's set in the RAG
-  /// design doc.
-  static const Set<String> knownBooks = {
-    'sn', 'mn', 'dn', 'an', // four main nikāyas
-    'dhp', 'ud', 'iti', 'snp', // Khuddaka — common verse/prose books
-    'thag', 'thig', 'vv', 'pv', 'cp', 'bv', // Khuddaka — more verse books
+  /// Every name of a book, lowercased -> its uid prefix.
+  static final Map<String, String> _prefixByName = {
+    for (final book in canonBooks)
+      for (final name in [book.name, ...book.aliases])
+        name.toLowerCase(): book.uidPrefix,
   };
 
-  /// `<letters><digits>(.<digits>)*` with an optional space after the letters:
-  /// "SN 15.3", "sn15.3", "AN 3.65", "Dhp 1". Anchored — the whole string must
-  /// be a reference, so it never fires on a sentence that merely contains one.
-  static final RegExp _refPattern =
-      RegExp(r'^([A-Za-z]+)\s*([0-9]+(?:\.[0-9]+)*)$');
+  /// A book name (one space allowed: "Bu Pj"), then numbers joined by `.` or
+  /// `:`, maybe ending in a range as SuttaCentral writes it ("Dhp 1-20").
+  /// Anchored, so it never fires on a sentence that merely holds one.
+  static final RegExp _refPattern = RegExp(
+    r'^([A-Za-z]+(?:\s+[A-Za-z]+)?)\s*([0-9]+(?:[.:][0-9]+)*(?:-[0-9]+)?)$',
+  );
 
-  /// Step 1 — parse a human/uid string into a canonical SuttaCentral uid, or
-  /// `null` if it isn't a canonical reference at all.
-  ///
-  /// "SN 15.3" | "sn 15.3" | "SN15.3" | "sn15.3"  ->  "sn15.3"
+  /// The uid prefix for a typed book name, or `null` when the table has none.
+  static String? _prefixOf(String book) =>
+      _prefixByName[book.trim().toLowerCase().replaceAll(_spaces, ' ')];
+
+  static final RegExp _spaces = RegExp(r'\s+');
+
+  /// A typed reference as a SuttaCentral uid, or `null` if it isn't one:
+  /// "SN 15:3" -> `sn15.3`, "Bu Pj 1" -> `pli-tv-bu-vb-pj1`.
   static String? parseRef(String input) {
     final match = _refPattern.firstMatch(input.trim());
     if (match == null) return null;
-
-    final book = match.group(1)!.toLowerCase();
-    if (!knownBooks.contains(book)) return null;
-
-    return '$book${match.group(2)!}'; // "sn" + "15.3" -> "sn15.3"
+    final prefix = _prefixOf(match.group(1)!);
+    if (prefix == null) return null;
+    return '$prefix${match.group(2)!.replaceAll(':', '.')}';
   }
 
-  /// Canonical display abbreviations; anything else falls back to UPPERCASE.
-  static const Map<String, String> _displayBook = {
-    'sn': 'SN',
-    'mn': 'MN',
-    'dn': 'DN',
-    'an': 'AN',
-    'dhp': 'Dhp',
-    'ud': 'Ud',
-    'iti': 'Iti',
-    'snp': 'Snp',
-    'thag': 'Thag',
-    'thig': 'Thig',
-    'vv': 'Vv',
-    'pv': 'Pv',
-    'cp': 'Cp',
-    'bv': 'Bv',
-  };
+  /// Whether [input] is just the name of a book in [canonBooks]: "SN", "dhp",
+  /// "Tha Ap". Not "KN" or "Mil".
+  static bool isBookName(String input) => _prefixOf(input) != null;
 
-  /// Format a canonical uid as a human display reference:
-  /// "sn15.3" -> "SN 15.3", "dhp1" -> "Dhp 1". Returns [uid] unchanged if it
-  /// doesn't split into letters + digits.
+  /// A uid as people cite it: `kp1` -> "Kp 1", `pli-tv-bu-vb-pj1` -> "Bu Pj 1".
+  /// Returns [uid] unchanged when no book's prefix is followed by a number.
   static String displayRef(String uid) {
-    final match = RegExp(r'^([A-Za-z]+)([0-9].*)$').firstMatch(uid.trim());
-    if (match == null) return uid;
-    final book = _displayBook[match.group(1)!.toLowerCase()] ??
-        match.group(1)!.toUpperCase();
-    return '$book ${match.group(2)!}';
+    final id = uid.trim();
+    for (final book in canonBooks) {
+      final prefix = book.uidPrefix;
+      if (!id.startsWith(prefix)) continue;
+      final number = id.substring(prefix.length);
+      // A digit must follow: `snp1.8` is not `sn` + "p1.8".
+      if (number.startsWith(_digit)) return '${book.name} $number';
+    }
+    return uid;
   }
+
+  static final RegExp _digit = RegExp('[0-9]');
 
   /// Canonical uid (from [parseRef] or a research citation) -> BJT node key.
-  /// `null` if not in the concordance.
+  /// `null` if not in the concordance. Exact only: see [uidToOpen].
   String? nodeKeyForUid(String uid) => _scToNode[uid];
+
+  /// The uid a typed reference opens: [uid] itself when mapped, else the
+  /// map's range holding its last number (`dhp5` -> `dhp1-20`). For search
+  /// only; research citations carry exact uids.
+  String? uidToOpen(String uid) {
+    if (_scToNode.containsKey(uid)) return uid;
+    final match = _lastNumber.firstMatch(uid);
+    if (match == null) return null;
+    final stem = match.group(1)!; // `dhp`, `an1.`
+    // tryParse: a typed number too long for an int opens nothing.
+    final number = int.tryParse(match.group(2)!);
+    if (number == null) return null;
+    // Runs only on a miss. A range is the stem plus a numeric N-M, so a
+    // chapter uid like `sn1-nalavagga` never counts.
+    for (final key in _scToNode.keys) {
+      if (!key.startsWith(stem)) continue;
+      final range = _numericRange.firstMatch(key.substring(stem.length));
+      if (range != null &&
+          int.parse(range.group(1)!) <= number &&
+          number <= int.parse(range.group(2)!)) {
+        return key;
+      }
+    }
+    return null;
+  }
+
+  static final RegExp _lastNumber = RegExp(r'^(.*\D)(\d+)$');
+  static final RegExp _numericRange = RegExp(r'^(\d+)-(\d+)$');
 
   /// The node's page on SuttaCentral: the preferred English translation when
   /// there is one, else SuttaCentral's own page for that text or division.

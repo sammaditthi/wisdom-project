@@ -21,8 +21,8 @@ String computeEffectiveQuery(String rawQuery) =>
     normalizeText(_convertQuery(rawQuery));
 
 /// The Sinhala to show for a Singlish [rawQuery], or null when there is none:
-/// Sinhala input, a sutta reference like "SN 15.3", or nothing left after
-/// cleaning.
+/// Sinhala input, a sutta reference like "SN 15.3", a book name typed with a
+/// capital ("SN", "Dhp"), or nothing left after cleaning.
 ///
 /// Checks for Latin letters rather than comparing raw and converted text:
 /// trimming or ZWJ removal also changes Sinhala input, which is no conversion.
@@ -32,9 +32,16 @@ String computeEffectiveQuery(String rawQuery) =>
 String? singlishPreviewText(String rawQuery) {
   if (!SinglishTransliterator.instance.isSinglishQuery(rawQuery)) return null;
   if (SuttaCentralRefResolver.parseRef(rawQuery) != null) return null;
+  // All-lowercase "sn" alone is Singlish; "SN" or "Sn" is the book.
+  if (rawQuery.contains(_capitalLetter) &&
+      SuttaCentralRefResolver.isBookName(rawQuery)) {
+    return null;
+  }
   final display = _convertQuery(rawQuery);
   return display.isEmpty ? null : display;
 }
+
+final _capitalLetter = RegExp('[A-Z]');
 
 /// Steps 1–3 of [computeEffectiveQuery].
 String _convertQuery(String rawQuery) {

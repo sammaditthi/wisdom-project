@@ -1,6 +1,6 @@
 # Sutta references — plan
 
-Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A and A5 not started.
+Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A done 2026-11-04, apart from A5, which is not started.
 
 Typing "SN 15.3" opens that sutta, and research answers link their sources the same way. This doc holds everything about it. It replaces Task 11 of `search-pane-redesign-plan.md`, `sutta-references-standards-report.md` (2026-10-10) and `suttacentral-bjt-concordance-findings.md` (2026-06-27). The last two are deleted.
 
@@ -21,8 +21,9 @@ Three parts:
 
 ## How it works today
 
-- `SuttaCentralRefResolver` (`packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart`): `parseRef` reads "SN 15.3" as `sn15.3` for the books in `knownBooks`; `displayRef` writes it back using `_displayBook`; `nodeKeyForUid` looks the ID up in `assets/data/sc-to-bjt.json`; `suttaCentralUrl` goes the other way (Part C). `SuttaCentralRefResolver.fromJson` reads the asset. The app loads it once (`suttacentral_provider.dart`) for search, research and the reader.
-- Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview when `parseRef` reads a reference.
+- The one table is `canonBooks` (`packages/wisdom_shared/lib/src/refs/canon_books.dart`).
+- `SuttaCentralRefResolver` (`suttacentral_ref_resolver.dart`, next to it): `parseRef` reads "SN 15.3" as `sn15.3` from the table; `displayRef` writes it back; `nodeKeyForUid` looks the ID up in `assets/data/sc-to-bjt.json`, exactly; `uidToOpen` adds the range fallback (A3) for search; `suttaCentralUrl` goes the other way (Part C). `SuttaCentralRefResolver.fromJson` reads the asset. The app loads it once (`suttacentral_provider.dart`) for search, research and the reader.
+- Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview by the A4 table.
 - Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
 - Research: the research Worker (`research_server/`, on Cloudflare) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet." Since Part B that is only `unmatched.txt`'s research list.
 - The research Worker keeps its own list (`NIKAYAS` in `research_server/src/refs.ts`), and `refFromUid` capitalises every book. So answers show "DHP 1-20" and "THAG 1.1", and Vinaya citations show raw IDs like `pli-tv-bu-vb-pj1`.
@@ -31,11 +32,11 @@ Three parts:
 
 **A1. One table.** Abbreviation → SuttaCentral ID prefix + display name, next to the resolver. It replaces `knownBooks` and `_displayBook`, so `displayRef('kp1')` gives "Kp 1", not "KP 1".
 
-- Sutta: DN, MN, SN, AN, Kp, Dhp, Ud, Iti, Snp, Vv, Pv, Thag, Thig, Tha Ap, Thi Ap, Bv, Cp, Ja, Mnd, Cnd, Ps, Ne, Pe, Mil.
+- Sutta: DN, MN, SN, AN, Kp, Dhp, Ud, Iti, Snp, Vv, Pv, Thag, Thig, Tha Ap, Thi Ap, Bv, Cp, Ja, Mnd, Cnd, Ps, Ne, Pe.
 - Abhidhamma: Ds, Vb, Dt, Pp, Kv, Ya, Patthana.
 - Vinaya: Kd → `pli-tv-kd`, Pvr → `pli-tv-pvr`; the monks' rule books Bu Pj, Ss, Ay, Np, Pc, Pd, Sk, As → `pli-tv-bu-vb-pj` …; the nuns' Bi Pj, Ss, Np, Pc, Pd, Sk, As → `pli-tv-bi-vb-pj` ….
-- Other spellings open the same book: Khp → Kp, Miln → Mil, Nm → Mnd, Nc → Cnd, It → Iti.
-- Kept, but open nothing (every Access to Insight entry stays, 2026-10-06): KN, Nd (Mnd or Cnd?), Cv and Mv (old Vinaya style), the commentaries DhpA, KhpA, ThagA and ThigA (SuttaCentral has none), and the single letters A, D, M and S.
+- Other spellings open the same book: Khp → Kp, Nm → Mnd, Nc → Cnd, It → Iti.
+- Not in the table, because they would open nothing: Mil (BJT has no Milindapañha), KN, Nd (Mnd or Cnd?), Cv and Mv (old Vinaya style), the commentaries DhpA, KhpA, ThagA and ThigA (SuttaCentral has none), and the single letters A, D, M and S. They are listed in a comment under the table, with how to add one (2026-11-04). They stay Singlish words.
 - "Sn" means SN, because case is ignored, as on SuttaCentral. Sutta Nipāta is "Snp": SuttaCentral's ID is `snp1.8`, shown "Snp 1.8". Access to Insight, dhammatalks.org and Wikipedia write "Sn".
 - "Ps" is the Paṭisambhidāmagga, as on SuttaCentral. PTS uses "Ps" for the Majjhima commentary.
 - Never build a tree key from an abbreviation: in `tree.json`, `ap` is the Abhidhamma and `vp-pv` the Parivāra.
@@ -44,10 +45,13 @@ Three parts:
 
 - A colon works like a dot: "SN 15:3" = "SN 15.3". Bodhi and dhammatalks.org write colons.
 - A book name may have one space: "Tha Ap 1" → `tha-ap1`, "Bu Pj 1" → `pli-tv-bu-vb-pj1`.
+- A range as SuttaCentral writes it: "Dhp 1-20" → `dhp1-20`, so a jump row's label opens again when typed or pasted. A range the map doesn't have ("Dhp 1-5") opens nothing (2026-11-05).
 
 **A3. One number inside a range.** SuttaCentral gives some texts one ID for a run of numbers: `dhp1-20` is the Dhammapada's first chapter (verses 1 to 20). Others are `an1.1-10` and `sn56.129-130`. People cite a single verse, "Dhp 5", and no `dhp5` ID exists. BJT also has one page for the whole chapter (`kn-dhp-1`, යමකවග්ගො).
 
 So: look up the exact ID first. If it's missing, find the range of the same book that holds the number (`dhp1-20`) and open that. The ranges are read from the lookup file's own keys, so no extra list is needed.
+
+The jump row names what opens: "Dhp 5" shows "Dhp 1-20" (decided 2026-11-04).
 
 **A4. When the Singlish preview hides** (`singlishPreviewText`):
 
@@ -57,7 +61,7 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 | Book alone, with at least one capital ("SN", "Dhp", "Sn") | Hidden | As typed |
 | All lowercase ("an", "sn", "dhp") | Shown: it's Singlish | As Sinhala |
 
-- Only books that open something count. KN, Nd, the single letters and the other "open nothing" entries keep their preview.
+- Only books in the table count. KN, Nd, the single letters and the other names left out of it keep their preview.
 - Saving a reference as typed loses nothing: running "an 3" again converts it again, while a saved "අන් 3" would lose the jump.
 - Why this is enough (measured 2026-10-10 on `bjt.db`, `dict.db` and `tree.json`, all six match modes): a capitalised book plus a number finds nothing in the default match mode. In "near" and "anywhere" a few do ("A 3.65", "Pe 1"), and those hits still show because the normal search runs. Capital S, M, C, U, V and J have no Singlish letter, so "SN" converts to "Sණ්", which matches nothing. A few rare Singlish words start like a book (AN → ඇණ, Ne → ණෙ, Pe → ඵෙ, Thag → ථග); their preview hides for one keystroke and returns with the next letter. Our search boxes don't turn on auto-capitals, so phones type lowercase. No corpus test needed.
 
@@ -100,7 +104,8 @@ So: look up the exact ID first. If it's missing, find the range of the same book
 
 - `verify_corpus_invariants.dart` section 7: every node the file names is in `tree.json`. It runs at every canon sync, but it can't see a key that still exists and now names another sutta.
 - So when a sync changes `tree.json`, `sync-regen.sh` asks for a rebuild: re-run the builder and review the git diff of the file. The build is exact, so an empty diff means nothing moved.
-- `.github/workflows/suttacentral-check.yml`, every Monday (and from the Actions tab): `check_upstream.py` reads SuttaCentral's file lists as they are today and fails when an ID the file names, or a translation the reader opens, is gone. Research citations keep working either way, because the store and this file are pinned together; what breaks is the reader's link. Then fix it in the builder (an alias for the moved ID), not by moving the pin.
+- `.github/workflows/suttacentral-check.yml`, every Monday (and from the Actions tab): `check_upstream.py` reads SuttaCentral's file lists as they are today and fails when an ID the file names, or a translation the reader opens, is gone. Research citations keep working either way, because the store and this file are pinned together; what breaks is the reader's link. Then fix it in the builder (an alias for the moved ID; the builder has none yet), not by moving the pin.
+- The repo is public, so GitHub pauses the schedule after 60 days without a commit. Turn it back on from the Actions tab.
 - Moving the bilara-data pin only goes with a re-ingest of the store (`sc-sync-ingest.md` §2).
 
 ## Part C — the way back
@@ -109,8 +114,8 @@ The reader's Share menu has "Open on SuttaCentral" when the active tab's node ha
 
 ## Steps
 
-1. A1, A2, A3 and A4: the table, the new forms, a number inside a range, the preview rule. A3 moved here from step 2: research citations carry exact IDs, so only typed references need it.
-2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson` and `suttaCentralUrl`, and lost the unused `resolveToNodeKey` and `isReady`; no unit tests for the new two yet.
+1. A1, A2, A3 and A4: the table, the new forms, a number inside a range, the preview rule. A3 moved here from step 2: research citations carry exact IDs, so only typed references need it. **Done 2026-11-04.** Handover: `canonBooks` replaced `knownBooks` and `_displayBook`. `parseRef` builds "table prefix + number". `displayRef` takes the book whose prefix is followed by a digit, so `snp1.8` is never SN. `isBookName` serves the A4 rule. `uidToOpen` is the range fallback, and only the jump row calls it. On a miss it scans the map's own keys (about 50 µs on the real map), so there is no index, and a resolver made with the plain const constructor has the fallback too. Checked against the real lookup file: every "Done when" case, and every numbered ID that isn't a range reads back to itself through `displayRef` then `parseRef`. No unit tests yet: the test agent writes them from the "Done when" list.
+2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson` and `suttaCentralUrl`, and lost the unused `resolveToNodeKey` and `isReady`. The new two are covered by the map-file test (`suttacentral_concordance_datasource_test.dart`) and the Share menu test (`reader_share_menu_test.dart`); `wisdom_shared` has no unit tests for them yet.
 3. A5: the research Worker on the one table. Its own commit.
 
 The test agent writes the unit tests (CLAUDE.md). Add a handover note under each step when it's done.
@@ -120,7 +125,7 @@ The test agent writes the unit tests (CLAUDE.md). Add a handover note under each
 1. **How the research Worker shares the one table.** TypeScript can't import Dart. The Worker uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
    - The Dart table stays the source, and a small tool writes a generated TypeScript copy for the worker.
    - The app writes `ref` itself from the `uid` (it already has the table), and finding references in the answer moves to the app too. The Worker then needs no book names, but the answer format changes.
-2. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the full lookup file will be much bigger than today's seed.
+2. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the lookup file now covers the whole canon, so check its size first.
 
 ## Not supported
 
@@ -128,9 +133,10 @@ Edge cases, left out on purpose: old PTS numbers, PTS volume/page references ("S
 
 ## Done when
 
-- [ ] "SN 15.3", "sn15.3", "SN 15:3", "Dhp 5", "Tha Ap 1" and "AN 3.65" show no preview, are saved as typed, and open their BJT page.
-- [ ] "SN", "Dhp" and "Thag" alone show no preview. "an", "sn", "a", "s", "m" and "KN" alone show theirs.
-- [ ] `displayRef('kp1')` is "Kp 1". Research answers show "Dhp 1-20", not "DHP 1-20", and "Bu Pj 1", not `pli-tv-bu-vb-pj1`.
+- [x] "SN 15.3", "sn15.3", "SN 15:3", "Dhp 5", "Dhp 1-20", "Tha Ap 1" and "AN 3.65" show no preview, are saved as typed, and open their BJT page.
+- [x] "SN", "Dhp" and "Thag" alone show no preview. "an", "sn", "a", "s", "m" and "KN" alone show theirs.
+- [x] `displayRef('kp1')` is "Kp 1".
+- [ ] Research answers show "Dhp 1-20", not "DHP 1-20", and "Bu Pj 1", not `pli-tv-bu-vb-pj1` (A5).
 - [x] The lookup file covers Sutta, Abhidhamma and Vinaya, apart from what `unmatched.txt` lists with a reason. Every value exists in `tree.json`.
 - [x] The reader opens the text it shows on SuttaCentral, Bhikkhu Bodhi's translation first, and a weekly check says when SuttaCentral moves a page it links to.
 - [ ] No list of book names exists outside the one table.

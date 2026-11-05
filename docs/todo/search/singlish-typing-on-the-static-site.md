@@ -109,7 +109,7 @@ candidate generator, or romanized names (backlog D1) and aliases (D2).
 ## 8. Decisions still open
 
 - **The reference carve-out.** The app shows no chip for `SN 15.3`.
-  `SuttaCentralRefResolver.parseRef` is one anchored regex plus a 14-book set,
+  `SuttaCentralRefResolver.parseRef` is one anchored regex plus the `canonBooks` table,
   both already in `wisdom_shared`, so shipping them as data buys exact parity
   for about six lines of JS. The alternative is letting a typed reference show
   a nonsense chip.

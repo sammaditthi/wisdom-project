@@ -318,8 +318,8 @@ wiring (`LINK_BASE_URL`, `openTipitakaLinkProvider`, explicit
 built-in deeplink handler disabled), research citations (tap → bottom sheet →
 **Open in reader** when `uid` resolves, graceful "not linked yet" otherwise,
 **Copy link** building the canonical URL), and the `sc-to-bjt.json` seed grown
-to all of SN 15. The full concordance build tool stays a separate task (see the
-resolver plan §B.4 / findings doc).
+to all of SN 15. The full map for the whole canon is since built
+(`tools/suttacentral_map/`, [`sutta-references-plan.md`](../search/sutta-references-plan.md) Part B).
 
 **What is left, in the order it unblocks itself:**
 
