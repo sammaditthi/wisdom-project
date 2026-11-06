@@ -95,10 +95,16 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
       if (prev != next) Navigator.of(context).pop();
     });
 
-    // uid → BJT nodeKey via the shared concordance (same resolver instance
-    // search-by-reference uses). Null while loading or when uncovered.
+    // What the citation opens, through the lookup search uses: a reference
+    // the model typed may sit inside a range ("AN 1.1" opens AN 1.1-10).
+    // Null while loading or when uncovered.
     final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
-    final nodeKey = resolver?.nodeKeyForUid(citation.uid);
+    final target = resolver?.resolve(citation.uid);
+    final nodeKey = target?.nodeKey;
+    // Named after what opens, like search's jump row: "Dhp 5" shows "Dhp 1-20".
+    final heading = target == null || target.uid == citation.uid
+        ? citation.ref
+        : SuttaCentralRefResolver.displayRef(target.uid);
 
     return Padding(
       // The prose gutter, so the sheet's text sits on the answer's edges.
@@ -140,8 +146,8 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
               Expanded(
                 child: Text(
                   citation.title == null
-                      ? citation.ref
-                      : '${citation.ref} · ${citation.title}',
+                      ? heading
+                      : '$heading · ${citation.title}',
                   // The sheet's subject, not chrome — the dictionary sheet's
                   // heading token, which the slider reaches.
                   style: context.typography.dialogTitle,

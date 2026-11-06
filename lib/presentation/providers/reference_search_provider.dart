@@ -33,11 +33,9 @@ final referenceSearchResultProvider = Provider<SearchResult?>((ref) {
 
   // "Dhp 5" has no uid of its own; it opens the range holding it, dhp1-20,
   // and the row names that range.
-  final uid = resolver.uidToOpen(typed);
-  if (uid == null) return null;
-
-  final nodeKey = resolver.nodeKeyForUid(uid);
-  if (nodeKey == null) return null;
+  final target = resolver.resolve(typed);
+  if (target == null) return null;
+  final (:uid, :nodeKey) = target;
 
   final node = ref.watch(nodeByKeyProvider(nodeKey));
   if (node == null || !node.isReadableContent) return null;

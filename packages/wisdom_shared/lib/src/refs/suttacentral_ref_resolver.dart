@@ -6,7 +6,7 @@ import 'canon_books.dart';
 /// Pure and I/O-free: the concordance (`assets/data/sc-to-bjt.json`, built by
 /// `tools/suttacentral_map/`) is injected, so this stays plain Dart.
 ///   1. [parseRef]        — "SN 15.3" / "sn15.3"  ->  canonical uid "sn15.3"
-///   2. [nodeKeyForUid]   — "sn15.3"              ->  BJT node "sn-2-3-1-3"
+///   2. [resolve]         — "sn15.3" / "dhp5"     ->  "sn-2-3-1-3" / "kn-dhp-1"
 ///   3. [suttaCentralUrl] — BJT node              ->  its page on SuttaCentral
 ///
 /// Why a map and not a formula: `docs/todo/search/sutta-references-plan.md`.
@@ -102,14 +102,15 @@ class SuttaCentralRefResolver {
   static final RegExp _digit = RegExp('[0-9]');
 
   /// Canonical uid (from [parseRef] or a research citation) -> BJT node key.
-  /// `null` if not in the concordance. Exact only: see [uidToOpen].
+  /// `null` if not in the concordance. Exact only: see [resolve].
   String? nodeKeyForUid(String uid) => _scToNode[uid];
 
-  /// The uid a typed reference opens: [uid] itself when mapped, else the
-  /// map's range holding its last number (`dhp5` -> `dhp1-20`). For search
-  /// only; research citations carry exact uids.
-  String? uidToOpen(String uid) {
-    if (_scToNode.containsKey(uid)) return uid;
+  /// What a reference opens: [uid] itself when mapped, else the map's range
+  /// holding its last number (`dhp5` -> `dhp1-20`, `an1.1` -> `an1.1-10`).
+  /// Search and research both open through this. `null` when neither is.
+  ({String uid, String nodeKey})? resolve(String uid) {
+    final exact = nodeKeyForUid(uid);
+    if (exact != null) return (uid: uid, nodeKey: exact);
     final match = _lastNumber.firstMatch(uid);
     if (match == null) return null;
     final stem = match.group(1)!; // `dhp`, `an1.`
@@ -118,13 +119,13 @@ class SuttaCentralRefResolver {
     if (number == null) return null;
     // Runs only on a miss. A range is the stem plus a numeric N-M, so a
     // chapter uid like `sn1-nalavagga` never counts.
-    for (final key in _scToNode.keys) {
-      if (!key.startsWith(stem)) continue;
-      final range = _numericRange.firstMatch(key.substring(stem.length));
+    for (final entry in _scToNode.entries) {
+      if (!entry.key.startsWith(stem)) continue;
+      final range = _numericRange.firstMatch(entry.key.substring(stem.length));
       if (range != null &&
           int.parse(range.group(1)!) <= number &&
           number <= int.parse(range.group(2)!)) {
-        return key;
+        return (uid: entry.key, nodeKey: entry.value);
       }
     }
     return null;

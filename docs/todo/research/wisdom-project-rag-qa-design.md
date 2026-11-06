@@ -193,7 +193,7 @@ The Flutter app binds only to this; keep it stable across retrieval-layer change
 ```
 
 **Deep-link decision (2026-07-06):** the server sends `deeplink: null` and the
-**app resolves `uid` client-side** (`uid → nodeKeyForUid() → /tipitaka/<nodeKey>`)
+**app resolves `uid` client-side** (`uid → resolve() → /tipitaka/<nodeKey>`)
 via the shared Dart resolver it already loads for search-by-reference — no
 Python duplicate of the concordance. The universal-link scheme itself is settled
 in [`deep-linking-and-shareable-urls.md`](./deep-linking-and-shareable-urls.md).

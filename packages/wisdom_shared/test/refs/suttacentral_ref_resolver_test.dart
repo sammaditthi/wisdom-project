@@ -48,7 +48,7 @@ void main() {
     expect(SuttaCentralRefResolver.isBookName('Mil'), isFalse);
   });
 
-  test('uidToOpen opens the uid itself, else the range holding it', () {
+  test('resolve opens the uid itself, else the range holding it', () {
     const resolver = SuttaCentralRefResolver({
       'sn15.3': 'sn-2-3-1-3',
       'dhp1-20': 'kn-dhp-1',
@@ -56,12 +56,24 @@ void main() {
       'an1.1-10': 'an-1-1',
     });
 
-    expect(resolver.uidToOpen('sn15.3'), 'sn15.3');
+    expect(resolver.resolve('sn15.3'), (uid: 'sn15.3', nodeKey: 'sn-2-3-1-3'));
+    expect(resolver.resolve('dhp1-20'), (uid: 'dhp1-20', nodeKey: 'kn-dhp-1'));
     // Both ends of a range are inside it.
-    expect(resolver.uidToOpen('dhp1'), 'dhp1-20');
-    expect(resolver.uidToOpen('dhp20'), 'dhp1-20');
-    expect(resolver.uidToOpen('dhp21'), 'dhp21-32');
-    expect(resolver.uidToOpen('an1.5'), 'an1.1-10');
-    expect(resolver.uidToOpen('dhp999'), isNull);
+    expect(resolver.resolve('dhp1'), (uid: 'dhp1-20', nodeKey: 'kn-dhp-1'));
+    expect(resolver.resolve('dhp20'), (uid: 'dhp1-20', nodeKey: 'kn-dhp-1'));
+    expect(resolver.resolve('dhp21'), (uid: 'dhp21-32', nodeKey: 'kn-dhp-2'));
+    // A research answer that names "AN 1.1" opens the chapter holding it.
+    expect(resolver.resolve('an1.1'), (uid: 'an1.1-10', nodeKey: 'an-1-1'));
+    expect(resolver.resolve('an1.5'), (uid: 'an1.1-10', nodeKey: 'an-1-1'));
+    expect(resolver.resolve('dhp999'), isNull);
+    // No number: nothing to look for in a range.
+    expect(resolver.resolve('pli-tv-bu-pm'), isNull);
+  });
+
+  test('nodeKeyForUid is exact: a number inside a range is a miss', () {
+    const resolver = SuttaCentralRefResolver({'dhp1-20': 'kn-dhp-1'});
+
+    expect(resolver.nodeKeyForUid('dhp1-20'), 'kn-dhp-1');
+    expect(resolver.nodeKeyForUid('dhp5'), isNull);
   });
 }
