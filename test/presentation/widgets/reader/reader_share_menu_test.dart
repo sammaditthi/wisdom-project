@@ -12,15 +12,11 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  /// Pumps the toolbar on [nodeKey] and opens its Share menu. [resolver]
-  /// defaults to a concordance of one sutta.
+  /// Pumps the toolbar on [nodeKey] and opens its Share menu.
   Future<void> openShareMenu(
     WidgetTester tester,
     String nodeKey, {
-    SuttaCentralRefResolver resolver = const SuttaCentralRefResolver(
-      {'dn1': 'dn-1-1'},
-      nodeToSc: {'dn-1-1': 'dn1'},
-    ),
+    required SuttaCentralRefResolver resolver,
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -42,45 +38,12 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  group('Reader Share menu', () {
-    testWidgets('offers "Open on SuttaCentral" on a sutta with a counterpart',
-        (tester) async {
-      await openShareMenu(tester, 'dn-1-1');
-
-      expect(find.text('Open on SuttaCentral'), findsOneWidget);
-    });
-
-    testWidgets('hides "Open on SuttaCentral" on a commentary', (tester) async {
-      await openShareMenu(tester, 'atta-dn-1-1');
-
-      expect(find.text('Copy link'), findsOneWidget);
-      expect(find.text('Open on SuttaCentral'), findsNothing);
-    });
-
-    // A rebuilt concordance may bring a translator the app has no name for.
-    testWidgets('names no one for a translator without a name', (tester) async {
-      await openShareMenu(
-        tester,
-        'dn-1-1',
-        resolver: const SuttaCentralRefResolver(
-          {'dn1': 'dn-1-1'},
-          nodeToSc: {'dn-1-1': 'dn1'},
-          translators: {'dn1': 'thanissaro'},
-        ),
-      );
-
-      expect(find.text('Open on SuttaCentral'), findsOneWidget);
-      expect(find.textContaining('Ven.'), findsNothing);
-      expect(find.textContaining('thanissaro'), findsNothing);
-    });
-  });
-
-  // The bundled concordance, so each node really opens what it claims.
-  // Loaded outside the widget tests' fake clock, where the large asset's
-  // off-thread decode would never finish.
-  group('Open on SuttaCentral translator line', () {
+  group('Reader Share menu: Open on SuttaCentral', () {
     late SuttaCentralRefResolver concordance;
 
+    // The bundled concordance, so each node really opens what it claims.
+    // Loaded outside the widget tests' fake clock, where the large asset's
+    // off-thread decode would never finish.
     setUpAll(() async {
       concordance = await SuttaCentralConcordanceDataSourceImpl().load();
     });
@@ -110,6 +73,30 @@ void main() {
         expect(find.textContaining('Ven.'), findsNothing);
       });
     }
+
+    testWidgets('a commentary has no row', (tester) async {
+      await openShareMenu(tester, 'atta-dn-1-1', resolver: concordance);
+
+      expect(find.text('Copy link'), findsOneWidget);
+      expect(find.text('Open on SuttaCentral'), findsNothing);
+    });
+
+    // A rebuilt concordance may bring a translator the app has no name for.
+    testWidgets('names no one for a translator without a name', (tester) async {
+      await openShareMenu(
+        tester,
+        'dn-1-1',
+        resolver: const SuttaCentralRefResolver(
+          {'dn1': 'dn-1-1'},
+          nodeToSc: {'dn-1-1': 'dn1'},
+          translators: {'dn1': 'thanissaro'},
+        ),
+      );
+
+      expect(find.text('Open on SuttaCentral'), findsOneWidget);
+      expect(find.textContaining('Ven.'), findsNothing);
+      expect(find.textContaining('thanissaro'), findsNothing);
+    });
 
     testWidgets('a screen reader hears the translator with the label',
         (tester) async {
