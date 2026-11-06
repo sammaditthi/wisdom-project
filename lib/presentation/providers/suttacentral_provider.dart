@@ -30,3 +30,20 @@ final activeSuttaCentralUrlProvider = Provider<Uri?>((ref) {
   if (nodeKey == null || resolver == null) return null;
   return resolver.suttaCentralUrl(nodeKey);
 });
+
+/// How the Share menu names each SuttaCentral translator, the same in every
+/// app language. A translator missing here is shown without a name.
+const _translatorNames = {
+  'bodhi': 'Ven. Bodhi',
+  'sujato': 'Ven. Sujato',
+  'brahmali': 'Ven. Brahmali',
+};
+
+/// Who translated the English that Open on SuttaCentral opens for the active
+/// tab, or null when it opens no translation.
+final activeSuttaCentralTranslatorProvider = Provider<String?>((ref) {
+  final nodeKey = ref.watch(activeNodeKeyProvider);
+  final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+  if (nodeKey == null || resolver == null) return null;
+  return _translatorNames[resolver.suttaCentralTranslator(nodeKey)];
+});

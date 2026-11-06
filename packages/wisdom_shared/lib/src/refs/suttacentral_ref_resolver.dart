@@ -147,4 +147,11 @@ class SuttaCentralRefResolver {
       translator == null ? '/$uid' : '/$uid/en/$translator',
     );
   }
+
+  /// SuttaCentral's id for the translator [suttaCentralUrl] opens (`bodhi`,
+  /// `sujato`, `brahmali`), or `null` when it opens no translation.
+  String? suttaCentralTranslator(String nodeKey) {
+    final uid = _nodeToSc[nodeKey];
+    return uid == null ? null : _translators[uid];
+  }
 }

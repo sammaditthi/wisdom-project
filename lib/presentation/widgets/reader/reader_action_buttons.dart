@@ -10,7 +10,7 @@ import '../../../core/utils/responsive_utils.dart';
 import '../../models/reader_layout.dart';
 import '../../providers/parallel_text_provider.dart';
 import '../../providers/suttacentral_provider.dart'
-    show activeSuttaCentralUrlProvider;
+    show activeSuttaCentralTranslatorProvider, activeSuttaCentralUrlProvider;
 import '../../providers/tab_provider.dart'
     show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
 import '../common/dismissible_menu_anchor.dart';
@@ -215,6 +215,7 @@ class _ShareMenuButton extends ConsumerWidget {
           _MenuRow(
             icon: Icon(Icons.open_in_new, size: 20, color: primary),
             label: l10n.openOnSuttaCentral,
+            note: ref.watch(activeSuttaCentralTranslatorProvider),
             onSelected: () => openOnSuttaCentral(context, ref),
           ),
         if (kIsWeb)
@@ -235,11 +236,13 @@ class _ShareMenuButton extends ConsumerWidget {
   }
 }
 
-/// A menu row: a glyph and a one-line label. With [selected] set, the row is
-/// one choice of a set, checked when true.
+/// A menu row: a glyph and a one-line label, with an optional [note] under it
+/// in small grey text. With [selected] set, the row is one choice of a set,
+/// checked when true.
 class _MenuRow extends StatelessWidget {
   final Widget icon;
   final String label;
+  final String? note;
   final VoidCallback onSelected;
   final bool? selected;
 
@@ -247,13 +250,15 @@ class _MenuRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onSelected,
+    this.note,
     this.selected,
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final rowStyle = context.typography.listRowTitle;
+    final typography = context.typography;
+    final rowStyle = typography.listRowTitle;
     final isSelected = selected ?? false;
 
     return MenuItemButton(
@@ -272,13 +277,29 @@ class _MenuRow extends StatelessWidget {
       child: Semantics(
         checked: selected,
         inMutuallyExclusiveGroup: selected == null ? null : true,
-        child: Text(
-          label,
-          style: isSelected
-              ? rowStyle.copyWith(fontWeight: FontWeight.w600)
-              : rowStyle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: isSelected
+                  ? rowStyle.copyWith(fontWeight: FontWeight.w600)
+                  : rowStyle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (note != null)
+              Text(
+                note!,
+                // The menu's grey hint style at the app's smallest size.
+                style: typography.menuSectionLabel.copyWith(
+                  fontSize: typography.countBadge.fontSize,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
         ),
       ),
     );
