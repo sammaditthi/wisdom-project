@@ -1,0 +1,12 @@
+[
+  { "name": "blank line splits", "text": "One (SN 15.3).\n\nTwo (SN 15.3).", "paragraphs": ["One (SN 15.3).", "Two (SN 15.3)."] },
+  { "name": "soft wrap joins", "text": "A (SN 15.3)\nB (SN 15.3)", "paragraphs": ["A (SN 15.3) B (SN 15.3)"] },
+  { "name": "dash bullets", "text": "- a (SN 15.3)\n- b (SN 15.3)", "paragraphs": ["a (SN 15.3)", "b (SN 15.3)"] },
+  { "name": "star bullets", "text": "* a (SN 15.3)\n* b (SN 15.3)", "paragraphs": ["a (SN 15.3)", "b (SN 15.3)"] },
+  { "name": "line after a bullet", "text": "- a (SN 15.3)\nafter (SN 15.3)", "paragraphs": ["a (SN 15.3)", "after (SN 15.3)"] },
+  { "name": "lines after a bullet join", "text": "- a (SN 15.3)\nafter one (SN 15.3)\nafter two (SN 15.3)", "paragraphs": ["a (SN 15.3)", "after one (SN 15.3) after two (SN 15.3)"] },
+  { "name": "text, bullet, text", "text": "Intro (SN 15.3)\n- a (SN 15.3)\nOutro (SN 15.3)", "paragraphs": ["Intro (SN 15.3)", "a (SN 15.3)", "Outro (SN 15.3)"] },
+  { "name": "several blank lines", "text": "A (SN 15.3)\n\n\n\nB (SN 15.3)", "paragraphs": ["A (SN 15.3)", "B (SN 15.3)"] },
+  { "name": "Windows line ends", "text": "A (SN 15.3)\r\nB (SN 15.3)\r\n\r\nC (SN 15.3)", "paragraphs": ["A (SN 15.3) B (SN 15.3)", "C (SN 15.3)"] },
+  { "name": "indented bullet", "text": "  - a (SN 15.3)  \n   b (SN 15.3)", "paragraphs": ["a (SN 15.3)", "b (SN 15.3)"] }
+]

@@ -19,6 +19,7 @@ npm ci
 npm run dev          # wrangler dev on :8082 (stub mode by default)
 npm run start:node   # same app on plain Node :8082
 npm run bench        # CPU worst-case benchmark vs the 10ms budget
+npm test             # unit tests (node:test, Node 21+)
 ```
 
 Dev port map: 8080 = Flutter web, **8082 = research server**, 8083 = static-site preview.

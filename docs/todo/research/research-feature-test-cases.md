@@ -1,8 +1,9 @@
 # Research Feature — Test Case Catalogue
 
 **Date:** 2026-07-14 · **Branch:** `feat/ai-qa` (multi-chat UI + fixes for review findings #1–#14)
-**Status:** No tests exist yet for any part of this feature (client or server). This document is the
-single reference for writing them — each case says *what* to assert and *which level* it belongs to,
+**Status:** Mostly unwritten. Written so far: part of §5.3 (W-ANS-1's paragraphs), part of §5.4
+(`citation_source_sheet_test.dart`) and the Worker's unit tests (§7). This document is the single
+reference for writing the rest — each case says *what* to assert and *which level* it belongs to,
 so nothing needs re-deriving from the code later.
 
 **Guards column** = which code-review finding the case is a regression guard for (the 14 bugs fixed
@@ -30,7 +31,7 @@ a fresh chat and an app restart both start on Fast by design.
 | Widgets | `research_chat_view.dart`, `chat_history_panel.dart`, `research_answer_view.dart`, `citation_source_sheet.dart`, `research_error_messages.dart`, `research_mode_selector.dart` |
 | Screen | `research_screen.dart` (responsive shell + nested `Navigator`) |
 | Cross-feature | citation → `openTipitakaLinkProvider` → Reader section (deep-link chain) |
-| Server | `research_server/` (Python — separate suite, §6) |
+| Server | `research_server/` (TypeScript Worker — separate suite, §7) |
 
 ---
 
@@ -203,6 +204,11 @@ Use the shared answer fixture (§3). Remember: bilingual content in Sinhala scri
 | W-ANS-4 | Marker with unknown uid | Silently dropped — no chip, no crash, surrounding text intact | — | P1 |
 | W-ANS-5 | Citations not named inline | Rendered once under "Other sources"; inline-cited uids NOT duplicated there | — | P1 |
 
+**Written:** W-ANS-1's paragraphs (blank lines split, soft wraps join, each bullet its own block),
+from `test/fixtures/research_answer_paragraphs.json`. The Worker's `paragraphs.test.ts` reads the
+same file, so the two can't split an answer differently. Still to write: W-ANS-1's bold/italic and
+W-ANS-2–5.
+
 ### 5.4 `CitationSourceSheet` — `test/presentation/widgets/research/citation_source_sheet_test.dart`
 
 Override `suttaCentralRefResolverProvider` (fixed uid→nodeKey map) and, where needed,
@@ -245,7 +251,7 @@ Override `researchModeProvider` to seed the shown tier; use the real notifier fo
 ## 6. E2E level — `integration_test/research_flow_test.dart` (run with `-d macos`)
 
 Hermetic: override `researchRepositoryProvider` with `FakeResearchRepository` via the
-`test_overrides.dart` pattern — **no real network, no Python server**. The rest of the app (tree,
+`test_overrides.dart` pattern — **no real network, no research server**. The rest of the app (tree,
 reader, documents, prefs) is real. Add to `all_tests.dart`; note the suite's known flakiness under
 shared-DB contention — if a run hangs on a spinner, re-run the file **alone** before blaming the code.
 
@@ -266,17 +272,29 @@ end-to-end. Keep out of `all_tests.dart`.
 
 ---
 
-## 7. Server side (separate suite — `research_server/tests/`, pytest)
+## 7. Server side (separate suite — `research_server/test/`, `node:test`)
 
-No tests exist. Out of scope for the Flutter suites above, but the contract cases worth having:
+Run with `cd research_server && npm test` (Node 21+), or `./scripts/research_server/test.sh`, the
+research release gate. Pure code only (`buildResponse`, `refs.ts`): the shared helper makes `fetch`
+throw, so nothing reaches Gemini. Case list and old-code checks:
+`docs/done/research/research-chip-tests-handover.md`.
 
-- `/research` stub mode: 200 with canned answer + citations shape the client parses.
+| File | Covers |
+|---|---|
+| `refs.test.ts` | the book table; `citedHolding`, same cases as the Dart `resolve`; every lookup-file uid round-trips |
+| `chips.test.ts` | chips from the model's refs and from grounding supports: once per paragraph, ranges, unknown refs left as text |
+| `worst_case.test.ts` | CPU guards on the inputs that once took seconds |
+| `paragraphs.test.ts` | the paragraph rule, on the fixture the app's widget test reads (§5.3) |
+
+Still to write, through the HTTP app (`src/app.ts`). The live-path ones need a `fetch` stub that
+returns canned Gemini replies instead of throwing.
+
+- Stub mode (`RESEARCH_STUB`, on by default): 200 with the canned answer, in the shape the client parses.
 - Error classification: Gemini 429/503/timeouts → the documented HTTP statuses + clean bodies
   (the client's typed-error mapping in §4/§5 assumes these).
 - Model-ladder fallback: primary 429 → next rung used; all rungs down → classified error.
-- Linkifier: known uid → `[[cite:uid]]` markers present in prose; unknown uid never emitted.
 - `X-App-Token` gate: missing/wrong token → 401 when `RESEARCH_APP_TOKEN` set; open when unset.
-- History passed through: request with `history` → forwarded turns in the prompt (stub can echo).
+- History: a request's `history` reaches the rewrite prompt.
 
 ---
 
