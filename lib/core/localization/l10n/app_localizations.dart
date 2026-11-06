@@ -1139,8 +1139,8 @@ abstract class AppLocalizations {
   /// App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab
   ///
   /// In en, this message translates to:
-  /// **'Open as web page'**
-  String get openAsWebPage;
+  /// **'Open as HTML page'**
+  String get openAsHtmlPage;
 
   /// Item in the reader's Share menu that opens the text being read on suttacentral.net, in its English translation where there is one. SuttaCentral is a name: never translated
   ///

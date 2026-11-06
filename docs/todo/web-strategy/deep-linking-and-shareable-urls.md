@@ -58,13 +58,13 @@
 | | |
 |---|---|
 | **Entry point** | **Share** (`Icons.adaptive.share`), last in the reader's action toolbar after a hairline divider (`docs/done/reader/reader-toolbar-merge.md`, 2026-10-16). The toolbar is the reader's only one since the FAB went (`docs/done/reader/reader-toolbar-auto-hide.md`, 2026-10-17). Nothing new in the `AppBar`. Code: `widgets/reader/reader_link_actions.dart`. |
-| **Share** | Opens a menu holding **Copy link**, which copies and shows a `linkCopied` SnackBar, and on the web **Open as web page**. The same menu at every width, on every platform. An extra tap, accepted 2026-10-05 because the menu is where sharing grows (see below). |
-| **Open as web page** | In the Share menu since 2026-10-16. It is not sharing, which is why it was its own button until then; as one it would have widened the merged toolbar past a phone browser. Web only: inside a native app it has no use (decided 2026-10-05, re-confirmed 2026-10-16). `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on web. Static is BJT-only, so it must hide for a non-BJT tab; every tab is BJT today, so there is no check yet. |
+| **Share** | Opens a menu holding **Copy link**, which copies and shows a `linkCopied` SnackBar, and on the web **Open as HTML page**. The same menu at every width, on every platform. An extra tap, accepted 2026-10-05 because the menu is where sharing grows (see below). |
+| **Open as HTML page** | In the Share menu since 2026-10-16. It is not sharing, which is why it was its own button until then; as one it would have widened the merged toolbar past a phone browser. Named for what it opens: on the web the reader is already on a web page (2026-11-06). Web only: inside a native app it has no use (decided 2026-10-05, re-confirmed 2026-10-16 and 2026-11-06). Printing, the one use it would have there, goes to a planned in-app Save as PDF instead. `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on web. Static is BJT-only, so it must hide for a non-BJT tab; every tab is BJT today, so there is no check yet. |
 | **`MenuAnchor`** | The toolbar's Share is a `MenuAnchor`, so the menu lives with its button. (Until 2026-10-16 one `showMenu` popup served the pill and the FAB, because the old FAB's item vanished as the FAB closed.) |
 | **Not built, on purpose** | The design's phone sheet and the menu's URL footer line. The URL added nothing, and "Link copied" confirms the copy (decided 2026-10-05). |
 | **URL** | `tipitakaLinkUrlBuilderProvider` with the tab's `nodeKey`, through `SitePlan.servingLink`, so a folded leaf comes out as `…/<pageKey>#<leafKey>`. No `?e=`: a tab drops its landing spot once it lands, so the link opens the text at its start (decided 2026-10-05). Non-BJT, once `?edition=` exists → `app.` + `?edition=…`. |
 | **Origins** | `LINK_BASE_URL`, default the apex. `scripts/app/web/deploy.sh` passes dev's static site, `https://<STATIC_SITE_DEV_PROJECT>.pages.dev`. |
-| **Strings** | `researchCopyLink` / `researchLinkCopied` became `copyLink` / `linkCopied`. New: `share` (`බෙදාගන්න`) and `openAsWebPage` (`වෙබ් පිටුවක් ලෙස විවෘත කරන්න`). |
+| **Strings** | `researchCopyLink` / `researchLinkCopied` became `copyLink` / `linkCopied`. New: `share` (`බෙදාගන්න`) and `openAsHtmlPage` (`සරල වෙබ් පිටුවට`). |
 
 **Later: the Share menu grows.** Next is the OS share sheet, on web and
 native. It needs a share plugin (none in `pubspec.yaml`). Before showing it in a
@@ -331,7 +331,7 @@ to all of SN 15. The full map for the whole canon is since built
    argument through `openTabFromNodeKeyProvider`, and the ~8-line static-site
    enhancement in the static plan §7.
 2. **Share… on reader tabs.** The Share button is built (Static ⇄ app
-   cross-links, B), with Copy link in its menu; Open as web page sits beside it
+   cross-links, B), with Copy link in its menu; Open as HTML page sits beside it
    on the web. Left: the OS share sheet, and `?layout=` on the link once 1
    lands. The button is what *produces* `?layout=`, so that half is small.
 3. **`?edition=` param** — a modifier on the URL the share button builds, so it

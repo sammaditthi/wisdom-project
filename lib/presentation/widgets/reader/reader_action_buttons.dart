@@ -189,7 +189,7 @@ class _LayoutMenuButton extends ConsumerWidget {
 }
 
 /// Share ▾: Copy link, Open on SuttaCentral where the text has a counterpart
-/// there, and on the web Open as web page.
+/// there, and on the web Open as HTML page.
 class _ShareMenuButton extends ConsumerWidget {
   final bool visible;
 
@@ -220,8 +220,8 @@ class _ShareMenuButton extends ConsumerWidget {
         if (kIsWeb)
           _MenuRow(
             icon: Icon(Icons.open_in_new, size: 20, color: primary),
-            label: l10n.openAsWebPage,
-            onSelected: () => openAsWebPage(context, ref),
+            label: l10n.openAsHtmlPage,
+            onSelected: () => openAsHtmlPage(context, ref),
           ),
       ],
       builder: (context, controller, focusNode) => _ToolbarButton.icon(

@@ -22,7 +22,7 @@ class DpdWebsiteLink extends StatelessWidget {
       link: true,
       child: SearchLinkButton(
         label: 'dpdict.net',
-        // The standard "leaves the app" mark, as on "Open as web page".
+        // The standard "leaves the app" mark, as on "Open as HTML page".
         icon: Icons.open_in_new,
         onPressed: () => UrlLauncherUtils.launchInAppBrowser(context, href),
       ),

@@ -11,7 +11,7 @@ import '../../providers/tab_provider.dart';
 
 // The reader's outward actions (deep-linking doc, Section B): Copy link, in
 // the Share menu where sharing grows, Open on SuttaCentral, and on the web
-// Open as web page.
+// Open as HTML page.
 
 /// Copies the active tab's shareable link and confirms with a SnackBar.
 Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
@@ -25,7 +25,7 @@ Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
 
 /// Opens the active tab's text on the static site, in a new tab. Web only.
 /// A short sutta opens as `<chapter>#<sutta>`, the page the site serves.
-Future<void> openAsWebPage(BuildContext context, WidgetRef ref) async {
+Future<void> openAsHtmlPage(BuildContext context, WidgetRef ref) async {
   final link = _activeTabLink(ref);
   if (link == null) return;
   final url = await ref.read(tipitakaLinkUrlBuilderProvider)(link);

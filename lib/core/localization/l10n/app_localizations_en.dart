@@ -589,7 +589,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get share => 'Share';
 
   @override
-  String get openAsWebPage => 'Open as web page';
+  String get openAsHtmlPage => 'Open as HTML page';
 
   @override
   String get openOnSuttaCentral => 'Open on SuttaCentral';

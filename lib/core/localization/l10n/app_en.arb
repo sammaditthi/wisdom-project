@@ -920,8 +920,8 @@
   "@share": {
     "description": "Reader toolbar button that opens the share menu"
   },
-  "openAsWebPage": "Open as web page",
-  "@openAsWebPage": {
+  "openAsHtmlPage": "Open as HTML page",
+  "@openAsHtmlPage": {
     "description": "App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab"
   },
   "openOnSuttaCentral": "Open on SuttaCentral",

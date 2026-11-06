@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# LINK_BASE_URL is where the reader's copied links and "Open as web page"
+# LINK_BASE_URL is where the reader's copied links and "Open as HTML page"
 # point: the same target's static site, as scripts/static_site/deploy.sh
 # derives it.
 if [ "$TARGET" = "prod" ]; then
