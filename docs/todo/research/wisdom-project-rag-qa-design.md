@@ -208,7 +208,7 @@ The field stays in the contract so a server-side URL (for non-app consumers of
 - **Unit:** one document per text-unit file.
 - **Document text:** heading (`:0.*` segments) + body (remaining non-empty segments, in order), as clean prose — no ids inline for v1 (clean text embeds better). Segment anchors are a v2 concern.
 - **Heading/body boundary is load-bearing:** `load_unit` writes `head\nbody` (heading segments joined, one newline, then the body). The citation `title` is recovered by splitting the grounding chunk on that newline (`snippet.split_heading`), so keep the `head\nbody` shape — dropping the newline would silently blank every source's heading.
-- **`display_name`:** the uid (`sn15.3`, `pli-tv-bu-vb-np18`) — becomes the citation title; both schemes pass through unchanged.
+- **`display_name`:** the uid (`sn15.3`, `pli-tv-bu-vb-np18`) — becomes the citation title; both schemes pass through unchanged. It comes from the file name (`dhp1-20_…` → `dhp1-20`), not the first segment: a range file keys its lines by its first verse (`dhp1:0.1`).
 - **`custom_metadata`:** all derived from the uid (§5.2) — `uid`, `basket`, `nikaya`/`division`, plus `samyutta`/`vagga`/`rule-class` as useful for `filters`; `kind=note` if notes are ingested.
 - **Run mode:** one-time batch over both trees (thousands of files). **Idempotent and resumable** (skip uids already present), with retries/backoff.
 - **Rebuild:** on translation updates, prefer rebuilding a fresh store and swapping the store name in config (blue/green) over in-place upsert.
@@ -222,7 +222,7 @@ The field stays in the contract so a server-side URL (for non-app consumers of
 
 **Ingest — both trees → one document per unit**
 ```python
-import json, glob, re, tempfile
+import json, glob, os, re, tempfile
 from google import genai
 
 client = genai.Client()
@@ -240,10 +240,11 @@ def meta_from_uid(uid):                                          # derived, neve
 for g in globs:
     for path in glob.glob(g, recursive=True):
         segs = json.load(open(path))
-        uid  = next(iter(segs)).split(":")[0]                   # "sn15.3" | "pli-tv-bu-vb-np18"
-        head = " ".join(segs[k].strip() for k in segs if k.startswith(f"{uid}:0."))
+        uid   = os.path.basename(path).split("_")[0]           # "sn15.3" | "dhp1-20" | "pli-tv-bu-vb-np18"
+        first = next(iter(segs)).split(":")[0]                 # lines are keyed by the first verse: "dhp1"
+        head = " ".join(segs[k].strip() for k in segs if k.startswith(f"{first}:0."))
         body = " ".join(segs[k].strip() for k in segs
-                        if not k.startswith(f"{uid}:0.") and segs[k].strip())
+                        if not k.startswith(f"{first}:0.") and segs[k].strip())
         md   = {"uid": uid, **{k: v for k, v in meta_from_uid(uid).items() if v}}
 
         with tempfile.NamedTemporaryFile("w", suffix=f"_{uid}.txt", delete=False) as f:

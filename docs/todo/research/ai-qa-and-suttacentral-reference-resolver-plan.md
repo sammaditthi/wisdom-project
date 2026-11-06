@@ -414,8 +414,8 @@ Decisions locked 2026-07-06 — see the rewritten
   citation still behaves identically to a shared link.
 - **UI:** tapping a cited source opens a **bottom sheet** (ref + title +
   snippet) with **Open in reader** when the uid resolves; a graceful
-  "not linked yet" note otherwise (since 2026-11-02, only the research uids in
-  `tools/suttacentral_map/unmatched.txt`).
+  "not linked yet" note otherwise (since 2026-11-06, only the research uids in
+  `tools/suttacentral_map/unmatched.txt`: `sutta-references-plan.md` step 4).
 - **Granularity:** v1 is **sutta-level** (open the file/page for SN 15.3).
   Segment-level (`sn15.3:1.4` → the exact BJT paragraph) is genuinely hard —
   BJT paragraphs ≠ SC segments and our BJT entries aren't SC-segment-tagged yet

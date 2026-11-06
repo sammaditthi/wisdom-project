@@ -73,19 +73,23 @@ def meta_from_uid(uid: str) -> dict:
 def load_unit(path: str) -> tuple[str, str] | None:
     """Read one bilara JSON file → (uid, document_text). None if empty.
 
-    Document text = heading segments (`uid:0.*`) + body (the rest, in order), as
-    clean prose with no inline ids — clean text embeds better (design §8).
+    The uid is the file name's: a range file (`dhp1-20_…`) keys its lines by
+    its first verse (`dhp1:0.1`), so its first line would name it `dhp1`.
+    Document text = heading segments (`<first verse>:0.*`) + body (the rest, in
+    order), as clean prose with no inline ids — clean text embeds better
+    (design §8).
     """
     with open(path, encoding="utf-8") as f:
         segs = json.load(f)
     if not segs:
         return None
-    uid = next(iter(segs)).split(":")[0]
-    head = " ".join(segs[k].strip() for k in segs if k.startswith(f"{uid}:0."))
+    uid = os.path.basename(path).split("_")[0]
+    first = next(iter(segs)).split(":")[0]
+    head = " ".join(segs[k].strip() for k in segs if k.startswith(f"{first}:0."))
     body = " ".join(
         segs[k].strip()
         for k in segs
-        if not k.startswith(f"{uid}:0.") and segs[k].strip()
+        if not k.startswith(f"{first}:0.") and segs[k].strip()
     )
     text = f"{head}\n{body}".strip()
     return (uid, text) if text else None

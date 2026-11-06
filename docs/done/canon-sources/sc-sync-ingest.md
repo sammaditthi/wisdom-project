@@ -26,6 +26,10 @@ Source: `suttacentral/bilara-data`, branch `published`, commit `ce5b98f`
 "RESEARCH_STORE": "fileSearchStores/tipitakaen-j02s31fl1p4q",
 ```
 
+On 2026-11-06 the 99 range texts (`dhp1-20` …) were re-uploaded under their
+real uids, in place: same store, same snapshot. They had been named after their
+first verse (`dhp1`). See `docs/todo/search/sutta-references-plan.md` step 4.
+
 ## 2. The decision: pinned, no routine re-ingest
 
 - **We don't re-ingest just because SuttaCentral changed.** The canon doesn't
