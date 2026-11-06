@@ -93,3 +93,4 @@ const List<CanonBook> canonBooks = [
 // 3. Add `CanonBook('<Name>', '<prefix>')`, other spellings as aliases. Case is
 //    ignored, so no name may clash with another ("Sn" is SN).
 // 4. Remove its row here, and update A1 in `sutta-references-plan.md`.
+// 5. Add the same row to the hand copy in `research_server/src/refs.ts`.

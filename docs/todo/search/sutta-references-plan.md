@@ -1,6 +1,6 @@
 # Sutta references — plan
 
-Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A done 2026-11-04, apart from A5, which is not started.
+Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A done 2026-11-04, and A5 2026-11-05; the research Worker isn't deployed with it yet.
 
 Typing "SN 15.3" opens that sutta, and research answers link their sources the same way. This doc holds everything about it. It replaces Task 11 of `search-pane-redesign-plan.md`, `sutta-references-standards-report.md` (2026-10-10) and `suttacentral-bjt-concordance-findings.md` (2026-06-27). The last two are deleted.
 
@@ -13,7 +13,7 @@ Three parts:
 ## Rules (decided)
 
 - **One numbering: SuttaCentral's.** A reference opens the BJT sutta that SuttaCentral's number points to. Bodhi's translations use the same numbers. Old PTS numbers for a few SN and AN suttas are ignored.
-- **One table of book names for the whole project:** the app, the research Worker and anything later. No other list anywhere.
+- **One table of book names for the whole project:** the app, the research Worker and anything later. The Worker can't import Dart, so it keeps a hand copy, and a one-line comment on each side says to change both. No generator tool (2026-11-05). No other list anywhere.
 - **The normal search always runs.** A reference only adds the jump row on top; a local result is never lost. No "reference mode" (2026-10-10).
 - **A reference with no BJT page opens nothing.** Never the nearest page instead.
 - The table is a `const` in `wisdom_shared`, not a JSON asset: no new static files on the app side (2026-10-06).
@@ -26,7 +26,7 @@ Three parts:
 - Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview by the A4 table.
 - Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
 - Research: the research Worker (`research_server/`, on Cloudflare) sends each citation's `uid` and a display `ref`. The app shows `ref` as sent and opens the `uid` through `nodeKeyForUid`; when that fails, the source sheet says "This source isn't linked to this edition yet." Since Part B that is only `unmatched.txt`'s research list.
-- The research Worker keeps its own list (`NIKAYAS` in `research_server/src/refs.ts`), and `refFromUid` capitalises every book. So answers show "DHP 1-20" and "THAG 1.1", and Vinaya citations show raw IDs like `pli-tv-bu-vb-pj1`.
+- The research Worker's hand copy is `BOOKS` in `research_server/src/refs.ts`. `refFromUid` writes each citation's `ref` from it ("Dhp 1-20", "Bu Pj 1"). `REF_IN_PROSE` finds references in the answer by the same names, so "SN 15:3" and "Tha Ap 1" link whole; it keeps their case, so "an 8" in English stays a word. A reference found in the answer shows as `refFromUid` writes it, not as the model typed it.
 
 ## Part A — read the reference
 
@@ -65,7 +65,7 @@ The jump row names what opens: "Dhp 5" shows "Dhp 1-20" (decided 2026-11-04).
 - Saving a reference as typed loses nothing: running "an 3" again converts it again, while a saved "අන් 3" would lose the jump.
 - Why this is enough (measured 2026-10-10 on `bjt.db`, `dict.db` and `tree.json`, all six match modes): a capitalised book plus a number finds nothing in the default match mode. In "near" and "anywhere" a few do ("A 3.65", "Pe 1"), and those hits still show because the normal search runs. Capital S, M, C, U, V and J have no Singlish letter, so "SN" converts to "Sණ්", which matches nothing. A few rare Singlish words start like a book (AN → ඇණ, Ne → ණෙ, Pe → ඵෙ, Thag → ථග); their preview hides for one keystroke and returns with the next letter. Our search boxes don't turn on auto-capitals, so phones type lowercase. No corpus test needed.
 
-**A5. The research Worker uses the same table.** `NIKAYAS` and the capitalising in `refFromUid` go. Display names and the prose matcher (which must take "SN 15:3" too, not link it as "SN 15") come from the one table. How is open: see "To decide", item 1. Separate commit; the user decides when to deploy the worker.
+**A5. The research Worker uses the same table,** as a hand copy (decided 2026-11-05). Display names and the prose matcher come from it, so the matcher takes "SN 15:3" whole, not as "SN 15". Separate commit; the user decides when to deploy the Worker.
 
 ## Part B — the lookup file
 
@@ -116,16 +116,13 @@ The reader's Share menu has "Open on SuttaCentral" when the active tab's node ha
 
 1. A1, A2, A3 and A4: the table, the new forms, a number inside a range, the preview rule. A3 moved here from step 2: research citations carry exact IDs, so only typed references need it. **Done 2026-11-04.** Handover: `canonBooks` replaced `knownBooks` and `_displayBook`. `parseRef` builds "table prefix + number". `displayRef` takes the book whose prefix is followed by a digit, so `snp1.8` is never SN. `isBookName` serves the A4 rule. `uidToOpen` is the range fallback, and only the jump row calls it. On a miss it scans the map's own keys (about 50 µs on the real map), so there is no index, and a resolver made with the plain const constructor has the fallback too. Checked against the real lookup file: every "Done when" case, and every numbered ID that isn't a range reads back to itself through `displayRef` then `parseRef`. Unit tests written 2026-11-05.
 2. Part B: the builder and the full lookup file. **Done 2026-11-02**, with Part C and the weekly check. Handover: research citations open for the whole canon; the reader links back. The resolver gained `fromJson` and `suttaCentralUrl`, and lost the unused `resolveToNodeKey` and `isReady`. The new two are covered by the map-file test (`suttacentral_concordance_datasource_test.dart`) and the Share menu test (`reader_share_menu_test.dart`); `wisdom_shared` has no unit tests for them yet.
-3. A5: the research Worker on the one table. Its own commit.
+3. A5: the research Worker on the one table. Its own commit. **Done 2026-11-05, not deployed.** Handover: `BOOKS` in `refs.ts` replaced `NIKAYAS`. `refFromUid` and `uidFromRef` mirror `displayRef` and `parseRef`. `knownUid` is gone: `uidFromRef` only returns a book from the table, so the shape check had nothing left to drop. Checked with a scratch script against the lookup file: every numbered uid reads back to itself, apart from the chapter uid `an2-balavagga2`, as on the Dart side. The Worker has no tests.
 
 The test agent writes the unit tests (CLAUDE.md). Add a handover note under each step when it's done.
 
 ## To decide
 
-1. **How the research Worker shares the one table.** TypeScript can't import Dart. The Worker uses book names twice: for the `ref` it sends with each citation, and to find references the model writes in its answer (`REF_IN_PROSE`). Two ways:
-   - The Dart table stays the source, and a small tool writes a generated TypeScript copy for the worker.
-   - The app writes `ref` itself from the `uid` (it already has the table), and finding references in the answer moves to the app too. The Worker then needs no book names, but the answer format changes.
-2. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the lookup file now covers the whole canon, so check its size first.
+1. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the lookup file now covers the whole canon, so check its size first.
 
 ## Not supported
 
@@ -136,10 +133,10 @@ Edge cases, left out on purpose: old PTS numbers, PTS volume/page references ("S
 - [x] "SN 15.3", "sn15.3", "SN 15:3", "Dhp 5", "Dhp 1-20", "Tha Ap 1" and "AN 3.65" show no preview, are saved as typed, and open their BJT page.
 - [x] "SN", "Dhp" and "Thag" alone show no preview. "an", "sn", "a", "s", "m" and "KN" alone show theirs.
 - [x] `displayRef('kp1')` is "Kp 1".
-- [ ] Research answers show "Dhp 1-20", not "DHP 1-20", and "Bu Pj 1", not `pli-tv-bu-vb-pj1` (A5).
+- [x] Research answers show "Dhp 1-20", not "DHP 1-20", and "Bu Pj 1", not `pli-tv-bu-vb-pj1` (A5). Live once the Worker is deployed.
 - [x] The lookup file covers Sutta, Abhidhamma and Vinaya, apart from what `unmatched.txt` lists with a reason. Every value exists in `tree.json`.
 - [x] The reader opens the text it shows on SuttaCentral, Bhikkhu Bodhi's translation first, and a weekly check says when SuttaCentral moves a page it links to.
-- [ ] No list of book names exists outside the one table.
+- [x] No list of book names exists outside the one table and the Worker's hand copy of it.
 
 ## Appendix: abbreviations by source
 

@@ -242,6 +242,11 @@ citations show the wrong case. The two abbreviation sets also diverge (Python
 **Recommendation:** give the Python side a proper-case map mirroring Dart; align
 the two abbreviation lists (or document why they differ).
 
+**✅ Resolved (2026-11-05):** the server is now the TypeScript Worker, and its
+`refs.ts` holds a hand copy of `canonBooks` (`wisdom_shared`), so both sides
+write "Dhp 155" and know the same books. A comment on each side says to change
+both (`sutta-references-plan.md`, A5).
+
 ---
 
 ### Finding 8 — No generic HTTP client; four datasources repeat the pattern (Low) — your Q6

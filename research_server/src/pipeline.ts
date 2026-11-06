@@ -18,7 +18,7 @@ import {
   responseText,
 } from './gemini.js';
 import { isSinhala } from './lang.js';
-import { knownUid, REF_IN_PROSE, refFromUid, uidFromRef } from './refs.js';
+import { REF_IN_PROSE, refFromUid, uidFromRef } from './refs.js';
 import { makeSnippet, queryTerms, splitHeading } from './snippet.js';
 import { cpuMs } from './timing.js';
 
@@ -241,10 +241,10 @@ function toCitations(
   // Refs named verbatim in the prose — resolve, drop the unknown.
   for (const m of answerText.matchAll(REF_IN_PROSE)) {
     const uid = uidFromRef(m[0]);
-    if (uid && knownUid(uid) && !cites.has(uid)) {
+    if (uid && !cites.has(uid)) {
       cites.set(uid, {
         uid,
-        ref: m[0],
+        ref: refFromUid(uid),
         title: null,
         kind: 'canon',
         snippet: null,
@@ -262,7 +262,7 @@ const PARENS_OF_CITES = /\(\s*((?:\[\[cite:[^\]]+\]\](?:\s*(?:,|;|&|and)\s*)?)+)
 function linkifyProseRefs(text: string): string {
   const linked = text.replace(REF_IN_PROSE, (m) => {
     const uid = uidFromRef(m);
-    return uid && knownUid(uid) ? cite(uid) : m;
+    return uid ? cite(uid) : m;
   });
   return linked.replace(PARENS_OF_CITES, (_, inner: string) => inner.trim());
 }
