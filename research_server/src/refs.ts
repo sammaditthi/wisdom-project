@@ -75,6 +75,7 @@ const NUMBER = String.raw`\d+(?:[.:]\d+)*(?:-\d+)?`;
 // "it 5" is a word, not a book.
 const NAMES = BOOKS.flatMap((b) => [b.name, ...(b.aliases ?? [])]).join('|');
 
+// No capture groups: pipeline.ts builds bigger regexes around this one.
 export const REF_IN_PROSE = new RegExp(`\\b(?:${NAMES})\\s?${NUMBER}\\b`, 'g');
 
 const REF = new RegExp(`^([A-Za-z]+(?:\\s+[A-Za-z]+)?)\\s*(${NUMBER})$`);
@@ -95,4 +96,22 @@ export function uidFromRef(ref: string): string | null {
   if (!m) return null;
   const prefix = PREFIX_BY_NAME.get(m[1]!.toLowerCase().replace(/\s+/g, ' '));
   return prefix ? prefix + m[2]!.replace(/:/g, '.') : null;
+}
+
+// The uid in `cited` that holds `uid`: itself, else a range of its stem holding
+// its last number (`an1.1` → `an1.1-10`); null when none does.
+// Hand copy of resolve (packages/wisdom_shared/lib/src/refs/suttacentral_ref_resolver.dart): change both.
+export function citedHolding(uid: string, cited: ReadonlySet<string>): string | null {
+  if (cited.has(uid)) return uid;
+  const last = /^(.*\D)(\d+)$/.exec(uid);
+  if (!last) return null;
+  const stem = last[1]!;
+  const number = Number(last[2]);
+  for (const c of cited) {
+    if (!c.startsWith(stem)) continue;
+    // A numeric N-M only, so a chapter uid like `sn1-nalavagga` never counts.
+    const range = /^(\d+)-(\d+)$/.exec(c.slice(stem.length));
+    if (range && Number(range[1]) <= number && number <= Number(range[2])) return c;
+  }
+  return null;
 }

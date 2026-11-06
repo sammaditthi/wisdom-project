@@ -108,6 +108,7 @@ class SuttaCentralRefResolver {
   /// What a reference opens: [uid] itself when mapped, else the map's range
   /// holding its last number (`dhp5` -> `dhp1-20`, `an1.1` -> `an1.1-10`).
   /// Search and research both open through this. `null` when neither is.
+  /// The Worker's `citedHolding` (research_server/src/refs.ts) is a hand copy: change both.
   ({String uid, String nodeKey})? resolve(String uid) {
     final exact = nodeKeyForUid(uid);
     if (exact != null) return (uid: uid, nodeKey: exact);

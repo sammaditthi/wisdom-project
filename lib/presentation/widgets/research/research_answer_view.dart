@@ -101,6 +101,7 @@ class ResearchAnswerView extends StatelessWidget {
   /// Splits the answer into paragraph / bullet blocks. Consecutive non-blank,
   /// non-bullet lines coalesce into one paragraph (LLM soft line breaks); blank
   /// lines separate paragraphs.
+  /// `paragraphStarts` (research_server/src/pipeline.ts) splits the same way: change both.
   List<({bool bullet, String text})> _parseBlocks(String src) {
     final blocks = <({bool bullet, String text})>[];
     final para = <String>[];

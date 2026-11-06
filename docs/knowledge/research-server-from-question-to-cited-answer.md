@@ -111,6 +111,11 @@ substitution; the model already placed each ref where it belongs.
 counting walk), splice markers at the end of supported sentences. No
 guessing anywhere — Gemini made every connection; we transcribe it.
 
+**Both paths: once per paragraph.** A source keeps its first chip in each
+paragraph (split as the app splits them); a repeat in brackets goes, and one
+the sentence needs stays as words. A ref the model writes inside a range the
+store cites ("AN 1.1" beside `an1.1-10`) becomes that range's chip.
+
 ## The snippet situation
 
 **Why it exists.** The card must prove — without a tap — that the answer

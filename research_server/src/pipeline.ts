@@ -18,7 +18,7 @@ import {
   responseText,
 } from './gemini.js';
 import { isSinhala } from './lang.js';
-import { REF_IN_PROSE, refFromUid, uidFromRef } from './refs.js';
+import { citedHolding, REF_IN_PROSE, refFromUid, uidFromRef } from './refs.js';
 import { makeSnippet, queryTerms, splitHeading } from './snippet.js';
 import { cpuMs } from './timing.js';
 
@@ -201,8 +201,11 @@ export function buildResponse(
   isSi: boolean,
   snippetChars: number,
 ): Omit<ResearchResponse, 'model'> {
-  const citations = toCitations(text, resp, searchQ, snippetChars);
-  let answerText = linkifyProseRefs(text);
+  const storeUids = new Set(
+    groundingChunks(resp).flatMap((c) => c.retrievedContext?.title || []),
+  );
+  const citations = toCitations(text, resp, storeUids, searchQ, snippetChars);
+  let answerText = linkifyProseRefs(text, storeUids);
   if (!answerText.includes('[[cite:')) {
     answerText = injectCitationTokens(text, resp);
   }
@@ -215,6 +218,7 @@ const groundingChunks = (resp: GenerateResponse) =>
 function toCitations(
   answerText: string,
   resp: GenerateResponse,
+  storeUids: ReadonlySet<string>,
   searchQ: string,
   snippetChars: number,
 ): Citation[] {
@@ -240,7 +244,7 @@ function toCitations(
 
   // Refs named verbatim in the prose — resolve, drop the unknown.
   for (const m of answerText.matchAll(REF_IN_PROSE)) {
-    const uid = uidFromRef(m[0]);
+    const uid = proseUid(m[0], storeUids);
     if (uid && !cites.has(uid)) {
       cites.set(uid, {
         uid,
@@ -254,17 +258,61 @@ function toCitations(
   return [...cites.values()];
 }
 
-// Parens that wrap ONLY cite tokens (and separators) are dropped so a chip
-// reads "…text 📖SN 15.11." instead of "(📖SN 15.11)".
-const PARENS_OF_CITES = /\(\s*((?:\[\[cite:[^\]]+\]\](?:\s*(?:,|;|&|and)\s*)?)+)\)/g;
+// The uid a ref the model wrote cites: the range this answer's store
+// citations hold it in (`an1.1` → `an1.1-10`), else its own. Never a guess.
+function proseUid(ref: string, storeUids: ReadonlySet<string>): string | null {
+  const uid = uidFromRef(ref);
+  return uid && (citedHolding(uid, storeUids) ?? uid);
+}
+
+// Brackets holding only refs ("(SN 15.3)", "(AN 1.1; **SN 15.3**)") with the
+// space before them, or one ref in the sentence, each with any bold or italic
+// marks round it. Groups: 1=space, 2=inside, 3=the sentence ref's marks.
+// `[ \t]*`, not `\s*`: never eat a newline. Linear on any input: a space run is
+// tried from its start only, and refs need a separator between them, or the
+// marks at each join could split several ways.
+const REF = REF_IN_PROSE.source;
+const MARKED_REF = String.raw`\*{0,3}${REF}\*{0,3}`;
+const SEP = String.raw`\s*(?:,|;|&|and)\s*`;
+const REFS_IN_PARENS_OR_REF = new RegExp(
+  String.raw`(?<![ \t])([ \t]*)\(\s*(${MARKED_REF}(?:${SEP}${MARKED_REF})*(?:${SEP})?)\)|(\*{0,3})${REF}\3`,
+  'g',
+);
 
 // PRIMARY chip source: refs the model wrote in prose, for known uids only.
-function linkifyProseRefs(text: string): string {
-  const linked = text.replace(REF_IN_PROSE, (m) => {
-    const uid = uidFromRef(m);
-    return uid ? cite(uid) : m;
-  });
-  return linked.replace(PARENS_OF_CITES, (_, inner: string) => inner.trim());
+// Brackets of refs become bare chips ("…text 📖SN 15.11."). A source shows once
+// per paragraph: a repeat in brackets goes, with its separator (and the
+// brackets once empty); a repeat in the sentence keeps the model's words, marks
+// and all. A chip drops the marks round its ref: it draws its own weight.
+function linkifyProseRefs(text: string, storeUids: ReadonlySet<string>): string {
+  const first = firstInParagraph(text);
+  const chip = (ref: string, at: number): string | null => {
+    const uid = proseUid(ref, storeUids);
+    return uid && first(uid, at) ? cite(uid) : null;
+  };
+  const unmarked = (s: string): string => s.replace(/\*/g, '');
+  return text.replace(
+    REFS_IN_PARENS_OR_REF,
+    (
+      m: string,
+      space: string | undefined,
+      inside: string | undefined,
+      _marks: string | undefined,
+      at: number,
+    ) => {
+      if (inside === undefined) return chip(unmarked(m), at) ?? m;
+      let out = '';
+      let from = 0;
+      for (const r of inside.matchAll(REF_IN_PROSE)) {
+        const c = chip(r[0], at);
+        // A chip keeps the separator before it, unless it is the first kept.
+        if (c) out += (out ? inside.slice(from, r.index) : '') + c;
+        from = r.index! + r[0].length;
+      }
+      // The bracket holds only refs, separators and marks: the marks go.
+      return out ? space + unmarked(out + inside.slice(from)).trim() : '';
+    },
+  );
 }
 
 // Fallback chip source: grounding_supports offsets (UTF-8 bytes → one mapping
@@ -297,7 +345,47 @@ function injectCitationTokens(text: string, resp: GenerateResponse): string {
     const pos = charAt.get(byteEnd) ?? text.length;
     text = text.slice(0, pos) + uids.map(cite).join('') + text.slice(pos);
   }
-  return text;
+  // Every chip here is one the Worker added, so a repeat is simply dropped.
+  const first = firstInParagraph(text);
+  return text.replace(CITE, (chip, uid: string, at: number) => (first(uid, at) ? chip : ''));
+}
+
+const CITE = /\[\[cite:([^\]\s]+)\]\]/g;
+
+// A bullet line, as the app reads one.
+const BULLET = /^\s*[-*]\s+/;
+
+// Where each paragraph starts, split as the app splits the answer (_parseBlocks
+// in lib/presentation/widgets/research/research_answer_view.dart): change both.
+// A blank line ends one; each bullet line is its own.
+function paragraphStarts(text: string): number[] {
+  const starts: number[] = [];
+  let at = 0;
+  let afterBullet = false;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    const bullet = BULLET.test(line);
+    if (!line || bullet || afterBullet) starts.push(at);
+    afterBullet = bullet;
+    at += raw.length + 1;
+  }
+  return starts;
+}
+
+// True for the first chip of `uid` in the paragraph holding offset `at`: one
+// chip per source per paragraph. For once per answer, key on the uid alone.
+// Offsets must come in text order, as replace() gives them.
+function firstInParagraph(text: string): (uid: string, at: number) => boolean {
+  const starts = paragraphStarts(text);
+  const seen = new Set<string>();
+  let passed = 0; // paragraph starts at or before the last offset
+  return (uid, at) => {
+    while (passed < starts.length && starts[passed]! <= at) passed++;
+    const key = `${passed} ${uid}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  };
 }
 
 function mapByteOffsets(text: string, byteOffsets: number[]): Map<number, number> {

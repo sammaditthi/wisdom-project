@@ -1,6 +1,6 @@
 # Sutta references — plan
 
-Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A done 2026-11-04, and A5 2026-11-05; the research Worker isn't deployed with it yet. The research store's names for range texts fixed 2026-11-06 (step 4), and research opens a range the way search does (step 5).
+Started 2026-10-11. Part B and the reader's way back (Part C) done 2026-11-02. Part A done 2026-11-04, and A5 2026-11-05; the research Worker isn't deployed with it yet. The research store's names for range texts fixed 2026-11-06 (step 4), and research opens a range the way search does (step 5). Research answers show each source once per paragraph, and "AN 1.1" beside a cited AN 1.1-10 is one chip (step 6, 2026-11-06); that also waits for the Worker deploy.
 
 Typing "SN 15.3" opens that sutta, and research answers link their sources the same way. This doc holds everything about it. It replaces Task 11 of `search-pane-redesign-plan.md`, `sutta-references-standards-report.md` (2026-10-10) and `suttacentral-bjt-concordance-findings.md` (2026-06-27). The last two are deleted.
 
@@ -26,7 +26,7 @@ Three parts:
 - Search: `referenceSearchResultProvider` adds the jump row. `singlishPreviewText` (`lib/core/utils/search_query_utils.dart`) hides the Singlish preview by the A4 table.
 - Typed punctuation no longer breaks the normal search (2026-10-29). `:` and `?` split words like `.` does, in the query, tree names and page text (`_wordBreakChars`, `lib/core/utils/text_utils.dart`), so "SN 15:3" reads "SN 15 3" and "15:3" never becomes "153". `'` is stripped. `~` was already safe: it is dropped after the Singlish conversion. FTS words are still sent unquoted; quoting them would let a row match that the highlighter cannot find.
 - Research: the research Worker (`research_server/`, on Cloudflare) sends each citation's `uid` and a display `ref`. The app opens the `uid` through `resolve`, so "AN 1.1" written in an answer opens AN 1.1-10. The source sheet shows `ref` as sent, or the range's name when the range opens instead, like the jump row: "Dhp 5" shows "Dhp 1-20". When nothing opens, it says "This source isn't linked to this edition yet." Since step 4 that is only `unmatched.txt`'s research list.
-- The research Worker's hand copy is `BOOKS` in `research_server/src/refs.ts`. `refFromUid` writes each citation's `ref` from it ("Dhp 1-20", "Bu Pj 1"). `REF_IN_PROSE` finds references in the answer by the same names, so "SN 15:3" and "Tha Ap 1" link whole; it keeps their case, so "an 8" in English stays a word. A reference found in the answer shows as `refFromUid` writes it, not as the model typed it.
+- The research Worker's hand copy is `BOOKS` in `research_server/src/refs.ts`. `refFromUid` writes each citation's `ref` from it ("Dhp 1-20", "Bu Pj 1"). `REF_IN_PROSE` finds references in the answer by the same names, so "SN 15:3" and "Tha Ap 1" link whole; it keeps their case, so "an 8" in English stays a word. A reference found in the answer shows as `refFromUid` writes it, not as the model typed it. Each source shows once per paragraph, and a reference inside a range the store cites shows as that range (step 6).
 
 ## Part A — read the reference
 
@@ -119,16 +119,41 @@ The reader's Share menu has "Open on SuttaCentral" when the active tab's node ha
 3. A5: the research Worker on the one table. Its own commit. **Done 2026-11-05, not deployed.** Handover: `BOOKS` in `refs.ts` replaced `NIKAYAS`. `refFromUid` and `uidFromRef` mirror `displayRef` and `parseRef`. `knownUid` is gone: `uidFromRef` only returns a book from the table, so the shape check had nothing left to drop. Checked with a scratch script against the lookup file: every numbered uid reads back to itself, apart from the chapter uid `an2-balavagga2`, as on the Dart side. The Worker has no tests.
 4. The research store's names for range texts. **Done 2026-11-06.** Handover: the ingest took each uid from the file's first line, so a range file went into the store under its first verse: `dhp1-20` as `dhp1`, `sn34.46-49` as `sn34.46`. On 2026-11-05 that was 99 files (95 Sujato, 4 Brahmali). The lookup file has only the real uids, so those citations said "This source isn't linked to this edition yet", and the Worker wrote "Dhp 1". `load_unit` (`tools/research_ingest/ingest.py`) now takes the uid from the file name. The heading check still uses the first line's uid, because the lines are keyed by the first verse. The dry run changed those 99 names and nothing else, text included. The 99 were uploaded under the new names, then the old 99 deleted by a one-off script, not added to the ingest; the store's document count is the same as before. Checked with one live call: a Dhammapada question cites `dhp1-20` as "Dhp 1-20". The Worker and the app didn't change.
 5. Research opens a range the way search does. **Done 2026-11-06.** Handover: a reference the model writes in its answer ("AN 1.1") becomes a citation with that uid, and the source sheet looked it up exactly, so it said "not linked" while the store's own citation, `an1.1-10`, opened. `uidToOpen` became `resolve`, which returns the uid that opens and its node; the jump row and the source sheet both call it. The sheet names what opens, as the jump row does: "AN 1.1" opens and names "AN 1.1-10"; a citation that opens its own uid keeps the `ref` the Worker sent. `nodeKeyForUid` stays as the exact lookup. Tests: `resolve` in `suttacentral_ref_resolver_test.dart`, and the sheet's first widget test (`citation_source_sheet_test.dart`), each checked by putting the old code back in a scratch copy.
+6. Research chips: each source once per paragraph, and a reference inside a cited range is that range. **Done 2026-11-06, not deployed.** Handover: a source showed a chip after every sentence it supported and on every reference the model wrote, and the model's "AN 1.1" beside the store's `an1.1-10` gave two chips for one text. An answer still takes its chips from one path only: the model's references, or the injected ones when it wrote none. In `research_server/src/pipeline.ts`, `firstInParagraph` keeps the first chip of each source per paragraph, with paragraphs split as the app's `_parseBlocks` splits them (`paragraphStarts`; a comment on each side says change both). A repeat in brackets goes, with its separator, and the brackets go once empty. A repeat the sentence needs ("as AN 1.1 says") stays as the model's words. Bold or italic marks round a reference (`*`, `**`, `***`) go with it when it becomes a chip or leaves a bracket, so "(**MN 138**)" counts as a bracket like any other; the model writes that form in the saved chats. A repeat kept as words keeps its marks. `citedHolding` (`refs.ts`, a hand copy of `resolve`) turns a reference the model wrote into the range the store cites, so `an1.1` is no longer a citation of its own. Checked in a scratch harness: with the new steps switched off, the output is byte-identical to HEAD. Replaying the 23 saved Mac-app chats, no paragraph lost a source, none shows one twice, and no bracket of references is left without a chip (3 were before the bold step). Bench worst case, cold, about 7.9 ms (HEAD 6.9 ms, budget 10 ms); `test.sh` passes. Two live calls (the Dhammapada question, Fast). In the first, the first model gave a 503 and the second answered with no retrieved sources, so no chips. In the second, "MN 128" became one chip; the model wrote "Dhammapada verses 3-5" in words, which isn't a reference, so Dhp 1-20 showed under Other sources only, as before. Neither answer had a repeat to drop, so the manual check below is still the real test. That call's log read `build=10.8ms` on a freshly started Node server; the same answer timed on its own costs about 2.7 ms cold (HEAD about 2.0 ms). The Worker has no tests.
 
 The test agent writes the unit tests (CLAUDE.md). Add a handover note under each step when it's done.
 
 ## To decide
 
 1. **Optional, static site.** "SN 15.3" in the site's search dialog could open the BJT page. Cost: the lookup file as extra rows in `search-index.json`, plus a small reference parser in `site.js`. The parser holds only Latin letters and digits, so "no Sinhala, no URLs in site.js" still holds. Do it only while it stays small; the lookup file now covers the whole canon, so check its size first.
+2. **Follow-up: ranges written with an en dash** (found 2026-11-06 in a saved research answer). The model wrote "SN 15.15–19". `NUMBER` in `research_server/src/refs.ts` and `_refPattern` in the Dart resolver read only a hyphen, so the answer shows an "SN 15.15" chip and a loose "–19". A pasted "Dhp 1–20" gets no jump row in search either. Two kinds: "Dhp 1–20" is a real ID (`dhp1-20`), so reading `–` as `-` opens it. "SN 15.15–19" is five separate texts with no ID for the run: decide between a chip for the first text and plain text. Change both copies.
 
 ## Not supported
 
 Edge cases, left out on purpose: old PTS numbers, PTS volume/page references ("S II 178"), and PTS verse numbers for Sn and Th ("Sn 143").
+
+## Manual check after the prod release
+
+Once the research Worker and the app are on prod, check these on app.sammaditthi.net and on macOS. Move this doc to `docs/done/search/` only when every box is ticked.
+
+**Research (new Worker)**
+
+- [ ] Ask (Fast): "What does the Dhammapada say about overcoming hatred?" Chips read "Dhp 1-20", not "DHP 1-20" or "Dhp 1"; at most one per paragraph; no leftover "(Dhp 1-20)" in plain or bold text; not again under Other sources.
+- [ ] Tap that chip: the sheet shows the English passage; Open in reader opens 1. යමකවග්ගො.
+- [ ] Ask: "What does AN 1.1 teach?" One "AN 1.1-10" chip per paragraph, no separate "AN 1.1" chip; it opens 1. චිත්තපරියාදානවග්ගො.
+- [ ] Ask: "What is the first pārājika rule for monks?" Chip "Bu Pj 1", not `pli-tv-bu-vb-pj1`; opens වෙරඤ්ජකණ්ඩො.
+- [ ] Ask in Sinhala: "වෛරය සංසිඳවීම ගැන ධම්මපදය කියන්නේ කුමක්ද?" Same chip behaviour as the first check.
+- [ ] Open a chat saved before the release (Recent): its chips still show and open.
+
+**Search**
+
+- [ ] "SN 15.3", "sn15.3", "SN 15:3", "AN 3.65", "Tha Ap 1": jump row on top, no Singlish preview, normal results still below; each opens its page.
+- [ ] "Dhp 5": the row names "Dhp 1-20" and opens 1. යමකවග්ගො.
+- [ ] "an" and "sn" alone show the Singlish preview; "SN" and "Dhp" don't. Recent searches keep "SN 15.3" as typed.
+
+**Reader**
+
+- [ ] AN 3.65 → Share → "Open on SuttaCentral" opens Bhikkhu Bodhi's translation; SN 15.3 opens Sujato's (SuttaCentral has no Bodhi for it). On a commentary tab the row isn't shown.
 
 ## Done when
 
@@ -137,6 +162,7 @@ Edge cases, left out on purpose: old PTS numbers, PTS volume/page references ("S
 - [x] `displayRef('kp1')` is "Kp 1".
 - [x] "AN 1.1" in a research answer opens AN 1.1-10, and its source sheet names "AN 1.1-10", as "Dhp 5" in search shows "Dhp 1-20" (step 5).
 - [x] Research answers show "Dhp 1-20", not "DHP 1-20" or "Dhp 1", and "Bu Pj 1", not `pli-tv-bu-vb-pj1` (A5, step 4). Live once the Worker is deployed.
+- [x] A research answer shows each source at most once per paragraph: a repeat in brackets goes, bold or not, one in the sentence stays as words, and "AN 1.1" beside a cited AN 1.1-10 is one "AN 1.1-10" chip (step 6). Live once the Worker is deployed.
 - [x] The lookup file covers Sutta, Abhidhamma and Vinaya, apart from what `unmatched.txt` lists with a reason. Every value exists in `tree.json`.
 - [x] The reader opens the text it shows on SuttaCentral, Bhikkhu Bodhi's translation first, and a weekly check says when SuttaCentral moves a page it links to.
 - [x] No list of book names exists outside the one table and the Worker's hand copy of it.
