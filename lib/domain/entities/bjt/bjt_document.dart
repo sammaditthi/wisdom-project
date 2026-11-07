@@ -49,18 +49,4 @@ class BJTDocument with _$BJTDocument {
     }
     return pages[local];
   }
-
-  /// Gets a specific page by its page number
-  BJTPage? getPageByNumber(int pageNumber) {
-    try {
-      return pages.firstWhere((page) => page.pageNumber == pageNumber);
-    } catch (e) {
-      return null;
-    }
-  }
-
-  /// Returns all page numbers
-  List<int> get allPageNumbers {
-    return pages.map((page) => page.pageNumber).toList();
-  }
 }

@@ -1,3 +1,5 @@
+import 'package:wisdom_shared/wisdom_shared.dart' show TipitakaNodeKeys;
+
 import '../../domain/entities/bjt/bjt_document.dart';
 import '../../domain/entities/bjt/bjt_page.dart';
 import '../../domain/entities/bjt/bjt_section.dart';
@@ -31,12 +33,14 @@ class BJTDocumentParser {
     // yet; cross-edition alignment will need them derived from the absolute
     // page and entry instead.
     int segmentIndex = 0;
+    final hasPrintedPages = _hasPrintedPages(fileId);
 
     final pages = pagesJson.map((pageJson) {
       return _parsePage(
         pageJson as Map<String, dynamic>,
         fileId,
         (_) => segmentIndex++,
+        hasPrintedPages: hasPrintedPages,
       );
     }).toList();
 
@@ -48,19 +52,26 @@ class BJTDocumentParser {
     );
   }
 
+  /// Commentary and treatise files are not Buddha Jayanti books: their
+  /// `pageNum`s match no printed page we can check, so they show none
+  /// (tipitaka.lk hides the commentaries' too).
+  static bool _hasPrintedPages(String fileId) =>
+      !fileId.startsWith(TipitakaNodeKeys.commentary) &&
+      !fileId.startsWith(TipitakaNodeKeys.treatises);
+
   static BJTPage _parsePage(
     Map<String, dynamic> pageJson,
     String fileId,
-    int Function(String) generateSegmentIndex,
-  ) {
-    final int pageNumber = pageJson['pageNum'] as int;
+    int Function(String) generateSegmentIndex, {
+    required bool hasPrintedPages,
+  }) {
     final Map<String, dynamic> paliJson =
         pageJson['pali'] as Map<String, dynamic>;
     final Map<String, dynamic> sinhJson =
         pageJson['sinh'] as Map<String, dynamic>;
 
     return BJTPage(
-      pageNumber: pageNumber,
+      pageNumber: hasPrintedPages ? pageJson['pageNum'] as int : null,
       paliSection: _parseSection(paliJson, 'pi', fileId, generateSegmentIndex),
       sinhalaSection:
           _parseSection(sinhJson, 'si', fileId, generateSegmentIndex),

@@ -16,8 +16,9 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$BJTPage {
-  /// The page number in the original text
-  int get pageNumber => throw _privateConstructorUsedError;
+  /// The printed page of the Pali side. Null where no printed page can be
+  /// checked (commentaries, treatises).
+  int? get pageNumber => throw _privateConstructorUsedError;
 
   /// Pali section for this page
   BJTSection get paliSection => throw _privateConstructorUsedError;
@@ -37,7 +38,7 @@ abstract class $BJTPageCopyWith<$Res> {
       _$BJTPageCopyWithImpl<$Res, BJTPage>;
   @useResult
   $Res call(
-      {int pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
+      {int? pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
 
   $BJTSectionCopyWith<$Res> get paliSection;
   $BJTSectionCopyWith<$Res> get sinhalaSection;
@@ -58,15 +59,15 @@ class _$BJTPageCopyWithImpl<$Res, $Val extends BJTPage>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? pageNumber = null,
+    Object? pageNumber = freezed,
     Object? paliSection = null,
     Object? sinhalaSection = null,
   }) {
     return _then(_value.copyWith(
-      pageNumber: null == pageNumber
+      pageNumber: freezed == pageNumber
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       paliSection: null == paliSection
           ? _value.paliSection
           : paliSection // ignore: cast_nullable_to_non_nullable
@@ -107,7 +108,7 @@ abstract class _$$BJTPageImplCopyWith<$Res> implements $BJTPageCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
+      {int? pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
 
   @override
   $BJTSectionCopyWith<$Res> get paliSection;
@@ -128,15 +129,15 @@ class __$$BJTPageImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? pageNumber = null,
+    Object? pageNumber = freezed,
     Object? paliSection = null,
     Object? sinhalaSection = null,
   }) {
     return _then(_$BJTPageImpl(
-      pageNumber: null == pageNumber
+      pageNumber: freezed == pageNumber
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
-              as int,
+              as int?,
       paliSection: null == paliSection
           ? _value.paliSection
           : paliSection // ignore: cast_nullable_to_non_nullable
@@ -158,9 +159,10 @@ class _$BJTPageImpl extends _BJTPage {
       required this.sinhalaSection})
       : super._();
 
-  /// The page number in the original text
+  /// The printed page of the Pali side. Null where no printed page can be
+  /// checked (commentaries, treatises).
   @override
-  final int pageNumber;
+  final int? pageNumber;
 
   /// Pali section for this page
   @override
@@ -203,14 +205,15 @@ class _$BJTPageImpl extends _BJTPage {
 
 abstract class _BJTPage extends BJTPage {
   const factory _BJTPage(
-      {required final int pageNumber,
+      {required final int? pageNumber,
       required final BJTSection paliSection,
       required final BJTSection sinhalaSection}) = _$BJTPageImpl;
   const _BJTPage._() : super._();
 
-  /// The page number in the original text
+  /// The printed page of the Pali side. Null where no printed page can be
+  /// checked (commentaries, treatises).
   @override
-  int get pageNumber;
+  int? get pageNumber;
 
   /// Pali section for this page
   @override

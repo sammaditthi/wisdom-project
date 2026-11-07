@@ -71,6 +71,11 @@ class SingleColumnPane extends StatelessWidget {
           anchor: anchor,
           padding: context.textEntryTheme.readingPadding(constraints.maxWidth),
           rowCount: (page) => _section(page).entries.length,
+          buildPageNumber: (context, page) =>
+              ReaderEntryBuilder.buildPageNumber(
+            context,
+            languageCode == 'pi' ? page.pageNumber : page.sinhalaPageNumber,
+          ),
           buildRows: (context, index, start, end) =>
               ReaderEntryBuilder.buildEntries(
             context,

@@ -15,12 +15,14 @@ import 'test_overrides.dart';
 /// What the reader panes draw around the anchor row, and how a selection
 /// behaves in them.
 ///
-/// Rows used, all in බ්රහ්මජාලසුත්තං (dn-1-1), file dn-1, page 3:
+/// Rows used, in බ්රහ්මජාලසුත්තං (dn-1-1), file dn-1, page 3:
 ///   entry 3 → paragraph 15, “බීජගාමභූතගාමසමාරම්භා …
 ///   entry 4 → centered චුල්ලසීලං නිට්ඨිතං., not the page's first row
 /// and page 0, where dn-1-1 starts:
 ///   entry 4 → centered `1.` on both sides, the sutta number
 ///   entry 5 → heading බ්රහ්මජාලසුත්තං, which the Sinhala side translates
+/// and its commentary atta-dn-1-1, file atta-dn-1, which starts at page 19
+/// entry 6.
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -179,6 +181,58 @@ void main() {
           reason: 'Cmd+A after a click in the Sinhala column selects its rows');
       expect(sinhalaSelection, isNot(contains(pali)),
           reason: 'and none of the Pali column');
+    },
+  );
+
+  testWidgets(
+    'page numbers: each layout shows the printed page of the text it draws',
+    (tester) async {
+      pinDesktopWindow(tester);
+      final container = await pumpReaderApp(tester);
+
+      // The page labels on screen, top first: Text widgets holding only a
+      // number or a 14–15 pair.
+      List<String> labels() => find
+          .descendant(
+            of: readerScrollView,
+            matching: find.byWidgetPredicate((w) =>
+                w is Text && RegExp(r'^\d+(–\d+)?$').hasMatch(w.data ?? '')),
+          )
+          .evaluate()
+          .map((e) => (e.widget as Text).data!)
+          .toList();
+
+      // dn-1-1 opens on page 0: the Pali printed on page 2, its Sinhala on
+      // the facing page 3. A fresh tab per layout, so each opens at the top
+      // with page 0's label showing.
+      const expected = {
+        ReaderLayout.paliOnly: ['2'],
+        ReaderLayout.sinhalaOnly: ['3'],
+        ReaderLayout.sideBySide: ['2', '3'],
+        ReaderLayout.stacked: ['2–3'],
+      };
+      for (final MapEntry(key: layout, value: labelsAtTop)
+          in expected.entries) {
+        await openTab(
+          tester,
+          container,
+          tabFromNode(container, 'dn-1-1').copyWith(layout: layout),
+        );
+        expect(labels().take(labelsAtTop.length).toList(), labelsAtTop,
+            reason: '$layout labels the first page with the printed page of '
+                'each language it shows');
+      }
+
+      // A commentary's pages match no printed page we can check.
+      await openTab(
+        tester,
+        container,
+        tabFromNode(container, 'atta-dn-1-1')
+            .copyWith(layout: ReaderLayout.sideBySide),
+      );
+      expect(readerRow(19, 6), findsOneWidget,
+          reason: 'The commentary\'s first row is drawn');
+      expect(labels(), isEmpty, reason: 'A commentary shows no page numbers');
     },
   );
 }

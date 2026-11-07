@@ -97,10 +97,18 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
                   anchor: widget.anchor,
                   padding: padding,
                   rowCount: (page) => page.paliSection.entries.length,
-                  buildPageNumber: (context, number) => columns.row(
-                    ReaderEntryBuilder.buildPageNumber(context, number),
-                    ReaderEntryBuilder.buildPageNumber(context, number),
-                  ),
+                  // Each column labelled with its own printed page: 14 | 15.
+                  buildPageNumber: (context, page) {
+                    final pali = ReaderEntryBuilder.buildPageNumber(
+                        context, page.pageNumber);
+                    if (pali == null) return null;
+                    return columns.row(
+                      pali,
+                      ReaderEntryBuilder.buildPageNumber(
+                              context, page.sinhalaPageNumber) ??
+                          const SizedBox.shrink(),
+                    );
+                  },
                   buildRows: (context, index, start, end) =>
                       _buildRows(context, index, start, end, columns),
                 ),

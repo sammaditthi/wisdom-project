@@ -67,6 +67,13 @@ class StackedPane extends StatelessWidget {
           padding: context.textEntryTheme.readingPadding(constraints.maxWidth),
           rowCount: (page) => page.paliSection.entries.length,
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          // A block holds both sides, so both pages: 14–15.
+          buildPageNumber: (context, page) =>
+              ReaderEntryBuilder.buildPageNumber(
+            context,
+            page.pageNumber,
+            facing: page.sinhalaPageNumber,
+          ),
           buildRows: _buildStackedEntries,
         ),
       ),

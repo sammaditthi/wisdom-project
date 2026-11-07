@@ -46,12 +46,32 @@ void main() {
       expect(document.pageCount, equals(2));
     });
 
-    test('page number comes from pageNum, not the page index', () {
+    test('page numbers: Pali from pageNum, Sinhala facing, none unprinted', () {
       // kn-jat starts at printed page 2 and skips odd numbers, so an
       // implementation that used the index would still look plausible.
-      expect(document.allPageNumbers, equals([2, 4]));
-      expect(document.getPageByNumber(4), same(document.pages[1]));
-      expect(document.getPageByNumber(1), isNull);
+      expect(document.pages.map((p) => p.pageNumber), equals([2, 4]),
+          reason: 'Pali page is pageNum, not the page index');
+      expect(document.pages.map((p) => p.sinhalaPageNumber), equals([3, 5]),
+          reason: 'Sinhala is printed on the page facing the Pali');
+
+      // Their pageNums match no printed page we can check, so they show none.
+      for (final fileId in ['atta-kn-jat', 'anya-vm']) {
+        final pages = BJTDocumentParser.parseDocument(fileId, fixture).pages;
+        expect(pages.map((p) => p.pageNumber), equals([null, null]),
+            reason: '$fileId has no Pali page number');
+        expect(pages.map((p) => p.sinhalaPageNumber), equals([null, null]),
+            reason: '$fileId has no Sinhala page number');
+      }
+
+      final paliOnly = BJTDocumentParser.parseDocument(
+          'ap-pat',
+          _pageWith({
+            'type': 'paragraph',
+            'text': 'ඒ භගවත්',
+          })).pages.single;
+      expect(paliOnly.pageNumber, equals(1));
+      expect(paliOnly.sinhalaPageNumber, isNull,
+          reason: 'No Sinhala text (Paṭṭhāna), so no Sinhala page');
     });
 
     test('sections are tagged pi / si', () {

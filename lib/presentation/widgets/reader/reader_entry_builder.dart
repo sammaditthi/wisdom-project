@@ -184,18 +184,25 @@ class ReaderEntryBuilder {
     }).toList();
   }
 
-  /// Builds a page number label with fixed height for alignment.
+  /// Builds a page number label with fixed height for alignment: `14`, or
+  /// `14–15` with a [facing] page for a block holding both. Null when there
+  /// is no [pageNumber].
   ///
   /// Wrapped in [SelectionContainer.disabled] so the digits aren't picked up
   /// when the user drag-selects across pages inside the reader's
   /// [SelectionArea] — copying a passage shouldn't sprinkle page numbers
   /// into the clipboard.
-  static Widget buildPageNumber(BuildContext context, int pageNumber) {
+  static Widget? buildPageNumber(
+    BuildContext context,
+    int? pageNumber, {
+    int? facing,
+  }) {
+    if (pageNumber == null) return null;
     return SelectionContainer.disabled(
       child: SizedBox(
         height: 20, // Fixed height to ensure alignment
         child: Text(
-          '$pageNumber',
+          facing == null ? '$pageNumber' : '$pageNumber–$facing',
           style: context.typography.pageNumber,
         ),
       ),

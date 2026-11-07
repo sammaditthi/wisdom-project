@@ -6,15 +6,16 @@ part 'bjt_page.freezed.dart';
 
 /// Represents a single page of BJT text with parallel Pali and Sinhala sections
 ///
-/// This is specific to the Buddha Jayanti Tripitaka edition which displays
-/// Pali and Sinhala in parallel columns on each physical page.
+/// This is specific to the Buddha Jayanti Tripitaka edition, which prints the
+/// Pali on an even left-hand page and its Sinhala on the facing odd page.
 @freezed
 class BJTPage with _$BJTPage {
   const BJTPage._();
 
   const factory BJTPage({
-    /// The page number in the original text
-    required int pageNumber,
+    /// The printed page of the Pali side. Null where no printed page can be
+    /// checked (commentaries, treatises).
+    required int? pageNumber,
 
     /// Pali section for this page
     required BJTSection paliSection,
@@ -22,6 +23,13 @@ class BJTPage with _$BJTPage {
     /// Sinhala section for this page
     required BJTSection sinhalaSection,
   }) = _BJTPage;
+
+  /// The printed page of the Sinhala side: the one facing the Pali. Null with
+  /// no Pali page number, or no Sinhala text (Paṭṭhāna is Pali only).
+  int? get sinhalaPageNumber {
+    final pali = pageNumber;
+    return pali != null && sinhalaSection.hasEntries ? pali + 1 : null;
+  }
 
   /// Gets the section for a specific language using ISO 639-1 code
   /// 'pi' = Pali, 'si' = Sinhala

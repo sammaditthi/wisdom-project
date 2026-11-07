@@ -3,7 +3,6 @@ import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../domain/entities/bjt/bjt_page.dart';
 import '../../../domain/entities/reader/document_slice.dart';
-import 'reader_entry_builder.dart';
 
 /// Builds the rows `[start, end)` of the page at slice-local [page].
 typedef PageRowsBuilder = List<Widget> Function(
@@ -28,7 +27,7 @@ class AnchoredPageList extends StatelessWidget {
     required this.padding,
     required this.rowCount,
     required this.buildRows,
-    this.buildPageNumber = ReaderEntryBuilder.buildPageNumber,
+    required this.buildPageNumber,
     this.crossAxisAlignment = CrossAxisAlignment.start,
   });
 
@@ -44,7 +43,10 @@ class AnchoredPageList extends StatelessWidget {
   final int Function(BJTPage page) rowCount;
 
   final PageRowsBuilder buildRows;
-  final Widget Function(BuildContext context, int pageNumber) buildPageNumber;
+
+  /// The label above [page]: each layout shows the printed page(s) of the
+  /// text it draws. Null shows no label and no gap.
+  final Widget? Function(BuildContext context, BJTPage page) buildPageNumber;
   final CrossAxisAlignment crossAxisAlignment;
 
   static const _centerKey = ValueKey('anchored-page-list-center');
@@ -144,11 +146,12 @@ class AnchoredPageList extends StatelessWidget {
     final page = slice.pages[index];
     // The unit may begin and end mid-page, so both ends are trimmed.
     final (first, last) = slice.entriesOn(index, rowCount(page));
+    final pageNumber = label ? buildPageNumber(context, page) : null;
     return Column(
       crossAxisAlignment: crossAxisAlignment,
       children: [
-        if (label) ...[
-          buildPageNumber(context, page.pageNumber),
+        if (pageNumber != null) ...[
+          pageNumber,
           const SizedBox(height: AppFonts.pageNumberGapPx),
         ],
         ...buildRows(context, index, start ?? first, end ?? last),
