@@ -481,6 +481,87 @@ void main() {
       expect(html, isNot(contains('title-repeat suppressed')));
     });
 
+    test('a printed page is labelled once, above its first row', () {
+      final html = _render(_suttaPage, slices: {
+        'sp-toc-1': _slice('sp-toc-1', [
+          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), at: 1),
+          // Page 1 is Pali-only, as Paṭṭhāna's pages are.
+          _row(
+              pali: _entry('ධම්මං'),
+              at: 2,
+              page: 1,
+              printed: (pali: 3, sinhala: null)),
+          _row(
+              pali: _entry('ධම්මං'),
+              at: 3,
+              page: 1,
+              printed: (pali: 3, sinhala: null)),
+        ]),
+      });
+      final main = _mainOf(html);
+
+      expect(
+          RegExp(r'<div class="(pg|row)[^"]*">')
+              .allMatches(main)
+              .map((match) => match.group(1)),
+          ['pg', 'row', 'row', 'pg', 'row', 'row'],
+          reason: 'One label per printed page, directly above its first row.');
+      expect(
+          main,
+          contains('<div class="pg"><div class="pali">1</div>'
+              '<div class="si">2</div></div>'),
+          reason: 'Each side shows its own printed page.');
+      expect(main, contains('<div class="pg"><div class="pali">3</div></div>'),
+          reason: 'A page with no Sinhala number writes no .si cell.');
+    });
+
+    test("a chapter section repeats its page's label, except the preamble's",
+        () {
+      final html = _render(
+        _chapterPage,
+        preamble: _slice('sp-grp', [
+          // A paragraph, so the title-repeat logic stays out of the way.
+          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+        ]),
+        slices: {
+          'sp-grp-1': _slice('sp-grp-1', [
+            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+            _row(
+                pali: _entry('ධම්මං'),
+                sinhala: _entry('ධර්මය'),
+                at: 1,
+                page: 1),
+          ]),
+          'sp-grp-2': _slice('sp-grp-2', [
+            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), page: 1),
+          ]),
+        },
+      );
+
+      expect(
+          RegExp(r'<div class="(pg[^"]*)">')
+              .allMatches(_mainOf(html))
+              .map((match) => match.group(1)),
+          ['pg', 'pg', 'pg pg-repeat'],
+          reason: "The preamble's label; none where section 1 starts on the "
+              "preamble's page; a plain one on page 1; a repeat where "
+              'section 2 starts on the page already labelled.');
+    });
+
+    test('a nav-only TOC has no page labels, a readable one does', () {
+      final navOnly = _render(_tocPage, preamble: _bothLanguages('sp-toc'));
+      final readable =
+          _render(_readableTocPage, preamble: _bothLanguages('sp-toc'));
+
+      // The readable half is the control: without it the nav-only check would
+      // pass on a template that never writes a label.
+      expect(_countOf(readable, 'class="pg'), 1,
+          reason: 'A readable TOC labels its preamble.');
+      expect(navOnly, isNot(contains('class="pg')),
+          reason: 'A nav-only TOC has no running text to label.');
+    });
+
     test('row classes track the cells actually emitted', () {
       final html = _render(_suttaPage, slices: {
         'sp-toc-1': _slice('sp-toc-1', [
@@ -1196,11 +1277,18 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
 ContentEntry _entry(String text, {String type = 'paragraph', int? level}) =>
     ContentEntry(type: type, text: text, level: level);
 
-DocRow _row({ContentEntry? pali, ContentEntry? sinhala, int at = 0}) => DocRow(
-      pageIndex: 0,
+DocRow _row({
+  ContentEntry? pali,
+  ContentEntry? sinhala,
+  int at = 0,
+  int page = 0,
+  // A canon page by default, so every fixture page is labelled.
+  PrintedPages? printed = (pali: 1, sinhala: 2),
+}) =>
+    DocRow(
+      pageIndex: page,
       pageNum: 1,
-      // A canon page, so every fixture page is labelled.
-      printed: (pali: 1, sinhala: 2),
+      printed: printed,
       entryIndex: at,
       pali: pali,
       sinhala: sinhala,
