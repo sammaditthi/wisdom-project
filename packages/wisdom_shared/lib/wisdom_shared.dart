@@ -21,6 +21,7 @@ export 'src/slices/slice_index.dart';
 export 'src/text/content_markers.dart';
 export 'src/text/pali_conjuncts.dart';
 export 'src/text/pali_letter_options.dart';
+export 'src/text/repeated_number.dart';
 export 'src/tree/tipitaka_tree.dart';
 export 'src/tree/tree_coordinate_corrections.dart';
 export 'src/utils/csv_parser.dart';

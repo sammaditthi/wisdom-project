@@ -706,6 +706,13 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // "stacked" means.
   css.writeln('#$stackedLayoutId:checked ~ .content .row '
       '{ grid-template-columns: 1fr; }');
+  // A sutta number the same on both sides shows once wherever the two share a
+  // column: stacked, and side-by-side below the breakpoint (handed back in the
+  // two-column query below).
+  css.writeln('#$stackedLayoutId:checked ~ .content .row.repeated-number .si,');
+  css.writeln(
+      '#$sideBySideLayoutId:checked ~ .content .row.repeated-number .si '
+      '{ display: none; }');
   css.writeln();
 
   // Side by side, but only where two columns of text still read. Below the
@@ -754,6 +761,8 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
       '  #$sideBySideLayoutId:checked ~ .content .pali { grid-column: 1; }');
   css.writeln(
       '  #$sideBySideLayoutId:checked ~ .content .si { grid-column: 2; }');
+  css.writeln('  #$sideBySideLayoutId:checked ~ .content .row.repeated-number '
+      '.si { display: block; }');
   css.writeln('}');
   css.writeln();
 

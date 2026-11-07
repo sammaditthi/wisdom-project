@@ -334,9 +334,15 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
       isExactMatch: true,
     );
 
-    void scan(int localPage, List<Entry> entries, String languageCode) {
+    void scan(
+      int localPage,
+      List<Entry> entries,
+      String languageCode, {
+      bool Function(int entryIndex)? hidden,
+    }) {
       final (first, last) = slice.entriesOn(localPage, entries.length);
       for (var entryIndex = first; entryIndex < last; entryIndex++) {
+        if (hidden != null && hidden(entryIndex)) continue;
         final ranges = finder.findMatchRanges(entries[entryIndex].plainText);
         for (var matchIdx = 0; matchIdx < ranges.length; matchIdx++) {
           matches.add(InPageMatch(
@@ -355,7 +361,14 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
         scan(localPage, page.paliSection.entries, 'pi');
       }
       if (layout != ReaderLayout.paliOnly) {
-        scan(localPage, page.sinhalaSection.entries, 'si');
+        // Stacked shows a repeated sutta number once, on the Pali side, so
+        // its Sinhala copy is not a match the reader could be taken to.
+        scan(
+          localPage,
+          page.sinhalaSection.entries,
+          'si',
+          hidden: layout == ReaderLayout.stacked ? page.repeatsNumberAt : null,
+        );
       }
     }
 

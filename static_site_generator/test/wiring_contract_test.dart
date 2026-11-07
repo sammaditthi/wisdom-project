@@ -179,8 +179,9 @@ void main() {
       };
 
       // A chapter page carrying a mixed slice emits nearly the whole set at
-      // once — a row with both languages, a Pali-only row (no-si) and a
-      // Sinhala-only row (no-pali). The two it cannot show belong to pages that
+      // once — a row with both languages, a Pali-only row (no-si), a
+      // Sinhala-only row (no-pali) and a sutta number the same on both sides
+      // (repeated-number). The two it cannot show belong to pages that
       // are missing something, so two more renders join it below: `.nav`, which
       // only a container page carries and which the side-by-side width override
       // names in a `:not()`, from the TOC page; and `.solo`, which only a
@@ -195,6 +196,7 @@ void main() {
           'sp-grp-1': _slice('sp-grp-1', [
             _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
             _row(pali: _entry('පාළි පමණයි'), at: 1),
+            _row(pali: _entry('6. 1. 2.'), sinhala: _entry('6. 1. 2.'), at: 2),
           ]),
           'sp-grp-2': _slice('sp-grp-2', [
             _row(sinhala: _entry('සිංහල පමණයි'), at: 2),
@@ -488,14 +490,35 @@ void main() {
           // DocRow.isEmpty — the only shape dropped outright. One row in the
           // whole corpus looks like this.
           _row(pali: _entry(''), sinhala: _entry(''), at: 3),
+          // Stacked shows a sutta number once, and only a sutta number: a Pali
+          // phrase the Sinhala side repeats, a number the two sides disagree
+          // on, and a dash rule all keep both cells. A stray space on one side,
+          // which the source has a few of, is still the same number.
+          _row(pali: _entry('6. 1. 2.'), sinhala: _entry('6. 1. 2.'), at: 4),
+          _row(pali: _entry('නිදානකථා'), sinhala: _entry('නිදානකථා'), at: 5),
+          _row(pali: _entry('4. 4. 5.'), sinhala: _entry('4. 5. 4.'), at: 6),
+          _row(pali: _entry('------'), sinhala: _entry('------'), at: 7),
+          _row(pali: _entry('4. 2. 6.'), sinhala: _entry('4. 2 .6.'), at: 8),
         ]),
       });
 
       // Every `.row` is a text row: there is no caption row to skip.
-      expect(_rowClassesIn(html), ['', 'no-si', 'no-pali'],
+      expect(
+          _rowClassesIn(html),
+          [
+            '',
+            'no-si',
+            'no-pali',
+            'repeated-number',
+            '',
+            '',
+            '',
+            'repeated-number'
+          ],
           reason: 'A row with one side missing must render with the class that '
               'lets a single-language layout skip it; only a both-sides-empty '
-              'row is dropped.');
+              'row is dropped. Only the same sutta number on both sides, '
+              'spacing aside, is marked repeated-number.');
     });
 
     test('heading depths are contiguous from h2 and rank both languages', () {

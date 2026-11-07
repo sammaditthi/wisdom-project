@@ -5,8 +5,10 @@ import 'package:flutter/services.dart'
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:the_wisdom_project/presentation/models/reader_layout.dart';
+import 'package:the_wisdom_project/presentation/providers/in_page_search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/last_selected_text_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
+import 'package:the_wisdom_project/presentation/widgets/reader/text_entry_widget.dart';
 
 import 'test_overrides.dart';
 
@@ -16,6 +18,9 @@ import 'test_overrides.dart';
 /// Rows used, all in බ්රහ්මජාලසුත්තං (dn-1-1), file dn-1, page 3:
 ///   entry 3 → paragraph 15, “බීජගාමභූතගාමසමාරම්භා …
 ///   entry 4 → centered චුල්ලසීලං නිට්ඨිතං., not the page's first row
+/// and page 0, where dn-1-1 starts:
+///   entry 4 → centered `1.` on both sides, the sutta number
+///   entry 5 → heading බ්රහ්මජාලසුත්තං, which the Sinhala side translates
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -63,6 +68,49 @@ void main() {
       expect(gapAboveHeading(), inTheList,
           reason: 'Splitting the page at the anchor must not drop the '
               'heading\'s gap: it is still not the page\'s first row');
+    },
+  );
+
+  testWidgets(
+    'stacked: a sutta number the same on both sides shows once',
+    (tester) async {
+      pinDesktopWindow(tester);
+      final container = await pumpReaderApp(tester);
+
+      await openTab(
+        tester,
+        container,
+        tabFromNode(container, 'dn-1-1').copyWith(layout: ReaderLayout.stacked),
+      );
+
+      int entriesIn(Finder row) => find
+          .descendant(of: row, matching: find.byType(TextEntryWidget))
+          .evaluate()
+          .length;
+      expect(entriesIn(readerRow(0, 4)), 1,
+          reason: 'The sutta number shows once, on the Pali side');
+      expect(entriesIn(readerRow(0, 5)), 2,
+          reason: 'The title after it still shows both languages');
+
+      // Nor may in-page search count the copy it hid. Side-by-side shows
+      // both, so it is the control that the query reaches the row at all.
+      bool sinhalaNumberMatched() =>
+          container.read(inPageSearchStatesProvider)[0]!.matches.any((m) =>
+              m.pageIndex == 0 && m.entryIndex == 4 && m.languageCode == 'si');
+
+      final search = container.read(inPageSearchStatesProvider.notifier);
+      search.openSearch();
+      search.updateQuery('1');
+      // 300 ms debounce + buffer, then settle for the match computation.
+      await tester.pump(const Duration(milliseconds: 400));
+      await pumpForSettle(tester);
+      expect(sinhalaNumberMatched(), isFalse,
+          reason: 'Stacked hides the Sinhala copy, so it is not a match');
+
+      container.read(updateActiveTabLayoutProvider)(ReaderLayout.sideBySide);
+      await pumpForSettle(tester);
+      expect(sinhalaNumberMatched(), isTrue,
+          reason: 'Side-by-side shows the Sinhala copy, so it is a match');
     },
   );
 

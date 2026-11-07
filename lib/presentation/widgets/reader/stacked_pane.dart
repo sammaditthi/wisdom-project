@@ -99,7 +99,9 @@ class StackedPane extends StatelessWidget {
     for (var i = 0; i < endEntry - startEntry; i++) {
       final entryIndex = i + startEntry;
       final paliEntry = page.paliSection.entries[entryIndex];
-      final sinhalaEntry = entryIndex < page.sinhalaSection.entries.length
+      // A sutta number printed the same on both sides shows once.
+      final sinhalaEntry = entryIndex < page.sinhalaSection.entryCount &&
+              !page.repeatsNumberAt(entryIndex)
           ? page.sinhalaSection.entries[entryIndex]
           : null;
 

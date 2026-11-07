@@ -668,6 +668,10 @@ class PageTemplate {
       buffer.write('<div class="row');
       if (!hasPali) buffer.write(' no-pali');
       if (!hasSinhala) buffer.write(' no-si');
+      // A sutta number the same on both sides; stacked shows it once.
+      if (hasPali && hasSinhala && isRepeatedNumber(pali.text, sinhala.text)) {
+        buffer.write(' repeated-number');
+      }
       buffer.write('">');
       if (hasPali) {
         // `pi-Sinh` — Pali written in Sinhala script. Not `si`: the words are

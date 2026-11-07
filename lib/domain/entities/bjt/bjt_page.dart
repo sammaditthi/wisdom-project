@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:wisdom_shared/wisdom_shared.dart' show isRepeatedNumber;
 import 'bjt_section.dart';
 
 part 'bjt_page.freezed.dart';
@@ -44,6 +45,13 @@ class BJTPage with _$BJTPage {
   bool get hasAnyContent {
     return paliSection.hasEntries || sinhalaSection.hasEntries;
   }
+
+  /// Whether row [entryIndex] carries the same sutta number on both sides.
+  bool repeatsNumberAt(int entryIndex) =>
+      entryIndex < paliSection.entryCount &&
+      entryIndex < sinhalaSection.entryCount &&
+      isRepeatedNumber(paliSection.entries[entryIndex].rawText,
+          sinhalaSection.entries[entryIndex].rawText);
 
   /// Returns the maximum number of entries between both sections
   /// This is useful for parallel rendering
