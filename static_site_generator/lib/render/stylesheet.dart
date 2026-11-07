@@ -289,6 +289,8 @@ void _writeRootVariables(StringBuffer css, ThemeTokens tokens) {
   // consumer in the app either (see above).
   css.writeln('  --entry-gap: ${_px(tokens.spacing('entryGapPx'))};');
   css.writeln('  --page-gap: ${_px(tokens.spacing('pageGapPx'))};');
+  css.writeln(
+      '  --page-number-gap: ${_px(tokens.spacing('pageNumberGapPx'))};');
   css.writeln('  --gatha-indent: ${_num(tokens.spacing('gathaIndentEm'))}em;');
   css.writeln(
       '  --gatha-indent-2: ${_num(tokens.spacing('gathaLevel2IndentEm'))}em;');
@@ -715,6 +717,31 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
       '{ display: none; }');
   css.writeln();
 
+  // Printed page labels, as `reader_entry_builder.dart`'s `buildPageNumber`.
+  // Not a `.row`, whose per-layout margins would override the gap below it.
+  // One line, `14–15`, wherever both sides share a column: the base state,
+  // so stacked and narrow side-by-side. The layout rules above hide a side's
+  // cell; Sinhala only drops the dash too.
+  css.writeln('.pg {');
+  css.writeln('  display: grid;');
+  css.writeln('  grid-auto-flow: column;');
+  css.writeln('  justify-content: start;');
+  css.writeln('  margin: var(--page-gap) 0 var(--page-number-gap);');
+  css.writeln('  font-family: var(--font-ui);');
+  css.writeln('  font-size: ${_num(tokens.uiSizeEm('pageNumber'))}em;');
+  css.writeln('  font-weight: 500;');
+  css.writeln('  line-height: 1;');
+  css.writeln('  color: var(--c-on-surface-variant);');
+  // Kept out of a copied passage, as the app does.
+  css.writeln('  -webkit-user-select: none;');
+  css.writeln('  user-select: none;');
+  css.writeln('}');
+  // `\2013` is the en dash, escaped so the sheet's charset cannot mangle it.
+  css.writeln(r'.pg .si::before { content: "\2013"; }');
+  css.writeln('#$sinhalaOnlyLayoutId:checked ~ .content .pg .si::before '
+      '{ content: none; }');
+  css.writeln();
+
   // Side by side, but only where two columns of text still read. Below the
   // breakpoint it falls back to the base single column — which is the stacked
   // layout, and so matches the app, whose seed in portrait is stacked and in
@@ -763,6 +790,13 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
       '  #$sideBySideLayoutId:checked ~ .content .si { grid-column: 2; }');
   css.writeln('  #$sideBySideLayoutId:checked ~ .content .row.repeated-number '
       '.si { display: block; }');
+  // Each column labelled with its own page, `14 | 15`, aligned with the text.
+  css.writeln('  #$sideBySideLayoutId:checked ~ .content .pg {');
+  css.writeln('    grid-template-columns: 1fr 1fr;');
+  css.writeln('    column-gap: ${_num(_columnGapRem)}rem;');
+  css.writeln('  }');
+  css.writeln('  #$sideBySideLayoutId:checked ~ .content .pg .si::before '
+      '{ content: none; }');
   css.writeln('}');
   css.writeln();
 
@@ -1390,6 +1424,12 @@ void _writeGroupedChapter(StringBuffer css) {
   css.writeln('.sutta .pager { display: none; }');
   css.writeln('$filtered .sutta .pager { display: grid; }');
   css.writeln('$filtered ~ .pager { display: none; }');
+  css.writeln();
+  // A section starting on a printed page the one above it labelled: shown
+  // only when the section above is filtered away. `display: grid` restates
+  // `.pg`'s own value.
+  css.writeln('.pg.pg-repeat { display: none; }');
+  css.writeln('$filtered .pg-repeat { display: grid; }');
 }
 
 String _kebab(String camel) => camel.replaceAllMapped(

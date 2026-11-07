@@ -49,6 +49,11 @@ class ThemeTokens {
   /// one and read as if a conversion had happened.
   double spacing(String key) => (_spacing[key] as num).toDouble();
 
+  /// A UI text size (`pageNumber`) as a multiple of the base font size.
+  double uiSizeEm(String key) =>
+      ((_fonts['uiSizes'] as Map<String, dynamic>)[key] as num).toDouble() /
+      (_fonts['baseFontSize'] as num).toDouble();
+
   /// Style for a plain entry type (`paragraph`, `gatha`, `unindented`).
   EntryStyle entryStyle(String type) => EntryStyle._(
         (_json['entryStyles'][type] as Map<String, dynamic>),

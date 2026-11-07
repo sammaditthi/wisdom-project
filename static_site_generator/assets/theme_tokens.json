@@ -220,6 +220,7 @@
     "readingColumnMeasureEm": 54.5,
     "entryGapPx": 12.0,
     "pageGapPx": 32.0,
+    "pageNumberGapPx": 16.0,
     "stackedPairGapPx": 8.0,
     "stackedPairBottomGapPx": 20.0
   }

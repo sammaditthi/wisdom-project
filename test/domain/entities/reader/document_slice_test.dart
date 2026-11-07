@@ -96,6 +96,7 @@ BJTDocument _document(int pageCount) => BJTDocument(
         for (var i = 0; i < pageCount; i++)
           BJTPage(
             pageNumber: i,
+            sinhalaPageNumber: null,
             paliSection: const BJTSection(
               languageCode: 'pi',
               entries: [],

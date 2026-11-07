@@ -40,10 +40,13 @@ class ContentSlicer {
     for (var pageIndex = 0; pageIndex < file.pages.length; pageIndex++) {
       final page = file.pages[pageIndex];
       pageStart.add(rows.length);
+      final printed = printedPages(file.fileId, page.pageNum,
+          hasSinhala: page.sinhala.isNotEmpty);
       for (var entryIndex = 0; entryIndex < page.entryCount; entryIndex++) {
         rows.add(DocRow(
           pageIndex: pageIndex,
           pageNum: page.pageNum,
+          printed: printed,
           entryIndex: entryIndex,
           pali: page.paliAt(entryIndex),
           sinhala: page.sinhalaAt(entryIndex),

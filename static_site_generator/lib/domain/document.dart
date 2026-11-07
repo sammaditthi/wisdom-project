@@ -1,3 +1,5 @@
+import 'package:wisdom_shared/wisdom_shared.dart' show PrintedPages;
+
 import 'content_file.dart';
 
 /// One row of a content file: the same position on both language sides.
@@ -15,10 +17,14 @@ class DocRow {
   /// Index into `ContentFile.pages` — the `<page>` half of a `?e=` coordinate.
   final int pageIndex;
 
-  /// The page number as printed in the book, or null when the source omits it.
-  /// Used for the in-page citation anchor and, from P7, footnote numbering,
-  /// which restarts on every printed page.
+  /// The source's `pageNum`, raw, or null when the source omits it. From P7,
+  /// footnote numbering restarts on every printed page. What a reader is
+  /// shown is [printed].
   final int? pageNum;
+
+  /// The printed page of each side, the same for every row of a page. Null
+  /// where no printed page can be checked (commentaries, treatises).
+  final PrintedPages? printed;
 
   /// Index within the page's entry lists.
   final int entryIndex;
@@ -29,6 +35,7 @@ class DocRow {
   const DocRow({
     required this.pageIndex,
     required this.pageNum,
+    required this.printed,
     required this.entryIndex,
     required this.pali,
     required this.sinhala,

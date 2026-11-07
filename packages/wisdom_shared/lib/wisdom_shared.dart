@@ -14,6 +14,7 @@ export 'src/links/commentary_link.dart';
 export 'src/links/tipitaka_link.dart';
 export 'src/pages/site_plan.dart';
 export 'src/refs/canon_books.dart';
+export 'src/refs/printed_pages.dart';
 export 'src/refs/suttacentral_ref_resolver.dart';
 export 'src/scope/scope_filter_sql.dart';
 export 'src/scope/scope_patterns.dart';

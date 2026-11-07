@@ -225,11 +225,10 @@ Map<String, dynamic> _spacing() => {
       // `gathaIndentEm` two lines up and no more of a reason there.
       'readingColumnMeasureEm': PaneWidthConstants.readingColumnMeasureEm,
       // The reader's vertical rhythm, read from the same constants the panes
-      // lay out with — never re-typed here. `AppFonts.pageNumberGapPx` is
-      // deliberately absent: it spaces a page-number chip the static site does
-      // not render, and an exported token with no consumer only invites one.
+      // lay out with — never re-typed here.
       'entryGapPx': AppFonts.entryGapPx,
       'pageGapPx': AppFonts.pageGapPx,
+      'pageNumberGapPx': AppFonts.pageNumberGapPx,
       // The stacked layout's two-part rhythm — a translation hugs the line it
       // translates, pairs stand apart. Only the stacked layout uses these; the
       // other three separate the languages by column or show one at a time.

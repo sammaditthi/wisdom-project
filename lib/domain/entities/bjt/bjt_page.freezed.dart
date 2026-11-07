@@ -17,8 +17,12 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$BJTPage {
   /// The printed page of the Pali side. Null where no printed page can be
-  /// checked (commentaries, treatises).
+  /// checked (commentaries, treatises). See `printedPages` in wisdom_shared.
   int? get pageNumber => throw _privateConstructorUsedError;
+
+  /// The printed page of the Sinhala side, facing the Pali. Also null with
+  /// no Sinhala text (Paṭṭhāna is Pali only).
+  int? get sinhalaPageNumber => throw _privateConstructorUsedError;
 
   /// Pali section for this page
   BJTSection get paliSection => throw _privateConstructorUsedError;
@@ -38,7 +42,10 @@ abstract class $BJTPageCopyWith<$Res> {
       _$BJTPageCopyWithImpl<$Res, BJTPage>;
   @useResult
   $Res call(
-      {int? pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
+      {int? pageNumber,
+      int? sinhalaPageNumber,
+      BJTSection paliSection,
+      BJTSection sinhalaSection});
 
   $BJTSectionCopyWith<$Res> get paliSection;
   $BJTSectionCopyWith<$Res> get sinhalaSection;
@@ -60,6 +67,7 @@ class _$BJTPageCopyWithImpl<$Res, $Val extends BJTPage>
   @override
   $Res call({
     Object? pageNumber = freezed,
+    Object? sinhalaPageNumber = freezed,
     Object? paliSection = null,
     Object? sinhalaSection = null,
   }) {
@@ -67,6 +75,10 @@ class _$BJTPageCopyWithImpl<$Res, $Val extends BJTPage>
       pageNumber: freezed == pageNumber
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      sinhalaPageNumber: freezed == sinhalaPageNumber
+          ? _value.sinhalaPageNumber
+          : sinhalaPageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
       paliSection: null == paliSection
           ? _value.paliSection
@@ -108,7 +120,10 @@ abstract class _$$BJTPageImplCopyWith<$Res> implements $BJTPageCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int? pageNumber, BJTSection paliSection, BJTSection sinhalaSection});
+      {int? pageNumber,
+      int? sinhalaPageNumber,
+      BJTSection paliSection,
+      BJTSection sinhalaSection});
 
   @override
   $BJTSectionCopyWith<$Res> get paliSection;
@@ -130,6 +145,7 @@ class __$$BJTPageImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? pageNumber = freezed,
+    Object? sinhalaPageNumber = freezed,
     Object? paliSection = null,
     Object? sinhalaSection = null,
   }) {
@@ -137,6 +153,10 @@ class __$$BJTPageImplCopyWithImpl<$Res>
       pageNumber: freezed == pageNumber
           ? _value.pageNumber
           : pageNumber // ignore: cast_nullable_to_non_nullable
+              as int?,
+      sinhalaPageNumber: freezed == sinhalaPageNumber
+          ? _value.sinhalaPageNumber
+          : sinhalaPageNumber // ignore: cast_nullable_to_non_nullable
               as int?,
       paliSection: null == paliSection
           ? _value.paliSection
@@ -155,14 +175,20 @@ class __$$BJTPageImplCopyWithImpl<$Res>
 class _$BJTPageImpl extends _BJTPage {
   const _$BJTPageImpl(
       {required this.pageNumber,
+      required this.sinhalaPageNumber,
       required this.paliSection,
       required this.sinhalaSection})
       : super._();
 
   /// The printed page of the Pali side. Null where no printed page can be
-  /// checked (commentaries, treatises).
+  /// checked (commentaries, treatises). See `printedPages` in wisdom_shared.
   @override
   final int? pageNumber;
+
+  /// The printed page of the Sinhala side, facing the Pali. Also null with
+  /// no Sinhala text (Paṭṭhāna is Pali only).
+  @override
+  final int? sinhalaPageNumber;
 
   /// Pali section for this page
   @override
@@ -174,7 +200,7 @@ class _$BJTPageImpl extends _BJTPage {
 
   @override
   String toString() {
-    return 'BJTPage(pageNumber: $pageNumber, paliSection: $paliSection, sinhalaSection: $sinhalaSection)';
+    return 'BJTPage(pageNumber: $pageNumber, sinhalaPageNumber: $sinhalaPageNumber, paliSection: $paliSection, sinhalaSection: $sinhalaSection)';
   }
 
   @override
@@ -184,6 +210,8 @@ class _$BJTPageImpl extends _BJTPage {
             other is _$BJTPageImpl &&
             (identical(other.pageNumber, pageNumber) ||
                 other.pageNumber == pageNumber) &&
+            (identical(other.sinhalaPageNumber, sinhalaPageNumber) ||
+                other.sinhalaPageNumber == sinhalaPageNumber) &&
             (identical(other.paliSection, paliSection) ||
                 other.paliSection == paliSection) &&
             (identical(other.sinhalaSection, sinhalaSection) ||
@@ -191,8 +219,8 @@ class _$BJTPageImpl extends _BJTPage {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, pageNumber, paliSection, sinhalaSection);
+  int get hashCode => Object.hash(
+      runtimeType, pageNumber, sinhalaPageNumber, paliSection, sinhalaSection);
 
   /// Create a copy of BJTPage
   /// with the given fields replaced by the non-null parameter values.
@@ -206,14 +234,20 @@ class _$BJTPageImpl extends _BJTPage {
 abstract class _BJTPage extends BJTPage {
   const factory _BJTPage(
       {required final int? pageNumber,
+      required final int? sinhalaPageNumber,
       required final BJTSection paliSection,
       required final BJTSection sinhalaSection}) = _$BJTPageImpl;
   const _BJTPage._() : super._();
 
   /// The printed page of the Pali side. Null where no printed page can be
-  /// checked (commentaries, treatises).
+  /// checked (commentaries, treatises). See `printedPages` in wisdom_shared.
   @override
   int? get pageNumber;
+
+  /// The printed page of the Sinhala side, facing the Pali. Also null with
+  /// no Sinhala text (Paṭṭhāna is Pali only).
+  @override
+  int? get sinhalaPageNumber;
 
   /// Pali section for this page
   @override

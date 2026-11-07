@@ -674,11 +674,11 @@ CREATE TABLE bjt_content (
 - **`pageNum` is a column, not part of the blob, and it is not optional.** In the
   JSON it is a sibling of `pali`/`sinh`, not inside either, so a blob holding the
   page's substructure verbatim does not carry it — and `BJTDocumentParser`
-  hard-casts it (`pageJson['pageNum'] as int`) wherever page numbers show, so
-  such a page without one throws rather than degrades. It is user-visible: the
-  reader panes print it via `ReaderEntryBuilder.buildPageNumber` as the Pali
-  page, with the Sinhala on the facing `pageNum + 1`. Commentaries and
-  treatises show none.
+  hard-casts it (`pageJson['pageNum'] as int`) on every page, commentaries
+  included, so a page without one throws rather than degrades. It is
+  user-visible: the reader panes print it via
+  `ReaderEntryBuilder.buildPageNumber` as the Pali page, with the Sinhala on
+  the facing `pageNum + 1`. Commentaries and treatises show none.
 
   It cannot be computed from `pageIndex`. Across the 285 content files only 7
   have a constant offset; `anya-vm.json` alone has 276 distinct ones. So it has

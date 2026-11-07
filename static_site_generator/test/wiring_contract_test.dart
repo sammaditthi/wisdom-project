@@ -1199,6 +1199,8 @@ ContentEntry _entry(String text, {String type = 'paragraph', int? level}) =>
 DocRow _row({ContentEntry? pali, ContentEntry? sinhala, int at = 0}) => DocRow(
       pageIndex: 0,
       pageNum: 1,
+      // A canon page, so every fixture page is labelled.
+      printed: (pali: 1, sinhala: 2),
       entryIndex: at,
       pali: pali,
       sinhala: sinhala,

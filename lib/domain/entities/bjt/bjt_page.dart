@@ -14,8 +14,12 @@ class BJTPage with _$BJTPage {
 
   const factory BJTPage({
     /// The printed page of the Pali side. Null where no printed page can be
-    /// checked (commentaries, treatises).
+    /// checked (commentaries, treatises). See `printedPages` in wisdom_shared.
     required int? pageNumber,
+
+    /// The printed page of the Sinhala side, facing the Pali. Also null with
+    /// no Sinhala text (Paṭṭhāna is Pali only).
+    required int? sinhalaPageNumber,
 
     /// Pali section for this page
     required BJTSection paliSection,
@@ -23,13 +27,6 @@ class BJTPage with _$BJTPage {
     /// Sinhala section for this page
     required BJTSection sinhalaSection,
   }) = _BJTPage;
-
-  /// The printed page of the Sinhala side: the one facing the Pali. Null with
-  /// no Pali page number, or no Sinhala text (Paṭṭhāna is Pali only).
-  int? get sinhalaPageNumber {
-    final pali = pageNumber;
-    return pali != null && sinhalaSection.hasEntries ? pali + 1 : null;
-  }
 
   /// Gets the section for a specific language using ISO 639-1 code
   /// 'pi' = Pali, 'si' = Sinhala

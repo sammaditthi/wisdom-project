@@ -142,14 +142,17 @@ class PageTemplate {
 
     switch (page.kind) {
       case PageKind.sutta:
-        body.writeln(_rows(slices[page.nodeKey], depths));
+        body.writeln(_rows(slices[page.nodeKey], depths, _PageLabels()));
       case PageKind.chapter:
         body.writeln(_chapter(page, slices, shown.preamble, depths,
             previous: previous, next: next));
       case PageKind.toc:
         if (shown.preamble != null && shown.preamble!.rows.isNotEmpty) {
-          body.writeln(
-              '<div class="preamble">${_rows(shown.preamble, depths)}</div>');
+          // Labels only where the preamble is read; a nav-only contents page
+          // is for finding.
+          final labels = page.isReadable ? _PageLabels() : null;
+          body.writeln('<div class="preamble">'
+              '${_rows(shown.preamble, depths, labels)}</div>');
         }
         body.writeln(
             tocList(tree.childrenOf(page.nodeKey), urlFor: build.urlFor));
@@ -252,6 +255,7 @@ class PageTemplate {
       rows[i] = DocRow(
         pageIndex: row.pageIndex,
         pageNum: row.pageNum,
+        printed: row.printed,
         entryIndex: row.entryIndex,
         pali: null,
         sinhala: row.sinhala,
@@ -581,9 +585,12 @@ class PageTemplate {
       buffer.write('<p class="chapter-bar">'
           '<a href="${page.url}">සම්පූර්ණ පරිච්ඡේදය</a></p>');
     }
+    final labels = _PageLabels();
     if (preamble != null && preamble.rows.isNotEmpty) {
-      buffer.write('<div class="preamble">${_rows(preamble, depths)}</div>');
+      buffer.write(
+          '<div class="preamble">${_rows(preamble, depths, labels)}</div>');
     }
+    labels.endPreamble();
     // Inside the section, so the `:has(:target)` filter carries it: the
     // single-sutta view shows the one link belonging to the sutta on screen and
     // hides the rest, with no second rule to keep in step with the first. Above
@@ -607,7 +614,7 @@ class PageTemplate {
             ? '<div class="section-links">$commentary</div>'
             : commentary);
       }
-      buffer.write(_rows(slices[sutta.nodeKey], depths));
+      buffer.write(_rows(slices[sutta.nodeKey], depths, labels, section: true));
       // The page's own pager walks files, which in the filtered view would skip
       // the rest of the run. One per section walks the run instead, and the CSS
       // shows whichever belongs to the view. Emitted on a lone-child chapter
@@ -655,11 +662,25 @@ class PageTemplate {
   ///
   /// Genuinely empty rows — [DocRow.isEmpty], `FIGURES.rowsEmptyBothSides` in
   /// the whole corpus — are the only ones dropped outright.
-  String _rows(NodeSlice? slice, Map<int, int> depths) {
+  ///
+  /// A printed page's label goes above its first drawn row; [labels] carries
+  /// across the slices of one page; null writes none. [section]: a chapter
+  /// section's slice.
+  String _rows(
+    NodeSlice? slice,
+    Map<int, int> depths,
+    _PageLabels? labels, {
+    bool section = false,
+  }) {
     if (slice == null) return '';
     final buffer = StringBuffer();
+    var sectionStart = section;
     for (final row in slice.rows) {
       if (row.isEmpty) continue;
+      if (labels != null) {
+        buffer.write(labels.above(row, sectionStart: sectionStart));
+      }
+      sectionStart = false;
       final pali = row.pali;
       final sinhala = row.sinhala;
       final hasPali = pali != null && pali.text.isNotEmpty;
@@ -767,4 +788,33 @@ class PageTemplate {
   /// same string on a commentary page.
   String _headingHtml(TipitakaNode node) =>
       escapeHtml(weldTitle(nodeTitle(node)));
+}
+
+/// The printed-page labels one HTML page writes, across all of its slices.
+///
+/// Each printed page is labelled once, above its first drawn row. A chapter
+/// section that starts on a page already labelled repeats the label as
+/// `pg-repeat`, which only the single-sutta view shows. Not when that page is
+/// the preamble's: the preamble shows in both views.
+class _PageLabels {
+  int? _lastPage;
+  int? _preamblePage;
+
+  /// Called once a chapter's preamble is written.
+  void endPreamble() => _preamblePage = _lastPage;
+
+  /// The label above [row], or '' when none goes there.
+  String above(DocRow row, {required bool sectionStart}) {
+    final printed = row.printed;
+    if (printed == null) return '';
+    final repeat = row.pageIndex == _lastPage;
+    if (repeat && (!sectionStart || row.pageIndex == _preamblePage)) return '';
+    _lastPage = row.pageIndex;
+    final sinhala = printed.sinhala;
+    // `.pali` / `.si` so the layouts show each side's own number.
+    return '<div class="pg${repeat ? ' pg-repeat' : ''}">'
+        '<div class="pali">${printed.pali}</div>'
+        '${sinhala == null ? '' : '<div class="si">$sinhala</div>'}'
+        '</div>';
+  }
 }

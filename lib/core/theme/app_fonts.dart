@@ -167,7 +167,7 @@ abstract class AppFonts {
   /// Gap between two printed pages in the reader.
   static const double pageGapPx = 32.0;
 
-  /// Gap above a page-number label.
+  /// Gap below a page-number label, before the page's text.
   static const double pageNumberGapPx = 16.0;
 
   /// Gap between a Pali entry and its Sinhala translation in the stacked

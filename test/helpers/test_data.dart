@@ -244,6 +244,7 @@ class TestData {
   /// A complete page with both sections
   static BJTPage get completePage => BJTPage(
         pageNumber: 1,
+        sinhalaPageNumber: 2,
         paliSection: paliSection,
         sinhalaSection: sinhalaSection,
       );
@@ -251,6 +252,7 @@ class TestData {
   /// A second page for multi-page tests
   static BJTPage get secondPage => const BJTPage(
         pageNumber: 2,
+        sinhalaPageNumber: 3,
         paliSection: BJTSection(
           languageCode: 'pi',
           entries: [
