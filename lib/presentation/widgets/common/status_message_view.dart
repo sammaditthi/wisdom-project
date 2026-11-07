@@ -128,15 +128,8 @@ class StatusMessageView extends StatelessWidget {
     final TextStyle titleStyle =
         isNegative ? typography.errorMessage : typography.emptyStateMessage;
 
-    // The description follows the same split: an error keeps it at full
-    // strength, while an informational one sits below a title that is already
-    // muted — `resultSubtitle` alone reads heavier than `emptyStateMessage`
-    // and inverts the hierarchy.
-    final TextStyle descriptionStyle = isNegative
-        ? typography.resultSubtitle
-        : typography.resultSubtitle.copyWith(
-            color: colorScheme.onSurface.withValues(alpha: 0.5),
-          );
+    // Same colour as an informational title; the smaller size keeps it below.
+    final TextStyle descriptionStyle = typography.resultSubtitle;
 
     // Scrolls rather than overflows: with a keyboard up on a short screen the
     // pane can be shorter than the message. When it fits, the scroll view

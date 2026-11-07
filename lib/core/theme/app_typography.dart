@@ -390,7 +390,7 @@ class AppTypography extends ThemeExtension<AppTypography> {
         fontFamilyFallback: AppFonts.uiFallback,
         fontSize: scaledFonts.base,
         fontWeight: AppFonts.bodyWeight,
-        color: colorScheme.onSurface.withValues(alpha: 0.6),
+        color: colorScheme.onSurfaceVariant,
         height: AppFonts.uiLineHeight,
       ),
       errorMessage: TextStyle(
@@ -405,8 +405,9 @@ class AppTypography extends ThemeExtension<AppTypography> {
         fontFamily: AppFonts.ui,
         fontFamilyFallback: AppFonts.uiFallback,
         fontSize: scaledFonts.pageNumber,
+        // Weight and colour role hand-copied by the static site's `.pg` rule.
         fontWeight: FontWeight.w500,
-        color: colorScheme.onSurface.withValues(alpha: 0.6),
+        color: colorScheme.onSurfaceVariant,
         height: 1.0,
       ),
     );
