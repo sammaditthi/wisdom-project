@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 /// The repo's one version command. The `version:` line of `pubspec.yaml` is the
@@ -39,6 +40,15 @@ const _unreleased = '## Unreleased';
 const _maxEntryLength = 500;
 const _maxNotesPerGroup = 5;
 
+/// The notes' rules, given to Claude as written so they live in one place.
+const _guidePath = 'docs/general/how-to-release.md';
+
+/// Commits no app reader sees, kept from Claude: docs, tests and CI by type,
+/// the website and release tooling by scope. It judges the rest (a `refactor`
+/// can rename a menu item, a `style` change an icon, a `chore` the app name).
+final _unseenCommit =
+    RegExp(r'^((docs|test|ci)[(:!]|\w+\((static-site|site|release|ops)\))');
+
 /// How a drifted version file is found: by hand, since it was edited by hand.
 const _findHandEdit =
     'git diff, or git log -p -- $_pubspecPath $_generatedPath';
@@ -74,22 +84,24 @@ int _status(Directory root) {
         'it with\n           $_findHandEdit');
   }
   stdout.writeln(_tagExists(root, 'v${version.name}')
-      ? 'next       notes under "$_unreleased" in $_changelogPath, then\n'
-          '           ./scripts/release.sh patch|minor|major'
+      ? 'next       ./scripts/release.sh patch|minor|major (Claude drafts '
+          'the notes\n           under "$_unreleased" if there are none)'
       : 'next       ./scripts/deploy.sh --prod   (v${version.name} is not '
           'tagged yet)');
   return 0;
 }
 
 /// Raises the version, dates the `## Unreleased` notes, regenerates, commits.
-/// Every check runs before anything is written. No tag: `scripts/deploy.sh`
-/// makes it once every test passes, so a red test costs no version.
+/// At a terminal it first has Claude draft missing notes and waits for your
+/// yes. No tag: `scripts/deploy.sh` makes it once every test passes, so a red
+/// test costs no version.
 int _cut(Directory root, String part) {
   _requireCleanTree(root);
 
   final pubspec = _pubspecText(root);
   final before = _readVersion(pubspec);
-  if (!_tagExists(root, 'v${before.name}')) {
+  final since = 'v${before.name}';
+  if (!_tagExists(root, since)) {
     throw _Fail(
       '${before.name} was never released (no tag v${before.name}), and a '
       'second bump would skip it. Release it: ./scripts/deploy.sh --prod',
@@ -106,15 +118,25 @@ int _cut(Directory root, String part) {
       ),
     _ => throw _Fail('cut takes major, minor or patch (got "$part").'),
   };
-  final changelog = _changelogText(root);
-  final heading = _entryHeading.firstMatch(changelog);
-  if (heading == null || heading[0]!.trim() != _unreleased) {
-    throw _Fail(
-      'write the notes under "$_unreleased" at the top of $_changelogPath'
-      '${_newest(heading)}.',
-    );
+  // Without a terminal (automation) nobody can approve a draft, so the notes
+  // must already be written.
+  if (_atTerminal()) {
+    if (_entryHeading.firstMatch(_changelogText(root))?[0]?.trim() !=
+        _unreleased) {
+      try {
+        _writeDraft(root, since);
+      } on _Fail catch (failure) {
+        throw _Fail('${failure.message}.\n       Write the notes under '
+            '"$_unreleased" in $_changelogPath by hand, then run this again.');
+      }
+    }
+    _review(root, since);
+    // It waited on you: anything else edited meanwhile would ride along.
+    _requireCleanTree(root);
   }
-  _requireNotes(changelog, heading);
+  final changelog = _changelogText(root);
+  final heading = _unreleasedHeading(changelog);
+  stdout.writeln('changelog  ${_requireNotes(changelog, heading)}');
   final generated = _generatedText(root);
 
   final today = DateTime.now().toIso8601String().substring(0, 10);
@@ -177,7 +199,7 @@ int _check(Directory root) {
       'from ./scripts/release.sh.',
     );
   }
-  _requireNotes(changelog, heading);
+  stdout.writeln('changelog  ${_requireNotes(changelog, heading)}');
   stdout.writeln('tag        v${version.name}');
   return 0;
 }
@@ -190,6 +212,7 @@ usage: dart run tools/release.dart <command>   (you type ./scripts/release.sh)
   status   the version, the last tag, the commits since it, and what's next
   cut      major | minor | patch — raises that part and the build by one,
            dates the "$_unreleased" notes in $_changelogPath, commits.
+           At a terminal, Claude drafts missing notes and asks you first.
            No tag: ./scripts/deploy.sh --prod tags once every test passes
   check    exit 1 if $_generatedPath drifted or $_changelogPath has no
            valid entry for this version; else print the tag''');
@@ -271,9 +294,9 @@ void _writeGenerated(Directory root, _Version version) {
 
 /// The release commit takes `pubspec.yaml` whole, so any other edit in it would
 /// ride along; and the deploy refuses a dirty tree anyway. The changelog is the
-/// one exception: its notes are written just before `cut`. `--porcelain` so
-/// untracked files count. Not trimmed in front: that would eat the first line's
-/// status column.
+/// one exception: its notes are written just before or during `cut`.
+/// `--porcelain` so untracked files count. Not trimmed in front: that would eat
+/// the first line's status column.
 void _requireCleanTree(Directory root) {
   final dirty = (_run(root, 'git', [
     'status',
@@ -298,9 +321,22 @@ String _newest(Match? heading) => heading == null
     ? ' (it has no "## " entry)'
     : ' (the newest is "${heading[0]!.trim()}")';
 
+/// The `## Unreleased` heading, or a refusal naming the newest one.
+Match _unreleasedHeading(String changelog) {
+  final heading = _entryHeading.firstMatch(changelog);
+  if (heading == null || heading[0]!.trim() != _unreleased) {
+    throw _Fail(
+      'write the notes under "$_unreleased" at the top of $_changelogPath'
+      '${_newest(heading)}.',
+    );
+  }
+  return heading;
+}
+
 /// Checks the entry below [heading], up to the next one: every note in a
-/// `### ` group, at most five a group, 500 characters in all.
-void _requireNotes(String text, Match heading) {
+/// `### ` group, at most five a group, 500 characters in all. Returns
+/// "N notes, M characters".
+String _requireNotes(String text, Match heading) {
   final next = text.indexOf(_entryHeading, heading.end);
   // A CRLF checkout counts as LF: the store counts the text, not line endings.
   final entry = text
@@ -340,7 +376,207 @@ void _requireNotes(String text, Match heading) {
       '$_maxEntryLength. Merge or cut notes.',
     );
   }
-  stdout.writeln('changelog  $notes notes, ${entry.length} characters');
+  return '$notes notes, ${entry.length} characters';
+}
+
+// ============================================
+// Drafting the notes
+// ============================================
+
+/// Shows the `## Unreleased` notes until you answer: yes once they keep the
+/// rules, r for a fresh draft, anything else stops and keeps them.
+void _review(Directory root, String since) {
+  while (true) {
+    final shown = _changelogText(root);
+    final heading = _unreleasedHeading(shown);
+    final next = shown.indexOf(_entryHeading, heading.end);
+    stdout.writeln(
+        '\n${shown.substring(heading.start, next < 0 ? null : next).trim()}\n');
+    try {
+      stdout.writeln('rules      kept: ${_requireNotes(shown, heading)}');
+    } on _Fail catch (failure) {
+      stdout.writeln('rules      BROKEN: ${failure.message}');
+    }
+    stdout.write('Edit $_changelogPath now if you like. Release with these '
+        'notes? [y]es / [r]egenerate / [N]o ');
+    switch ((stdin.readLineSync() ?? '').trim().toLowerCase()) {
+      case 'y' || 'yes':
+        final edited = _changelogText(root);
+        try {
+          _requireNotes(edited, _unreleasedHeading(edited));
+          return;
+        } on _Fail {
+          // Shown again, with what broke.
+        }
+      case 'r':
+        try {
+          _writeDraft(root, since);
+        } on _Fail catch (failure) {
+          stdout.writeln('draft      ${failure.message}; notes unchanged');
+        }
+      default:
+        throw const _Fail('stopped. The notes stay in $_changelogPath: edit '
+            'them, then run this again.');
+    }
+  }
+}
+
+/// Not `stdin.hasTerminal`: it also says yes to `/dev/null`, the stdin CI
+/// gives a job. Only a real terminal has an echo mode; reading it throws on
+/// anything else.
+bool _atTerminal() {
+  try {
+    stdin.echoMode;
+    return true;
+  } on StdinException {
+    return false;
+  }
+}
+
+/// Puts Claude's draft at the top of the changelog, replacing any notes under
+/// `## Unreleased`.
+void _writeDraft(Directory root, String since) {
+  final notes = _draft(root, since);
+  final changelog = _changelogText(root);
+  final heading = _entryHeading.firstMatch(changelog);
+  final start = heading?.start ?? changelog.length;
+  var end = start;
+  if (heading != null && heading[0]!.trim() == _unreleased) {
+    final next = changelog.indexOf(_entryHeading, heading.end);
+    end = next < 0 ? changelog.length : next;
+  }
+  _changelogFile(root)
+      .writeAsStringSync(changelog.replaceRange(start, end, '$notes\n'));
+}
+
+/// Claude Sonnet's notes for the commits since [since], as a `## Unreleased`
+/// entry. It gets no tools: all it reads is in the prompt, and it replies
+/// with JSON, so this script alone writes the Markdown.
+String _draft(Directory root, String since) {
+  final commits = _gitOut(root, [
+    'log',
+    '--no-merges',
+    '--format=%s%n%b%x1e',
+    '$since..HEAD',
+  ])
+      .split('\x1e')
+      .map((commit) => commit.trim())
+      .where((commit) => commit.isNotEmpty && !_unseenCommit.hasMatch(commit))
+      .map((commit) => commit
+          .split('\n')
+          .where((line) => !line.startsWith('Co-Authored-By:'))
+          .join('\n')
+          .trim())
+      .join('\n\n');
+  if (commits.isEmpty) {
+    throw _Fail('no commits since $since that an app reader would notice');
+  }
+
+  // The whole guide, not its rules section alone: that section's example has a
+  // "## Unreleased" line, so cutting at the next "## " loses the rules.
+  final guide = File('${root.path}/$_guidePath').readAsStringSync().trim();
+
+  // The two newest released entries, for the style.
+  final changelog = _changelogText(root);
+  final released = _entryHeading
+      .allMatches(changelog)
+      .where((heading) => heading[0]!.trim() != _unreleased)
+      .toList();
+  final recent = released.isEmpty
+      ? ''
+      : changelog
+          .substring(released.first.start,
+              released.length > 2 ? released[2].start : null)
+          .trim();
+
+  final prompt = '''
+Draft the release notes for the next version of an app from the commits below.
+
+Reply with only this JSON, nothing before or after it:
+{"new": ["..."], "improved": ["..."], "fixed": ["..."]}
+Each item is one note in plain text: no leading "- ", no Markdown. Leave a list empty when nothing fits it.
+
+Hard limits, checked before release: at most $_maxNotesPerGroup notes in a list, and $_maxEntryLength characters for the whole entry including its ### headings. So aim for about six notes in all, each under 70 characters: pick what an app reader would notice most, merge related changes into one note ("Search: ..."), and drop small polish.
+
+Follow "The CHANGELOG entry" in <guide>; the rest of it is how a release runs, for context. Leave out refactors and other technical work, and anything only on the website. Write like the entries in <recent>: short, plain, no detail a reader doesn't need.
+
+<guide>
+$guide
+</guide>
+
+<recent>
+$recent
+</recent>
+
+<commits>
+$commits
+</commits>
+''';
+
+  stdout.writeln('draft      Claude Sonnet is reading the commits since '
+      '$since...');
+  final ProcessResult result;
+  try {
+    // Run from the temp folder so this repo's CLAUDE.md and memory stay out.
+    // The prompt goes before --tools, which would take it as a tool name.
+    result = Process.runSync(
+      'claude',
+      [
+        '-p',
+        prompt,
+        '--model',
+        'sonnet',
+        '--tools',
+        '',
+        '--no-session-persistence',
+      ],
+      workingDirectory: Directory.systemTemp.path,
+    );
+  } on ProcessException {
+    throw const _Fail('Claude Code (the claude command) is not installed');
+  }
+  final reply = '${result.stdout}'.trim();
+  if (result.exitCode != 0) {
+    throw _Fail('claude failed: ${'${result.stderr}'.trim()} $reply');
+  }
+
+  Object? json;
+  final open = reply.indexOf('{');
+  final close = reply.lastIndexOf('}');
+  if (open >= 0 && close > open) {
+    try {
+      json = jsonDecode(reply.substring(open, close + 1));
+    } on FormatException {
+      // Reported below, with the reply.
+    }
+  }
+  if (json is! Map) throw _Fail('Claude replied without the notes: $reply');
+
+  final groups = <String>[];
+  for (final (key, title) in const [
+    ('new', 'New'),
+    ('improved', 'Improved'),
+    ('fixed', 'Fixed'),
+  ]) {
+    final items = json[key];
+    final notes = [
+      if (items is List)
+        for (final item in items)
+          if (item is String)
+            // One line each, without a bullet of its own.
+            item
+                .replaceFirst(RegExp(r'^\s*[-*]\s+'), '')
+                .replaceAll(RegExp(r'\s+'), ' ')
+                .trim(),
+    ].where((note) => note.isNotEmpty);
+    if (notes.isNotEmpty) {
+      groups.add('### $title\n${notes.map((note) => '- $note').join('\n')}');
+    }
+  }
+  if (groups.isEmpty) {
+    throw const _Fail('Claude found nothing an app reader would notice');
+  }
+  return '$_unreleased\n${groups.join('\n\n')}\n';
 }
 
 // ============================================

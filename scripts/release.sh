@@ -11,10 +11,12 @@
 #                                   # bookmarks or deep links
 #   -h, --help
 #
-# Write the notes under "## Unreleased" at the top of CHANGELOG.md first; this
-# turns that heading into "## <version> - <today>". The rules for the notes are
-# in docs/general/how-to-release.md. Only delegates: tools/release.dart does
-# the work.
+# No notes under "## Unreleased" at the top of CHANGELOG.md? Claude Sonnet
+# drafts them from the commits since the last tag; edit the file, then answer
+# y. Notes already there are used as written. The heading then becomes
+# "## <version> - <today>". The rules for the notes are in
+# docs/general/how-to-release.md. Only delegates: tools/release.dart does the
+# work.
 # END-USAGE
 
 . "$(dirname "$0")/lib/common.sh"

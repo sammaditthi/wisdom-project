@@ -3,10 +3,15 @@
 **Every release is these two commands. Don't release any other way.**
 
 ```bash
-# write the notes under "## Unreleased" in CHANGELOG.md, then:
-./scripts/release.sh minor     # raise the version, date the notes, commit (local only)
+./scripts/release.sh minor     # draft the notes, you check them, raise the version, commit (local only)
 ./scripts/deploy.sh --prod     # test everything, ask, tag, push, deploy every product
 ```
+
+With no notes under `## Unreleased`, `release.sh` has Claude Sonnet
+(`claude -p`, no tools) draft them from the commits since the last tag, by the
+rules below. Edit `CHANGELOG.md` while it waits, then answer `y`, or `r` for a
+new draft. Notes already there are used as written. No terminal, or no
+`claude`: write them by hand first.
 
 If anything fails, fix it and run `./scripts/deploy.sh --prod` again. Don't
 fall back to a product's own `deploy.sh --prod`: it ships one product, skips
