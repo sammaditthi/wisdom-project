@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.0 - 2026-11-08
+### New
+- Open on SuttaCentral in the Share menu, naming whose English translation it opens
+
+### Improved
+- Recent searches show five, with Show more for the rest
+- Search opens references like SN 15:3, Tha Ap 1 and Dhp 5
+
+### Fixed
+- Sinhala shows its own printed page number, not the Pali one
+- The stacked layout shows a sutta number once, not twice
+- Research citations like AN 1.1 open their text, and each source shows once a paragraph
+
 ## 1.1.0 - 2026-11-01
 ### New
 - Singlish: R types repaya, and c types ච
