@@ -1394,6 +1394,30 @@ abstract class AppLocalizations {
   /// **'Close the tab'**
   String get shortcutCloseTab;
 
+  /// Keyboard shortcuts tab: row for the key that shows or hides the navigator (the tree of texts)
+  ///
+  /// In en, this message translates to:
+  /// **'Show or hide the navigator'**
+  String get shortcutToggleNavigator;
+
+  /// Keyboard shortcuts tab: row for the key that makes the text bigger
+  ///
+  /// In en, this message translates to:
+  /// **'Text bigger'**
+  String get shortcutTextBigger;
+
+  /// Keyboard shortcuts tab: row for the key that makes the text smaller
+  ///
+  /// In en, this message translates to:
+  /// **'Text smaller'**
+  String get shortcutTextSmaller;
+
+  /// Keyboard shortcuts tab: row for the key that returns the text to its default size
+  ///
+  /// In en, this message translates to:
+  /// **'Text back to normal'**
+  String get shortcutTextNormal;
+
   /// Keyboard shortcuts tab: row for the key that opens the Settings dialog
   ///
   /// In en, this message translates to:

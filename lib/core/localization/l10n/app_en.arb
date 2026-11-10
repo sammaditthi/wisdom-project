@@ -1101,6 +1101,22 @@
   "@shortcutCloseTab": {
     "description": "Keyboard shortcuts tab: row for the key that closes the active reader tab"
   },
+  "shortcutToggleNavigator": "Show or hide the navigator",
+  "@shortcutToggleNavigator": {
+    "description": "Keyboard shortcuts tab: row for the key that shows or hides the navigator (the tree of texts)"
+  },
+  "shortcutTextBigger": "Text bigger",
+  "@shortcutTextBigger": {
+    "description": "Keyboard shortcuts tab: row for the key that makes the text bigger"
+  },
+  "shortcutTextSmaller": "Text smaller",
+  "@shortcutTextSmaller": {
+    "description": "Keyboard shortcuts tab: row for the key that makes the text smaller"
+  },
+  "shortcutTextNormal": "Text back to normal",
+  "@shortcutTextNormal": {
+    "description": "Keyboard shortcuts tab: row for the key that returns the text to its default size"
+  },
   "shortcutOpenSettings": "Open Settings",
   "@shortcutOpenSettings": {
     "description": "Keyboard shortcuts tab: row for the key that opens the Settings dialog"

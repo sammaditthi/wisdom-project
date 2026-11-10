@@ -731,6 +731,18 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutCloseTab => 'ටැබය වසන්න';
 
   @override
+  String get shortcutToggleNavigator => 'පටුන පෙන්වන්න හෝ සඟවන්න';
+
+  @override
+  String get shortcutTextBigger => 'අකුරු විශාල කරන්න';
+
+  @override
+  String get shortcutTextSmaller => 'අකුරු කුඩා කරන්න';
+
+  @override
+  String get shortcutTextNormal => 'අකුරු සාමාන්‍ය ප්‍රමාණයට';
+
+  @override
   String get shortcutOpenSettings => 'සැකසුම් විවෘත කරන්න';
 
   @override

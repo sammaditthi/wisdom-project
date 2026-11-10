@@ -65,6 +65,21 @@ class SmartCopyIntent extends Intent {
   const SmartCopyIntent();
 }
 
+/// How a text-size key changes the reader text.
+enum TextSizeChange { bigger, smaller, normal }
+
+/// Make the text bigger, smaller or back to normal (⌘+ ⌘− ⌘0).
+class TextSizeIntent extends Intent {
+  const TextSizeIntent(this.change);
+
+  final TextSizeChange change;
+}
+
+/// Show or hide the navigator (⌘B), as the app-bar button does.
+class ToggleNavigatorIntent extends Intent {
+  const ToggleNavigatorIntent();
+}
+
 /// Open the Settings dialog on [tab] (⌘, for General, ⌘/ for the shortcut
 /// list).
 class OpenSettingsIntent extends Intent {

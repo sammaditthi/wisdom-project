@@ -4,17 +4,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/theme/theme_notifier.dart';
 import '../providers/app_section_provider.dart';
 import '../providers/in_page_search_focus_provider.dart';
 import '../providers/in_page_search_provider.dart';
 import '../providers/last_selected_text_provider.dart';
 import '../providers/main_search_focus_provider.dart';
+import '../providers/navigator_visibility_provider.dart';
 import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
 import '../providers/tab_lifecycle_provider.dart';
 import '../providers/tab_provider.dart';
 import '../widgets/settings/settings_dialog.dart';
 import 'app_navigator_key.dart';
+import 'shortcut_guards.dart';
 import 'shortcut_intents.dart';
 
 /// Closes the topmost overlay on the LIFO stack.
@@ -193,6 +196,49 @@ class OpenSettingsAction extends ContextAction<OpenSettingsIntent> {
   Object? invoke(OpenSettingsIntent intent, [BuildContext? context]) {
     final overlayContext = appNavigatorKey.currentState!.overlay!.context;
     unawaited(SettingsDialog.show(overlayContext, initial: intent.tab));
+    return null;
+  }
+}
+
+/// Steps the text size like the reader menu's slider: 0.1 a press, rounded to
+/// the slider's 0.05 grid so steps never drift, inside the notifier's limits.
+class TextSizeAction extends ContextAction<TextSizeIntent> {
+  final WidgetRef ref;
+  TextSizeAction(this.ref);
+
+  static const double _step = 0.1;
+
+  @override
+  Object? invoke(TextSizeIntent intent, [BuildContext? context]) {
+    final notifier = ref.read(fontScaleProvider.notifier);
+    final scale = ref.read(fontScaleProvider);
+    double snap(double value) => (value * 20).round() / 20;
+    switch (intent.change) {
+      case TextSizeChange.bigger:
+        unawaited(notifier.setScale(snap(scale + _step)));
+      case TextSizeChange.smaller:
+        unawaited(notifier.setScale(snap(scale - _step)));
+      case TextSizeChange.normal:
+        unawaited(notifier.reset());
+    }
+    return null;
+  }
+}
+
+/// Shows or hides the navigator. A reader key: needs the Reader, with nothing
+/// open over it.
+class ToggleNavigatorAction extends ContextAction<ToggleNavigatorIntent> {
+  final WidgetRef ref;
+  ToggleNavigatorAction(this.ref);
+
+  @override
+  bool isEnabled(ToggleNavigatorIntent intent, [BuildContext? context]) =>
+      readerKeysAllowed(ref);
+
+  @override
+  Object? invoke(ToggleNavigatorIntent intent, [BuildContext? context]) {
+    final visible = ref.read(navigatorVisibleProvider.notifier);
+    visible.state = !visible.state;
     return null;
   }
 }

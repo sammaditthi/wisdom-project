@@ -34,6 +34,9 @@ class OverlayStackSync extends ConsumerWidget {
 
   const OverlayStackSync({super.key, required this.child});
 
+  /// The find bar's id on the stack. Reader keys still work while it is open.
+  static const inPageSearchOverlayId = 'in-page-search';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // NOTE: The `ref.listen` calls below intentionally live in `build`, not
@@ -71,12 +74,12 @@ class OverlayStackSync extends ConsumerWidget {
       (_, isOpen) {
         if (isOpen) {
           stack.push(DismissibleOverlay(
-            id: 'in-page-search',
+            id: inPageSearchOverlayId,
             dismiss: () =>
                 ref.read(inPageSearchStatesProvider.notifier).closeSearch(),
           ));
         } else {
-          stack.remove('in-page-search');
+          stack.remove(inPageSearchOverlayId);
         }
       },
     );

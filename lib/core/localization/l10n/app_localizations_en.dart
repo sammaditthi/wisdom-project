@@ -731,6 +731,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutCloseTab => 'Close the tab';
 
   @override
+  String get shortcutToggleNavigator => 'Show or hide the navigator';
+
+  @override
+  String get shortcutTextBigger => 'Text bigger';
+
+  @override
+  String get shortcutTextSmaller => 'Text smaller';
+
+  @override
+  String get shortcutTextNormal => 'Text back to normal';
+
+  @override
   String get shortcutOpenSettings => 'Open Settings';
 
   @override

@@ -125,6 +125,41 @@ final List<AppShortcut> appShortcuts = [
     desktopOnly: false,
   ),
 
+  // ─── Reading ───────────────────────────────────────────────────────────
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.keyB, primary: true),
+    intent: const ToggleNavigatorIntent(),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutToggleNavigator,
+  ),
+  // The browser's own zoom keys: same meaning, so the reader takes them.
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.equal, primary: true),
+    alsoKeys: const [
+      ShortcutKeys(LogicalKeyboardKey.equal, primary: true, shift: true),
+      ShortcutKeys(LogicalKeyboardKey.numpadAdd, primary: true),
+    ],
+    intent: const TextSizeIntent(TextSizeChange.bigger),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutTextBigger,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.minus, primary: true),
+    alsoKeys: const [
+      ShortcutKeys(LogicalKeyboardKey.numpadSubtract, primary: true),
+    ],
+    intent: const TextSizeIntent(TextSizeChange.smaller),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutTextSmaller,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.digit0, primary: true),
+    alsoKeys: const [ShortcutKeys(LogicalKeyboardKey.numpad0, primary: true)],
+    intent: const TextSizeIntent(TextSizeChange.normal),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutTextNormal,
+  ),
+
   // ─── Everywhere ────────────────────────────────────────────────────────
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.comma, primary: true),
