@@ -13,6 +13,7 @@ import '../../../domain/entities/reader/document_slice.dart';
 import '../../../domain/entities/reader/reader_unit.dart';
 import '../../providers/app_section_provider.dart';
 import '../../providers/document_provider.dart';
+import '../../providers/reader_keyboard_bridge_provider.dart';
 import '../../providers/dictionary_provider.dart'
     show
         selectedDictionaryWordProvider,
@@ -55,7 +56,18 @@ class MultiPaneReaderWidget extends ConsumerStatefulWidget {
 }
 
 class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
-    with ReaderSelectionHandler<MultiPaneReaderWidget> {
+    with ReaderSelectionHandler<MultiPaneReaderWidget>
+    implements ReaderKeyboardHandle {
+  /// Where this reader lets the sutta and scroll shortcuts reach it.
+  late final ReaderKeyboardBridge _keyboardBridge;
+
+  /// Wraps the text, so the scroll keys can tell focus is in the reader.
+  final FocusNode _textFocus = FocusNode(
+    debugLabel: 'Reader text',
+    canRequestFocus: false,
+    skipTraversal: true,
+  );
+
   // Single scroll controller for all modes. Each new scroll view (a tab
   // switch, a layout switch, a unit that just loaded) starts at the active
   // tab's saved offset, so its first frame is already where that tab was left.
@@ -116,6 +128,7 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _keyboardBridge = ref.read(readerKeyboardBridgeProvider)..attach(this);
   }
 
   /// Scroll listener for scroll-position tracking.
@@ -168,6 +181,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
 
   @override
   void dispose() {
+    _keyboardBridge.detach(this);
+    _textFocus.dispose();
     _scrollSaveDebounce?.cancel();
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
@@ -249,6 +264,44 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // moves it or re-reads the scroll state after the new layout. The jump
     // must not measure the old layout, whose offset 0 may have pages above it.
     _anchorAt(null);
+  }
+
+  @override
+  bool get hasFocus => _textFocus.hasFocus;
+
+  @override
+  bool canStep(ReaderStep step) => _neighbour(step) != null;
+
+  @override
+  void step(ReaderStep step) {
+    final leaf = _neighbour(step);
+    if (leaf != null) _navigateToSutta(leaf);
+  }
+
+  /// The sutta on [step]'s side of the active unit, as the toolbar reads it.
+  TipitakaTreeNode? _neighbour(ReaderStep step) {
+    final nodeKey = ref.read(activeNodeKeyProvider);
+    return nodeKey == null
+        ? null
+        : ref.read(neighbourLeafProvider((nodeKey, step)));
+  }
+
+  /// Flutter's own ScrollAction numbers: a line is 50 px, a page 0.8 of the
+  /// viewport, animated over 100 ms.
+  @override
+  void scroll(AxisDirection direction, ScrollIncrementType type) {
+    for (final position in _scrollController.positions) {
+      final amount = type == ScrollIncrementType.page
+          ? position.viewportDimension * 0.8
+          : 50.0;
+      final delta = direction == AxisDirection.up ? -amount : amount;
+      position.animateTo(
+        (position.pixels + delta)
+            .clamp(position.minScrollExtent, position.maxScrollExtent),
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   /// One step action, or null when the corpus ends that way.
@@ -495,14 +548,17 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         Column(
           children: [
             Expanded(
-              child: _buildBody(
-                context,
-                unitAsync: unitAsync,
-                contentAsync: contentAsync,
-                slice: slice,
-                anchor: anchor,
-                readerLayout: readerLayout,
-                searchState: searchState,
+              child: Focus(
+                focusNode: _textFocus,
+                child: _buildBody(
+                  context,
+                  unitAsync: unitAsync,
+                  contentAsync: contentAsync,
+                  slice: slice,
+                  anchor: anchor,
+                  readerLayout: readerLayout,
+                  searchState: searchState,
+                ),
               ),
             ),
           ],

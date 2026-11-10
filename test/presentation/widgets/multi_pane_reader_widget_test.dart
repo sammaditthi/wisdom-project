@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:the_wisdom_project/domain/entities/failure.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/reader_keyboard_bridge_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 
 import '../../helpers/mocks.mocks.dart';
@@ -41,6 +42,28 @@ void main() {
       // The "select a sutta" hint shows the Urna Hair Relic emblem
       // (Image.asset) as its leading visual, not a Material icon.
       expect(find.byType(Image), findsOneWidget);
+    });
+  });
+
+  // ============================================================
+  // Keyboard bridge (keyboard-shortcuts-sheet.md: sutta and scroll keys)
+  // ============================================================
+  group('Keyboard bridge', () {
+    testWidgets('the reader attaches to the keyboard bridge while mounted',
+        (tester) async {
+      final overrides = [
+        TestProviderOverrides.bjtDocumentRepository(mockRepository),
+      ];
+      await tester.pumpApp(const MultiPaneReaderWidget(), overrides: overrides);
+      await tester.pump();
+
+      final bridge = ProviderScope.containerOf(
+        tester.element(find.byType(MultiPaneReaderWidget)),
+      ).read(readerKeyboardBridgeProvider);
+      expect(bridge.handle, isNotNull);
+
+      await tester.pumpApp(const SizedBox(), overrides: overrides);
+      expect(bridge.handle, isNull);
     });
   });
 

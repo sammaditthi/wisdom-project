@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../models/reader_layout.dart';
+import '../providers/reader_unit_provider.dart' show ReaderStep;
 import '../widgets/settings/settings_tab.dart';
 
 /// App-wide keyboard intents.
@@ -78,6 +79,21 @@ class SetLayoutIntent extends Intent {
   const SetLayoutIntent(this.layout);
 
   final ReaderLayout layout;
+}
+
+/// Go to the previous or next sutta (⌥⌘< >), as the toolbar's ⏮ ⏭ do.
+class StepSuttaIntent extends Intent {
+  const StepSuttaIntent(this.step);
+
+  final ReaderStep step;
+}
+
+/// Scroll the reader a line (↑ ↓) or a page (PgUp PgDn).
+class ScrollReaderIntent extends Intent {
+  const ScrollReaderIntent(this.direction, this.type);
+
+  final AxisDirection direction;
+  final ScrollIncrementType type;
 }
 
 /// How a text-size key changes the reader text.

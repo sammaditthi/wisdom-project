@@ -737,6 +737,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutCloseTab => 'Close the tab';
 
   @override
+  String get shortcutPreviousSutta => 'Previous sutta';
+
+  @override
+  String get shortcutNextSutta => 'Next sutta';
+
+  @override
   String get shortcutToggleNavigator => 'Show or hide the navigator';
 
   @override
@@ -747,6 +753,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutTextNormal => 'Text back to normal';
+
+  @override
+  String get shortcutScroll => 'Scroll';
+
+  @override
+  String get shortcutScrollPage => 'Scroll a page';
 
   @override
   String get shortcutOpenSettings => 'Open Settings';

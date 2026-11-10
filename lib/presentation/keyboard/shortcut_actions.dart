@@ -11,6 +11,7 @@ import '../providers/in_page_search_provider.dart';
 import '../providers/last_selected_text_provider.dart';
 import '../providers/main_search_focus_provider.dart';
 import '../providers/navigator_visibility_provider.dart';
+import '../providers/reader_keyboard_bridge_provider.dart';
 import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
 import '../providers/tab_lifecycle_provider.dart';
@@ -280,6 +281,59 @@ class SetLayoutAction extends ContextAction<SetLayoutIntent> {
   @override
   Object? invoke(SetLayoutIntent intent, [BuildContext? context]) {
     ref.read(updateActiveTabLayoutProvider)(intent.layout);
+    return null;
+  }
+}
+
+/// Steps to the neighbouring sutta through the mounted reader, which runs the
+/// toolbar buttons' own code. Nothing at the corpus edge, or while typing.
+class StepSuttaAction extends ContextAction<StepSuttaIntent> {
+  final WidgetRef ref;
+  StepSuttaAction(this.ref);
+
+  @override
+  bool isEnabled(StepSuttaIntent intent, [BuildContext? context]) =>
+      readerKeysAllowed(ref) &&
+      !isTypingInTextBox() &&
+      (ref.read(readerKeyboardBridgeProvider).handle?.canStep(intent.step) ??
+          false);
+
+  @override
+  Object? invoke(StepSuttaIntent intent, [BuildContext? context]) {
+    ref.read(readerKeyboardBridgeProvider).handle?.step(intent.step);
+    return null;
+  }
+}
+
+/// Scrolls the reader — only when focus is in the reader's text or on
+/// nothing. On a navigator row, a tab or a button the arrows keep their usual
+/// job of moving focus, and in a text box they move the caret.
+class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
+  final WidgetRef ref;
+
+  /// `AppShortcuts`' fallback node: focus there is focus on nothing.
+  final FocusNode idleFocus;
+
+  ScrollReaderAction(this.ref, this.idleFocus);
+
+  @override
+  bool isEnabled(ScrollReaderIntent intent, [BuildContext? context]) {
+    final handle = ref.read(readerKeyboardBridgeProvider).handle;
+    if (handle == null || !readerKeysAllowed(ref) || isTypingInTextBox()) {
+      return false;
+    }
+    final primary = FocusManager.instance.primaryFocus;
+    final idle =
+        primary == null || primary is FocusScopeNode || primary == idleFocus;
+    return idle || handle.hasFocus;
+  }
+
+  @override
+  Object? invoke(ScrollReaderIntent intent, [BuildContext? context]) {
+    ref
+        .read(readerKeyboardBridgeProvider)
+        .handle
+        ?.scroll(intent.direction, intent.type);
     return null;
   }
 }

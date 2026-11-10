@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../core/localization/l10n/app_localizations.dart';
 import '../models/reader_layout.dart';
+import '../providers/reader_unit_provider.dart' show ReaderStep;
 import '../widgets/settings/settings_tab.dart';
 import 'shortcut_intents.dart';
 
@@ -160,6 +161,37 @@ final List<AppShortcut> appShortcuts = [
     ),
 
   // ─── Reading ───────────────────────────────────────────────────────────
+  // The , and . keys, marked < and >: they point the way the toolbar's ⏮ ⏭
+  // do, and answer with or without ⇧. Not ⌥⌘← →, which Chrome keeps.
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true),
+    alsoKeys: const [
+      ShortcutKeys(
+        LogicalKeyboardKey.comma,
+        primary: true,
+        alt: true,
+        shift: true,
+      ),
+    ],
+    intent: const StepSuttaIntent(ReaderStep.previous),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutPreviousSutta,
+  ),
+  AppShortcut(
+    keys:
+        const ShortcutKeys(LogicalKeyboardKey.period, primary: true, alt: true),
+    alsoKeys: const [
+      ShortcutKeys(
+        LogicalKeyboardKey.period,
+        primary: true,
+        alt: true,
+        shift: true,
+      ),
+    ],
+    intent: const StepSuttaIntent(ReaderStep.next),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutNextSutta,
+  ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.keyB, primary: true),
     intent: const ToggleNavigatorIntent(),
@@ -192,6 +224,33 @@ final List<AppShortcut> appShortcuts = [
     intent: const TextSizeIntent(TextSizeChange.normal),
     group: ShortcutGroup.reading,
     label: (l10n) => l10n.shortcutTextNormal,
+  ),
+  // Same label: ↑ and ↓ share one row in the Settings tab.
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.arrowUp),
+    intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.line),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutScroll,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
+    intent:
+        const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.line),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutScroll,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.pageUp),
+    intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.page),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutScrollPage,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.pageDown),
+    intent:
+        const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.page),
+    group: ShortcutGroup.reading,
+    label: (l10n) => l10n.shortcutScrollPage,
   ),
 
   // ─── Everywhere ────────────────────────────────────────────────────────

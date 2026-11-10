@@ -737,6 +737,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutCloseTab => 'ටැබය වසන්න';
 
   @override
+  String get shortcutPreviousSutta => 'පෙර සූත්‍රය';
+
+  @override
+  String get shortcutNextSutta => 'ඊළඟ සූත්‍රය';
+
+  @override
   String get shortcutToggleNavigator => 'පටුන පෙන්වන්න හෝ සඟවන්න';
 
   @override
@@ -747,6 +753,12 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get shortcutTextNormal => 'අකුරු සාමාන්‍ය ප්‍රමාණයට';
+
+  @override
+  String get shortcutScroll => 'අනුචලනය';
+
+  @override
+  String get shortcutScrollPage => 'පිටුවක් අනුචලනය';
 
   @override
   String get shortcutOpenSettings => 'සැකසුම් විවෘත කරන්න';

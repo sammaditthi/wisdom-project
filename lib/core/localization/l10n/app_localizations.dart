@@ -1406,6 +1406,18 @@ abstract class AppLocalizations {
   /// **'Close the tab'**
   String get shortcutCloseTab;
 
+  /// Keyboard shortcuts tab: row for the key that opens the previous sutta, like the toolbar's previous button
+  ///
+  /// In en, this message translates to:
+  /// **'Previous sutta'**
+  String get shortcutPreviousSutta;
+
+  /// Keyboard shortcuts tab: row for the key that opens the next sutta, like the toolbar's next button
+  ///
+  /// In en, this message translates to:
+  /// **'Next sutta'**
+  String get shortcutNextSutta;
+
   /// Keyboard shortcuts tab: row for the key that shows or hides the navigator (the tree of texts)
   ///
   /// In en, this message translates to:
@@ -1429,6 +1441,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Text back to normal'**
   String get shortcutTextNormal;
+
+  /// Keyboard shortcuts tab: row for the up and down arrow keys, which scroll the text a little
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll'**
+  String get shortcutScroll;
+
+  /// Keyboard shortcuts tab: row for Page Up and Page Down, which scroll the text a page
+  ///
+  /// In en, this message translates to:
+  /// **'Scroll a page'**
+  String get shortcutScrollPage;
 
   /// Keyboard shortcuts tab: row for the key that opens the Settings dialog
   ///

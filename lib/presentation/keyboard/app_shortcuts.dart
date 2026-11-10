@@ -30,13 +30,28 @@ import 'shortcut_intents.dart';
 /// That's why ESC works from anywhere (search bar, panel, reader, empty
 /// space), Ctrl+F works in-place, and Ctrl+C has a fallback for the web
 /// focus-tree quirk.
-class AppShortcuts extends ConsumerWidget {
+class AppShortcuts extends ConsumerStatefulWidget {
   final Widget child;
 
   const AppShortcuts({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AppShortcuts> createState() => _AppShortcutsState();
+}
+
+class _AppShortcutsState extends ConsumerState<AppShortcuts> {
+  /// The fallback node below. Focus on it means focus is on nothing, which
+  /// lets the arrow keys scroll the reader.
+  final FocusNode _idleFocus = FocusNode(debugLabel: 'AppShortcuts idle');
+
+  @override
+  void dispose() {
+    _idleFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Shortcuts(
       shortcuts: shortcutMap(defaultTargetPlatform),
       child: Actions(
@@ -51,6 +66,8 @@ class AppShortcuts extends ConsumerWidget {
           SwitchTabIntent: SwitchTabAction(ref),
           SetLayoutIntent: SetLayoutAction(ref),
           ToggleNavigatorIntent: ToggleNavigatorAction(ref),
+          StepSuttaIntent: StepSuttaAction(ref),
+          ScrollReaderIntent: ScrollReaderAction(ref, _idleFocus),
         },
         // Autofocused fallback node. Holds focus only when no other widget
         // is focused (e.g. on a fresh route before any tap); as soon as the
@@ -58,11 +75,12 @@ class AppShortcuts extends ConsumerWidget {
         // Shortcuts above would have no focus path to receive events from
         // on initial render.
         child: Focus(
+          focusNode: _idleFocus,
           autofocus: true,
           // skipTraversal keeps this invisible to Tab-key focus traversal —
           // pressing Tab still walks through real interactive widgets.
           skipTraversal: true,
-          child: child,
+          child: widget.child,
         ),
       ),
     );
