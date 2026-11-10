@@ -37,6 +37,10 @@ class OverlayStackSync extends ConsumerWidget {
   /// The find bar's id on the stack. Reader keys still work while it is open.
   static const inPageSearchOverlayId = 'in-page-search';
 
+  /// The dictionary sheet's id. A click on a word opens it, so reader keys
+  /// still work while it is open.
+  static const dictionaryOverlayId = 'dictionary';
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // NOTE: The `ref.listen` calls below intentionally live in `build`, not
@@ -104,14 +108,14 @@ class OverlayStackSync extends ConsumerWidget {
     ref.listen<String?>(selectedDictionaryWordProvider, (_, word) {
       if (word != null) {
         stack.push(DismissibleOverlay(
-          id: 'dictionary',
+          id: dictionaryOverlayId,
           dismiss: () {
             ref.read(selectedDictionaryWordProvider.notifier).state = null;
             ref.read(dictionaryHighlightProvider.notifier).state = null;
           },
         ));
       } else {
-        stack.remove('dictionary');
+        stack.remove(dictionaryOverlayId);
       }
     });
 

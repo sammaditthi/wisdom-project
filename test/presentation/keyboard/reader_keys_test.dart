@@ -75,6 +75,28 @@ void main() {
     expect(fake.scrolls, isEmpty);
   }, variant: mac);
 
+  testWidgets('↓ with a popup menu open does not scroll the reader',
+      (tester) async {
+    // The reader menu is a plain PopupMenuButton: a route, not on the
+    // overlay stack. Its scope takes focus, and ↓ must stay with the menu.
+    final fake = await pumpWithFake(
+      tester,
+      home: Scaffold(
+        body: PopupMenuButton<int>(
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 1, child: Text('one')),
+          ],
+          child: const Text('menu'),
+        ),
+      ),
+    );
+    await tester.tap(find.text('menu'));
+    await tester.pumpAndSettle();
+
+    await pressKeys(tester, LogicalKeyboardKey.arrowDown);
+    expect(fake.scrolls, isEmpty);
+  }, variant: mac);
+
   testWidgets('↓ in a text box does not scroll', (tester) async {
     final fake = await pumpWithFake(
       tester,

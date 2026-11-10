@@ -122,6 +122,56 @@ void main() {
     expect(box.hasPrimaryFocus, isTrue);
   }, variant: mac);
 
+  testWidgets('↑ to a result already in view does not scroll the list',
+      (tester) async {
+    final list = ScrollController();
+    addTearDown(list.dispose);
+    final many = [
+      for (var i = 0; i < 30; i++) FocusNode(debugLabel: 'row $i'),
+    ];
+    addTearDown(() {
+      for (final node in many) {
+        node.dispose();
+      }
+    });
+    await pumpShortcutHost(
+      tester,
+      home: Scaffold(
+        body: SizedBox(
+          height: 300,
+          child: Consumer(
+            builder: (context, ref, _) => Focus(
+              focusNode: ref.watch(searchResultsFocusNodeProvider),
+              child: ListView(
+                controller: list,
+                children: [
+                  for (final (i, node) in many.indexed)
+                    SizedBox(
+                      height: 48,
+                      child: TextButton(
+                        focusNode: node,
+                        onPressed: () {},
+                        child: Text('row $i'),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    list.jumpTo(400); // rows 8–14 in view
+    await tester.pump();
+    many[12].requestFocus();
+    await tester.pump();
+
+    await pressKeys(tester, LogicalKeyboardKey.arrowUp);
+    await tester.pumpAndSettle();
+    expect(many[11].hasPrimaryFocus, isTrue);
+    expect(list.offset, 400);
+  }, variant: mac);
+
   test('↓ tries results first, then scrolling', () {
     final down = shortcutMap(TargetPlatform.macOS)
         .entries

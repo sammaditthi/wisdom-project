@@ -357,7 +357,7 @@ class MoveIntoSearchResultsAction
   @override
   Object? invoke(MoveIntoSearchResultsIntent intent, [BuildContext? context]) {
     final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
-    FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops.first);
+    _focusStop(stops.first, ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
     return null;
   }
 }
@@ -377,7 +377,7 @@ class NextSearchResultAction extends ContextAction<NextSearchResultIntent> {
     final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
     final at = stops.indexOf(FocusManager.instance.primaryFocus!);
     if (at + 1 < stops.length) {
-      FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops[at + 1]);
+      _focusStop(stops[at + 1], ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
     }
     return null;
   }
@@ -398,10 +398,21 @@ class PreviousSearchResultAction
     final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
     final at = stops.indexOf(FocusManager.instance.primaryFocus!);
     if (at > 0) {
-      FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops[at - 1]);
+      _focusStop(
+        stops[at - 1],
+        ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+      );
     } else {
       ref.read(mainSearchFocusNodeProvider)?.requestFocus();
     }
     return null;
   }
 }
+
+/// Focuses a search result and scrolls only as far as needed to show it, as
+/// Flutter's own Tab traversal does — a result already in view stays put.
+void _focusStop(FocusNode stop, ScrollPositionAlignmentPolicy policy) =>
+    FocusTraversalPolicy.defaultTraversalRequestFocusCallback(
+      stop,
+      alignmentPolicy: policy,
+    );

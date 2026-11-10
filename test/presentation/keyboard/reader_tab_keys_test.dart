@@ -8,6 +8,7 @@ import 'package:the_wisdom_project/presentation/providers/last_reader_layout_pro
 import 'package:the_wisdom_project/presentation/providers/navigator_sync_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/overlay_stack_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
+import 'package:the_wisdom_project/presentation/widgets/app/overlay_stack_sync.dart';
 import 'package:the_wisdom_project/presentation/widgets/settings/settings_dialog.dart';
 
 import 'shortcut_test_host.dart';
@@ -110,6 +111,23 @@ void main() {
     expect(c.read(tabsProvider), hasLength(2));
     await flushTabSaves(tester);
   }, variant: windows);
+
+  testWidgets('⌥⌘] still works with the dictionary sheet open',
+      (tester) async {
+    // Clicking a word opens the sheet; the reader keys must not go dead.
+    final c = await pumpWithTabs(tester);
+    c.read(overlayStackProvider.notifier).push(
+          DismissibleOverlay(
+            id: OverlayStackSync.dictionaryOverlayId,
+            dismiss: () {},
+          ),
+        );
+
+    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
+        primary: true, alt: true);
+    expect(c.read(activeTabIndexProvider), 1);
+    await flushTabSaves(tester);
+  }, variant: mac);
 
   testWidgets('⌥⌘] behind Settings does nothing', (tester) async {
     final c = await pumpWithTabs(tester);
