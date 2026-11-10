@@ -1,3 +1,5 @@
+import '../../core/localization/l10n/app_localizations.dart';
+
 /// Represents the layout mode for the bilingual reader
 ///
 /// The user's last-selected layout is persisted per-device via
@@ -24,5 +26,13 @@ enum ReaderLayout {
         ReaderLayout.sideBySide => 'P|S',
         ReaderLayout.stacked => 'P/S',
         ReaderLayout.sinhalaOnly => 'S',
+      };
+
+  /// The layout's localized name, as the toolbar's Layout menu shows it.
+  String label(AppLocalizations l10n) => switch (this) {
+        ReaderLayout.paliOnly => l10n.layoutPaliOnly,
+        ReaderLayout.sideBySide => l10n.layoutSideBySide,
+        ReaderLayout.stacked => l10n.layoutStacked,
+        ReaderLayout.sinhalaOnly => l10n.layoutSinhalaOnly,
       };
 }

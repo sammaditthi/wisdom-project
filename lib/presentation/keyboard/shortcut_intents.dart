@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../models/reader_layout.dart';
 import '../widgets/settings/settings_tab.dart';
 
 /// App-wide keyboard intents.
@@ -63,6 +64,20 @@ class CloseActiveTabIntent extends Intent {
 /// a visible selection.
 class SmartCopyIntent extends Intent {
   const SmartCopyIntent();
+}
+
+/// Move to the next (+1) or previous (-1) reader tab, wrapping at the ends.
+class SwitchTabIntent extends Intent {
+  const SwitchTabIntent(this.offset);
+
+  final int offset;
+}
+
+/// Set the active tab's reading layout (⌥⌘1–4).
+class SetLayoutIntent extends Intent {
+  const SetLayoutIntent(this.layout);
+
+  final ReaderLayout layout;
 }
 
 /// How a text-size key changes the reader text.

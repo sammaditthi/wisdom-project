@@ -1097,6 +1097,14 @@
   "@shortcutSearchTipitaka": {
     "description": "Keyboard shortcuts tab: row for the key that jumps to the main search box"
   },
+  "shortcutNextTab": "Next tab",
+  "@shortcutNextTab": {
+    "description": "Keyboard shortcuts tab: row for the key that moves to the next reader tab"
+  },
+  "shortcutPreviousTab": "Previous tab",
+  "@shortcutPreviousTab": {
+    "description": "Keyboard shortcuts tab: row for the key that moves to the previous reader tab"
+  },
   "shortcutCloseTab": "Close the tab",
   "@shortcutCloseTab": {
     "description": "Keyboard shortcuts tab: row for the key that closes the active reader tab"

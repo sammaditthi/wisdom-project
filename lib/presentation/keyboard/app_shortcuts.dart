@@ -48,6 +48,8 @@ class AppShortcuts extends ConsumerWidget {
           SmartCopyIntent: SmartCopyAction(ref),
           OpenSettingsIntent: OpenSettingsAction(ref),
           TextSizeIntent: TextSizeAction(ref),
+          SwitchTabIntent: SwitchTabAction(ref),
+          SetLayoutIntent: SetLayoutAction(ref),
           ToggleNavigatorIntent: ToggleNavigatorAction(ref),
         },
         // Autofocused fallback node. Holds focus only when no other widget

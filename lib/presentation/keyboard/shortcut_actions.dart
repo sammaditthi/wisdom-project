@@ -132,7 +132,8 @@ class CloseActiveTabAction extends ContextAction<CloseActiveTabIntent> {
 
   @override
   bool isEnabled(CloseActiveTabIntent intent, [BuildContext? context]) {
-    return ref.read(activeTabIndexProvider) >= 0;
+    // Not while typing: Ctrl+Alt is AltGr, which types characters.
+    return ref.read(activeTabIndexProvider) >= 0 && !isTypingInTextBox();
   }
 }
 
@@ -239,6 +240,46 @@ class ToggleNavigatorAction extends ContextAction<ToggleNavigatorIntent> {
   Object? invoke(ToggleNavigatorIntent intent, [BuildContext? context]) {
     final visible = ref.read(navigatorVisibleProvider.notifier);
     visible.state = !visible.state;
+    return null;
+  }
+}
+
+/// Moves to the next or previous reader tab, wrapping at the ends as Chrome
+/// does. A reader key, and not while typing (Ctrl+Alt is AltGr).
+class SwitchTabAction extends ContextAction<SwitchTabIntent> {
+  final WidgetRef ref;
+  SwitchTabAction(this.ref);
+
+  @override
+  bool isEnabled(SwitchTabIntent intent, [BuildContext? context]) =>
+      readerKeysAllowed(ref) &&
+      !isTypingInTextBox() &&
+      ref.read(tabsProvider).length >= 2;
+
+  @override
+  Object? invoke(SwitchTabIntent intent, [BuildContext? context]) {
+    final count = ref.read(tabsProvider).length;
+    final active = ref.read(activeTabIndexProvider);
+    ref.read(switchTabProvider)((active + intent.offset) % count);
+    return null;
+  }
+}
+
+/// Sets the active tab's layout through the same path as the Layout menu, so
+/// the choice is remembered for new tabs too.
+class SetLayoutAction extends ContextAction<SetLayoutIntent> {
+  final WidgetRef ref;
+  SetLayoutAction(this.ref);
+
+  @override
+  bool isEnabled(SetLayoutIntent intent, [BuildContext? context]) =>
+      readerKeysAllowed(ref) &&
+      !isTypingInTextBox() &&
+      ref.read(activeTabIndexProvider) >= 0;
+
+  @override
+  Object? invoke(SetLayoutIntent intent, [BuildContext? context]) {
+    ref.read(updateActiveTabLayoutProvider)(intent.layout);
     return null;
   }
 }

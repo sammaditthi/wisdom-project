@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../core/localization/l10n/app_localizations.dart';
+import '../models/reader_layout.dart';
 import '../widgets/settings/settings_tab.dart';
 import 'shortcut_intents.dart';
 
@@ -114,6 +115,28 @@ final List<AppShortcut> appShortcuts = [
   ),
 
   // ─── Reader tabs ───────────────────────────────────────────────────────
+  // ⌥⌘ acts on the reader tab. Not ⌥⌘← →: Chrome keeps those for its own
+  // tabs and the page never sees them. ⇧⌘[ ] is the browser's tab switch.
+  AppShortcut(
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    ),
+    intent: const SwitchTabIntent(1),
+    group: ShortcutGroup.readerTabs,
+    label: (l10n) => l10n.shortcutNextTab,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.bracketLeft,
+      primary: true,
+      alt: true,
+    ),
+    intent: const SwitchTabIntent(-1),
+    group: ShortcutGroup.readerTabs,
+    label: (l10n) => l10n.shortcutPreviousTab,
+  ),
   // Not plain ⌘W: browsers keep it (close their tab) and the page never sees
   // the keydown. ⇧⌘W closes the browser window. Adding ⌥ is the closest
   // combo free on every platform.
@@ -124,6 +147,17 @@ final List<AppShortcut> appShortcuts = [
     label: (l10n) => l10n.shortcutCloseTab,
     desktopOnly: false,
   ),
+
+  // ─── Layout ────────────────────────────────────────────────────────────
+  // ⌥⌘1–4 in the toolbar's left-to-right order. Not ⌘1–4: the browser's
+  // "go to tab 1–4".
+  for (final (i, layout) in ReaderLayout.values.indexed)
+    AppShortcut(
+      keys: ShortcutKeys(_digits[i], primary: true, alt: true),
+      intent: SetLayoutIntent(layout),
+      group: ShortcutGroup.layout,
+      label: layout.label,
+    ),
 
   // ─── Reading ───────────────────────────────────────────────────────────
   AppShortcut(
@@ -189,6 +223,13 @@ final List<AppShortcut> appShortcuts = [
     label: (l10n) => l10n.shortcutCloseOverlay,
     desktopOnly: false,
   ),
+];
+
+const _digits = [
+  LogicalKeyboardKey.digit1,
+  LogicalKeyboardKey.digit2,
+  LogicalKeyboardKey.digit3,
+  LogicalKeyboardKey.digit4,
 ];
 
 /// The shortcuts registered on [platform].

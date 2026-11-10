@@ -157,7 +157,7 @@ class _LayoutMenuButton extends ConsumerWidget {
         for (final layout in ReaderLayout.values)
           _MenuRow(
             icon: _LayoutGlyph(layout: layout, color: primary),
-            label: _layoutLabel(context, layout),
+            label: layout.label(l10n),
             selected: layout == current,
             onSelected: () => ref.read(updateActiveTabLayoutProvider)(layout),
           ),
@@ -165,7 +165,7 @@ class _LayoutMenuButton extends ConsumerWidget {
       builder: (context, controller, focusNode) {
         final isOpen = controller.isOpen;
         return _ToolbarButton(
-          tooltip: l10n.currentLayout(_layoutLabel(context, current)),
+          tooltip: l10n.currentLayout(current.label(l10n)),
           onTap: controller.toggle,
           menuOpen: isOpen,
           focusNode: focusNode,
@@ -387,16 +387,6 @@ class _ToolbarButton extends StatelessWidget {
   }
 }
 
-/// The localized name of [layout].
-String _layoutLabel(BuildContext context, ReaderLayout layout) {
-  final l10n = AppLocalizations.of(context);
-  return switch (layout) {
-    ReaderLayout.paliOnly => l10n.layoutPaliOnly,
-    ReaderLayout.sideBySide => l10n.layoutSideBySide,
-    ReaderLayout.stacked => l10n.layoutStacked,
-    ReaderLayout.sinhalaOnly => l10n.layoutSinhalaOnly,
-  };
-}
 
 /// Icons for the two-language layouts; the single-language ones show their
 /// letter instead.
