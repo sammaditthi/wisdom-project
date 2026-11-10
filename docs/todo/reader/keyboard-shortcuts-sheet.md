@@ -185,6 +185,8 @@ Open — each needs someone at the keyboard:
 5. **Sinhala keyboard layout on:** [ ] , . / and the digits still match.
    Flutter falls back to US keys for these; the static site needed its own
    fallback for letters (`site.js`), so confirm it on each platform.
+6. **Sinhala IME composing:** with a candidate list open in the search box,
+   ↓ and Tab go to the candidates, not to the results.
 
 ## Left to the builder
 
