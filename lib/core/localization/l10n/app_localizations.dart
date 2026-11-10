@@ -1388,6 +1388,12 @@ abstract class AppLocalizations {
   /// **'Search the Tipitaka'**
   String get shortcutSearchTipitaka;
 
+  /// Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results
+  ///
+  /// In en, this message translates to:
+  /// **'Search box to results'**
+  String get shortcutSearchToResults;
+
   /// Keyboard shortcuts tab: row for the key that moves to the next reader tab
   ///
   /// In en, this message translates to:

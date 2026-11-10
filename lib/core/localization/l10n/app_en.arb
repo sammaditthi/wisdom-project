@@ -1097,6 +1097,10 @@
   "@shortcutSearchTipitaka": {
     "description": "Keyboard shortcuts tab: row for the key that jumps to the main search box"
   },
+  "shortcutSearchToResults": "Search box to results",
+  "@shortcutSearchToResults": {
+    "description": "Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results"
+  },
   "shortcutNextTab": "Next tab",
   "@shortcutNextTab": {
     "description": "Keyboard shortcuts tab: row for the key that moves to the next reader tab"

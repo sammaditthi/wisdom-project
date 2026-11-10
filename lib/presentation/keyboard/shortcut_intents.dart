@@ -81,6 +81,22 @@ class SetLayoutIntent extends Intent {
   final ReaderLayout layout;
 }
 
+/// From the main search box to the first search result (↓ or Tab).
+class MoveIntoSearchResultsIntent extends Intent {
+  const MoveIntoSearchResultsIntent();
+}
+
+/// To the next search result (↓ in the results).
+class NextSearchResultIntent extends Intent {
+  const NextSearchResultIntent();
+}
+
+/// To the previous search result, or from the first back to the search box
+/// (↑ or Shift+Tab in the results).
+class PreviousSearchResultIntent extends Intent {
+  const PreviousSearchResultIntent();
+}
+
 /// Go to the previous or next sutta (⌥⌘< >), as the toolbar's ⏮ ⏭ do.
 class StepSuttaIntent extends Intent {
   const StepSuttaIntent(this.step);

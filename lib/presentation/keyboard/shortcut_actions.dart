@@ -14,10 +14,13 @@ import '../providers/navigator_visibility_provider.dart';
 import '../providers/reader_keyboard_bridge_provider.dart';
 import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
+import '../providers/search_provider.dart';
+import '../providers/search_results_focus_provider.dart';
 import '../providers/tab_lifecycle_provider.dart';
 import '../providers/tab_provider.dart';
 import '../widgets/settings/settings_dialog.dart';
 import 'app_navigator_key.dart';
+import 'search_result_stops.dart';
 import 'shortcut_guards.dart';
 import 'shortcut_intents.dart';
 
@@ -334,6 +337,71 @@ class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
         .read(readerKeyboardBridgeProvider)
         .handle
         ?.scroll(intent.direction, intent.type);
+    return null;
+  }
+}
+
+/// Moves from the main search box to the first result, while the results
+/// panel shows and has something to focus.
+class MoveIntoSearchResultsAction
+    extends ContextAction<MoveIntoSearchResultsIntent> {
+  final WidgetRef ref;
+  MoveIntoSearchResultsAction(this.ref);
+
+  @override
+  bool isEnabled(MoveIntoSearchResultsIntent intent, [BuildContext? context]) =>
+      (ref.read(mainSearchFocusNodeProvider)?.hasFocus ?? false) &&
+      ref.read(searchStateProvider).isResultsPanelVisible &&
+      searchResultStops(ref.read(searchResultsFocusNodeProvider)).isNotEmpty;
+
+  @override
+  Object? invoke(MoveIntoSearchResultsIntent intent, [BuildContext? context]) {
+    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
+    FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops.first);
+    return null;
+  }
+}
+
+/// Moves to the next result. On the last one it stays — still handled, so
+/// the key doesn't fall through and scroll the reader.
+class NextSearchResultAction extends ContextAction<NextSearchResultIntent> {
+  final WidgetRef ref;
+  NextSearchResultAction(this.ref);
+
+  @override
+  bool isEnabled(NextSearchResultIntent intent, [BuildContext? context]) =>
+      ref.read(searchResultsFocusNodeProvider).hasFocus;
+
+  @override
+  Object? invoke(NextSearchResultIntent intent, [BuildContext? context]) {
+    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
+    final at = stops.indexOf(FocusManager.instance.primaryFocus!);
+    if (at + 1 < stops.length) {
+      FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops[at + 1]);
+    }
+    return null;
+  }
+}
+
+/// Moves to the previous result, or from the first back to the search box.
+class PreviousSearchResultAction
+    extends ContextAction<PreviousSearchResultIntent> {
+  final WidgetRef ref;
+  PreviousSearchResultAction(this.ref);
+
+  @override
+  bool isEnabled(PreviousSearchResultIntent intent, [BuildContext? context]) =>
+      ref.read(searchResultsFocusNodeProvider).hasFocus;
+
+  @override
+  Object? invoke(PreviousSearchResultIntent intent, [BuildContext? context]) {
+    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
+    final at = stops.indexOf(FocusManager.instance.primaryFocus!);
+    if (at > 0) {
+      FocusTraversalPolicy.defaultTraversalRequestFocusCallback(stops[at - 1]);
+    } else {
+      ref.read(mainSearchFocusNodeProvider)?.requestFocus();
+    }
     return null;
   }
 }

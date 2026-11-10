@@ -10,6 +10,7 @@ import '../../../domain/entities/search/search_result.dart';
 import '../../providers/reader_unit_provider.dart';
 import '../../providers/reference_search_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/search_results_focus_provider.dart';
 import '../../utils/search_result_labels.dart';
 import '../common/mouse_drag_scroll.dart';
 import '../common/status_message_view.dart';
@@ -43,52 +44,80 @@ class SearchResultsPanel extends ConsumerWidget {
     // stored key stands in until it does.
     final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
 
+    // Tab reaches the results before the chips and the tab bar above them,
+    // and the results sit in the node the ↓ / Tab shortcuts look in
+    // (keyboard-shortcuts-sheet.md, Search box → results).
     return Material(
       color: theme.colorScheme.surface,
-      child: Column(
-        children: [
-          // Header with the match options and filter chips
-          const _PanelHeader(),
-          // Category tabs
-          _SearchResultsTabBar(
-            selectedResultType: searchState.selectedResultType,
-            countByResultType: searchState.countByResultType,
-            onResultTypeSelected: (type) =>
-                ref.read(searchStateProvider.notifier).selectResultType(type),
-          ),
-          // Pinned canonical-reference jump (e.g. "SN 15.3" → open that sutta).
-          // In-memory lookup, so it appears instantly above the FTS results,
-          // independent of the active tab or whether FTS has finished loading.
-          _ReferenceResultRow(onResultTap: onResultTap),
-          // Results list - different view for "All" tab vs specific category
-          Expanded(
-            child: searchState.selectedResultType == SearchResultType.topResults
-                ? _buildTopResultsTabContent(
-                    context,
-                    ref,
-                    searchState.isLoading,
-                    searchState.groupedResults,
-                    searchState.countByResultType,
-                    searchState.effectiveQueryText,
-                    searchState.isPhraseSearch,
-                    searchState.isExactMatch,
-                    resolver,
-                  )
-                : _buildResultTypeTabContent(
-                    context,
-                    ref,
-                    theme,
-                    searchState.fullResults,
-                    searchState.selectedResultType,
-                    searchState.effectiveQueryText,
-                    searchState
-                        .countByResultType[searchState.selectedResultType],
-                    searchState.isPhraseSearch,
-                    searchState.isExactMatch,
-                    resolver,
+      child: FocusTraversalGroup(
+        policy: OrderedTraversalPolicy(),
+        child: Column(
+          children: [
+            // Header with the match options and filter chips
+            const FocusTraversalOrder(
+              order: NumericFocusOrder(2),
+              child: _PanelHeader(),
+            ),
+            // Category tabs
+            FocusTraversalOrder(
+              order: const NumericFocusOrder(2),
+              child: _SearchResultsTabBar(
+                selectedResultType: searchState.selectedResultType,
+                countByResultType: searchState.countByResultType,
+                onResultTypeSelected: (type) => ref
+                    .read(searchStateProvider.notifier)
+                    .selectResultType(type),
+              ),
+            ),
+            Expanded(
+              child: FocusTraversalOrder(
+                order: const NumericFocusOrder(1),
+                child: Focus(
+                  focusNode: ref.watch(searchResultsFocusNodeProvider),
+                  child: Column(
+                    children: [
+                      // Pinned canonical-reference jump (e.g. "SN 15.3" → open
+                      // that sutta). In-memory lookup, so it appears instantly
+                      // above the FTS results, independent of the active tab or
+                      // whether FTS has finished loading.
+                      _ReferenceResultRow(onResultTap: onResultTap),
+                      // Results list - different view for "All" tab vs specific
+                      // category
+                      Expanded(
+                        child: searchState.selectedResultType ==
+                                SearchResultType.topResults
+                            ? _buildTopResultsTabContent(
+                                context,
+                                ref,
+                                searchState.isLoading,
+                                searchState.groupedResults,
+                                searchState.countByResultType,
+                                searchState.effectiveQueryText,
+                                searchState.isPhraseSearch,
+                                searchState.isExactMatch,
+                                resolver,
+                              )
+                            : _buildResultTypeTabContent(
+                                context,
+                                ref,
+                                theme,
+                                searchState.fullResults,
+                                searchState.selectedResultType,
+                                searchState.effectiveQueryText,
+                                searchState.countByResultType[
+                                    searchState.selectedResultType],
+                                searchState.isPhraseSearch,
+                                searchState.isExactMatch,
+                                resolver,
+                              ),
+                      ),
+                    ],
                   ),
-          ),
-        ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -68,6 +68,11 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
           ToggleNavigatorIntent: ToggleNavigatorAction(ref),
           StepSuttaIntent: StepSuttaAction(ref),
           ScrollReaderIntent: ScrollReaderAction(ref, _idleFocus),
+          MoveIntoSearchResultsIntent: MoveIntoSearchResultsAction(ref),
+          NextSearchResultIntent: NextSearchResultAction(ref),
+          PreviousSearchResultIntent: PreviousSearchResultAction(ref),
+          // A key used by several entries maps to PrioritizedIntents.
+          PrioritizedIntents: PrioritizedAction(),
         },
         // Autofocused fallback node. Holds focus only when no other widget
         // is focused (e.g. on a fresh route before any tap); as soon as the

@@ -114,6 +114,33 @@ final List<AppShortcut> appShortcuts = [
     label: (l10n) => l10n.shortcutSearchTipitaka,
     desktopOnly: false,
   ),
+  // Same label: ↓ and Tab share one row. Before the scroll keys, so in the
+  // search box ↓ means "to the results", not "scroll".
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
+    intent: const MoveIntoSearchResultsIntent(),
+    group: ShortcutGroup.search,
+    label: (l10n) => l10n.shortcutSearchToResults,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.tab),
+    intent: const MoveIntoSearchResultsIntent(),
+    group: ShortcutGroup.search,
+    label: (l10n) => l10n.shortcutSearchToResults,
+  ),
+  // Moves inside the results; not listed.
+  const AppShortcut(
+    keys: ShortcutKeys(LogicalKeyboardKey.arrowDown),
+    intent: NextSearchResultIntent(),
+  ),
+  const AppShortcut(
+    keys: ShortcutKeys(LogicalKeyboardKey.arrowUp),
+    intent: PreviousSearchResultIntent(),
+  ),
+  const AppShortcut(
+    keys: ShortcutKeys(LogicalKeyboardKey.tab, shift: true),
+    intent: PreviousSearchResultIntent(),
+  ),
 
   // ─── Reader tabs ───────────────────────────────────────────────────────
   // ⌥⌘ acts on the reader tab. Not ⌥⌘← →: Chrome keeps those for its own
@@ -300,11 +327,22 @@ List<AppShortcut> shortcutsFor(TargetPlatform platform) {
   ];
 }
 
-/// The `Shortcuts` map for [platform].
+/// The `Shortcuts` map for [platform]. A key bound by several entries tries
+/// them in list order: the first one enabled acts.
+///
+/// Grouped by [ShortcutKeys], since `SingleActivator` has no `==`: two equal
+/// activators would be two map keys, and only the first would ever fire.
 Map<ShortcutActivator, Intent> shortcutMap(TargetPlatform platform) {
+  final intentsByKeys = <ShortcutKeys, List<Intent>>{};
+  for (final s in shortcutsFor(platform)) {
+    for (final keys in [s.keys, ...s.alsoKeys]) {
+      (intentsByKeys[keys] ??= []).add(s.intent);
+    }
+  }
   return <ShortcutActivator, Intent>{
-    for (final s in shortcutsFor(platform))
-      for (final keys in [s.keys, ...s.alsoKeys])
-        keys.activatorFor(platform): s.intent,
+    for (final MapEntry(key: keys, value: intents) in intentsByKeys.entries)
+      keys.activatorFor(platform): intents.length == 1
+          ? intents.single
+          : PrioritizedIntents(orderedIntents: intents),
   };
 }

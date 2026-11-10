@@ -728,6 +728,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutSearchTipitaka => 'Search the Tipitaka';
 
   @override
+  String get shortcutSearchToResults => 'Search box to results';
+
+  @override
   String get shortcutNextTab => 'Next tab';
 
   @override

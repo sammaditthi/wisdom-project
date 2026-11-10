@@ -21,7 +21,9 @@ import 'package:the_wisdom_project/domain/entities/search/search_result_type.dar
 import 'package:the_wisdom_project/domain/entities/search/search_result.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/keyboard/search_result_stops.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/search_results_focus_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/highlighted_fts_search_text.dart';
 import 'package:the_wisdom_project/presentation/widgets/search/search_results_panel.dart';
@@ -304,6 +306,21 @@ void main() {
       expect(notifier.state.selectedResultType, SearchResultType.title);
       // The tab bar follows the state: Titles is the second tab.
       expect(tester.widget<TabBar>(find.byType(TabBar)).controller!.index, 1);
+    });
+
+    testWidgets('the results are where the ↓ / Tab keys look for them',
+        (tester) async {
+      await _pumpPanel(
+        tester,
+        state: topResultsWith({SearchResultType.title: 5}),
+      );
+      await tester.pumpAndSettle();
+
+      final results = ProviderScope.containerOf(
+        tester.element(find.byType(SearchResultsPanel)),
+      ).read(searchResultsFocusNodeProvider);
+      final seeAll = Focus.of(tester.element(find.text('See all')));
+      expect(searchResultStops(results), contains(seeAll));
     });
 
     // ── "Show N more" in a full-text group ──────────────────────────────

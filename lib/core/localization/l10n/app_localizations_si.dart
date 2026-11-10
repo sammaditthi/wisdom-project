@@ -728,6 +728,9 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutSearchTipitaka => 'ත්‍රිපිටකයේ සොයන්න';
 
   @override
+  String get shortcutSearchToResults => 'සෙවුම් කොටුවේ සිට ප්‍රතිඵල වෙත';
+
+  @override
   String get shortcutNextTab => 'ඊළඟ ටැබය';
 
   @override
