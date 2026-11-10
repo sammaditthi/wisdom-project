@@ -1,36 +1,214 @@
-# Keyboard shortcuts sheet — plan
+# Keyboard shortcuts — design
 
-Started 2026-10-11. Not started.
+Started 2026-10-11. Designed with the user 2026-11-10. Not built.
 
-The search box used to show its shortcut (Ctrl+Shift+F). It was removed on 2026-10-09 because it also showed on touch tablets with no keyboard, and it was decided that shortcuts get their own sheet (`search-pane-redesign-plan.md`, Task 9). Today nothing in the app tells people the shortcuts exist.
+**Goal:** new shortcuts for reading with the keyboard, and a **Keyboard
+shortcuts** tab in Settings that lists every shortcut with the keys of the
+platform it runs on. Desktop only: macOS, Windows and Linux, as an app or in
+a browser.
 
-**Goal:** one sheet that lists every keyboard shortcut, opened from the keyboard and from the app.
+**Why:** reading needs tab, layout, text-size and scroll keys, and nothing in
+the app tells people shortcuts exist. The search box's hint was removed on
+2026-10-09 because it showed on touch tablets (`search-pane-redesign-plan.md`,
+Task 9).
 
-## Shortcuts today
+Design board: the Keyboard shortcuts board on the
+[App settings dialog canvas](https://claude.ai/artifact/Kd5nkzPuL2PdCmtyQLGjXn)
+(`RefTabs.dc.html`, phone: `PhoneShortcuts.dc.html`). It shows only the five
+old keys; the rows below replace them.
 
-All in `defaultBindings()` (`lib/presentation/keyboard/keyboard_bindings.dart`). Ctrl on Windows, Linux, web and Android; Cmd on macOS and iOS.
+## The keys
 
-| Keys | Does |
-| --- | --- |
-| Esc | Closes the top overlay |
-| Ctrl/Cmd+F | Find in page |
-| Ctrl/Cmd+Shift+F | Main search |
-| Ctrl/Cmd+Alt+W | Closes the reader tab |
-| Ctrl/Cmd+C | Copies the selection |
+Same keys on desktop and web. "Windows" also means Linux.
+
+| Group | Does | Mac | Windows | |
+| --- | --- | --- | --- | --- |
+| Search | Find in page | ⌘F | Ctrl+F | exists |
+| | Search the Tipiṭaka | ⇧⌘F | Ctrl+Shift+F | exists |
+| | Search box → results | ↓ or Tab | ↓ or Tab | new |
+| Reader tabs | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
+| | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
+| | Close the tab | ⌥⌘W | Ctrl+Alt+W | exists |
+| Layout | Pali only | ⌥⌘1 | Ctrl+Alt+1 | new |
+| | Sinhala only | ⌥⌘2 | Ctrl+Alt+2 | new |
+| | Side by side | ⌥⌘3 | Ctrl+Alt+3 | new |
+| | Stacked | ⌥⌘4 | Ctrl+Alt+4 | new |
+| Reading | Previous sutta | ⌥⌘< | Ctrl+Alt+< | new |
+| | Next sutta | ⌥⌘> | Ctrl+Alt+> | new |
+| | Show / hide the navigator | ⌘B | Ctrl+B | new |
+| | Text bigger | ⌘+ | Ctrl++ | new |
+| | Text smaller | ⌘− | Ctrl+− | new |
+| | Text back to normal | ⌘0 | Ctrl+0 | new |
+| | Scroll | ↑ ↓ | ↑ ↓ | new |
+| | Scroll a page | PgUp PgDn (fn↑ fn↓) | PgUp PgDn | new |
+| Everywhere | Open Settings | ⌘, | Ctrl+, | new |
+| | Open this list | ⌘/ | Ctrl+/ | new |
+| | Copy the selection | ⌘C | Ctrl+C | exists |
+| | Close a menu, panel or dialog | Esc | Esc | exists |
+
+## How the keys were chosen
+
+- **The browser's own key when it means the same thing:** ⌘F, ⌘+ / ⌘−, ⌘,.
+- **Add ⌥ when the browser keeps the key, or uses it for something else.**
+  Chrome never passes its close-tab and next/previous-tab keys to the page
+  (⌘W, ⌥⌘←/→, ⇧⌘[ ], Ctrl+Tab, Ctrl+PgUp/PgDn). ⌘1–4 is the browser's "go to
+  tab 1–4". So the reader-tab keys are ⌥⌘: W closes, [ ] move, 1–4 set the
+  layout, in the toolbar's left-to-right order (`ReaderLayout.values`), and
+  < > step to the previous or next sutta, pointing the way the toolbar's
+  ⏮ ⏭ buttons do. Plain ← → (as in Kindle and Apple Books) was turned down: a
+  stray press leaves a long sutta, and coming back starts it at the top.
+- **⇧ makes the same key reach further:** ⌘F finds in the page, ⇧⌘F searches
+  everywhere (as in VS Code, Xcode, JetBrains). ⇧ is not used for the tab keys
+  because it is taken: ⇧⌘W closes the browser window, ⇧⌘[ ] is the browser's
+  tab switch, ⇧⌘3/4 take a macOS screenshot, ⇧⌘B is Chrome's bookmarks bar.
+- **⌘B** is the side-panel toggle in VS Code and many others. **⌘/** opens the
+  shortcut list in Google Docs and Slack, and works while typing, which `?`
+  can't.
+- Accepted trade-off: on the web, ⌘+ / ⌘− change the reading text size
+  instead of zooming the page. The browser's zoom menu still works.
 
 ## Rules
 
-- The sheet reads its rows from `defaultBindings()`, so a new shortcut can't be left off. Each intent needs a label in `app_en.arb` and `app_si.arb`.
-- It shows only the keys for the platform it runs on: Cmd on Apple platforms, Ctrl elsewhere.
+1. **One list.** Every shortcut is one entry in `keyboard_bindings.dart`: its
+   key, its modifiers, its intent, its group and its label. `AppShortcuts`
+   builds its key map from the list, and the Settings tab builds its rows from
+   it, so a shortcut can't be missing from the tab. No key combo is spelled
+   anywhere else in `lib/`. Adding a shortcut = one entry + its action + a
+   label in `app_en.arb` and `app_si.arb`.
+2. **One modifier per platform.** The list says "primary" and the platform
+   picks it from `defaultTargetPlatform` (on the web, the browser's OS): ⌘ on
+   macOS and iOS, Ctrl elsewhere. Only that one is registered. No `kIsWeb`
+   branch. This changes today's keys, which register both, so ⌃F stops
+   opening find on a Mac (in Mac text boxes it moves the cursor). It applies
+   on Android and iOS too: the existing five keys stay there, Ctrl on
+   Android, ⌘ on iOS.
+3. **Desktop only.** New keys and the Settings tab exist only when
+   `defaultTargetPlatform` is macOS, Windows or Linux, app or browser
+   *(my call)*. One check, no `kIsWeb`. Phone and tablet browsers get neither:
+   Flutter web reports an iPad as iOS even when it asks for the desktop site
+   (`browser_detection.dart`, `maxTouchPoints`).
+4. **Typing comes first.** While a text box has focus, these do nothing of
+   ours and the key goes to the box: arrows, PgUp/PgDn, ⌘C, and every
+   ⌥⌘ / Ctrl+Alt key, close-tab included. Ctrl+Alt is the AltGr key on
+   Windows and Linux, and on many layouts AltGr plus a key types a character
+   (German AltGr+2 = ²). This changes close-tab, which today fires while
+   typing *(my call)*. Same pattern as today: `isEnabled` returns false and
+   the key passes on. The search box's ↓ / Tab is the one exception, below.
+5. **Reader keys need the Reader.** Tab, layout, navigator and scroll keys act
+   only while the Reader section shows (as `OpenMainSearchAction` checks), and
+   not while a dialog or the search results panel is open. An open in-page
+   find bar does not block them; its text box does, by rule 4.
 
-## To decide
+## How each one behaves
 
-1. **The key that opens it.** Common choices: `?` (Gmail, GitHub, YouTube) or Ctrl/Cmd+/ (Google Docs, Slack). `?` can't work while a text field has focus, because it types a "?". Ctrl/Cmd+/ works everywhere.
-2. **Where it opens from in the app.** For example a "Keyboard shortcuts" item in the settings or the app menu. Show it only where a keyboard is likely (desktop and web), or everywhere?
-3. **Its shape.** A dialog on wide screens and a bottom sheet on phones, or the same at every width.
+- **Next / previous tab:** wraps from the last tab to the first, as Chrome
+  does *(my call)*. Nothing with fewer than two tabs. Through
+  `switchTabProvider`, so the navigator follows.
+- **Layout 1–4:** through `updateActiveTabLayoutProvider`, so the choice is
+  also remembered for new tabs. The toolbar offers all four at every width,
+  so there is no width check. Nothing with no tab open.
+- **Previous / next sutta:** does exactly what the toolbar's ⏮ ⏭ buttons do,
+  through the same code. Today that code is inside the reader widget
+  (`_navigateToSutta` in `multi_pane_reader_widget.dart`, which also resets
+  the scroll anchor, so it needs the widget). The mounted reader attaches
+  itself to `readerKeyboardBridgeProvider`, and the keys call
+  `_navigateToSutta` through it: buttons and keys end in the same method.
+  Nothing at the first or last sutta, where the button is left out. The keys
+  are the , and . keys; they answer with or without ⇧, and the Settings tab
+  shows them as < and >.
+- **Navigator:** flips `navigatorVisibleProvider`, as the app-bar button does.
+- **Text size:** ⌘+ and ⌘− move `fontScaleProvider` by 0.1, two slider steps
+  *(my call)*, inside the notifier's limits. ⌘+ also answers ⌘= and the keypad
+  +. ⌘0 calls `FontScaleNotifier.reset()`. App-wide, so it works in every
+  section.
+- **Scroll:** moves the active tab's reader. Each tab has one scroll
+  controller for every layout, so side by side scrolls as one. Only when
+  focus is in the reader or on nothing. On a navigator row, a tab or a button
+  the arrows keep their usual job of moving focus *(my call)*.
+- **Search box → results:** with the main search box focused and results
+  showing, ↓ or Tab moves to the first stop in the visible results tab. The
+  stops are everything there that takes focus, in order: the reference row
+  (e.g. "SN 15.3"), result rows, "See all" and "Show N more" — the same stops
+  as Tab, so nothing is skipped *(my call)*. ↓ / ↑ step through them, and ↑
+  from the first goes back to the box; Shift+Tab from the first also goes
+  back. Enter opens a row (already works). The chips and the results tab bar
+  come after the results in Tab order. With no results, ↓ and Tab work as
+  today. Matches the static site's search dialog (`site.js`), which steps
+  through every link.
+- **Open Settings:** opens on General. Works with the rail hidden, which
+  closes `app-settings-dialog.md` Decision 7. If Settings is already open,
+  nothing happens *(my call)*.
+- **Open this list:** opens Settings on the Keyboard shortcuts tab. Same rule
+  when Settings is already open.
+
+## The Settings tab
+
+- `SettingsTab.shortcuts`, between General and Anumodanā, as on the board.
+  Icon: a keyboard. Label: "Keyboard shortcuts".
+- Read-only. One `SettingsSection` per group above, one `SettingsRow` per
+  entry, keys on the right as key caps, styled like the board.
+- **Mac:** symbols in Apple's order, ⌃ ⌥ ⇧ ⌘, then the key: `⌥ ⌘ W`.
+  **Windows:** words: `Ctrl Alt W`. One key cap per key, as on the board.
+- The four layout rows reuse the layout names already in the ARB files.
+- Sinhala labels: drafted, then reviewed with the user before merge, as the
+  settings dialog's copy was.
+
+## Not in this round
+
+- Changing keys from the app.
+- New keys on the static site. Its ⇧⌘F stays as it is.
+- Phones and tablets.
+- Keyboard moves inside the recent-searches list.
+- Showing shortcuts in button tooltips.
+
+## Must never happen
+
+- A key that types into, or takes over an editing key from, a text box.
+- A key that does nothing on the web because the browser keeps it.
+
+## Check while building
+
+1. **Safari and ⌘,.** If Safari keeps it for its own settings, stop and ask
+   the user before choosing another key.
+2. Every new key reaches the page in Chrome, Safari and Firefox on macOS and
+   in Chrome and Edge on Windows.
+3. ⌘+ / ⌘− / ⌘0 change the text size, not the page zoom, in each of those.
+4. **macOS menu:** `MainMenu.xib` has "Preferences…" on ⌘, with no action.
+   Wire it to Settings or drop its key, so the menu never swallows ⌘,.
+5. **Sinhala keyboard layout on:** [ ] , . / and the digits still match.
+   Flutter falls back to US keys for these; the static site needed its own
+   fallback for letters (`site.js`), so confirm it on each platform.
+
+## Left to the builder
+
+- How an action opens the dialog: `AppShortcuts` sits in
+  `MaterialApp.builder`, above the `Navigator`, so it needs a context below
+  it.
+- How the scroll action reaches the active tab's scroll controller, and how
+  far a press scrolls.
+- How search → results moves focus (a binding that is enabled only in the
+  search box, or traversal order), within rule 1.
+- The key-cap widget and the ARB key names.
+
+## Tests (bare minimum)
+
+- **Unit:** on macOS the list gives only ⌘ keys, on Windows only Ctrl.
+  Every entry has a label in English and Sinhala.
+- **Widget, one per new key:** next/previous tab (with wrap), next/previous
+  sutta (with and without ⇧, nothing at the last sutta), a layout key,
+  ⌘B, ⌘+ / ⌘− / ⌘0, ⌘, and ⌘/ open Settings on the right tab, ↓ from the
+  search box lands on the first stop, arrows and a ⌥⌘ key do nothing while a
+  text box has focus, ↓ on a navigator row doesn't scroll the reader.
+- **Widget, Settings tab:** ⌘ symbols with the platform set to macOS, Ctrl
+  words with Windows, no tab on Android and iOS.
+- **Update:** `settings_dialog_test.dart` (tab list), and check
+  `integration_test/search_mode_test.dart` (⇧⌘F) still passes.
 
 ## Done when
 
-- [ ] The key opens the sheet from anywhere in the app, and Esc closes it.
-- [ ] The app menu or settings opens it too.
-- [ ] Every entry in `defaultBindings()` has a row, in English and Sinhala.
+- [ ] Every key in the table works on macOS desktop and the web, and on
+      Windows desktop.
+- [ ] The Settings tab lists every entry, in English and Sinhala, with the
+      platform's keys.
+- [ ] The *Check while building* list is done.
+- [ ] The tests above pass.
