@@ -379,5 +379,9 @@
   "anumodanaLicences": "බලපත්‍ර",
   "openSourceLicences": "විවෘත මූලාශ්‍ර බලපත්‍ර",
   "versionLabel": "අනුවාදය",
-  "openLinkTo": "{name} විවෘත කරන්න"
+  "openLinkTo": "{name} විවෘත කරන්න",
+  "shortcutSearchTipitaka": "ත්‍රිපිටකයේ සොයන්න",
+  "shortcutCloseTab": "ටැබය වසන්න",
+  "shortcutCopy": "තේරූ කොටස පිටපත් කරන්න",
+  "shortcutCloseOverlay": "මෙනුවක්, පුවරුවක් හෝ කවුළුවක් වසන්න"
 }

@@ -1345,6 +1345,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open {name}'**
   String openLinkTo(String name);
+
+  /// Keyboard shortcuts tab: row for the key that jumps to the main search box
+  ///
+  /// In en, this message translates to:
+  /// **'Search the Tipitaka'**
+  String get shortcutSearchTipitaka;
+
+  /// Keyboard shortcuts tab: row for the key that closes the active reader tab
+  ///
+  /// In en, this message translates to:
+  /// **'Close the tab'**
+  String get shortcutCloseTab;
+
+  /// Keyboard shortcuts tab: row for the copy key
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the selection'**
+  String get shortcutCopy;
+
+  /// Keyboard shortcuts tab: row for Esc, which closes the most recently opened menu, panel or dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Close a menu, panel or dialog'**
+  String get shortcutCloseOverlay;
 }
 
 class _AppLocalizationsDelegate

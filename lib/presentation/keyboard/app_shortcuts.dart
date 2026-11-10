@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -37,7 +38,7 @@ class AppShortcuts extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Shortcuts(
-      shortcuts: defaultBindings(),
+      shortcuts: shortcutMap(defaultTargetPlatform),
       child: Actions(
         actions: <Type, Action<Intent>>{
           DismissTopOverlayIntent: DismissTopOverlayAction(ref),

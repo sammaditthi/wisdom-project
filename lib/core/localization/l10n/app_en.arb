@@ -1068,5 +1068,21 @@
         "example": "tipitaka.lk"
       }
     }
+  },
+  "shortcutSearchTipitaka": "Search the Tipitaka",
+  "@shortcutSearchTipitaka": {
+    "description": "Keyboard shortcuts tab: row for the key that jumps to the main search box"
+  },
+  "shortcutCloseTab": "Close the tab",
+  "@shortcutCloseTab": {
+    "description": "Keyboard shortcuts tab: row for the key that closes the active reader tab"
+  },
+  "shortcutCopy": "Copy the selection",
+  "@shortcutCopy": {
+    "description": "Keyboard shortcuts tab: row for the copy key"
+  },
+  "shortcutCloseOverlay": "Close a menu, panel or dialog",
+  "@shortcutCloseOverlay": {
+    "description": "Keyboard shortcuts tab: row for Esc, which closes the most recently opened menu, panel or dialog"
   }
 }

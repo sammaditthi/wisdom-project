@@ -1,72 +1,162 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../core/localization/l10n/app_localizations.dart';
 import 'shortcut_intents.dart';
 
-/// Single source of truth for the app's default keyboard shortcuts.
+/// The single list of the app's keyboard shortcuts.
 ///
-/// To add a new shortcut: append entries to the returned map (one per
-/// modifier flavour you support) and make sure the corresponding [Intent]
-/// + [Action] exist in `shortcut_intents.dart` / `shortcut_actions.dart`.
-///
-/// ## Cross-platform convention (Ctrl vs Cmd)
-///
-/// Flutter's `SingleActivator` has independent `control:` and `meta:` flags.
-/// We register the **same intent twice** — once with `control: true` for
-/// Windows / Linux / Web / Android, once with `meta: true` for macOS / iOS.
-/// This matches Flutter's framework convention for its own copy/paste
-/// shortcuts and avoids any `Platform.isMacOS` branching at call sites.
-///
-/// ## Future: user-customised bindings
-///
-/// When we add a settings UI for remapping shortcuts, this function gets
-/// replaced by a Riverpod provider that:
-///   1. Loads overrides from SharedPreferences (keyed by stable command IDs,
-///      e.g. `"OpenInPageSearchIntent"`).
-///   2. Merges them on top of these defaults.
-///   3. The `AppShortcuts` widget watches that provider, so live remapping
-///      Just Works with no other code changes.
-Map<ShortcutActivator, Intent> defaultBindings() {
+/// `AppShortcuts` builds its key map from it and the Settings tab builds its
+/// rows from it, so no key combo is spelled anywhere else. How the keys were
+/// chosen: `docs/todo/reader/keyboard-shortcuts-sheet.md`.
+
+/// Sections of the Settings tab, in the order they show.
+enum ShortcutGroup { search, readerTabs, layout, reading, everywhere }
+
+/// A key and its modifiers. [primary] is ⌘ on Apple platforms, Ctrl
+/// elsewhere, so a shortcut is written once for every platform.
+@immutable
+class ShortcutKeys {
+  const ShortcutKeys(
+    this.key, {
+    this.primary = false,
+    this.alt = false,
+    this.shift = false,
+  });
+
+  final LogicalKeyboardKey key;
+  final bool primary;
+  final bool alt;
+  final bool shift;
+
+  /// The activator for [platform]: only its own primary modifier.
+  SingleActivator activatorFor(TargetPlatform platform) {
+    final command = usesCommandKey(platform);
+    return SingleActivator(
+      key,
+      control: primary && !command,
+      meta: primary && command,
+      alt: alt,
+      shift: shift,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is ShortcutKeys &&
+      other.key == key &&
+      other.primary == primary &&
+      other.alt == alt &&
+      other.shift == shift;
+
+  @override
+  int get hashCode => Object.hash(key, primary, alt, shift);
+}
+
+/// One shortcut: one row in the Settings tab.
+@immutable
+class AppShortcut {
+  const AppShortcut({
+    required this.keys,
+    required this.intent,
+    this.alsoKeys = const [],
+    this.group,
+    this.label,
+    this.desktopOnly = true,
+  }) : assert(group == null || label != null);
+
+  /// The combo the Settings tab shows.
+  final ShortcutKeys keys;
+
+  /// Also bound, never shown (e.g. the keypad's +).
+  final List<ShortcutKeys> alsoKeys;
+
+  final Intent intent;
+
+  /// Null: bound but not listed.
+  final ShortcutGroup? group;
+
+  final String Function(AppLocalizations l10n)? label;
+
+  /// Off desktop the shortcut is not registered.
+  final bool desktopOnly;
+}
+
+/// macOS, Windows and Linux — as an app or in a browser. Flutter web reports
+/// an iPad as iOS, so phones and tablets are never desktop.
+bool isDesktopPlatform(TargetPlatform platform) => switch (platform) {
+      TargetPlatform.macOS || TargetPlatform.windows || TargetPlatform.linux =>
+        true,
+      _ => false,
+    };
+
+/// Apple platforms use ⌘ where the others use Ctrl.
+bool usesCommandKey(TargetPlatform platform) =>
+    platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
+
+/// Every shortcut, in Settings-tab order within each group.
+final List<AppShortcut> appShortcuts = [
+  // ─── Search ────────────────────────────────────────────────────────────
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true),
+    intent: const OpenInPageSearchIntent(),
+    group: ShortcutGroup.search,
+    label: (l10n) => l10n.findInPage,
+    desktopOnly: false,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true, shift: true),
+    intent: const OpenMainSearchIntent(),
+    group: ShortcutGroup.search,
+    label: (l10n) => l10n.shortcutSearchTipitaka,
+    desktopOnly: false,
+  ),
+
+  // ─── Reader tabs ───────────────────────────────────────────────────────
+  // Not plain ⌘W: browsers keep it (close their tab) and the page never sees
+  // the keydown. ⇧⌘W closes the browser window. Adding ⌥ is the closest
+  // combo free on every platform.
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.keyW, primary: true, alt: true),
+    intent: const CloseActiveTabIntent(),
+    group: ShortcutGroup.readerTabs,
+    label: (l10n) => l10n.shortcutCloseTab,
+    desktopOnly: false,
+  ),
+
+  // ─── Everywhere ────────────────────────────────────────────────────────
+  // The action defers to the focused widget's own copy first, then falls
+  // back to the last reader selection — which rescues ⌘C on web.
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.keyC, primary: true),
+    intent: const SmartCopyIntent(),
+    group: ShortcutGroup.everywhere,
+    label: (l10n) => l10n.shortcutCopy,
+    desktopOnly: false,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.escape),
+    intent: const DismissTopOverlayIntent(),
+    group: ShortcutGroup.everywhere,
+    label: (l10n) => l10n.shortcutCloseOverlay,
+    desktopOnly: false,
+  ),
+];
+
+/// The shortcuts registered on [platform].
+List<AppShortcut> shortcutsFor(TargetPlatform platform) {
+  final desktop = isDesktopPlatform(platform);
+  return [
+    for (final s in appShortcuts)
+      if (desktop || !s.desktopOnly) s,
+  ];
+}
+
+/// The `Shortcuts` map for [platform].
+Map<ShortcutActivator, Intent> shortcutMap(TargetPlatform platform) {
   return <ShortcutActivator, Intent>{
-    // ─── ESC: dismiss the top overlay (LIFO) ─────────────────────────────
-    const SingleActivator(LogicalKeyboardKey.escape):
-        const DismissTopOverlayIntent(),
-
-    // ─── Ctrl/Cmd + F: open in-page search ───────────────────────────────
-    const SingleActivator(LogicalKeyboardKey.keyF, control: true):
-        const OpenInPageSearchIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyF, meta: true):
-        const OpenInPageSearchIntent(),
-
-    // ─── Ctrl/Cmd + Shift + F: focus the main FTS search bar ─────────────
-    const SingleActivator(LogicalKeyboardKey.keyF, control: true, shift: true):
-        const OpenMainSearchIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyF, meta: true, shift: true):
-        const OpenMainSearchIntent(),
-
-    // ─── Ctrl/Cmd + Alt/Option + W: close the active reader tab ──────────
-    // Why not plain Cmd/Ctrl+W? Browsers reserve that at the OS layer
-    // (close-tab) and intercept it before the page ever sees a keydown —
-    // unlike Cmd+F, which goes through the page first and is preventable.
-    // Cmd/Ctrl+Shift+W closes the whole browser window. Cmd/Ctrl+Shift+Q
-    // hits the macOS log-out shortcut. Adding Alt/Option to W is the
-    // closest combo that is genuinely free on every platform, and macOS
-    // already uses the same modifier shape for "close all windows" so the
-    // muscle-memory is consistent.
-    const SingleActivator(LogicalKeyboardKey.keyW, control: true, alt: true):
-        const CloseActiveTabIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyW, meta: true, alt: true):
-        const CloseActiveTabIntent(),
-
-    // ─── Ctrl/Cmd + C: smart copy ────────────────────────────────────────
-    // Dispatches a custom SmartCopyIntent — the handler first delegates to
-    // the focused widget's native CopySelectionTextIntent action (preserves
-    // TextField + SelectableRegion behaviour) and falls back to copying
-    // the last-highlighted reader text if no native handler responds.
-    // The fallback is what rescues Ctrl+C on web.
-    const SingleActivator(LogicalKeyboardKey.keyC, control: true):
-        const SmartCopyIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyC, meta: true):
-        const SmartCopyIntent(),
+    for (final s in shortcutsFor(platform))
+      for (final keys in [s.keys, ...s.alsoKeys])
+        keys.activatorFor(platform): s.intent,
   };
 }

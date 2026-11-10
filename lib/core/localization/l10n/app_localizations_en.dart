@@ -705,4 +705,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String openLinkTo(String name) {
     return 'Open $name';
   }
+
+  @override
+  String get shortcutSearchTipitaka => 'Search the Tipitaka';
+
+  @override
+  String get shortcutCloseTab => 'Close the tab';
+
+  @override
+  String get shortcutCopy => 'Copy the selection';
+
+  @override
+  String get shortcutCloseOverlay => 'Close a menu, panel or dialog';
 }

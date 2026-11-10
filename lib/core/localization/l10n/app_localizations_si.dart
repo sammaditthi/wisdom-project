@@ -705,4 +705,16 @@ class AppLocalizationsSi extends AppLocalizations {
   String openLinkTo(String name) {
     return '$name විවෘත කරන්න';
   }
+
+  @override
+  String get shortcutSearchTipitaka => 'ත්‍රිපිටකයේ සොයන්න';
+
+  @override
+  String get shortcutCloseTab => 'ටැබය වසන්න';
+
+  @override
+  String get shortcutCopy => 'තේරූ කොටස පිටපත් කරන්න';
+
+  @override
+  String get shortcutCloseOverlay => 'මෙනුවක්, පුවරුවක් හෝ කවුළුවක් වසන්න';
 }
