@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../core/localization/l10n/app_localizations.dart';
+import '../widgets/settings/settings_tab.dart';
 import 'shortcut_intents.dart';
 
 /// The single list of the app's keyboard shortcuts.
@@ -125,6 +126,18 @@ final List<AppShortcut> appShortcuts = [
   ),
 
   // ─── Everywhere ────────────────────────────────────────────────────────
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.comma, primary: true),
+    intent: const OpenSettingsIntent(SettingsTab.general),
+    group: ShortcutGroup.everywhere,
+    label: (l10n) => l10n.shortcutOpenSettings,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(LogicalKeyboardKey.slash, primary: true),
+    intent: const OpenSettingsIntent(SettingsTab.shortcuts),
+    group: ShortcutGroup.everywhere,
+    label: (l10n) => l10n.shortcutOpenShortcutList,
+  ),
   // The action defers to the focused widget's own copy first, then falls
   // back to the last reader selection — which rescues ⌘C on web.
   AppShortcut(

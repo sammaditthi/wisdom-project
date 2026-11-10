@@ -30,6 +30,9 @@ class SettingsDialog extends StatefulWidget {
 
   final SettingsTab initialTab;
 
+  /// Its id on [overlayStackProvider], so a shortcut can tell it is open.
+  static const overlayId = 'settings-dialog';
+
   /// How wide and tall the dialog wants to be before the window clamps it.
   static const double _preferredWidth = 760;
   static const double _preferredHeight = 640;
@@ -51,7 +54,7 @@ class SettingsDialog extends StatefulWidget {
         .read(overlayStackProvider.notifier);
     final navigator = Navigator.of(context, rootNavigator: true);
     overlayStack.push(DismissibleOverlay(
-      id: 'settings-dialog',
+      id: overlayId,
       dismiss: () {
         if (navigator.canPop()) navigator.pop();
       },
@@ -62,7 +65,7 @@ class SettingsDialog extends StatefulWidget {
         builder: (context) => SettingsDialog(initialTab: initial),
       );
     } finally {
-      overlayStack.remove('settings-dialog');
+      overlayStack.remove(overlayId);
     }
   }
 

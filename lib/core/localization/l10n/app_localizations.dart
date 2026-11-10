@@ -1394,6 +1394,18 @@ abstract class AppLocalizations {
   /// **'Close the tab'**
   String get shortcutCloseTab;
 
+  /// Keyboard shortcuts tab: row for the key that opens the Settings dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get shortcutOpenSettings;
+
+  /// Keyboard shortcuts tab: row for the key that opens Settings on this Keyboard shortcuts tab
+  ///
+  /// In en, this message translates to:
+  /// **'Open this list'**
+  String get shortcutOpenShortcutList;
+
   /// Keyboard shortcuts tab: row for the copy key
   ///
   /// In en, this message translates to:

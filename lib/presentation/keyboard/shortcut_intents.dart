@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../widgets/settings/settings_tab.dart';
+
 /// App-wide keyboard intents.
 ///
 /// An [Intent] in Flutter is just a data class that names "what the user wants
@@ -61,4 +63,12 @@ class CloseActiveTabIntent extends Intent {
 /// a visible selection.
 class SmartCopyIntent extends Intent {
   const SmartCopyIntent();
+}
+
+/// Open the Settings dialog on [tab] (⌘, for General, ⌘/ for the shortcut
+/// list).
+class OpenSettingsIntent extends Intent {
+  const OpenSettingsIntent(this.tab);
+
+  final SettingsTab tab;
 }

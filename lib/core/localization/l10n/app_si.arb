@@ -388,6 +388,8 @@
   "shortcutGroupEverywhere": "සෑම තැනම",
   "shortcutSearchTipitaka": "ත්‍රිපිටකයේ සොයන්න",
   "shortcutCloseTab": "ටැබය වසන්න",
+  "shortcutOpenSettings": "සැකසුම් විවෘත කරන්න",
+  "shortcutOpenShortcutList": "මෙම ලැයිස්තුව විවෘත කරන්න",
   "shortcutCopy": "තේරූ කොටස පිටපත් කරන්න",
   "shortcutCloseOverlay": "මෙනුවක්, පුවරුවක් හෝ කවුළුවක් වසන්න"
 }

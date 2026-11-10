@@ -731,6 +731,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutCloseTab => 'Close the tab';
 
   @override
+  String get shortcutOpenSettings => 'Open Settings';
+
+  @override
+  String get shortcutOpenShortcutList => 'Open this list';
+
+  @override
   String get shortcutCopy => 'Copy the selection';
 
   @override

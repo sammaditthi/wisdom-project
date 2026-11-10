@@ -10,6 +10,7 @@ import 'core/storage/key_value_store_provider.dart';
 import 'core/storage/shared_preferences_key_value_store.dart';
 import 'core/utils/start_failure.dart';
 import 'data/database/database_manifest.dart';
+import 'presentation/keyboard/app_navigator_key.dart';
 import 'presentation/keyboard/app_shortcuts.dart';
 import 'presentation/screens/app_shell.dart';
 import 'presentation/screens/database_install_screen.dart';
@@ -241,6 +242,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     final appLanguage = ref.watch(appLanguageProvider);
 
     return MaterialApp(
+      // Lets shortcuts open dialogs from above the Navigator.
+      navigatorKey: appNavigatorKey,
       // From the ARB `appTitle`, so it follows the App Language.
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,

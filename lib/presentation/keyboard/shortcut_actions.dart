@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +13,8 @@ import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
 import '../providers/tab_lifecycle_provider.dart';
 import '../providers/tab_provider.dart';
+import '../widgets/settings/settings_dialog.dart';
+import 'app_navigator_key.dart';
 import 'shortcut_intents.dart';
 
 /// Closes the topmost overlay on the LIFO stack.
@@ -166,6 +170,29 @@ class SmartCopyAction extends ContextAction<SmartCopyIntent> {
     if (text != null && text.isNotEmpty) {
       Clipboard.setData(ClipboardData(text: text));
     }
+    return null;
+  }
+}
+
+/// Opens the Settings dialog on the intent's tab.
+///
+/// Disabled while Settings is already open. Opens through [appNavigatorKey]'s
+/// overlay, whose context sits below the `Navigator`; `AppShortcuts` doesn't.
+class OpenSettingsAction extends ContextAction<OpenSettingsIntent> {
+  final WidgetRef ref;
+  OpenSettingsAction(this.ref);
+
+  @override
+  bool isEnabled(OpenSettingsIntent intent, [BuildContext? context]) =>
+      appNavigatorKey.currentState?.overlay != null &&
+      !ref
+          .read(overlayStackProvider)
+          .any((o) => o.id == SettingsDialog.overlayId);
+
+  @override
+  Object? invoke(OpenSettingsIntent intent, [BuildContext? context]) {
+    final overlayContext = appNavigatorKey.currentState!.overlay!.context;
+    unawaited(SettingsDialog.show(overlayContext, initial: intent.tab));
     return null;
   }
 }

@@ -46,6 +46,7 @@ class AppShortcuts extends ConsumerWidget {
           OpenMainSearchIntent: OpenMainSearchAction(ref),
           CloseActiveTabIntent: CloseActiveTabAction(ref),
           SmartCopyIntent: SmartCopyAction(ref),
+          OpenSettingsIntent: OpenSettingsAction(ref),
         },
         // Autofocused fallback node. Holds focus only when no other widget
         // is focused (e.g. on a fresh route before any tap); as soon as the

@@ -1101,6 +1101,14 @@
   "@shortcutCloseTab": {
     "description": "Keyboard shortcuts tab: row for the key that closes the active reader tab"
   },
+  "shortcutOpenSettings": "Open Settings",
+  "@shortcutOpenSettings": {
+    "description": "Keyboard shortcuts tab: row for the key that opens the Settings dialog"
+  },
+  "shortcutOpenShortcutList": "Open this list",
+  "@shortcutOpenShortcutList": {
+    "description": "Keyboard shortcuts tab: row for the key that opens Settings on this Keyboard shortcuts tab"
+  },
   "shortcutCopy": "Copy the selection",
   "@shortcutCopy": {
     "description": "Keyboard shortcuts tab: row for the copy key"

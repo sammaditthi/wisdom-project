@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/theme/app_theme.dart';
+import 'package:the_wisdom_project/presentation/keyboard/app_navigator_key.dart';
 import 'package:the_wisdom_project/presentation/keyboard/app_shortcuts.dart';
 
 import '../../helpers/pump_app.dart';
@@ -23,6 +24,7 @@ Future<ProviderContainer> pumpShortcutHost(
     UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
+        navigatorKey: appNavigatorKey,
         theme: AppTheme.light(),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
