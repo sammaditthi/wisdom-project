@@ -375,6 +375,9 @@ Sized but unscoped — decide the derivation before estimating it.
 
 ## B1. Re-cut the emblem ✅ **shipped 2026-10-17**, and drawn larger
 
+Retired 2026-11-10: the toolbar shows a drawn books icon instead, and the
+emblem copies are gone (`docs/todo/brand/new-emblem.md`).
+
 The toolbar emblem was one 200×200 PNG, 47,115 B, drawn at 28px: the heaviest
 thing a first visit fetched after a font, before first paint, on the slow
 connections this site exists for. Nothing else needed it that large once the
@@ -904,7 +907,7 @@ ellipsis and drops ancestors at three widths. The site should match.
   short trail at the left. Not `scrollLeft` from `site.js`: with JavaScript off
   the page's name would start hidden.
 - A gap before the controls on the right, as in the app.
-- Decide: the emblem (`.home`) moves out of the scroller and stays pinned at
+- Decide: the home icon (`.home`) moves out of the scroller and stays pinned at
   the left, like the app's menu button, or it scrolls away with the root end.
 
 **What goes:** the per-segment shrink (`flex: 0 200 auto`) and ellipsis, and

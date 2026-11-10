@@ -8,7 +8,7 @@
  * applied by `layoutScript` (`lib/render/reading_layouts.dart`), inline after
  * the radios, because a deferred script runs only after the page has painted.
  *
- * A committed source the build copies, like the fonts and the emblem — there is
+ * A committed source the build copies, like the fonts and the OG card — there is
  * no bundler and no transpiler in this pipeline (D9). So: no modules, no
  * optional chaining, nothing that needs a build step to reach an old phone.
  *

@@ -9,12 +9,8 @@
 #                384px copies in 2.0x/, 3.0x/ and 4.0x/ for sharper screens.
 #   favicon.png  32px, the centre disc only (the outer ring is noise at tab
 #                size), into web/. The static site reads that same file.
-#   emblem.png   the static site's toolbar mark, drawn at 36px, into
-#                static_site_generator/assets/, with emblem@2x.png and
-#                emblem@3x.png beside it for srcset. PNG, which every browser
-#                reads.
-#   og-card.png  the static site's 1200x630 link-preview card, beside the
-#                emblem copies.
+#   og-card.png  the static site's 1200x630 link-preview card, into
+#                static_site_generator/assets/.
 #
 # Run by hand and commit the output, like ../fonts/subset_fonts.sh.
 
@@ -49,13 +45,6 @@ mask = mask.resize((size, size), Image.LANCZOS)
 disc.putalpha(Image.composite(disc.getchannel("A"), Image.new("L", (size, size), 0), mask))
 disc.resize((32, 32), Image.LANCZOS).save("../../web/favicon.png")
 
-# The site's toolbar mark, drawn 1:1 on 1x-3x screens like AppEmblem's copies.
-# 36 is emblemSize in static_site_generator/lib/render/site_assets.dart.
-for scale in (1, 2, 3):
-    suffix = "" if scale == 1 else f"@{scale}x"
-    logo.resize((36 * scale, 36 * scale), Image.LANCZOS).save(
-        f"../../static_site_generator/assets/emblem{suffix}.png", optimize=True)
-
 # The link-preview card. 1200x630 is the size every scraper documents and the
 # one ratio (1.91:1) Facebook, WhatsApp and X crop to without cutting the mark.
 # The logo at 440px, centred on the site's page background, so a shared link
@@ -70,4 +59,4 @@ card.convert("RGB").save("../../static_site_generator/assets/og-card.png", optim
 PY
 
 echo "Wrote emblem.webp, its 2.0x/ 3.0x/ 4.0x/ copies, web/favicon.png and"
-echo "the site's emblem.png, emblem@2x.png, emblem@3x.png and og-card.png"
+echo "the site's og-card.png"

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'src/cli.dart';
 
 /// Every link the built site writes, resolved against the files on disk: each
-/// internal `href`, `src`, `srcset`, `url()`, URL-shaped `data-*` and
+/// internal `href`, `src`, `url()`, URL-shaped `data-*` and
 /// `sitemap.xml` `<loc>` against a real file, and each `#fragment` against the
 /// ids on the page it names. Exits 1 on any failure, so it can gate a deploy.
 ///
@@ -227,10 +227,6 @@ class _Link {
 
 final RegExp _htmlRef = RegExp(r'(?:href|src)="([^"]*)"');
 
-/// The emblem's denser copies, which no `src` names: a list of URLs, each
-/// followed by its density.
-final RegExp _srcsetRef = RegExp(r'\ssrcset="([^"]*)"');
-
 /// `og:image` carries an asset URL that appears nowhere else on the page, and
 /// P5 named it the one asset whose absence is invisible on the site itself —
 /// only a link scraper ever asks for it. `og:url` rides along for free.
@@ -268,11 +264,6 @@ Iterable<String> _urlsIn(String relative, String text) sync* {
   for (final pattern in [_htmlRef, _metaRef, _dataRef]) {
     for (final match in pattern.allMatches(text)) {
       yield _unescape(match.group(1)!);
-    }
-  }
-  for (final match in _srcsetRef.allMatches(text)) {
-    for (final candidate in _unescape(match.group(1)!).split(',')) {
-      yield candidate.trim().split(' ').first;
     }
   }
 }

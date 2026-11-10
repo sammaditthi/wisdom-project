@@ -1,6 +1,5 @@
 import '../domain/theme_tokens.dart';
 import 'reading_layouts.dart';
-import 'site_assets.dart';
 import 'site_icons.dart';
 import 'web_fonts.dart';
 
@@ -110,7 +109,7 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// An ancestor squeezed under about 45px is three Sinhala clusters and an
 /// ellipsis — present, unreadable, and standing where the page's own name
 /// should be. Each step is where the ancestors still showing stop clearing that
-/// floor. Below the last one the emblem and the leaf are the whole of what
+/// floor. Below the last one the home icon and the leaf are the whole of what
 /// fits, and the up button is what replaces the parent link that went with
 /// them.
 ///
@@ -147,18 +146,19 @@ double _readingColumnRem(ThemeTokens tokens) =>
 /// excepted: 861.6 → 946.6, 669.6 → 728.0, 438.8 → 480.2, and
 /// [_layoutsFoldWidth] 573.6 → 615.0. Scaled, not re-measured over the corpus.
 ///
-/// ## The 36px emblem added 8px (2026-10-17)
+/// ## The home icon (2026-11-10)
 ///
-/// 8px more of the trail that never gives way, so the same method again:
-/// 946.6 → 954.6 → **60rem**, 728.0 → 736.0 → **46rem**, 480.2 → 488.2 →
-/// **31rem**, and the fold 615.0 → 623.0 → **39rem**. None crosses a rem; the
-/// pill's step, which adds to the first, does.
+/// The 36px emblem added 8px of trail that never gives way (2026-10-17); the
+/// 28px books icon that replaced it took them back. So the steps are the
+/// scaled ones above, rounded up: 946.6 → **60rem**, 728.0 → **46rem**, 480.2 →
+/// **31rem**, and the fold 615.0 → **39rem**. The 8px crossed a rem only in
+/// the pill's step, which adds to the first: 69rem with the emblem, 68rem now.
 ///
 /// ## What it costs on a phone
 ///
 /// A tap: the layout buttons are in the ⋮ menu. In return the trail gets ~214px
-/// at 390px; emblem 36 and the leaf's 17px of padding leave ~161px for the
-/// page's own name against a ~148px median.
+/// at 390px; the 28px home icon and the leaf's 17px of padding leave ~169px for
+/// the page's own name against a ~148px median.
 ///
 /// [_trailKeepThree] no longer coincides with [_twoColumnMinWidth], as it did
 /// at 48rem through P3. That was arithmetic, not sharing — the two answer
@@ -175,9 +175,9 @@ const String _layoutsFoldWidth = '39rem';
 ///
 /// Set so the trail never has less room with the pill than it had with the ⋮
 /// at [_trailKeepThree]. Measured in Chrome (2026-10-17, no book icon): the
-/// pill is 164px and pins 140px more than the ⋮. 954.6 + 140 = 1094.6px,
+/// pill is 164px and pins 140px more than the ⋮. 946.6 + 140 = 1086.6px,
 /// rounded up to the next whole rem (16px in a media query).
-const String _appPillMinWidth = '69rem';
+const String _appPillMinWidth = '68rem';
 
 /// Height of the sticky reader toolbar.
 ///
@@ -571,7 +571,7 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // With no cap left it had nothing to hold. Both failed caps are measured in
   // the build plan.
   //
-  // `padding` matches `.content`'s: on a phone the emblem and the first
+  // `padding` matches `.content`'s: on a phone the home icon and the first
   // character of the text share one left edge.
   //
   // Full bleed needs this to stay a normal-flow block child of `<body>`, which
@@ -861,8 +861,8 @@ void _writeIcons(StringBuffer css) {
   css.writeln();
 }
 
-/// The bar's navigation half: the trail, the emblem that opens it, and the up
-/// button pinned beyond its right edge.
+/// The bar's navigation half: the trail, the home icon that opens it, and the
+/// up button pinned beyond its right edge.
 ///
 /// `.toolbar` is `justify-content: flex-end`, and the trail's `flex: 1` is what
 /// absorbs the free space — so the trail starts at the window's left edge and
@@ -870,7 +870,7 @@ void _writeIcons(StringBuffer css) {
 /// `margin-right: auto`; it is inside the trail now and needs no margin of its
 /// own.
 void _writeToolbarNav(StringBuffer css) {
-  css.writeln('/* Toolbar: the trail, its emblem, and the up button. */');
+  css.writeln('/* Toolbar: the trail, its home icon, and the up button. */');
   // The only flex item in the bar allowed to shrink, and the whole reason the
   // controls beside it never move. `min-width: 0` is what permits that: a flex
   // item's floor is `min-content` until it is said otherwise, and here that is
@@ -905,7 +905,7 @@ void _writeToolbarNav(StringBuffer css) {
   css.writeln('  color: var(--c-on-surface-variant);');
   css.writeln('}');
   css.writeln();
-  // Every segment but the emblem: one line, its own ellipsis, its own `›`.
+  // Every segment but home: one line, its own ellipsis, its own `›`.
   //
   // `min-width: 0` for the same reason the bar gives it to `.breadcrumb` — a
   // flex item will not shrink below `min-content` unless told to, and a node
@@ -914,7 +914,7 @@ void _writeToolbarNav(StringBuffer css) {
   // The vertical padding is slack for `overflow: hidden`. `line-height: 1` sets
   // the box to the em, and Sinhala ink runs taller than its em, so without this
   // each segment would shave the marks off its own text. 6px keeps the box at
-  // ~26px, still under the 36px emblem, so the bar's height is untouched.
+  // ~26px, still under the 36px home link, so the bar's height is untouched.
   css.writeln('.breadcrumb > :not(.home) {');
   css.writeln('  position: relative;');
   css.writeln('  min-width: 0;');
@@ -948,7 +948,7 @@ void _writeToolbarNav(StringBuffer css) {
   // page you are on is the last thing to go.
   //
   // Neither may grow — `.breadcrumb` is wider than its contents whenever the
-  // trail is short, and a stretched trail would put the emblem and the page
+  // trail is short, and a stretched trail would put the home icon and the page
   // name at opposite ends of the bar.
   css.writeln('.breadcrumb a:not(.home) { flex: 0 200 auto; }');
   // The page you are on, brighter than the links above it — the app draws the
@@ -957,15 +957,19 @@ void _writeToolbarNav(StringBuffer css) {
   css.writeln('.breadcrumb .leaf { flex: 0 1 auto; '
       'color: var(--c-on-surface); }');
   css.writeln();
-  css.writeln('.home { display: flex; flex: none; align-items: center; }');
+  // The padding makes the tap target 36px tall, as tall as `.up`. Height
+  // only: a wider link would move the trail's breakpoints.
+  css.writeln('.home { display: flex; flex: none; align-items: center; '
+      'padding: 4px 0; }');
+  // In the leaf's colour, not the dimmed links': the way home should stand out.
+  // `.breadcrumb a` sets `color: inherit`, so this needs its specificity.
+  css.writeln('.breadcrumb .home { color: var(--c-on-surface); }');
   // A focus ring the anchor can actually show — unlike the layout labels, this
   // is a real link, so `:focus-visible` lands on the element itself. Inset,
   // because an outset ring on the first segment would be drawn outside
   // `.breadcrumb`'s padding box and clipped by its `overflow: hidden`.
   css.writeln('.home:focus-visible '
       '{ ${_focusRing()} border-radius: 8px; }');
-  css.writeln('.home img '
-      '{ display: block; width: ${emblemSize}px; height: ${emblemSize}px; }');
   css.writeln();
   // Where compressing stops paying and dropping starts. Derivation and the
   // measurements behind each width are on [_trailKeepThree] and its two
@@ -974,7 +978,7 @@ void _writeToolbarNav(StringBuffer css) {
   // `:nth-last-of-type` counts anchors from the end, so the rules are written
   // in terms of how many of the *nearest* ancestors survive — which is the
   // question — and hold for a trail of two segments or of six without knowing
-  // which it is. `:not(.home)` spares the emblem, which is an anchor too.
+  // which it is. `:not(.home)` spares home, which is an anchor too.
   //
   // `width: 0`, never `display: none`. A collapsed segment is still a rendered
   // link in the DOM and in the accessibility tree; the breadcrumb *is* this
@@ -996,7 +1000,7 @@ void _writeToolbarNav(StringBuffer css) {
   // Last of the trail's rules on purpose. It ties the media queries above at
   // specificity, so source order is what lets focus win — a keyboard user who
   // tabs into a collapsed segment gets it back, rather than watching focus
-  // vanish into a zero-width box. `:not(.home)` keeps the emblem's own 8px
+  // vanish into a zero-width box. `:not(.home)` keeps home's own 8px
   // ring, which this would otherwise outrank.
   css.writeln('.breadcrumb a:not(.home):focus-visible {');
   css.writeln('  width: auto;');

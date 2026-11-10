@@ -486,8 +486,7 @@ writes, so a renamed asset cannot leave a rule pointing at nothing):
 | `site.css` | hash of the CSS |
 | `site.js` | hash of the script **and** the index |
 | `search-index.json` | the same hash |
-| `emblem.png`, `@2x`, `@3x` | one hash of all three copies, cut together |
-| `og-card.png` | hash of the image (its own token, not the emblem's — the card can change while the emblem does not) |
+| `og-card.png` | hash of the image |
 | `favicon.png` | hash of the image |
 | `fonts/*.woff2` | one hash of all eight faces, carried in the CSS |
 
@@ -504,7 +503,7 @@ Two things to know before editing it:
   any edit to either.
 - **Rules must not overlap on the same header.** Pages merges all matching
   rules and joins duplicate header names with a comma, so `/assets/*` beside a
-  `/assets/emblem.png` exception would emit both policies in one
+  `/assets/og-card.png` exception would emit both policies in one
   `Cache-Control` rather than overriding. The two patterns above are disjoint,
   which is the only reason the file is this short. The CSP on `/*` (backlog
   C2) sets a different header, so it spans both safely.

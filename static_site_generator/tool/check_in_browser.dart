@@ -364,11 +364,11 @@ Future<void> _checkPageShapes(_Shapes shapes) async {
     ];
 
     if (shape.value == '/') {
-      // The emblem is the brand mark and points here from here; what the
-      // landing shape promises is that there is nothing above it to climb.
-      final emblem = home == null ? null : (await attributesOf(home))['href'];
-      _expect(crumbs.isEmpty && await query('a.up') == null && emblem == '/',
-          'landing has nothing above it', 'crumbs=$crumbs emblem=$emblem');
+      // The home icon points here from here; what the landing shape
+      // promises is that there is nothing above it to climb.
+      final homeHref = home == null ? null : (await attributesOf(home))['href'];
+      _expect(crumbs.isEmpty && await query('a.up') == null && homeHref == '/',
+          'landing has nothing above it', 'crumbs=$crumbs home=$homeHref');
       _expect((await queryAll('main a[href^="/tipitaka/"]')).isNotEmpty,
           'landing links into the corpus');
       await shot('shape-landing');
@@ -423,10 +423,10 @@ Future<void> _checkPageShapes(_Shapes shapes) async {
       if (await currentUrl() == '$origin/') break;
     }
     if (await currentUrl() != '$origin/') {
-      // The top of the corpus has no parent; the emblem is its way home.
-      final emblem = await query('nav.breadcrumb a.home');
-      if (emblem != null) {
-        await clickAndWait(emblem);
+      // The top of the corpus has no parent; the home icon is its way home.
+      final homeLink = await query('nav.breadcrumb a.home');
+      if (homeLink != null) {
+        await clickAndWait(homeLink);
         steps++;
       }
     }

@@ -15,7 +15,7 @@
 /// browser's cache, but the browser must ask the edge "still valid?" before
 /// reusing them — a conditional request, a `304`, and a full round trip. Every
 /// link on this site is a whole new document, so **each page view pays that
-/// round trip for the stylesheet, the script, the emblem and every WOFF2 face
+/// round trip for the stylesheet, the script and every WOFF2 face
 /// it uses** (8 faces, 328 KB, 2–4 per page), none of which changed between one
 /// sutta and the next. On the slow connections this surface exists for, that is
 /// the difference between a page that renders and a page that waits.
@@ -27,16 +27,17 @@
 /// ## One tier, because every URL here carries a hash
 ///
 /// A year of `immutable` is only safe when a new file arrives under a new URL,
-/// and [SiteAssets] makes that true of all five — the stylesheet, the script,
-/// the search index, the emblem, and the font faces through the `@font-face`
-/// rules in the stylesheet. None of them can go stale: a changed file is a
-/// changed URL, and an unchanged one is not worth revalidating.
+/// and [SiteAssets] makes that true of all of them — the stylesheet, the
+/// script, the search index, the OG card, the favicon, and the font faces
+/// through the `@font-face` rules in the stylesheet. None of them can go
+/// stale: a changed file is a changed URL, and an unchanged one is not worth
+/// revalidating.
 ///
-/// This used to be two tiers. The emblem and the fonts had no version, so they
-/// got a week of `max-age` — long enough to skip revalidating across one
-/// sitting, short enough to bound the wait for a corrected font face. Hashing
-/// them retired the compromise and, with it, the second tier and the three
-/// exact-path rules that kept the two apart.
+/// This used to be two tiers. The fonts (and the since-retired emblem) had no
+/// version, so they got a week of `max-age` — long enough to skip revalidating
+/// across one sitting, short enough to bound the wait for a corrected font
+/// face. Hashing them retired the compromise and, with it, the second tier and
+/// the three exact-path rules that kept the two apart.
 ///
 /// ## The two file rules that are not about caching
 ///
@@ -81,8 +82,8 @@
 /// > inherit all rules' headers.
 ///
 /// — and where two matched rules set the *same* header, Pages joins the values
-/// with a comma. A `/assets/*` blanket beside a `/assets/emblem.png` exception
-/// would therefore not override anything; it would emit
+/// with a comma. A `/assets/*` blanket beside a `/assets/og-card.png`
+/// exception would therefore not override anything; it would emit
 /// `Cache-Control: public, max-age=31536000, immutable, public, max-age=604800`
 /// and leave the real policy to whatever the browser makes of that. The two
 /// patterns below are disjoint, which is the only reason the file is this

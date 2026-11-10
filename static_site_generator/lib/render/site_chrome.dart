@@ -13,7 +13,7 @@
 /// Kept out of `page_template.dart` because `/` needs the identical bar while
 /// sharing none of that file's other machinery — no slices, no pager, no
 /// reading layout. The trail is not an exception to that: `/` carries one like
-/// every other page, the emblem with no segments after it, which is this
+/// every other page, the home icon with no segments after it, which is this
 /// function's own defaults rather than a second bar shape. Two copies of a bar
 /// whose flex contract lives in the stylesheet is how one of them quietly stops
 /// matching.
@@ -24,7 +24,6 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import 'node_labels.dart';
 import 'reading_layouts.dart';
 import 'search_dialog.dart';
-import 'site_assets.dart';
 import 'site_build.dart';
 import 'site_icons.dart';
 
@@ -61,19 +60,10 @@ const String upLabel = 'ඉහළ';
 /// that stops being a link on one page is the odder behaviour, and the
 /// alternative costs a branch through every caller to save one anchor.
 ///
-/// The emblem's URLs arrive from [SiteAssets] rather than being written here:
-/// they carry a hash of the images, which only the build that read the bytes
-/// can know. `src` is the 1× copy; `srcset` offers the denser ones.
+/// The icon is `aria-hidden`, so `title` is the link's name, as on [upLink].
 String homeLink(SiteBuild build) {
   final label = build.strings.html(homeLabelKey);
-  final emblems = build.assets.emblems;
-  final srcset = [
-    for (var i = 1; i < emblems.length; i++) '${emblems[i]} ${i + 1}x',
-  ].join(', ');
-  return '<a class="home" href="/" '
-      'title="$label">'
-      '<img src="${emblems.first}" srcset="$srcset" '
-      'width="$emblemSize" height="$emblemSize" alt="$label"></a>';
+  return '<a class="home" href="/" title="$label">${homeIcon.markup}</a>';
 }
 
 /// The trail: home, the ancestors, and the page itself.
@@ -99,7 +89,7 @@ String homeLink(SiteBuild build) {
 /// in the crawl graph. `aria-current="page"` is what carries "this segment is
 /// where you are".
 ///
-/// ## The emblem is segment zero
+/// ## Home is segment zero
 ///
 /// Not a control standing beside the trail: `/` really is the parent of `vp`,
 /// `sp` and the other five roots, so the merge states a fact about the
@@ -158,11 +148,11 @@ String breadcrumb({
 /// the corpus as the boxes render, a full trail is 684px at the median, against
 /// 172px of room on a 390px screen — the window less 218px of pinned controls,
 /// which is three layout buttons and not four, side-by-side being
-/// `display: none` below 48rem. What fits in 172px is the emblem and the page's
-/// own name and nothing else. So at and below 31rem the stylesheet collapses
-/// every ancestor and the parent link goes with them. This anchor is pinned and
-/// never shrinks, which is what keeps the one step a reader always wants on
-/// screen.
+/// `display: none` below 48rem. What fits in 172px is the home icon and the
+/// page's own name and nothing else. So at and below 31rem the stylesheet
+/// collapses every ancestor and the parent link goes with them. This anchor is
+/// pinned and never shrinks, which is what keeps the one step a reader always
+/// wants on screen.
 ///
 /// Rendered on every page with a parent and hidden by width, not branched here:
 /// above 31rem the nearest ancestor is a breadcrumb link, so showing both would
@@ -171,9 +161,9 @@ String breadcrumb({
 /// The app ships no equivalent because it has the navigator tree; P3.5 withdrew
 /// this site's, and nothing took over the job of climbing one level.
 ///
-/// Omitted on the seven roots, whose parent is `/` — the emblem at the other end
-/// of the trail already goes there, and two controls to one destination is the
-/// kind of thing a reader has to test to understand.
+/// Omitted on the seven roots, whose parent is `/` — the home icon at the other
+/// end of the trail already goes there, and two controls to one destination is
+/// the kind of thing a reader has to test to understand.
 ///
 /// `title` alone, not `title` plus `aria-label`. The glyph is `aria-hidden`, so
 /// the anchor has no name from its content and `title` becomes the name — the
@@ -261,7 +251,7 @@ String toolbar({
   String? appUrl,
 }) {
   final buffer = StringBuffer('<div class="toolbar">');
-  // Defaults render `/`'s bar: the emblem alone in a trail with nowhere to
+  // Defaults render `/`'s bar: the home icon alone in a trail with nowhere to
   // climb. That is the same markup every other page carries, minus segments —
   // not a second bar shape with a branch guarding it.
   buffer.write(breadcrumb(build: build, trail: trail, current: current));

@@ -18,13 +18,15 @@ class SiteIcon {
   /// inside a `data:` URL. The span's `background-color` is the colour.
   final String svg;
 
+  /// [grid] is the width and height of the drawing's own coordinates.
   const SiteIcon(
     this.maskClass, {
     required this.size,
     required String paint,
     required String shapes,
-  }) : svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" '
-            '$paint>$shapes</svg>';
+    int grid = 24,
+  }) : svg = '<svg xmlns="http://www.w3.org/2000/svg" '
+            'viewBox="0 0 $grid $grid" $paint>$shapes</svg>';
 
   /// Hidden from assistive tech, as the SVG was: every control that shows an
   /// icon is named by its own `title`, `aria-label` or text.
@@ -79,6 +81,19 @@ const SiteIcon newTabIcon = SiteIcon('new-tab-icon',
     paint: 'fill="none" stroke="black" stroke-width="2" $_round',
     shapes: '<path d="M7 17L17 7"/><path d="M9 7h8v8"/>');
 
+/// The breadcrumb's home: books on a shelf. Drawn on its own 28 grid at 28px
+/// with a 1.5 line on .25/.75 positions, so it fills whole pixels on 2x
+/// screens. Keep those positions if it is redrawn (`docs/todo/brand/`).
+const SiteIcon homeIcon = SiteIcon('home-icon',
+    size: 28,
+    grid: 28,
+    paint: 'fill="none" stroke="black" stroke-width="1.5" $_round',
+    shapes: '<path d="M2.25 23.25h23.5"/>' // shelf
+        '<path d="M4.25 23.25V4.75h4.5v18.5"/>' // tall book, open at the bottom
+        '<path d="M8.75 8.25h3.5v15"/>' // short book
+        '<rect x="15.25" y="6.25" width="4.5" height="17" rx=".875" '
+        'transform="rotate(20 19.75 23.25)"/>'); // leaning book
+
 /// The ⋮. Filled, not stroked.
 const SiteIcon moreIcon = SiteIcon('more-icon',
     size: 18,
@@ -88,6 +103,7 @@ const SiteIcon moreIcon = SiteIcon('more-icon',
 
 /// Every icon, in the order the stylesheet writes their rules.
 const List<SiteIcon> siteIcons = [
+  homeIcon,
   sideBySideIcon,
   stackedIcon,
   upIcon,

@@ -18,7 +18,7 @@ String contentHash(String content) => contentHashOfBytes(utf8.encode(content));
 
 /// The same digest over bytes that are not text.
 ///
-/// The emblem and the WOFF2 subsets are versioned by content like everything
+/// The images and the WOFF2 subsets are versioned by content like everything
 /// else the site links (`SiteAssets`), and decoding a PNG as UTF-8 to reach
 /// [contentHash] would throw on the first invalid sequence.
 String contentHashOfBytes(List<int> bytes) =>

@@ -47,7 +47,7 @@ class SiteBuild {
   /// Cloudflare's content-hash dedup re-uploads every file (§11.8).
   final String generatorVersion;
 
-  /// The stylesheet, script, index, emblem and card URLs, each carrying a hash
+  /// The stylesheet, script, index, card and favicon URLs, each carrying a hash
   /// of its own bytes — see [SiteAssets]. A page cannot know those; the caller
   /// that read the bytes can.
   final SiteAssets assets;

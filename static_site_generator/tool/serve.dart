@@ -230,7 +230,7 @@ ContentType _contentTypeOf(String path) {
   if (path.endsWith('.txt')) {
     return ContentType('text', 'plain', charset: 'utf-8');
   }
-  // The emblem and the OG card. Also octet-stream until now; browsers sniff a
+  // The OG card and the favicon. Also octet-stream until now; browsers sniff a
   // PNG and render it anyway, which is exactly why nobody noticed — a host
   // sending `X-Content-Type-Options: nosniff` would not, and a link scraper
   // fetching the card rejects it on the type alone.

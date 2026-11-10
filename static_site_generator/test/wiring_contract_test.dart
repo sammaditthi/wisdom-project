@@ -64,6 +64,7 @@ import 'package:static_site_generator/render/search_dialog.dart';
 import 'package:static_site_generator/render/search_index.dart';
 import 'package:static_site_generator/render/site_assets.dart';
 import 'package:static_site_generator/render/site_build.dart';
+import 'package:static_site_generator/render/site_chrome.dart';
 import 'package:static_site_generator/render/site_headers.dart';
 import 'package:static_site_generator/render/stylesheet.dart';
 import 'package:test/test.dart';
@@ -873,6 +874,29 @@ void main() {
       expect(emitted, containsAll(masked),
           reason: 'Masks no page uses: ${masked.difference(emitted)}.');
     });
+
+    test('the home link is named by its title and holds only its icon', () {
+      // The icon is `aria-hidden`, so `title` is the link's only name: without
+      // it a screen reader hears a bare "link" at the start of every page.
+      final label = _strings.html(homeLabelKey);
+      final pages = {
+        'sutta': _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()}),
+        'toc': _render(_tocPage),
+        'landing': LandingPage(roots: _tree.roots, build: _build).render(),
+      };
+      pages.forEach((kind, html) {
+        final links =
+            RegExp(r'<a class="home"([^>]*)>(.*?)</a>').allMatches(html);
+        expect(links, hasLength(1),
+            reason: 'The $kind page should have exactly one home link.');
+        final attributes = links.single.group(1)!;
+        expect(attributes, contains(' href="/"'));
+        expect(attributes, contains(' title="$label"'),
+            reason: 'The $kind page\'s home link has no name.');
+        expect(links.single.group(2),
+            '<span class="home-icon" aria-hidden="true"></span>');
+      });
+    });
   });
 
   // The same class of bug as the stylesheet contract above, in the other
@@ -1052,14 +1076,14 @@ void main() {
   group('the asset cache contract — _headers ⇄ SiteAssets', () {
     test('no URL gets two different values of one header', () {
       // Pages applies every rule a URL matches and joins a header set twice
-      // with a comma, so `/assets/*` beside `/assets/emblem.png` would ship
+      // with a comma, so `/assets/*` beside `/assets/og-card.png` would ship
       // two cache policies in one `Cache-Control`.
       expect(_headerConflicts(parseHeaderRules(buildSiteHeaders())), isEmpty);
 
       // The same check on that exact hazard, so it cannot pass by never
       // seeing an overlap.
       final hazard = parseHeaderRules('/assets/*\n  Cache-Control: a\n\n'
-          '/assets/emblem.png\n  Cache-Control: b\n');
+          '/assets/og-card.png\n  Cache-Control: b\n');
       expect(_headerConflicts(hazard), isNotEmpty);
     });
 
@@ -1068,11 +1092,6 @@ void main() {
         String css = 'a{}',
         String script = 's',
         String searchIndex = '[]',
-        List<List<int>> emblems = const [
-          [1],
-          [4],
-          [5],
-        ],
         List<int> ogCard = const [2],
         List<int> favicon = const [3],
       }) =>
@@ -1080,7 +1099,6 @@ void main() {
             css: css,
             script: script,
             searchIndex: searchIndex,
-            emblems: emblems,
             ogCard: ogCard,
             favicon: favicon,
           );
@@ -1101,15 +1119,6 @@ void main() {
       // fresh script can pair with a cached index.
       expect(moved(assetsWith(script: 't')), {'script', 'searchIndex'});
       expect(moved(assetsWith(searchIndex: '[1]')), {'script', 'searchIndex'});
-      // One token for the three copies, as for the fonts: they are cut
-      // together, so any one of them moving moves all three.
-      expect(
-          moved(assetsWith(emblems: const [
-            [1],
-            [9],
-            [5],
-          ])),
-          {'emblems[0]', 'emblems[1]', 'emblems[2]'});
       expect(moved(assetsWith(ogCard: const [9])), {'ogCard'});
       expect(moved(assetsWith(favicon: const [9])), {'favicon'});
     });
@@ -1120,7 +1129,6 @@ void main() {
             css: '',
             script: script,
             searchIndex: searchIndex,
-            emblems: const [],
             ogCard: const [],
             favicon: const [],
           );
@@ -1357,11 +1365,6 @@ const SiteAssets _assets = SiteAssets(
   stylesheet: '/assets/site.css?v=test',
   script: '/assets/site.js?v=test',
   searchIndex: '/assets/search-index.json?v=test',
-  emblems: [
-    '/assets/emblem.png?v=test',
-    '/assets/emblem@2x.png?v=test',
-    '/assets/emblem@3x.png?v=test',
-  ],
   ogCard: '/assets/og-card.png?v=test',
   favicon: '/assets/favicon.png?v=test',
 );
