@@ -73,9 +73,9 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
 5. **Anumodanā is names, uses and licences** (2026-10-23) — no prose intro.
 6. **Anumodanā's row icons are generic.** Real logos only if supplied, with
    permission to use them.
-7. **Rail hidden on desktop.** Settings cannot be reached until the rail is
-   shown again; the switch stays in the reader menu. Parked — a Ctrl/Cmd+,
-   shortcut would cover it.
+7. **Rail hidden on desktop.** The gear goes with the rail; the switch stays
+   in the reader menu. Cmd/Ctrl+, opens Settings without the rail
+   (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
 8. **First review round** (2026-10-24). Theme is icons with tooltips; Sinhala
    Dark is කාළ. Every `SegmentedButton` is a soft rectangle, from
    `AppSegmentedButtonTheme` in all three themes — except the search Refine
@@ -356,10 +356,6 @@ exists (`settings`, `theme`, `themeLight`, `appLanguage`, `contentLanguage`,
   styled on their own; one pass moves them onto those pieces, which graduate
   from `widgets/settings/` to `widgets/common/` once a second caller exists.
   After this lands.
-- **Keyboard shortcuts tab.** Rows from `defaultBindings()`, device's
-  activators only, chosen by `defaultTargetPlatform` (on the web, the browser's
-  OS): `meta` on macOS and iOS, `control` elsewhere, Esc on both. No `kIsWeb`
-  branch. See `docs/todo/reader/keyboard-shortcuts-sheet.md`.
 - **Singlish key-chart tab.** Not titled Transliteration — that is the
   Anumodanā section's name (Decisions 11). Needs its own letter→key list, in
   alphabet order, beside `SinglishTransliterator` in `lib/core/utils/`: the

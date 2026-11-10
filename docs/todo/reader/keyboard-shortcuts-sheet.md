@@ -1,6 +1,8 @@
 # Keyboard shortcuts — design
 
-Started 2026-10-11. Designed with the user 2026-11-10. Not built.
+Started 2026-10-11. Designed with the user 2026-11-10. Built 2026-11-10 on
+`feat/keyboard-shortcuts` (plan: `keyboard-shortcuts-build-plan.md`); the
+checks below that need a person are still open.
 
 **Goal:** new shortcuts for reading with the keyboard, and a **Keyboard
 shortcuts** tab in Settings that lists every shortcut with the keys of the
@@ -167,6 +169,11 @@ Same keys on desktop and web. "Windows" also means Linux.
 - A key that does nothing on the web because the browser keeps it.
 
 ## Check while building
+
+Done 2026-11-10: the full unit suite, and on macOS
+`integration_test/search_mode_test.dart` (now presses the platform's own
+modifier, and checks the other one does nothing) and `reader_panes_test.dart`.
+Open — each needs someone at the keyboard:
 
 1. **Safari and ⌘,.** If Safari keeps it for its own settings, stop and ask
    the user before choosing another key.

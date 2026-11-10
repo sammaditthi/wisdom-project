@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+### New
+- Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next sutta, resize text and more
+
 ## 1.2.0 - 2026-11-08
 ### New
 - Open on SuttaCentral in the Share menu, naming whose English translation it opens

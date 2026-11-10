@@ -160,7 +160,7 @@ void main() {
 
       expect(find.byType(NavigationRail), findsNothing);
       expect(find.byIcon(Icons.settings_outlined), findsNothing,
-          reason: 'parked: a Ctrl/Cmd+, shortcut would cover this');
+          reason: 'Cmd/Ctrl+, opens Settings without the rail');
 
       // The reader menu is still the way back, and brings the gear with it.
       container.read(navigationRailHiddenProvider.notifier).state = false;

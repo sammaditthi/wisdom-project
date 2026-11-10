@@ -13,6 +13,7 @@ library;
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -214,9 +215,13 @@ void main() {
         await pumpForSettle(tester);
       }
 
-      // Ctrl+Shift+F, or Cmd+Shift+F, the macOS binding.
-      Future<void> pressSearchShortcut({bool cmd = false}) async {
-        final (modifier, physicalModifier) = cmd
+      // The platform's own: Cmd+Shift+F on macOS, Ctrl+Shift+F elsewhere.
+      // [otherPlatform] presses the other one, which must do nothing — one
+      // modifier per platform (keyboard-shortcuts-sheet.md, rule 2).
+      Future<void> pressSearchShortcut({bool otherPlatform = false}) async {
+        final apple = defaultTargetPlatform == TargetPlatform.macOS ||
+            defaultTargetPlatform == TargetPlatform.iOS;
+        final (modifier, physicalModifier) = apple != otherPlatform
             ? (LogicalKeyboardKey.metaLeft, PhysicalKeyboardKey.metaLeft)
             : (LogicalKeyboardKey.controlLeft, PhysicalKeyboardKey.controlLeft);
         await tester.sendKeyDownEvent(modifier, physicalKey: physicalModifier);
@@ -308,18 +313,19 @@ void main() {
       section.state = AppSection.reader;
       await pumpForSettle(tester);
 
-      // ---- 11. Ctrl+Shift+F opens it with no field to focus ----
+      // ---- 11. Cmd/Ctrl+Shift+F opens it with no field to focus ----
       await pressSearchShortcut();
       expect(searchField, findsOneWidget,
-          reason: '11. Ctrl+Shift+F opens search mode');
+          reason: '11. Cmd/Ctrl+Shift+F opens search mode');
       expect(fieldHasFocus(), isTrue);
       await pressEsc(tester);
       await pumpForSettle(tester);
       expectClosed(container, '11. Esc again');
-      // Cmd+Shift+F, the macOS binding, does the same.
-      await pressSearchShortcut(cmd: true);
-      expect(searchField, findsOneWidget,
-          reason: '11. Cmd+Shift+F opens search mode');
+      // The other platform's modifier does nothing.
+      await pressSearchShortcut(otherPlatform: true);
+      expectClosed(container, "11. the other platform's modifier");
+      // Reopened, as step 12 expects.
+      await pressSearchShortcut();
       expect(fieldHasFocus(), isTrue);
 
       // ---- 12. On another section, back leaves the reader's search alone ----
