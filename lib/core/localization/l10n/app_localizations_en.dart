@@ -707,6 +707,24 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get settingsKeyboardShortcuts => 'Keyboard shortcuts';
+
+  @override
+  String get shortcutGroupSearch => 'Search';
+
+  @override
+  String get shortcutGroupReaderTabs => 'Reader tabs';
+
+  @override
+  String get shortcutGroupLayout => 'Layout';
+
+  @override
+  String get shortcutGroupReading => 'Reading';
+
+  @override
+  String get shortcutGroupEverywhere => 'Everywhere';
+
+  @override
   String get shortcutSearchTipitaka => 'Search the Tipitaka';
 
   @override

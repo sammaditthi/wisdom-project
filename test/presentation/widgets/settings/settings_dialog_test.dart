@@ -7,6 +7,7 @@
 /// covered here against the same `overlayStackProvider` the Esc shortcut reads.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -192,7 +193,8 @@ void main() {
       await open(tester);
 
       expect(find.byType(TabBar), findsOneWidget);
-      expect(find.byType(Tab), findsNWidgets(SettingsTab.values.length));
+      expect(find.byType(Tab),
+          findsNWidgets(SettingsTab.available(defaultTargetPlatform).length));
       // The app bar names the dialog; the pages name themselves on the tabs.
       expect(find.text('Settings'), findsOneWidget);
       expect(find.text('General'), findsOneWidget);
@@ -267,5 +269,31 @@ void main() {
       expect(find.byType(SettingsDialog), findsNothing);
       expect(container.read(overlayStackProvider), isEmpty);
     });
+  });
+
+  group('Keyboard shortcuts tab (keyboard-shortcuts-sheet.md, rule 3)', () {
+    Finder sidebarItem(String label) => find.descendant(
+          of: find.byType(ListTile),
+          matching: find.text(label),
+        );
+
+    testWidgets('desktop has three tabs in order', (tester) async {
+      await pumpHost(tester);
+      await open(tester);
+
+      final general = tester.getTopLeft(sidebarItem('General')).dy;
+      final shortcuts =
+          tester.getTopLeft(sidebarItem('Keyboard shortcuts')).dy;
+      final anumodana = tester.getTopLeft(sidebarItem('Anumodanā')).dy;
+      expect(general, lessThan(shortcuts));
+      expect(shortcuts, lessThan(anumodana));
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
+    testWidgets('Android has no Keyboard shortcuts tab', (tester) async {
+      await pumpHost(tester);
+      await open(tester);
+
+      expect(find.text('Keyboard shortcuts'), findsNothing);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.android));
   });
 }

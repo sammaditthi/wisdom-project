@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,6 +10,7 @@ import '../../../core/utils/responsive_utils.dart';
 import '../../providers/overlay_stack_provider.dart';
 import 'anumodana_page.dart';
 import 'general_settings_page.dart';
+import 'keyboard_shortcuts_page.dart';
 import 'settings_row.dart' show settingsGutter;
 import 'settings_tab.dart';
 
@@ -74,12 +76,17 @@ class _SettingsDialogState extends State<SettingsDialog>
   /// layouts — so dragging the window across the breakpoint keeps your place.
   late final TabController _tabs;
 
+  /// The tabs this platform shows (no Keyboard shortcuts off desktop).
+  final List<SettingsTab> _available =
+      SettingsTab.available(defaultTargetPlatform);
+
   @override
   void initState() {
     super.initState();
     _tabs = TabController(
-      length: SettingsTab.values.length,
-      initialIndex: widget.initialTab.index,
+      length: _available.length,
+      // A tab this platform doesn't show falls back to General.
+      initialIndex: math.max(0, _available.indexOf(widget.initialTab)),
       vsync: this,
     );
     _tabs.addListener(() {
@@ -93,14 +100,15 @@ class _SettingsDialogState extends State<SettingsDialog>
     super.dispose();
   }
 
-  SettingsTab get _selected => SettingsTab.values[_tabs.index];
+  SettingsTab get _selected => _available[_tabs.index];
 
-  void _select(SettingsTab tab) => _tabs.index = tab.index;
+  void _select(SettingsTab tab) => _tabs.index = _available.indexOf(tab);
 
   void _close() => Navigator.of(context).pop();
 
   Widget _pageFor(SettingsTab tab) => switch (tab) {
         SettingsTab.general => const GeneralSettingsPage(),
+        SettingsTab.shortcuts => const KeyboardShortcutsPage(),
         SettingsTab.anumodana => const AnumodanaPage(),
       };
 
@@ -131,7 +139,11 @@ class _SettingsDialogState extends State<SettingsDialog>
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _Sidebar(selected: _selected, onSelected: _select),
+            _Sidebar(
+              tabs: _available,
+              selected: _selected,
+              onSelected: _select,
+            ),
             Expanded(
               child: Column(
                 children: [
@@ -171,7 +183,7 @@ class _SettingsDialogState extends State<SettingsDialog>
           bottom: TabBar(
             controller: _tabs,
             tabs: [
-              for (final tab in SettingsTab.values)
+              for (final tab in _available)
                 Tab(icon: Icon(tab.icon), text: tab.label(l10n)),
             ],
           ),
@@ -179,7 +191,7 @@ class _SettingsDialogState extends State<SettingsDialog>
         body: TabBarView(
           controller: _tabs,
           children: [
-            for (final tab in SettingsTab.values) _pageFor(tab),
+            for (final tab in _available) _pageFor(tab),
           ],
         ),
       ),
@@ -189,8 +201,13 @@ class _SettingsDialogState extends State<SettingsDialog>
 
 /// The dialog's left-hand tab list.
 class _Sidebar extends StatelessWidget {
-  const _Sidebar({required this.selected, required this.onSelected});
+  const _Sidebar({
+    required this.tabs,
+    required this.selected,
+    required this.onSelected,
+  });
 
+  final List<SettingsTab> tabs;
   final SettingsTab selected;
   final ValueChanged<SettingsTab> onSelected;
 
@@ -217,7 +234,7 @@ class _Sidebar extends StatelessWidget {
                 style: context.typography.menuSectionLabel,
               ),
             ),
-            for (final tab in SettingsTab.values)
+            for (final tab in tabs)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: ListTile(

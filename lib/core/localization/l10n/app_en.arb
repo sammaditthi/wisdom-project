@@ -1069,6 +1069,30 @@
       }
     }
   },
+  "settingsKeyboardShortcuts": "Keyboard shortcuts",
+  "@settingsKeyboardShortcuts": {
+    "description": "Settings dialog: name of the tab listing every keyboard shortcut (desktop only)"
+  },
+  "shortcutGroupSearch": "Search",
+  "@shortcutGroupSearch": {
+    "description": "Keyboard shortcuts tab: section of the search keys"
+  },
+  "shortcutGroupReaderTabs": "Reader tabs",
+  "@shortcutGroupReaderTabs": {
+    "description": "Keyboard shortcuts tab: section of the keys that move between and close reader tabs"
+  },
+  "shortcutGroupLayout": "Layout",
+  "@shortcutGroupLayout": {
+    "description": "Keyboard shortcuts tab: section of the keys that switch the reading layout"
+  },
+  "shortcutGroupReading": "Reading",
+  "@shortcutGroupReading": {
+    "description": "Keyboard shortcuts tab: section of the keys used while reading (sutta, text size, scroll, navigator)"
+  },
+  "shortcutGroupEverywhere": "Everywhere",
+  "@shortcutGroupEverywhere": {
+    "description": "Keyboard shortcuts tab: section of the keys that work anywhere in the app"
+  },
   "shortcutSearchTipitaka": "Search the Tipitaka",
   "@shortcutSearchTipitaka": {
     "description": "Keyboard shortcuts tab: row for the key that jumps to the main search box"

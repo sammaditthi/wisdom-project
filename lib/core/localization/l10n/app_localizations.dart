@@ -1346,6 +1346,42 @@ abstract class AppLocalizations {
   /// **'Open {name}'**
   String openLinkTo(String name);
 
+  /// Settings dialog: name of the tab listing every keyboard shortcut (desktop only)
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard shortcuts'**
+  String get settingsKeyboardShortcuts;
+
+  /// Keyboard shortcuts tab: section of the search keys
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get shortcutGroupSearch;
+
+  /// Keyboard shortcuts tab: section of the keys that move between and close reader tabs
+  ///
+  /// In en, this message translates to:
+  /// **'Reader tabs'**
+  String get shortcutGroupReaderTabs;
+
+  /// Keyboard shortcuts tab: section of the keys that switch the reading layout
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get shortcutGroupLayout;
+
+  /// Keyboard shortcuts tab: section of the keys used while reading (sutta, text size, scroll, navigator)
+  ///
+  /// In en, this message translates to:
+  /// **'Reading'**
+  String get shortcutGroupReading;
+
+  /// Keyboard shortcuts tab: section of the keys that work anywhere in the app
+  ///
+  /// In en, this message translates to:
+  /// **'Everywhere'**
+  String get shortcutGroupEverywhere;
+
   /// Keyboard shortcuts tab: row for the key that jumps to the main search box
   ///
   /// In en, this message translates to:

@@ -707,6 +707,24 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
+  String get settingsKeyboardShortcuts => 'යතුරුපුවරු කෙටිමං';
+
+  @override
+  String get shortcutGroupSearch => 'සෙවීම';
+
+  @override
+  String get shortcutGroupReaderTabs => 'කියවීම් ටැබ';
+
+  @override
+  String get shortcutGroupLayout => 'පිරිසැලසුම';
+
+  @override
+  String get shortcutGroupReading => 'කියවීම';
+
+  @override
+  String get shortcutGroupEverywhere => 'සෑම තැනම';
+
+  @override
   String get shortcutSearchTipitaka => 'ත්‍රිපිටකයේ සොයන්න';
 
   @override
