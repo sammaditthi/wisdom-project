@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'main_search_focus_provider.dart';
 import 'search_provider.dart';
+import 'search_results_focus_provider.dart';
 
 /// On phones: true while the app bar is in search mode (a full-width search
 /// field in place of the breadcrumb).
@@ -13,7 +14,10 @@ final closeSearchProvider = Provider<void Function()>((ref) {
   return () {
     // Release focus first. A field that keeps focus never re-fires
     // onFocus(), so the panel would stay hidden when the user types again.
+    // Focus in the panel is released too: as the panel closes Flutter would
+    // hand it back to the field, and the field reopens the panel.
     ref.read(mainSearchFocusNodeProvider)?.unfocus();
+    ref.read(searchPanelFocusNodeProvider).unfocus();
     ref.read(searchStateProvider.notifier).dismissResultsPanel();
     ref.read(searchModeProvider.notifier).state = false;
   };

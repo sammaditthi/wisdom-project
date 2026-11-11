@@ -175,7 +175,7 @@ test('special keys', () {
   const smaller = ShortcutKeys(LogicalKeyboardKey.minus, primary: true);
   expect(keyCapLabels(pgUp, TargetPlatform.macOS), ['fn', '↑']);
   expect(keyCapLabels(pgUp, TargetPlatform.windows), ['PgUp']);
-  expect(keyCapLabels(prev, TargetPlatform.macOS), ['⌥', '⌘', '<']);
+  expect(keyCapLabels(prev, TargetPlatform.macOS, keyCap: '<'), ['⌥', '⌘', '<']);
   expect(keyCapLabels(smaller, TargetPlatform.windows), ['Ctrl', '−']); // U+2212
 });
 
@@ -200,7 +200,7 @@ testWidgets('Android has no Keyboard shortcuts tab', (tester) async {
 - [ ] **Step 2: Run, expect FAIL** on undefined `keyCapLabels` / `KeyboardShortcutsPage`.
 
 - [ ] **Step 3: Implement.**
-  - `keyCapLabels`: modifiers first. Mac: `alt` ⌥, `shift` ⇧, `primary` ⌘, in that order. Elsewhere: `primary` Ctrl, `alt` Alt, `shift` Shift. Then the key: letters upper-case, digits as is, `[` `]`, comma `<`, period `>`, equal `+`, minus `−` (U+2212), slash `/`, ↑ ↓, Esc, Tab; `pageUp`/`pageDown` are `fn`+`↑`/`↓` on Mac, `PgUp`/`PgDn` elsewhere; anything else `key.keyLabel`. After writing, dump the file's code points to check every symbol landed as itself.
+  - `keyCapLabels`: modifiers first. Mac: `alt` ⌥, `shift` ⇧, `primary` ⌘, in that order. Elsewhere: `primary` Ctrl, `alt` Alt, `shift` Shift. Then the key: letters upper-case, digits as is, `[` `]`, comma `,`, period `.` (the sutta-step entries show `<` `>` through `AppShortcut.keyCap`), equal `+`, minus `−` (U+2212), slash `/`, ↑ ↓, Esc, Tab; `pageUp`/`pageDown` are `fn`+`↑`/`↓` on Mac, `PgUp`/`PgDn` elsewhere; anything else `key.keyLabel`. After writing, dump the file's code points to check every symbol landed as itself.
   - `SettingsTab.shortcuts` (icon `Icons.keyboard_outlined`, label `settingsKeyboardShortcuts` "Keyboard shortcuts" / "යතුරුපුවරු කෙටිමං"). `available` keeps `shortcuts` only when `isDesktopPlatform`. The dialog uses `SettingsTab.available(defaultTargetPlatform)` for the TabController length, the sidebar, the tab bar and the index ↔ tab mapping; an `initial` not in the list falls back to General.
   - `KeyboardShortcutsPage`: `shortcutsFor(defaultTargetPlatform)` where `group != null`, one `SettingsSection` per `ShortcutGroup` (first gets `isFirst`), one `SettingsRow` per entry with `trailing:` key caps. Consecutive entries with the same label share one row, their key groups side by side with a wider gap. Section titles: `shortcutGroupSearch` "Search" / "සෙවීම", `shortcutGroupReaderTabs` "Reader tabs" / "කියවීම් ටැබ", `shortcutGroupLayout` "Layout" / "පිරිසැලසුම", `shortcutGroupReading` "Reading" / "කියවීම", `shortcutGroupEverywhere` "Everywhere" / "සෑම තැනම".
   - Key cap (private widget): min 28×28, horizontal padding 7, border 1 with a 2 px bottom edge, radius 6, 13 px w600, from `colorScheme` roles (`outlineVariant` border, `surface` fill) — the board's look (`RefTabs.dc.html`).
@@ -349,7 +349,7 @@ testWidgets('⌥⌘] behind Settings does nothing', ...); // SettingsDialog.over
   - `SwitchTabAction`: enabled when `readerKeysAllowed && !isTypingInTextBox()` and at least two tabs; invoke `switchTabProvider((active + offset) % length)`.
   - `SetLayoutAction`: enabled when `readerKeysAllowed && !isTypingInTextBox()` and `activeTabIndexProvider >= 0`; invoke `updateActiveTabLayoutProvider(intent.layout)`.
   - `CloseActiveTabAction.isEnabled`: add `&& !isTypingInTextBox()`.
-  - Entries, desktop only: `bracketRight, primary, alt` → `SwitchTabIntent(1)`, label `shortcutNextTab` "Next tab" / "ඊළඟ ටැබය"; `bracketLeft, primary, alt` → `SwitchTabIntent(-1)`, label `shortcutPreviousTab` "Previous tab" / "පෙර ටැබය" — both group readerTabs, before close-tab. Then for each `ReaderLayout.values[i]`: `digit(i+1), primary, alt` → `SetLayoutIntent(layout)`, group layout, label `(l10n) => layout.label(l10n)`.
+  - Entries, desktop only: `bracketRight, primary, alt` → `SwitchTabIntent(1)`, label `shortcutNextTab` "Next tab" / "ඊළඟ ටැබය"; `bracketLeft, primary, alt` → `SwitchTabIntent(-1)`, label `shortcutPreviousTab` "Previous tab" / "පෙර ටැබය" — both group readerTabs, before close-tab. Then for each `ReaderLayout.values[i]`: `digit(i+1), primary, alt` (`alsoKeys`: `numpad(i+1), primary, alt`) → `SetLayoutIntent(layout)`, group layout, label `(l10n) => layout.label(l10n)`.
 
 - [ ] **Step 4: Run, expect PASS**, plus `test/presentation/widgets/reader/` (the toolbar's layout menu still reads the same labels).
 

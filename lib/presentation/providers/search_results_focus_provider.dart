@@ -7,12 +7,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// `SearchResultsPanel` borrows it, as `InPageSearchBar` borrows
 /// `inPageSearchFocusNodeProvider`'s. It takes no focus itself; it only
 /// tells whether a result has it.
-final searchResultsFocusNodeProvider = Provider<FocusNode>((ref) {
+final searchResultsFocusNodeProvider = Provider<FocusNode>(
+  (ref) => _wrapperNode(ref, 'Search results'),
+);
+
+/// The node around the whole results panel — chips, tabs and results — so
+/// closing search can release focus from anywhere in it.
+final searchPanelFocusNodeProvider = Provider<FocusNode>(
+  (ref) => _wrapperNode(ref, 'Search panel'),
+);
+
+FocusNode _wrapperNode(Ref ref, String label) {
   final node = FocusNode(
-    debugLabel: 'Search results',
+    debugLabel: label,
     canRequestFocus: false,
     skipTraversal: true,
   );
   ref.onDispose(node.dispose);
   return node;
-});
+}

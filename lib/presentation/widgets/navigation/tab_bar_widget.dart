@@ -208,16 +208,9 @@ class _TabBarWidgetState extends ConsumerState<TabBarWidget> {
       return pos.maxScrollExtent;
     }
 
-    // Any other tab: derive the offset from its actual rendered box.
-    //
-    // KNOWN LIMITATION: ListView.builder only builds tabs within the
-    // viewport plus a small cacheExtent, so a tab scrolled far off-screen
-    // has no RenderBox to measure and this returns null — the reveal then
-    // gives up. Currently unreachable: every tab activation is either a
-    // newly-added last tab (handled above, needs no RenderBox) or a tap on
-    // an already-visible tab. It only becomes relevant if a future feature
-    // switches to an existing, possibly off-screen tab — handle it then
-    // (an iterative jump toward the tab, or ScrollablePositionedList).
+    // Any other tab: derive the offset from its actual rendered box. Every
+    // tab is built, even far off-screen (the list's scrollCacheExtent), so the
+    // tab keys can bring any of them into view.
     final box = _tabKeys[activeIndex]?.currentContext?.findRenderObject();
     if (box is! RenderBox) return null;
 
@@ -332,6 +325,10 @@ class _TabBarWidgetState extends ConsumerState<TabBarWidget> {
         child: ListView.builder(
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
+          // Builds every tab, so an off-screen one has a box to scroll to.
+          scrollCacheExtent: const ScrollCacheExtent.pixels(
+            maxOpenTabs * _TabItem.maxWidth,
+          ),
           itemCount: tabs.length,
           physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
@@ -431,6 +428,8 @@ class _TabItem extends ConsumerWidget {
     required this.onClose,
   });
 
+  static const double maxWidth = 200;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
@@ -466,7 +465,7 @@ class _TabItem extends ConsumerWidget {
         child: Container(
           constraints: const BoxConstraints(
             minWidth: 120,
-            maxWidth: 200,
+            maxWidth: maxWidth,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(

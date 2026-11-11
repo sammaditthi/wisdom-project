@@ -106,9 +106,9 @@ Same keys on desktop and web. "Windows" also means Linux.
 - **Next / previous tab:** wraps from the last tab to the first, as Chrome
   does *(my call)*. Nothing with fewer than two tabs. Through
   `switchTabProvider`, so the navigator follows.
-- **Layout 1–4:** through `updateActiveTabLayoutProvider`, so the choice is
-  also remembered for new tabs. The toolbar offers all four at every width,
-  so there is no width check. Nothing with no tab open.
+- **Layout 1–4:** top row or keypad. Through `updateActiveTabLayoutProvider`,
+  so the choice is also remembered for new tabs. The toolbar offers all four
+  at every width, so there is no width check. Nothing with no tab open.
 - **Previous / next sutta:** does exactly what the toolbar's ⏮ ⏭ buttons do,
   through the same code. Today that code is inside the reader widget
   (`_navigateToSutta` in `multi_pane_reader_widget.dart`, which also resets

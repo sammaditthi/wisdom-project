@@ -27,6 +27,9 @@ class FakeSearchStateNotifier extends StateNotifier<SearchState>
       state = state.copyWith(scope: nodeKeys);
 
   @override
+  void dismissResultsPanel() => state = state.copyWith(isPanelDismissed: true);
+
+  @override
   void toggleFTSGroupExpansion(String nodeKey) {
     final groups = state.expandedFTSGroups;
     state = state.copyWith(

@@ -65,6 +65,57 @@ void main() {
       await tester.pumpApp(const SizedBox(), overrides: overrides);
       expect(bridge.handle, isNull);
     });
+
+    // A held key repeats faster than one scroll animation. Each press adds
+    // to where the last one was heading, so none of it is lost.
+    testWidgets('a press during a key scroll adds a full line', (tester) async {
+      when(mockRepository.loadDocument('dn-1')).thenAnswer(
+        (_) async => Right(TestData.sampleDocument),
+      );
+      // Short, so the sample text scrolls.
+      tester.view.physicalSize = const Size(800, 200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpApp(
+        const MultiPaneReaderWidget(),
+        overrides: [
+          TestProviderOverrides.bjtDocumentRepository(mockRepository),
+          ..._readingDn1(),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      final reader = ProviderScope.containerOf(
+        tester.element(find.byType(MultiPaneReaderWidget)),
+      ).read(readerKeyboardBridgeProvider).handle!;
+      final position = tester
+          .stateList<ScrollableState>(find.byType(Scrollable))
+          .map((s) => s.position)
+          .singleWhere((p) => p.axis == Axis.vertical);
+      expect(position.maxScrollExtent, greaterThan(100));
+
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      await tester.pump(const Duration(milliseconds: 30));
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      await tester.pumpAndSettle();
+
+      expect(position.pixels, 100);
+
+      // The other way mid-scroll: up from where the page is, not on top of
+      // the pending ↓.
+      position.jumpTo(0);
+      await tester.pump();
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 30));
+      final atUp = position.pixels;
+      expect(atUp, greaterThan(0));
+      reader.scroll(AxisDirection.up, ScrollIncrementType.line);
+      await tester.pumpAndSettle();
+
+      expect(position.pixels, lessThan(atUp));
+    });
   });
 
   // ============================================================

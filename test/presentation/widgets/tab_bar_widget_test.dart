@@ -317,4 +317,50 @@ void main() {
       expect(offset(), greaterThan(0));
     });
   });
+
+  // ============================================================
+  // Active tab scrolls into view
+  // ============================================================
+  // The tab keys can make any tab active, however far off-screen it is.
+  group('Active tab scrolls into view', () {
+    final strip = find.byType(Scrollable);
+
+    ScrollPosition stripPosition(WidgetTester tester) =>
+        tester.state<ScrollableState>(strip).position;
+
+    Future<void> activate(WidgetTester tester, int index) async {
+      ProviderScope.containerOf(tester.element(find.byType(TabBarWidget)))
+          .read(activeTabIndexProvider.notifier)
+          .state = index;
+      await tester.pumpAndSettle();
+    }
+
+    void expectFullyOnScreen(WidgetTester tester, String label) {
+      final tab = tester.getRect(find.text(label));
+      final view = tester.getRect(strip);
+      expect(tab.left, greaterThanOrEqualTo(view.left));
+      expect(tab.right, lessThanOrEqualTo(view.right));
+    }
+
+    testWidgets('last tab → first, as the next-tab key wraps', (tester) async {
+      await pumpTenTabs(tester);
+      await activate(tester, 9);
+      expect(stripPosition(tester).pixels, greaterThan(0));
+
+      await activate(tester, 0);
+
+      expect(stripPosition(tester).pixels, 0);
+    });
+
+    testWidgets('a tab far off-screen after the strip was scrolled away',
+        (tester) async {
+      await pumpTenTabs(tester);
+      stripPosition(tester).jumpTo(stripPosition(tester).maxScrollExtent);
+      await tester.pumpAndSettle();
+
+      await activate(tester, 2);
+
+      expectFullyOnScreen(tester, 'Tab Number 2');
+    });
+  });
 }

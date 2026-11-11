@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/presentation/keyboard/keyboard_bindings.dart';
 import 'package:the_wisdom_project/presentation/keyboard/shortcut_intents.dart';
 import 'package:the_wisdom_project/presentation/providers/main_search_focus_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/search_mode_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_results_focus_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
@@ -32,9 +33,15 @@ void main() {
     }
   });
 
-  /// A search box and three results, with the results panel showing unless
-  /// [panelOpen] is false. Focus starts in the box.
-  Future<void> pumpSearch(WidgetTester tester, {bool panelOpen = true}) async {
+  /// A search box and three results, shown as the reader screen shows the
+  /// panel: only while it is visible, which it is unless [panelOpen] is
+  /// false. [mountedWhileHidden] keeps the results, so a test can check the
+  /// keys' own visibility check. Focus starts in the box.
+  Future<ProviderContainer> pumpSearch(
+    WidgetTester tester, {
+    bool panelOpen = true,
+    bool mountedWhileHidden = false,
+  }) async {
     final c = await pumpShortcutHost(
       tester,
       overrides: [
@@ -49,19 +56,30 @@ void main() {
           children: [
             TextField(focusNode: box),
             Consumer(
-              builder: (context, ref, _) => Focus(
-                focusNode: ref.watch(searchResultsFocusNodeProvider),
-                child: Column(
-                  children: [
-                    for (final (i, node) in stops.indexed)
-                      TextButton(
-                        focusNode: node,
-                        onPressed: () {},
-                        child: Text('result $i'),
-                      ),
-                  ],
-                ),
-              ),
+              builder: (context, ref, _) {
+                final visible = ref.watch(
+                  searchStateProvider.select((s) => s.isResultsPanelVisible),
+                );
+                if (!visible && !mountedWhileHidden) {
+                  return const SizedBox.shrink();
+                }
+                return Focus(
+                  focusNode: ref.watch(searchPanelFocusNodeProvider),
+                  child: Focus(
+                    focusNode: ref.watch(searchResultsFocusNodeProvider),
+                    child: Column(
+                      children: [
+                        for (final (i, node) in stops.indexed)
+                          TextButton(
+                            focusNode: node,
+                            onPressed: () {},
+                            child: Text('result $i'),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -70,6 +88,7 @@ void main() {
     c.read(mainSearchFocusNodeProvider.notifier).state = box;
     box.requestFocus();
     await tester.pump();
+    return c;
   }
 
   testWidgets('↓ and Tab go from the box to the first stop', (tester) async {
@@ -115,8 +134,24 @@ void main() {
     expect(stops[2].hasPrimaryFocus, isTrue);
   }, variant: mac);
 
+  // Esc and opening a result both close search this way. Flutter used to
+  // hand focus from the closing result back to the box, and the box
+  // reopened the panel, so it took a second Esc.
+  testWidgets('closing search from a result leaves the box unfocused',
+      (tester) async {
+    final c = await pumpSearch(tester);
+    await pressKeys(tester, LogicalKeyboardKey.arrowDown);
+    expect(stops[0].hasPrimaryFocus, isTrue);
+
+    c.read(closeSearchProvider)();
+    await tester.pump();
+
+    expect(find.text('result 0'), findsNothing);
+    expect(box.hasFocus, isFalse);
+  }, variant: mac);
+
   testWidgets('panel hidden: ↓ leaves focus in the box', (tester) async {
-    await pumpSearch(tester, panelOpen: false);
+    await pumpSearch(tester, panelOpen: false, mountedWhileHidden: true);
 
     await pressKeys(tester, LogicalKeyboardKey.arrowDown);
     expect(box.hasPrimaryFocus, isTrue);

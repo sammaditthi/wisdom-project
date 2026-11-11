@@ -30,8 +30,10 @@ void main() {
     const smaller = ShortcutKeys(LogicalKeyboardKey.minus, primary: true);
     expect(keyCapLabels(pageUp, TargetPlatform.macOS), ['fn', '↑']);
     expect(keyCapLabels(pageUp, TargetPlatform.windows), ['PgUp']);
+    const settings = ShortcutKeys(LogicalKeyboardKey.comma, primary: true);
+    expect(keyCapLabels(settings, TargetPlatform.macOS), ['⌘', ',']);
     expect(
-      keyCapLabels(previousSutta, TargetPlatform.macOS),
+      keyCapLabels(previousSutta, TargetPlatform.macOS, keyCap: '<'),
       ['⌥', '⌘', '<'],
     );
     // U+2212 MINUS SIGN, not the hyphen the key types.

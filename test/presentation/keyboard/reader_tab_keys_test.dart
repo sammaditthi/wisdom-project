@@ -87,6 +87,15 @@ void main() {
     await flushTabSaves(tester);
   }, variant: mac);
 
+  testWidgets('the keypad 3 works as the top-row 3', (tester) async {
+    final c = await pumpWithTabs(tester);
+
+    await pressKeys(tester, LogicalKeyboardKey.numpad3,
+        primary: true, alt: true);
+    expect(c.read(activeReaderLayoutProvider), ReaderLayout.sideBySide);
+    await flushTabSaves(tester);
+  }, variant: mac);
+
   testWidgets('Ctrl+Alt+3 in a text box goes to the box', (tester) async {
     final c = await pumpWithTabs(
       tester,

@@ -287,21 +287,51 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   }
 
   /// Flutter's own ScrollAction numbers: a line is 50 px, a page 0.8 of the
-  /// viewport, animated over 100 ms.
+  /// viewport. A page animates as Flutter's does; a line, see [_scrollLine].
   @override
   void scroll(AxisDirection direction, ScrollIncrementType type) {
+    final sign = direction == AxisDirection.up ? -1.0 : 1.0;
     for (final position in _scrollController.positions) {
-      final amount = type == ScrollIncrementType.page
-          ? position.viewportDimension * 0.8
-          : 50.0;
-      final delta = direction == AxisDirection.up ? -amount : amount;
-      position.animateTo(
-        (position.pixels + delta)
-            .clamp(position.minScrollExtent, position.maxScrollExtent),
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeInOut,
-      );
+      if (type == ScrollIncrementType.line) {
+        _scrollLine(position, sign * 50);
+      } else {
+        position.animateTo(
+          (position.pixels + sign * position.viewportDimension * 0.8)
+              .clamp(position.minScrollExtent, position.maxScrollExtent),
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+        );
+      }
     }
+  }
+
+  /// Where each position's running arrow scroll is heading.
+  final _lineTargets = <ScrollPosition, double>{};
+
+  /// A held arrow repeats faster than one scroll, so each press adds to where
+  /// the running one is heading while that is still ahead, with an ease-out
+  /// that starts at speed: no stop-start.
+  void _scrollLine(ScrollPosition position, double delta) {
+    final pending = _lineTargets[position];
+    final from = pending != null && (pending - position.pixels) * delta > 0
+        ? pending
+        : position.pixels;
+    final target = (from + delta)
+        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    // Held at the end: already heading there. Restarting would also let the
+    // old scroll's whenComplete drop the entry while this one still runs.
+    if (target == pending) return;
+    _lineTargets[position] = target;
+    position
+        .animateTo(
+      target,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    )
+        // Finished, or cut short by a drag, the wheel or a page key.
+        .whenComplete(() {
+      if (_lineTargets[position] == target) _lineTargets.remove(position);
+    });
   }
 
   /// One step action, or null when the corpus ends that way.

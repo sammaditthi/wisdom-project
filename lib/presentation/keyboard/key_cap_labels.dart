@@ -5,9 +5,13 @@ import 'keyboard_bindings.dart';
 /// The text on each key cap of [keys], for the Keyboard shortcuts tab.
 ///
 /// Mac: Apple's symbols in Apple's order (⌃ ⌥ ⇧ ⌘; this app has no ⌃).
-/// Elsewhere: Ctrl, Alt, Shift. The comma and period keys show as < and >,
-/// the direction they step in.
-List<String> keyCapLabels(ShortcutKeys keys, TargetPlatform platform) {
+/// Elsewhere: Ctrl, Alt, Shift. [keyCap], when given, stands in for the
+/// key's own label (the sutta keys' < and >).
+List<String> keyCapLabels(
+  ShortcutKeys keys,
+  TargetPlatform platform, {
+  String? keyCap,
+}) {
   final mac = usesCommandKey(platform);
   return [
     if (mac) ...[
@@ -19,13 +23,11 @@ List<String> keyCapLabels(ShortcutKeys keys, TargetPlatform platform) {
       if (keys.alt) 'Alt',
       if (keys.shift) 'Shift',
     ],
-    ..._keyLabels(keys.key, mac: mac),
+    if (keyCap != null) keyCap else ..._keyLabels(keys.key, mac: mac),
   ];
 }
 
 List<String> _keyLabels(LogicalKeyboardKey key, {required bool mac}) {
-  if (key == LogicalKeyboardKey.comma) return const ['<'];
-  if (key == LogicalKeyboardKey.period) return const ['>'];
   if (key == LogicalKeyboardKey.equal) return const ['+'];
   if (key == LogicalKeyboardKey.minus) return const ['−']; // − sign
   if (key == LogicalKeyboardKey.arrowUp) return const ['↑'];

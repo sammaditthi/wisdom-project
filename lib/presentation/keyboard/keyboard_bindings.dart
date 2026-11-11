@@ -65,11 +65,15 @@ class AppShortcut {
     this.alsoKeys = const [],
     this.group,
     this.label,
+    this.keyCap,
     this.desktopOnly = true,
   }) : assert(group == null || label != null);
 
   /// The combo the Settings tab shows.
   final ShortcutKeys keys;
+
+  /// What the Settings tab prints for the key, when not the key's own label.
+  final String? keyCap;
 
   /// Also bound, never shown (e.g. the keypad's +).
   final List<ShortcutKeys> alsoKeys;
@@ -177,11 +181,12 @@ final List<AppShortcut> appShortcuts = [
   ),
 
   // ─── Layout ────────────────────────────────────────────────────────────
-  // ⌥⌘1–4 in the toolbar's left-to-right order. Not ⌘1–4: the browser's
-  // "go to tab 1–4".
+  // ⌥⌘1–4 in the toolbar's left-to-right order, top row or keypad. Not
+  // ⌘1–4: the browser's "go to tab 1–4".
   for (final (i, layout) in ReaderLayout.values.indexed)
     AppShortcut(
       keys: ShortcutKeys(_digits[i], primary: true, alt: true),
+      alsoKeys: [ShortcutKeys(_keypadDigits[i], primary: true, alt: true)],
       intent: SetLayoutIntent(layout),
       group: ShortcutGroup.layout,
       label: layout.label,
@@ -203,6 +208,7 @@ final List<AppShortcut> appShortcuts = [
     intent: const StepSuttaIntent(ReaderStep.previous),
     group: ShortcutGroup.reading,
     label: (l10n) => l10n.shortcutPreviousSutta,
+    keyCap: '<',
   ),
   AppShortcut(
     keys:
@@ -218,6 +224,7 @@ final List<AppShortcut> appShortcuts = [
     intent: const StepSuttaIntent(ReaderStep.next),
     group: ShortcutGroup.reading,
     label: (l10n) => l10n.shortcutNextSutta,
+    keyCap: '>',
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.keyB, primary: true),
@@ -316,6 +323,13 @@ const _digits = [
   LogicalKeyboardKey.digit2,
   LogicalKeyboardKey.digit3,
   LogicalKeyboardKey.digit4,
+];
+
+const _keypadDigits = [
+  LogicalKeyboardKey.numpad1,
+  LogicalKeyboardKey.numpad2,
+  LogicalKeyboardKey.numpad3,
+  LogicalKeyboardKey.numpad4,
 ];
 
 /// The shortcuts registered on [platform].

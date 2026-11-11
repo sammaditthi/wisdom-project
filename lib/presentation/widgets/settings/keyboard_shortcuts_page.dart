@@ -38,7 +38,7 @@ class KeyboardShortcutsPage extends StatelessWidget {
     AppLocalizations l10n,
     TargetPlatform platform,
     ShortcutGroup group,
-    List<({String label, List<ShortcutKeys> keys})> rows, {
+    List<({String label, List<AppShortcut> shortcuts})> rows, {
     required bool isFirst,
   }) {
     return SettingsSection(
@@ -50,7 +50,8 @@ class KeyboardShortcutsPage extends StatelessWidget {
             label: row.label,
             trailing: _KeyCombos(
               combos: [
-                for (final keys in row.keys) keyCapLabels(keys, platform),
+                for (final s in row.shortcuts)
+                  keyCapLabels(s.keys, platform, keyCap: s.keyCap),
               ],
             ),
             showDivider: i < rows.length - 1,
@@ -61,18 +62,18 @@ class KeyboardShortcutsPage extends StatelessWidget {
 
   /// One row per entry, except that consecutive entries with the same label
   /// (↑ and ↓ for Scroll) share one.
-  static List<({String label, List<ShortcutKeys> keys})> _rows(
+  static List<({String label, List<AppShortcut> shortcuts})> _rows(
     AppLocalizations l10n,
     List<AppShortcut> listed,
     ShortcutGroup group,
   ) {
-    final rows = <({String label, List<ShortcutKeys> keys})>[];
+    final rows = <({String label, List<AppShortcut> shortcuts})>[];
     for (final s in listed.where((s) => s.group == group)) {
       final label = s.label!(l10n);
       if (rows.isNotEmpty && rows.last.label == label) {
-        rows.last.keys.add(s.keys);
+        rows.last.shortcuts.add(s);
       } else {
-        rows.add((label: label, keys: [s.keys]));
+        rows.add((label: label, shortcuts: [s]));
       }
     }
     return rows;

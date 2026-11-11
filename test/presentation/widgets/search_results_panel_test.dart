@@ -323,6 +323,26 @@ void main() {
       expect(searchResultStops(results), contains(seeAll));
     });
 
+    testWidgets('the panel focus node wraps everything focusable',
+        (tester) async {
+      await _pumpPanel(
+        tester,
+        state: topResultsWith({SearchResultType.title: 5}),
+      );
+      await tester.pumpAndSettle();
+
+      final panel = ProviderScope.containerOf(
+        tester.element(find.byType(SearchResultsPanel)),
+      ).read(searchPanelFocusNodeProvider);
+      // Everything Tab reaches in this app is the panel's: chips, category
+      // tabs and results.
+      final focusable = FocusManager.instance.rootScope.traversalDescendants
+          .where((node) => node is! FocusScopeNode)
+          .toList();
+      expect(focusable, isNotEmpty);
+      expect(panel.traversalDescendants, containsAll(focusable));
+    });
+
     // ── "Show N more" in a full-text group ──────────────────────────────
 
     testWidgets('"Show 2 more" shows the hidden matches and "Show less"',
