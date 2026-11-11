@@ -26,27 +26,27 @@ Same keys on desktop and web. "Windows" also means Linux.
 | Group | Does | Mac | Windows | |
 | --- | --- | --- | --- | --- |
 | Search | Find in page | ⌘F | Ctrl+F | exists |
-| | Search the Tipiṭaka | ⇧⌘F | Ctrl+Shift+F | exists |
-| | Search box → results | ↓ or Tab | ↓ or Tab | new |
-| Reader tabs | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
-| | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
-| | Close the tab | ⌥⌘W | Ctrl+Alt+W | exists |
+| | Search | ⇧⌘F | Ctrl+Shift+F | exists |
+| | Go to results | ↓ or Tab | ↓ or Tab | new |
+| Reader | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
+| | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
+| | Close tab | ⌥⌘W | Ctrl+Alt+W | exists |
+| | Previous text | ⌥⌘< | Ctrl+Alt+< | new |
+| | Next text | ⌥⌘> | Ctrl+Alt+> | new |
+| | Show/hide navigator | ⌘B | Ctrl+B | new |
+| | Increase font size | ⌘+ | Ctrl++ | new |
+| | Decrease font size | ⌘− | Ctrl+− | new |
+| | Reset font size | ⌘0 | Ctrl+0 | new |
+| | Scroll | ↑ ↓ | ↑ ↓ | new |
+| | Scroll a page | PgUp PgDn or fn↑ fn↓ | PgUp PgDn | new |
 | Layout | Pali only | ⌥⌘1 | Ctrl+Alt+1 | new |
 | | Sinhala only | ⌥⌘2 | Ctrl+Alt+2 | new |
 | | Side by side | ⌥⌘3 | Ctrl+Alt+3 | new |
 | | Stacked | ⌥⌘4 | Ctrl+Alt+4 | new |
-| Reading | Previous sutta | ⌥⌘< | Ctrl+Alt+< | new |
-| | Next sutta | ⌥⌘> | Ctrl+Alt+> | new |
-| | Show / hide the navigator | ⌘B | Ctrl+B | new |
-| | Text bigger | ⌘+ | Ctrl++ | new |
-| | Text smaller | ⌘− | Ctrl+− | new |
-| | Text back to normal | ⌘0 | Ctrl+0 | new |
-| | Scroll | ↑ ↓ | ↑ ↓ | new |
-| | Scroll a page | PgUp PgDn (fn↑ fn↓) | PgUp PgDn | new |
-| Everywhere | Open Settings | ⌘, | Ctrl+, | new |
-| | Open this list | ⌘/ | Ctrl+/ | new |
-| | Copy the selection | ⌘C | Ctrl+C | exists |
-| | Close a menu, panel or dialog | Esc | Esc | exists |
+| App | Settings | ⌘, | Ctrl+, | new |
+| | Keyboard shortcuts | ⌘/ | Ctrl+/ | new |
+| | Copy | ⌘C | Ctrl+C | exists |
+| | Close menu, panel or dialog | Esc | Esc | exists |
 
 ## How the keys were chosen
 
@@ -56,7 +56,7 @@ Same keys on desktop and web. "Windows" also means Linux.
   (⌘W, ⌥⌘←/→, ⇧⌘[ ], Ctrl+Tab, Ctrl+PgUp/PgDn). ⌘1–4 is the browser's "go to
   tab 1–4". So the reader-tab keys are ⌥⌘: W closes, [ ] move, 1–4 set the
   layout, in the toolbar's left-to-right order (`ReaderLayout.values`), and
-  < > step to the previous or next sutta, pointing the way the toolbar's
+  < > step to the previous or next text, pointing the way the toolbar's
   ⏮ ⏭ buttons do. Plain ← → (as in Kindle and Apple Books) was turned down: a
   stray press leaves a long sutta, and coming back starts it at the top.
 - **⇧ makes the same key reach further:** ⌘F finds in the page, ⇧⌘F searches
@@ -109,7 +109,7 @@ Same keys on desktop and web. "Windows" also means Linux.
 - **Layout 1–4:** top row or keypad. Through `updateActiveTabLayoutProvider`,
   so the choice is also remembered for new tabs. The toolbar offers all four
   at every width, so there is no width check. Nothing with no tab open.
-- **Previous / next sutta:** does exactly what the toolbar's ⏮ ⏭ buttons do,
+- **Previous / next text:** does exactly what the toolbar's ⏮ ⏭ buttons do,
   through the same code. Today that code is inside the reader widget
   (`_navigateToSutta` in `multi_pane_reader_widget.dart`, which also resets
   the scroll anchor, so it needs the widget). The mounted reader attaches
@@ -127,7 +127,7 @@ Same keys on desktop and web. "Windows" also means Linux.
   controller for every layout, so side by side scrolls as one. Only when
   focus is in the reader or on nothing. On a navigator row, a tab or a button
   the arrows keep their usual job of moving focus *(my call)*.
-- **Search box → results:** with the main search box focused and results
+- **Go to results:** with the main search box focused and results
   showing, ↓ or Tab moves to the first stop in the visible results tab. The
   stops are everything there that takes focus, in order: the reference row
   (e.g. "SN 15.3"), result rows, "See all" and "Show N more" — the same stops
@@ -137,11 +137,11 @@ Same keys on desktop and web. "Windows" also means Linux.
   come after the results in Tab order. With no results, ↓ and Tab work as
   today. Matches the static site's search dialog (`site.js`), which steps
   through every link.
-- **Open Settings:** opens on General. Works with the rail hidden, which
+- **Settings:** opens on General. Works with the rail hidden, which
   closes `app-settings-dialog.md` Decision 7. If Settings is already open,
   nothing happens *(my call)*.
-- **Open this list:** opens Settings on the Keyboard shortcuts tab. Same rule
-  when Settings is already open.
+- **Keyboard shortcuts:** opens Settings on the Keyboard shortcuts tab. Same
+  rule when Settings is already open.
 
 ## The Settings tab
 
@@ -151,9 +151,16 @@ Same keys on desktop and web. "Windows" also means Linux.
   entry, keys on the right as key caps, styled like the board.
 - **Mac:** symbols in Apple's order, ⌃ ⌥ ⇧ ⌘, then the key: `⌥ ⌘ W`.
   **Windows:** words: `Ctrl Alt W`. One key cap per key, as on the board.
-- The four layout rows reuse the layout names already in the ARB files.
-- Sinhala labels: drafted, then reviewed with the user before merge, as the
-  settings dialog's copy was.
+- **"or"** joins two keys that do the same thing: ↓ or Tab, and on a Mac
+  PgUp or fn ↑ (Mac laptops have no Page Up). Keys side by side without it
+  are a pair: ↑ ↓. Single keys share a line; pairs take a line per way
+  (PgUp PgDn, then or fn ↑ fn ↓), so the row stays narrow.
+- **Labels** (English and Sinhala reviewed with the user 2026-11-11): short,
+  no "the", and the app's own words. "Text", not "sutta": the keys also step
+  through commentaries. "Search", as on the search box: it searches the
+  commentaries too, so not "Tipitaka". "Font size", as on the reader menu's
+  slider. Previous before next, as the toolbar's ⏮ ⏭. Settings, Keyboard
+  shortcuts and the layout rows reuse the strings already in the ARB files.
 
 ## Not in this round
 

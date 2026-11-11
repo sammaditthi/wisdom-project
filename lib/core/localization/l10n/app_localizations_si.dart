@@ -713,49 +713,46 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutGroupSearch => 'සෙවීම';
 
   @override
-  String get shortcutGroupReaderTabs => 'කියවීම් ටැබ';
+  String get shortcutGroupReader => 'කියවීම';
 
   @override
   String get shortcutGroupLayout => 'පිරිසැලසුම';
 
   @override
-  String get shortcutGroupReading => 'කියවීම';
+  String get shortcutGroupApp => 'යෙදුම';
 
   @override
-  String get shortcutGroupEverywhere => 'සෑම තැනම';
+  String get shortcutOr => 'හෝ';
 
   @override
-  String get shortcutSearchTipitaka => 'ත්‍රිපිටකයේ සොයන්න';
+  String get shortcutGoToResults => 'ප්‍රතිඵල වෙත යන්න';
 
   @override
-  String get shortcutSearchToResults => 'සෙවුම් කොටුවේ සිට ප්‍රතිඵල වෙත';
+  String get shortcutPreviousTab => 'පෙර ටැබ් එක';
 
   @override
-  String get shortcutNextTab => 'ඊළඟ ටැබය';
+  String get shortcutNextTab => 'ඊළඟ ටැබ් එක';
 
   @override
-  String get shortcutPreviousTab => 'පෙර ටැබය';
+  String get shortcutCloseTab => 'ටැබ් එක වසන්න';
 
   @override
-  String get shortcutCloseTab => 'ටැබය වසන්න';
+  String get shortcutPreviousText => 'පෙර පෙළ';
 
   @override
-  String get shortcutPreviousSutta => 'පෙර සූත්‍රය';
+  String get shortcutNextText => 'ඊළඟ පෙළ';
 
   @override
-  String get shortcutNextSutta => 'ඊළඟ සූත්‍රය';
+  String get shortcutToggleNavigator => 'පටුන පෙන්වන්න/සඟවන්න';
 
   @override
-  String get shortcutToggleNavigator => 'පටුන පෙන්වන්න හෝ සඟවන්න';
+  String get shortcutIncreaseFontSize => 'අකුරු විශාල කරන්න';
 
   @override
-  String get shortcutTextBigger => 'අකුරු විශාල කරන්න';
+  String get shortcutDecreaseFontSize => 'අකුරු කුඩා කරන්න';
 
   @override
-  String get shortcutTextSmaller => 'අකුරු කුඩා කරන්න';
-
-  @override
-  String get shortcutTextNormal => 'අකුරු සාමාන්‍ය ප්‍රමාණයට';
+  String get shortcutResetFontSize => 'අකුරු ප්‍රමාණය යළි සකසන්න';
 
   @override
   String get shortcutScroll => 'අනුචලනය';
@@ -764,14 +761,8 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutScrollPage => 'පිටුවක් අනුචලනය';
 
   @override
-  String get shortcutOpenSettings => 'සැකසුම් විවෘත කරන්න';
+  String get shortcutCopy => 'පිටපත් කරන්න';
 
   @override
-  String get shortcutOpenShortcutList => 'මෙම ලැයිස්තුව විවෘත කරන්න';
-
-  @override
-  String get shortcutCopy => 'තේරූ කොටස පිටපත් කරන්න';
-
-  @override
-  String get shortcutCloseOverlay => 'මෙනුවක්, පුවරුවක් හෝ කවුළුවක් වසන්න';
+  String get shortcutCloseOverlay => 'මෙනුවක්, පැනලයක් හෝ සංවාද කොටුවක් වසන්න';
 }

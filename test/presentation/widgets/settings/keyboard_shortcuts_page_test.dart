@@ -16,8 +16,8 @@ void main() {
     expect(find.text('Find in page'), findsOneWidget);
   }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
-  // The , and . keys show as < and > only where they step through suttas.
-  testWidgets('Open Settings shows a comma; the sutta keys show < and >',
+  // The , and . keys show as < and > only where they step through texts.
+  testWidgets('Settings shows a comma; the text step keys show < and >',
       (tester) async {
     // Tall enough that the list builds every row.
     tester.view.physicalSize = const Size(800, 3000);
@@ -34,9 +34,9 @@ void main() {
         .where((text) => text != label)
         .toList();
 
-    expect(capsOf('Open Settings'), ['⌘', ',']);
-    expect(capsOf('Previous sutta'), ['⌥', '⌘', '<']);
-    expect(capsOf('Next sutta'), ['⌥', '⌘', '>']);
+    expect(capsOf('Settings'), ['⌘', ',']);
+    expect(capsOf('Previous text'), ['⌥', '⌘', '<']);
+    expect(capsOf('Next text'), ['⌥', '⌘', '>']);
   }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
   testWidgets('Windows shows Ctrl, not ⌘', (tester) async {
@@ -46,4 +46,19 @@ void main() {
     expect(find.text('⌘'), findsNothing);
     expect(find.text('Find in page'), findsOneWidget);
   }, variant: TargetPlatformVariant.only(TargetPlatform.windows));
+
+  // The widest keys are the Mac's Scroll a page row: PgUp PgDn, then
+  // "or fn ↑ fn ↓" on a second line. A row that outgrows a narrow window
+  // overflows (warning stripes, cut-off keys).
+  testWidgets('fits a 300px-wide window', (tester) async {
+    tester.view.physicalSize = const Size(300, 3000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpAppWithScaffold(const KeyboardShortcutsPage());
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Scroll a page'), findsOneWidget);
+  },
+      variant: const TargetPlatformVariant(
+          {TargetPlatform.macOS, TargetPlatform.windows}));
 }

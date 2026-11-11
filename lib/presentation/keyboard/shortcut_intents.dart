@@ -97,7 +97,7 @@ class PreviousSearchResultIntent extends Intent {
   const PreviousSearchResultIntent();
 }
 
-/// Go to the previous or next sutta (⌥⌘< >), as the toolbar's ⏮ ⏭ do.
+/// Go to the previous or next text (⌥⌘< >), as the toolbar's ⏮ ⏭ do.
 class StepSuttaIntent extends Intent {
   const StepSuttaIntent(this.step);
 

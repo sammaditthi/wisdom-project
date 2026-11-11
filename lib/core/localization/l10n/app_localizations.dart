@@ -206,7 +206,7 @@ abstract class AppLocalizations {
   /// **'Collapse all'**
   String get collapseAll;
 
-  /// Label for settings menu
+  /// Label for settings menu. Also the label of the ⌘, row in the Keyboard shortcuts tab
   ///
   /// In en, this message translates to:
   /// **'Settings'**
@@ -308,7 +308,7 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get close;
 
-  /// Hint text shown in search input field
+  /// Hint text shown in search input field. Also the label of the ⇧⌘F row in the Keyboard shortcuts tab, so it names what the box says
   ///
   /// In en, this message translates to:
   /// **'Search'**
@@ -1346,7 +1346,7 @@ abstract class AppLocalizations {
   /// **'Open {name}'**
   String openLinkTo(String name);
 
-  /// Settings dialog: name of the tab listing every keyboard shortcut (desktop only)
+  /// Settings dialog: name of the tab listing every keyboard shortcut (desktop only). Also the label of the ⌘/ row in that tab
   ///
   /// In en, this message translates to:
   /// **'Keyboard shortcuts'**
@@ -1358,11 +1358,11 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get shortcutGroupSearch;
 
-  /// Keyboard shortcuts tab: section of the keys that move between and close reader tabs
+  /// Keyboard shortcuts tab: section of the keys used in the reader (tabs, previous/next text, navigator, font size, scroll)
   ///
   /// In en, this message translates to:
-  /// **'Reader tabs'**
-  String get shortcutGroupReaderTabs;
+  /// **'Reader'**
+  String get shortcutGroupReader;
 
   /// Keyboard shortcuts tab: section of the keys that switch the reading layout
   ///
@@ -1370,35 +1370,23 @@ abstract class AppLocalizations {
   /// **'Layout'**
   String get shortcutGroupLayout;
 
-  /// Keyboard shortcuts tab: section of the keys used while reading (sutta, text size, scroll, navigator)
+  /// Keyboard shortcuts tab: last section, the keys that work anywhere in the app (Settings, this list, copy, Esc)
   ///
   /// In en, this message translates to:
-  /// **'Reading'**
-  String get shortcutGroupReading;
+  /// **'App'**
+  String get shortcutGroupApp;
 
-  /// Keyboard shortcuts tab: section of the keys that work anywhere in the app
+  /// Keyboard shortcuts tab: word between two keys that do the same thing (↓ or Tab)
   ///
   /// In en, this message translates to:
-  /// **'Everywhere'**
-  String get shortcutGroupEverywhere;
-
-  /// Keyboard shortcuts tab: row for the key that jumps to the main search box
-  ///
-  /// In en, this message translates to:
-  /// **'Search the Tipitaka'**
-  String get shortcutSearchTipitaka;
+  /// **'or'**
+  String get shortcutOr;
 
   /// Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results
   ///
   /// In en, this message translates to:
-  /// **'Search box to results'**
-  String get shortcutSearchToResults;
-
-  /// Keyboard shortcuts tab: row for the key that moves to the next reader tab
-  ///
-  /// In en, this message translates to:
-  /// **'Next tab'**
-  String get shortcutNextTab;
+  /// **'Go to results'**
+  String get shortcutGoToResults;
 
   /// Keyboard shortcuts tab: row for the key that moves to the previous reader tab
   ///
@@ -1406,47 +1394,53 @@ abstract class AppLocalizations {
   /// **'Previous tab'**
   String get shortcutPreviousTab;
 
+  /// Keyboard shortcuts tab: row for the key that moves to the next reader tab
+  ///
+  /// In en, this message translates to:
+  /// **'Next tab'**
+  String get shortcutNextTab;
+
   /// Keyboard shortcuts tab: row for the key that closes the active reader tab
   ///
   /// In en, this message translates to:
-  /// **'Close the tab'**
+  /// **'Close tab'**
   String get shortcutCloseTab;
 
-  /// Keyboard shortcuts tab: row for the key that opens the previous sutta, like the toolbar's previous button
+  /// Keyboard shortcuts tab: row for the key that opens the previous text (sutta, commentary section…), like the toolbar's previous button
   ///
   /// In en, this message translates to:
-  /// **'Previous sutta'**
-  String get shortcutPreviousSutta;
+  /// **'Previous text'**
+  String get shortcutPreviousText;
 
-  /// Keyboard shortcuts tab: row for the key that opens the next sutta, like the toolbar's next button
+  /// Keyboard shortcuts tab: row for the key that opens the next text (sutta, commentary section…), like the toolbar's next button
   ///
   /// In en, this message translates to:
-  /// **'Next sutta'**
-  String get shortcutNextSutta;
+  /// **'Next text'**
+  String get shortcutNextText;
 
   /// Keyboard shortcuts tab: row for the key that shows or hides the navigator (the tree of texts)
   ///
   /// In en, this message translates to:
-  /// **'Show or hide the navigator'**
+  /// **'Show/hide navigator'**
   String get shortcutToggleNavigator;
 
-  /// Keyboard shortcuts tab: row for the key that makes the text bigger
+  /// Keyboard shortcuts tab: row for the key that moves the reader menu's Font size slider up
   ///
   /// In en, this message translates to:
-  /// **'Text bigger'**
-  String get shortcutTextBigger;
+  /// **'Increase font size'**
+  String get shortcutIncreaseFontSize;
 
-  /// Keyboard shortcuts tab: row for the key that makes the text smaller
+  /// Keyboard shortcuts tab: row for the key that moves the reader menu's Font size slider down
   ///
   /// In en, this message translates to:
-  /// **'Text smaller'**
-  String get shortcutTextSmaller;
+  /// **'Decrease font size'**
+  String get shortcutDecreaseFontSize;
 
-  /// Keyboard shortcuts tab: row for the key that returns the text to its default size
+  /// Keyboard shortcuts tab: row for the key that returns the font size to its default
   ///
   /// In en, this message translates to:
-  /// **'Text back to normal'**
-  String get shortcutTextNormal;
+  /// **'Reset font size'**
+  String get shortcutResetFontSize;
 
   /// Keyboard shortcuts tab: row for the up and down arrow keys, which scroll the text a little
   ///
@@ -1454,34 +1448,22 @@ abstract class AppLocalizations {
   /// **'Scroll'**
   String get shortcutScroll;
 
-  /// Keyboard shortcuts tab: row for Page Up and Page Down, which scroll the text a page
+  /// Keyboard shortcuts tab: row for Page Up and Page Down (fn + arrow on a Mac laptop), which scroll the text a page
   ///
   /// In en, this message translates to:
   /// **'Scroll a page'**
   String get shortcutScrollPage;
 
-  /// Keyboard shortcuts tab: row for the key that opens the Settings dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Open Settings'**
-  String get shortcutOpenSettings;
-
-  /// Keyboard shortcuts tab: row for the key that opens Settings on this Keyboard shortcuts tab
-  ///
-  /// In en, this message translates to:
-  /// **'Open this list'**
-  String get shortcutOpenShortcutList;
-
   /// Keyboard shortcuts tab: row for the copy key
   ///
   /// In en, this message translates to:
-  /// **'Copy the selection'**
+  /// **'Copy'**
   String get shortcutCopy;
 
   /// Keyboard shortcuts tab: row for Esc, which closes the most recently opened menu, panel or dialog
   ///
   /// In en, this message translates to:
-  /// **'Close a menu, panel or dialog'**
+  /// **'Close menu, panel or dialog'**
   String get shortcutCloseOverlay;
 }
 

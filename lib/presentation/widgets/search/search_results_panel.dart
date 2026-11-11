@@ -46,7 +46,7 @@ class SearchResultsPanel extends ConsumerWidget {
 
     // Tab reaches the results before the chips and the tab bar above them,
     // and the results sit in the node the ↓ / Tab shortcuts look in
-    // (keyboard-shortcuts-sheet.md, Search box → results). The whole panel
+    // (keyboard-shortcuts-sheet.md, Go to results). The whole panel
     // sits in the node closing search releases focus from.
     return Material(
       color: theme.colorScheme.surface,

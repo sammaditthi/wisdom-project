@@ -6,7 +6,7 @@ import 'keyboard_bindings.dart';
 ///
 /// Mac: Apple's symbols in Apple's order (⌃ ⌥ ⇧ ⌘; this app has no ⌃).
 /// Elsewhere: Ctrl, Alt, Shift. [keyCap], when given, stands in for the
-/// key's own label (the sutta keys' < and >).
+/// key's own label (the previous/next text keys' < and >).
 List<String> keyCapLabels(
   ShortcutKeys keys,
   TargetPlatform platform, {
@@ -23,23 +23,38 @@ List<String> keyCapLabels(
       if (keys.alt) 'Alt',
       if (keys.shift) 'Shift',
     ],
-    if (keyCap != null) keyCap else ..._keyLabels(keys.key, mac: mac),
+    keyCap ?? _keyLabel(keys.key),
   ];
 }
 
-List<String> _keyLabels(LogicalKeyboardKey key, {required bool mac}) {
-  if (key == LogicalKeyboardKey.equal) return const ['+'];
-  if (key == LogicalKeyboardKey.minus) return const ['−']; // − sign
-  if (key == LogicalKeyboardKey.arrowUp) return const ['↑'];
-  if (key == LogicalKeyboardKey.arrowDown) return const ['↓'];
-  if (key == LogicalKeyboardKey.escape) return const ['Esc'];
-  if (key == LogicalKeyboardKey.tab) return const ['Tab'];
-  // Mac laptops have no Page Up / Page Down; fn plus an arrow sends them.
-  if (key == LogicalKeyboardKey.pageUp) {
-    return mac ? const ['fn', '↑'] : const ['PgUp'];
-  }
-  if (key == LogicalKeyboardKey.pageDown) {
-    return mac ? const ['fn', '↓'] : const ['PgDn'];
-  }
-  return [key.keyLabel.toUpperCase()];
+/// Every way to press [keys], as key caps. One, except Page Up / Page Down on
+/// a Mac: laptops have no such keys, and fn plus an arrow sends them.
+List<List<String>> keyCapWays(
+  ShortcutKeys keys,
+  TargetPlatform platform, {
+  String? keyCap,
+}) {
+  final caps = keyCapLabels(keys, platform, keyCap: keyCap);
+  final arrow = switch (keys.key) {
+    LogicalKeyboardKey.pageUp => '↑',
+    LogicalKeyboardKey.pageDown => '↓',
+    _ => null,
+  };
+  if (arrow == null || !usesCommandKey(platform)) return [caps];
+  return [
+    caps,
+    [...caps.take(caps.length - 1), 'fn', arrow],
+  ];
+}
+
+String _keyLabel(LogicalKeyboardKey key) {
+  if (key == LogicalKeyboardKey.equal) return '+';
+  if (key == LogicalKeyboardKey.minus) return '−'; // − sign
+  if (key == LogicalKeyboardKey.arrowUp) return '↑';
+  if (key == LogicalKeyboardKey.arrowDown) return '↓';
+  if (key == LogicalKeyboardKey.escape) return 'Esc';
+  if (key == LogicalKeyboardKey.tab) return 'Tab';
+  if (key == LogicalKeyboardKey.pageUp) return 'PgUp';
+  if (key == LogicalKeyboardKey.pageDown) return 'PgDn';
+  return key.keyLabel.toUpperCase();
 }

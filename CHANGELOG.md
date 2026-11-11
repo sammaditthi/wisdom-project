@@ -2,7 +2,7 @@
 
 ## Unreleased
 ### New
-- Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next sutta, resize text and more
+- Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next text, change the font size and more
 
 ## 1.2.0 - 2026-11-08
 ### New

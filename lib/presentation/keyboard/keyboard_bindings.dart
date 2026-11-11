@@ -14,7 +14,7 @@ import 'shortcut_intents.dart';
 /// chosen: `docs/todo/reader/keyboard-shortcuts-sheet.md`.
 
 /// Sections of the Settings tab, in the order they show.
-enum ShortcutGroup { search, readerTabs, layout, reading, everywhere }
+enum ShortcutGroup { search, reader, layout, app }
 
 /// A key and its modifiers. [primary] is ⌘ on Apple platforms, Ctrl
 /// elsewhere, so a shortcut is written once for every platform.
@@ -62,6 +62,7 @@ class AppShortcut {
   const AppShortcut({
     required this.keys,
     required this.intent,
+    this.orKeys = const [],
     this.alsoKeys = const [],
     this.group,
     this.label,
@@ -74,6 +75,9 @@ class AppShortcut {
 
   /// What the Settings tab prints for the key, when not the key's own label.
   final String? keyCap;
+
+  /// Also bound, and shown after "or" (↓ or Tab).
+  final List<ShortcutKeys> orKeys;
 
   /// Also bound, never shown (e.g. the keypad's +).
   final List<ShortcutKeys> alsoKeys;
@@ -115,22 +119,18 @@ final List<AppShortcut> appShortcuts = [
     keys: const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true, shift: true),
     intent: const OpenMainSearchIntent(),
     group: ShortcutGroup.search,
-    label: (l10n) => l10n.shortcutSearchTipitaka,
+    // The search box's own word: it searches the commentaries too.
+    label: (l10n) => l10n.searchHint,
     desktopOnly: false,
   ),
-  // Same label: ↓ and Tab share one row. Before the scroll keys, so in the
-  // search box ↓ means "to the results", not "scroll".
+  // Before the scroll keys, so in the search box ↓ means "to the results",
+  // not "scroll".
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
+    orKeys: const [ShortcutKeys(LogicalKeyboardKey.tab)],
     intent: const MoveIntoSearchResultsIntent(),
     group: ShortcutGroup.search,
-    label: (l10n) => l10n.shortcutSearchToResults,
-  ),
-  AppShortcut(
-    keys: const ShortcutKeys(LogicalKeyboardKey.tab),
-    intent: const MoveIntoSearchResultsIntent(),
-    group: ShortcutGroup.search,
-    label: (l10n) => l10n.shortcutSearchToResults,
+    label: (l10n) => l10n.shortcutGoToResults,
   ),
   // Moves inside the results; not listed.
   const AppShortcut(
@@ -146,19 +146,10 @@ final List<AppShortcut> appShortcuts = [
     intent: PreviousSearchResultIntent(),
   ),
 
-  // ─── Reader tabs ───────────────────────────────────────────────────────
+  // ─── Reader ────────────────────────────────────────────────────────────
+  // Previous before next, as the toolbar's ⏮ ⏭ and the keys [ ] and < >.
   // ⌥⌘ acts on the reader tab. Not ⌥⌘← →: Chrome keeps those for its own
   // tabs and the page never sees them. ⇧⌘[ ] is the browser's tab switch.
-  AppShortcut(
-    keys: const ShortcutKeys(
-      LogicalKeyboardKey.bracketRight,
-      primary: true,
-      alt: true,
-    ),
-    intent: const SwitchTabIntent(1),
-    group: ShortcutGroup.readerTabs,
-    label: (l10n) => l10n.shortcutNextTab,
-  ),
   AppShortcut(
     keys: const ShortcutKeys(
       LogicalKeyboardKey.bracketLeft,
@@ -166,8 +157,18 @@ final List<AppShortcut> appShortcuts = [
       alt: true,
     ),
     intent: const SwitchTabIntent(-1),
-    group: ShortcutGroup.readerTabs,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutPreviousTab,
+  ),
+  AppShortcut(
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    ),
+    intent: const SwitchTabIntent(1),
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutNextTab,
   ),
   // Not plain ⌘W: browsers keep it (close their tab) and the page never sees
   // the keydown. ⇧⌘W closes the browser window. Adding ⌥ is the closest
@@ -175,24 +176,10 @@ final List<AppShortcut> appShortcuts = [
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.keyW, primary: true, alt: true),
     intent: const CloseActiveTabIntent(),
-    group: ShortcutGroup.readerTabs,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutCloseTab,
     desktopOnly: false,
   ),
-
-  // ─── Layout ────────────────────────────────────────────────────────────
-  // ⌥⌘1–4 in the toolbar's left-to-right order, top row or keypad. Not
-  // ⌘1–4: the browser's "go to tab 1–4".
-  for (final (i, layout) in ReaderLayout.values.indexed)
-    AppShortcut(
-      keys: ShortcutKeys(_digits[i], primary: true, alt: true),
-      alsoKeys: [ShortcutKeys(_keypadDigits[i], primary: true, alt: true)],
-      intent: SetLayoutIntent(layout),
-      group: ShortcutGroup.layout,
-      label: layout.label,
-    ),
-
-  // ─── Reading ───────────────────────────────────────────────────────────
   // The , and . keys, marked < and >: they point the way the toolbar's ⏮ ⏭
   // do, and answer with or without ⇧. Not ⌥⌘← →, which Chrome keeps.
   AppShortcut(
@@ -206,8 +193,8 @@ final List<AppShortcut> appShortcuts = [
       ),
     ],
     intent: const StepSuttaIntent(ReaderStep.previous),
-    group: ShortcutGroup.reading,
-    label: (l10n) => l10n.shortcutPreviousSutta,
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutPreviousText,
     keyCap: '<',
   ),
   AppShortcut(
@@ -222,14 +209,14 @@ final List<AppShortcut> appShortcuts = [
       ),
     ],
     intent: const StepSuttaIntent(ReaderStep.next),
-    group: ShortcutGroup.reading,
-    label: (l10n) => l10n.shortcutNextSutta,
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutNextText,
     keyCap: '>',
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.keyB, primary: true),
     intent: const ToggleNavigatorIntent(),
-    group: ShortcutGroup.reading,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutToggleNavigator,
   ),
   // The browser's own zoom keys: same meaning, so the reader takes them.
@@ -240,8 +227,8 @@ final List<AppShortcut> appShortcuts = [
       ShortcutKeys(LogicalKeyboardKey.numpadAdd, primary: true),
     ],
     intent: const TextSizeIntent(TextSizeChange.bigger),
-    group: ShortcutGroup.reading,
-    label: (l10n) => l10n.shortcutTextBigger,
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutIncreaseFontSize,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.minus, primary: true),
@@ -249,70 +236,82 @@ final List<AppShortcut> appShortcuts = [
       ShortcutKeys(LogicalKeyboardKey.numpadSubtract, primary: true),
     ],
     intent: const TextSizeIntent(TextSizeChange.smaller),
-    group: ShortcutGroup.reading,
-    label: (l10n) => l10n.shortcutTextSmaller,
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutDecreaseFontSize,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.digit0, primary: true),
     alsoKeys: const [ShortcutKeys(LogicalKeyboardKey.numpad0, primary: true)],
     intent: const TextSizeIntent(TextSizeChange.normal),
-    group: ShortcutGroup.reading,
-    label: (l10n) => l10n.shortcutTextNormal,
+    group: ShortcutGroup.reader,
+    label: (l10n) => l10n.shortcutResetFontSize,
   ),
-  // Same label: ↑ and ↓ share one row in the Settings tab.
+  // Same label: ↑ and ↓ share one row in the Settings tab, as do PgUp PgDn.
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowUp),
     intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.line),
-    group: ShortcutGroup.reading,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScroll,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
     intent:
         const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.line),
-    group: ShortcutGroup.reading,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScroll,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.pageUp),
     intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.page),
-    group: ShortcutGroup.reading,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScrollPage,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.pageDown),
     intent:
         const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.page),
-    group: ShortcutGroup.reading,
+    group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScrollPage,
   ),
 
-  // ─── Everywhere ────────────────────────────────────────────────────────
+  // ─── Layout ────────────────────────────────────────────────────────────
+  // ⌥⌘1–4 in the toolbar's left-to-right order, top row or keypad. Not
+  // ⌘1–4: the browser's "go to tab 1–4".
+  for (final (i, layout) in ReaderLayout.values.indexed)
+    AppShortcut(
+      keys: ShortcutKeys(_digits[i], primary: true, alt: true),
+      alsoKeys: [ShortcutKeys(_keypadDigits[i], primary: true, alt: true)],
+      intent: SetLayoutIntent(layout),
+      group: ShortcutGroup.layout,
+      label: layout.label,
+    ),
+
+  // ─── App ───────────────────────────────────────────────────────────────
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.comma, primary: true),
     intent: const OpenSettingsIntent(SettingsTab.general),
-    group: ShortcutGroup.everywhere,
-    label: (l10n) => l10n.shortcutOpenSettings,
+    group: ShortcutGroup.app,
+    label: (l10n) => l10n.settings,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.slash, primary: true),
     intent: const OpenSettingsIntent(SettingsTab.shortcuts),
-    group: ShortcutGroup.everywhere,
-    label: (l10n) => l10n.shortcutOpenShortcutList,
+    group: ShortcutGroup.app,
+    label: (l10n) => l10n.settingsKeyboardShortcuts,
   ),
   // The action defers to the focused widget's own copy first, then falls
   // back to the last reader selection — which rescues ⌘C on web.
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.keyC, primary: true),
     intent: const SmartCopyIntent(),
-    group: ShortcutGroup.everywhere,
+    group: ShortcutGroup.app,
     label: (l10n) => l10n.shortcutCopy,
     desktopOnly: false,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.escape),
     intent: const DismissTopOverlayIntent(),
-    group: ShortcutGroup.everywhere,
+    group: ShortcutGroup.app,
     label: (l10n) => l10n.shortcutCloseOverlay,
     desktopOnly: false,
   ),
@@ -349,7 +348,7 @@ List<AppShortcut> shortcutsFor(TargetPlatform platform) {
 Map<ShortcutActivator, Intent> shortcutMap(TargetPlatform platform) {
   final intentsByKeys = <ShortcutKeys, List<Intent>>{};
   for (final s in shortcutsFor(platform)) {
-    for (final keys in [s.keys, ...s.alsoKeys]) {
+    for (final keys in [s.keys, ...s.orKeys, ...s.alsoKeys]) {
       (intentsByKeys[keys] ??= []).add(s.intent);
     }
   }

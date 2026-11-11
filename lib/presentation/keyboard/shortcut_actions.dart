@@ -288,7 +288,7 @@ class SetLayoutAction extends ContextAction<SetLayoutIntent> {
   }
 }
 
-/// Steps to the neighbouring sutta through the mounted reader, which runs the
+/// Steps to the neighbouring text through the mounted reader, which runs the
 /// toolbar buttons' own code. Nothing at the corpus edge, or while typing.
 class StepSuttaAction extends ContextAction<StepSuttaIntent> {
   final WidgetRef ref;

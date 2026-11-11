@@ -713,49 +713,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutGroupSearch => 'Search';
 
   @override
-  String get shortcutGroupReaderTabs => 'Reader tabs';
+  String get shortcutGroupReader => 'Reader';
 
   @override
   String get shortcutGroupLayout => 'Layout';
 
   @override
-  String get shortcutGroupReading => 'Reading';
+  String get shortcutGroupApp => 'App';
 
   @override
-  String get shortcutGroupEverywhere => 'Everywhere';
+  String get shortcutOr => 'or';
 
   @override
-  String get shortcutSearchTipitaka => 'Search the Tipitaka';
-
-  @override
-  String get shortcutSearchToResults => 'Search box to results';
-
-  @override
-  String get shortcutNextTab => 'Next tab';
+  String get shortcutGoToResults => 'Go to results';
 
   @override
   String get shortcutPreviousTab => 'Previous tab';
 
   @override
-  String get shortcutCloseTab => 'Close the tab';
+  String get shortcutNextTab => 'Next tab';
 
   @override
-  String get shortcutPreviousSutta => 'Previous sutta';
+  String get shortcutCloseTab => 'Close tab';
 
   @override
-  String get shortcutNextSutta => 'Next sutta';
+  String get shortcutPreviousText => 'Previous text';
 
   @override
-  String get shortcutToggleNavigator => 'Show or hide the navigator';
+  String get shortcutNextText => 'Next text';
 
   @override
-  String get shortcutTextBigger => 'Text bigger';
+  String get shortcutToggleNavigator => 'Show/hide navigator';
 
   @override
-  String get shortcutTextSmaller => 'Text smaller';
+  String get shortcutIncreaseFontSize => 'Increase font size';
 
   @override
-  String get shortcutTextNormal => 'Text back to normal';
+  String get shortcutDecreaseFontSize => 'Decrease font size';
+
+  @override
+  String get shortcutResetFontSize => 'Reset font size';
 
   @override
   String get shortcutScroll => 'Scroll';
@@ -764,14 +761,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutScrollPage => 'Scroll a page';
 
   @override
-  String get shortcutOpenSettings => 'Open Settings';
+  String get shortcutCopy => 'Copy';
 
   @override
-  String get shortcutOpenShortcutList => 'Open this list';
-
-  @override
-  String get shortcutCopy => 'Copy the selection';
-
-  @override
-  String get shortcutCloseOverlay => 'Close a menu, panel or dialog';
+  String get shortcutCloseOverlay => 'Close menu, panel or dialog';
 }

@@ -98,7 +98,7 @@
 
   "settings": "Settings",
   "@settings": {
-    "description": "Label for settings menu"
+    "description": "Label for settings menu. Also the label of the ⌘, row in the Keyboard shortcuts tab"
   },
 
   "theme": "Theme",
@@ -183,7 +183,7 @@
 
   "searchHint": "Search",
   "@searchHint": {
-    "description": "Hint text shown in search input field"
+    "description": "Hint text shown in search input field. Also the label of the ⇧⌘F row in the Keyboard shortcuts tab, so it names what the box says"
   },
 
   "isExactMatchToggle": "Exact word match",
@@ -1071,71 +1071,67 @@
   },
   "settingsKeyboardShortcuts": "Keyboard shortcuts",
   "@settingsKeyboardShortcuts": {
-    "description": "Settings dialog: name of the tab listing every keyboard shortcut (desktop only)"
+    "description": "Settings dialog: name of the tab listing every keyboard shortcut (desktop only). Also the label of the ⌘/ row in that tab"
   },
   "shortcutGroupSearch": "Search",
   "@shortcutGroupSearch": {
     "description": "Keyboard shortcuts tab: section of the search keys"
   },
-  "shortcutGroupReaderTabs": "Reader tabs",
-  "@shortcutGroupReaderTabs": {
-    "description": "Keyboard shortcuts tab: section of the keys that move between and close reader tabs"
+  "shortcutGroupReader": "Reader",
+  "@shortcutGroupReader": {
+    "description": "Keyboard shortcuts tab: section of the keys used in the reader (tabs, previous/next text, navigator, font size, scroll)"
   },
   "shortcutGroupLayout": "Layout",
   "@shortcutGroupLayout": {
     "description": "Keyboard shortcuts tab: section of the keys that switch the reading layout"
   },
-  "shortcutGroupReading": "Reading",
-  "@shortcutGroupReading": {
-    "description": "Keyboard shortcuts tab: section of the keys used while reading (sutta, text size, scroll, navigator)"
+  "shortcutGroupApp": "App",
+  "@shortcutGroupApp": {
+    "description": "Keyboard shortcuts tab: last section, the keys that work anywhere in the app (Settings, this list, copy, Esc)"
   },
-  "shortcutGroupEverywhere": "Everywhere",
-  "@shortcutGroupEverywhere": {
-    "description": "Keyboard shortcuts tab: section of the keys that work anywhere in the app"
+  "shortcutOr": "or",
+  "@shortcutOr": {
+    "description": "Keyboard shortcuts tab: word between two keys that do the same thing (↓ or Tab)"
   },
-  "shortcutSearchTipitaka": "Search the Tipitaka",
-  "@shortcutSearchTipitaka": {
-    "description": "Keyboard shortcuts tab: row for the key that jumps to the main search box"
-  },
-  "shortcutSearchToResults": "Search box to results",
-  "@shortcutSearchToResults": {
+  "shortcutGoToResults": "Go to results",
+  "@shortcutGoToResults": {
     "description": "Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results"
-  },
-  "shortcutNextTab": "Next tab",
-  "@shortcutNextTab": {
-    "description": "Keyboard shortcuts tab: row for the key that moves to the next reader tab"
   },
   "shortcutPreviousTab": "Previous tab",
   "@shortcutPreviousTab": {
     "description": "Keyboard shortcuts tab: row for the key that moves to the previous reader tab"
   },
-  "shortcutCloseTab": "Close the tab",
+  "shortcutNextTab": "Next tab",
+  "@shortcutNextTab": {
+    "description": "Keyboard shortcuts tab: row for the key that moves to the next reader tab"
+  },
+  "shortcutCloseTab": "Close tab",
   "@shortcutCloseTab": {
     "description": "Keyboard shortcuts tab: row for the key that closes the active reader tab"
   },
-  "shortcutPreviousSutta": "Previous sutta",
-  "@shortcutPreviousSutta": {
-    "description": "Keyboard shortcuts tab: row for the key that opens the previous sutta, like the toolbar's previous button"
+  "shortcutPreviousText": "Previous text",
+  "@shortcutPreviousText": {
+    "description": "Keyboard shortcuts tab: row for the key that opens the previous text (sutta, commentary section…), like the toolbar's previous button"
   },
-  "shortcutNextSutta": "Next sutta",
-  "@shortcutNextSutta": {
-    "description": "Keyboard shortcuts tab: row for the key that opens the next sutta, like the toolbar's next button"
+  "shortcutNextText": "Next text",
+  "@shortcutNextText": {
+    "description": "Keyboard shortcuts tab: row for the key that opens the next text (sutta, commentary section…), like the toolbar's next button"
   },
-  "shortcutToggleNavigator": "Show or hide the navigator",
+  "shortcutToggleNavigator": "Show/hide navigator",
   "@shortcutToggleNavigator": {
     "description": "Keyboard shortcuts tab: row for the key that shows or hides the navigator (the tree of texts)"
   },
-  "shortcutTextBigger": "Text bigger",
-  "@shortcutTextBigger": {
-    "description": "Keyboard shortcuts tab: row for the key that makes the text bigger"
+  "shortcutIncreaseFontSize": "Increase font size",
+  "@shortcutIncreaseFontSize": {
+    "description": "Keyboard shortcuts tab: row for the key that moves the reader menu's Font size slider up"
   },
-  "shortcutTextSmaller": "Text smaller",
-  "@shortcutTextSmaller": {
-    "description": "Keyboard shortcuts tab: row for the key that makes the text smaller"
+  "shortcutDecreaseFontSize": "Decrease font size",
+  "@shortcutDecreaseFontSize": {
+    "description": "Keyboard shortcuts tab: row for the key that moves the reader menu's Font size slider down"
   },
-  "shortcutTextNormal": "Text back to normal",
-  "@shortcutTextNormal": {
-    "description": "Keyboard shortcuts tab: row for the key that returns the text to its default size"
+  "shortcutResetFontSize": "Reset font size",
+  "@shortcutResetFontSize": {
+    "description": "Keyboard shortcuts tab: row for the key that returns the font size to its default"
   },
   "shortcutScroll": "Scroll",
   "@shortcutScroll": {
@@ -1143,21 +1139,13 @@
   },
   "shortcutScrollPage": "Scroll a page",
   "@shortcutScrollPage": {
-    "description": "Keyboard shortcuts tab: row for Page Up and Page Down, which scroll the text a page"
+    "description": "Keyboard shortcuts tab: row for Page Up and Page Down (fn + arrow on a Mac laptop), which scroll the text a page"
   },
-  "shortcutOpenSettings": "Open Settings",
-  "@shortcutOpenSettings": {
-    "description": "Keyboard shortcuts tab: row for the key that opens the Settings dialog"
-  },
-  "shortcutOpenShortcutList": "Open this list",
-  "@shortcutOpenShortcutList": {
-    "description": "Keyboard shortcuts tab: row for the key that opens Settings on this Keyboard shortcuts tab"
-  },
-  "shortcutCopy": "Copy the selection",
+  "shortcutCopy": "Copy",
   "@shortcutCopy": {
     "description": "Keyboard shortcuts tab: row for the copy key"
   },
-  "shortcutCloseOverlay": "Close a menu, panel or dialog",
+  "shortcutCloseOverlay": "Close menu, panel or dialog",
   "@shortcutCloseOverlay": {
     "description": "Keyboard shortcuts tab: row for Esc, which closes the most recently opened menu, panel or dialog"
   }
