@@ -27,7 +27,7 @@ Same keys on desktop and web. "Windows" also means Linux.
 | --- | --- | --- | --- | --- |
 | Search | Find in page | ⌘F | Ctrl+F | exists |
 | | Search | ⇧⌘F | Ctrl+Shift+F | exists |
-| | Go to results | ↓ or Tab | ↓ or Tab | new |
+| | Go to results | ↓ | ↓ | new |
 | Reader | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
 | | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
 | | Close tab | ⌥⌘W | Ctrl+Alt+W | exists |
@@ -128,15 +128,22 @@ Same keys on desktop and web. "Windows" also means Linux.
   focus is in the reader or on nothing. On a navigator row, a tab or a button
   the arrows keep their usual job of moving focus *(my call)*.
 - **Go to results:** with the main search box focused and results
-  showing, ↓ or Tab moves to the first stop in the visible results tab. The
-  stops are everything there that takes focus, in order: the reference row
-  (e.g. "SN 15.3"), result rows, "See all" and "Show N more" — the same stops
-  as Tab, so nothing is skipped *(my call)*. ↓ / ↑ step through them, and ↑
-  from the first goes back to the box; Shift+Tab from the first also goes
-  back. Enter opens a row (already works). The chips and the results tab bar
-  come after the results in Tab order. With no results, ↓ and Tab work as
-  today. Matches the static site's search dialog (`site.js`), which steps
-  through every link.
+  showing, ↓ moves to the first stop in the visible results tab. The stops
+  are everything there that takes focus, in order: the reference row (e.g.
+  "SN 15.3"), result rows, "See all" and "Show N more", so nothing is
+  skipped *(my call)*. ↓ / ↑ step through them, and ↑ from the first goes
+  back to the box. Enter opens a row (already works). With no results, ↓
+  works as today. Matches the static site's search dialog (`site.js`): the
+  arrows are a shortcut, Tab stays Tab.
+- **Tab in the panel** is not a shortcut, so it isn't listed: it walks the
+  panel in the order it shows (WCAG 2.4.3, as VS Code's search sidebar
+  does): match options, chips, results tabs, then the results. Two keys are
+  bound only because the panel is drawn over the reader and plain Tab would
+  leave the box for the app bar and the reader behind: Tab from the box goes
+  to the match options button, and Shift+Tab from that button back to the
+  box. The box's clear button is skipped, as a macOS search field's is.
+  With the list scrolled, Tab still goes chips → tabs → results, and the
+  result it lands on is scrolled into view, as in a browser.
 - **Settings:** opens on General. Works with the rail hidden, which
   closes `app-settings-dialog.md` Decision 7. If Settings is already open,
   nothing happens *(my call)*.
@@ -151,10 +158,10 @@ Same keys on desktop and web. "Windows" also means Linux.
   entry, keys on the right as key caps, styled like the board.
 - **Mac:** symbols in Apple's order, ⌃ ⌥ ⇧ ⌘, then the key: `⌥ ⌘ W`.
   **Windows:** words: `Ctrl Alt W`. One key cap per key, as on the board.
-- **"or"** joins two keys that do the same thing: ↓ or Tab, and on a Mac
-  PgUp or fn ↑ (Mac laptops have no Page Up). Keys side by side without it
-  are a pair: ↑ ↓. Single keys share a line; pairs take a line per way
-  (PgUp PgDn, then or fn ↑ fn ↓), so the row stays narrow.
+- **"or"** joins two ways to press the same keys: on a Mac, PgUp or fn ↑
+  (Mac laptops have no Page Up). Keys side by side without it are a pair:
+  ↑ ↓. Each way takes its own line (PgUp PgDn, then or fn ↑ fn ↓), so the
+  row stays narrow.
 - **Labels** (English and Sinhala reviewed with the user 2026-11-11): short,
   no "the", and the app's own words. "Text", not "sutta": the keys also step
   through commentaries. "Search", as on the search box: it searches the
@@ -193,7 +200,7 @@ Open — each needs someone at the keyboard:
    Flutter falls back to US keys for these; the static site needed its own
    fallback for letters (`site.js`), so confirm it on each platform.
 6. **Sinhala IME composing:** with a candidate list open in the search box,
-   ↓ and Tab go to the candidates, not to the results.
+   ↓ and Tab go to the candidates, not into the results panel.
 
 ## Left to the builder
 

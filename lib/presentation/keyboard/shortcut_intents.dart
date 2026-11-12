@@ -81,9 +81,25 @@ class SetLayoutIntent extends Intent {
   final ReaderLayout layout;
 }
 
-/// From the main search box to the first search result (↓ or Tab).
+/// Where the search box's keys land in the results panel.
+enum SearchPanelStop {
+  /// ↓: the first result.
+  firstResult,
+
+  /// Tab: the panel's first control, so Tab walks it in the order it shows.
+  firstControl,
+}
+
+/// From the main search box into the results panel (↓ or Tab).
 class MoveIntoSearchResultsIntent extends Intent {
-  const MoveIntoSearchResultsIntent();
+  const MoveIntoSearchResultsIntent(this.stop);
+
+  final SearchPanelStop stop;
+}
+
+/// From the panel's first control back to the search box (Shift+Tab).
+class BackToSearchBoxIntent extends Intent {
+  const BackToSearchBoxIntent();
 }
 
 /// To the next search result (↓ in the results).
@@ -92,7 +108,7 @@ class NextSearchResultIntent extends Intent {
 }
 
 /// To the previous search result, or from the first back to the search box
-/// (↑ or Shift+Tab in the results).
+/// (↑ in the results).
 class PreviousSearchResultIntent extends Intent {
   const PreviousSearchResultIntent();
 }

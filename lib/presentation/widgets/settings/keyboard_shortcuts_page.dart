@@ -60,18 +60,14 @@ class KeyboardShortcutsPage extends StatelessWidget {
   }
 
   /// The row's combos, once for each way to press them: way 0 is every
-  /// entry's own keys, the next ones its [AppShortcut.orKeys] or a Mac's fn
-  /// arrows (`PgUp PgDn`, then `fn ↑ fn ↓`).
+  /// entry's own keys, way 1 a Mac's fn arrows (`PgUp PgDn`, then
+  /// `fn ↑ fn ↓`).
   static List<List<_Combo>> _ways(
     List<AppShortcut> shortcuts,
     TargetPlatform platform,
   ) {
     final perEntry = [
-      for (final s in shortcuts)
-        [
-          ...keyCapWays(s.keys, platform, keyCap: s.keyCap),
-          for (final keys in s.orKeys) ...keyCapWays(keys, platform),
-        ],
+      for (final s in shortcuts) keyCapWays(s.keys, platform, keyCap: s.keyCap),
     ];
     // Way n lines up every entry's nth way, so each needs as many.
     assert(perEntry.every((ways) => ways.length == perEntry.first.length));
@@ -141,19 +137,7 @@ class _KeyCombos extends StatelessWidget {
           ],
         ),
     ];
-    // Single keys share a line (↓ or Tab). Pairs take a line per way
-    // (PgUp PgDn, then or fn ↑ fn ↓), which keeps the row narrow.
-    if (ways.every((combos) => combos.length == 1)) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final (w, part) in parts.indexed) ...[
-            if (w > 0) const SizedBox(width: 8),
-            part,
-          ],
-        ],
-      );
-    }
+    // A line per way (PgUp PgDn, then or fn ↑ fn ↓) keeps the row narrow.
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,

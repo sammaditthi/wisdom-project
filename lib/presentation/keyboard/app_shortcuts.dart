@@ -69,6 +69,7 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
           StepSuttaIntent: StepSuttaAction(ref),
           ScrollReaderIntent: ScrollReaderAction(ref, _idleFocus),
           MoveIntoSearchResultsIntent: MoveIntoSearchResultsAction(ref),
+          BackToSearchBoxIntent: BackToSearchBoxAction(ref),
           NextSearchResultIntent: NextSearchResultAction(ref),
           PreviousSearchResultIntent: PreviousSearchResultAction(ref),
           // A key used by several entries maps to PrioritizedIntents.

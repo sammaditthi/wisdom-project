@@ -62,7 +62,6 @@ class AppShortcut {
   const AppShortcut({
     required this.keys,
     required this.intent,
-    this.orKeys = const [],
     this.alsoKeys = const [],
     this.group,
     this.label,
@@ -75,9 +74,6 @@ class AppShortcut {
 
   /// What the Settings tab prints for the key, when not the key's own label.
   final String? keyCap;
-
-  /// Also bound, and shown after "or" (↓ or Tab).
-  final List<ShortcutKeys> orKeys;
 
   /// Also bound, never shown (e.g. the keypad's +).
   final List<ShortcutKeys> alsoKeys;
@@ -127,10 +123,20 @@ final List<AppShortcut> appShortcuts = [
   // not "scroll".
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
-    orKeys: const [ShortcutKeys(LogicalKeyboardKey.tab)],
-    intent: const MoveIntoSearchResultsIntent(),
+    intent: const MoveIntoSearchResultsIntent(SearchPanelStop.firstResult),
     group: ShortcutGroup.search,
     label: (l10n) => l10n.shortcutGoToResults,
+  ),
+  // Tab works as Tab, so it isn't listed. The panel is drawn over the reader,
+  // so plain Tab from the box would go on to the app bar and the reader behind
+  // it; these take it into the panel's first control and back.
+  const AppShortcut(
+    keys: ShortcutKeys(LogicalKeyboardKey.tab),
+    intent: MoveIntoSearchResultsIntent(SearchPanelStop.firstControl),
+  ),
+  const AppShortcut(
+    keys: ShortcutKeys(LogicalKeyboardKey.tab, shift: true),
+    intent: BackToSearchBoxIntent(),
   ),
   // Moves inside the results; not listed.
   const AppShortcut(
@@ -139,10 +145,6 @@ final List<AppShortcut> appShortcuts = [
   ),
   const AppShortcut(
     keys: ShortcutKeys(LogicalKeyboardKey.arrowUp),
-    intent: PreviousSearchResultIntent(),
-  ),
-  const AppShortcut(
-    keys: ShortcutKeys(LogicalKeyboardKey.tab, shift: true),
     intent: PreviousSearchResultIntent(),
   ),
 
@@ -348,7 +350,7 @@ List<AppShortcut> shortcutsFor(TargetPlatform platform) {
 Map<ShortcutActivator, Intent> shortcutMap(TargetPlatform platform) {
   final intentsByKeys = <ShortcutKeys, List<Intent>>{};
   for (final s in shortcutsFor(platform)) {
-    for (final keys in [s.keys, ...s.orKeys, ...s.alsoKeys]) {
+    for (final keys in [s.keys, ...s.alsoKeys]) {
       (intentsByKeys[keys] ??= []).add(s.intent);
     }
   }

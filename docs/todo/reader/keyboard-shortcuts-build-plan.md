@@ -57,10 +57,9 @@
 
   @immutable
   class AppShortcut {
-    const AppShortcut({required this.keys, required this.intent, this.orKeys = const [], this.alsoKeys = const [],
+    const AppShortcut({required this.keys, required this.intent, this.alsoKeys = const [],
         this.group, this.label, this.desktopOnly = true}); // asserts label != null when group != null
     final ShortcutKeys keys;           // the combo the Settings tab shows
-    final List<ShortcutKeys> orKeys;   // bound too, shown after "or" (↓ or Tab)
     final List<ShortcutKeys> alsoKeys; // bound too, never shown
     final Intent intent;
     final ShortcutGroup? group;        // null: bound but not listed
@@ -127,7 +126,7 @@ test('every listed entry has a label in English and Sinhala', () {
 | `keyC, primary` | `SmartCopyIntent` | app | `shortcutCopy` "Copy" / "පිටපත් කරන්න" |
 | `escape` | `DismissTopOverlayIntent` | app | `shortcutCloseOverlay` "Close menu, panel or dialog" / "මෙනුවක්, පැනලයක් හෝ සංවාද කොටුවක් වසන්න" |
 
-Keep the existing comments' *why* (e.g. why not plain ⌘W) above each entry, shortened. `shortcutMap` maps each of `keys`, `orKeys` and `alsoKeys` through `activatorFor`. `AppShortcuts` uses `shortcutMap(defaultTargetPlatform)`.
+Keep the existing comments' *why* (e.g. why not plain ⌘W) above each entry, shortened. `shortcutMap` maps each of `keys` and `alsoKeys` through `activatorFor`. `AppShortcuts` uses `shortcutMap(defaultTargetPlatform)`.
 
 - [ ] **Step 4: Run, expect PASS.** Also run `test/presentation/screens/app_shell_test.dart` — still passes.
 
@@ -203,7 +202,7 @@ testWidgets('Android has no Keyboard shortcuts tab', (tester) async {
 - [ ] **Step 3: Implement.**
   - `keyCapLabels`: modifiers first. Mac: `alt` ⌥, `shift` ⇧, `primary` ⌘, in that order. Elsewhere: `primary` Ctrl, `alt` Alt, `shift` Shift. Then the key: letters upper-case, digits as is, `[` `]`, comma `,`, period `.` (the sutta-step entries show `<` `>` through `AppShortcut.keyCap`), equal `+`, minus `−` (U+2212), slash `/`, ↑ ↓, Esc, Tab; `pageUp`/`pageDown` are `PgUp`/`PgDn`, and on a Mac `keyCapWays` adds `fn ↑`/`fn ↓` as a second way (Mac laptops have no Page Up); anything else `key.keyLabel`. After writing, dump the file's code points to check every symbol landed as itself.
   - `SettingsTab.shortcuts` (icon `Icons.keyboard_outlined`, label `settingsKeyboardShortcuts` "Keyboard shortcuts" / "යතුරුපුවරු කෙටිමං"). `available` keeps `shortcuts` only when `isDesktopPlatform`. The dialog uses `SettingsTab.available(defaultTargetPlatform)` for the TabController length, the sidebar, the tab bar and the index ↔ tab mapping; an `initial` not in the list falls back to General.
-  - `KeyboardShortcutsPage`: `shortcutsFor(defaultTargetPlatform)` where `group != null`, one `SettingsSection` per `ShortcutGroup` (first gets `isFirst`), one `SettingsRow` per entry with `trailing:` key caps. Consecutive entries with the same label share one row, their key groups side by side with a wider gap. An entry's `orKeys`, and a Mac's fn arrows for PgUp/PgDn (`keyCapWays`), follow `shortcutOr` "or" / "හෝ": single keys share a line (↓ or Tab), pairs take a line per way (PgUp PgDn, then or fn ↑ fn ↓). Section titles: `shortcutGroupSearch` "Search" / "සෙවීම", `shortcutGroupReader` "Reader" / "කියවීම", `shortcutGroupLayout` "Layout" / "පිරිසැලසුම", `shortcutGroupApp` "App" / "යෙදුම".
+  - `KeyboardShortcutsPage`: `shortcutsFor(defaultTargetPlatform)` where `group != null`, one `SettingsSection` per `ShortcutGroup` (first gets `isFirst`), one `SettingsRow` per entry with `trailing:` key caps. Consecutive entries with the same label share one row, their key groups side by side with a wider gap. A Mac's fn arrows for PgUp/PgDn (`keyCapWays`) follow `shortcutOr` "or" / "හෝ", a line per way (PgUp PgDn, then or fn ↑ fn ↓). Section titles: `shortcutGroupSearch` "Search" / "සෙවීම", `shortcutGroupReader` "Reader" / "කියවීම", `shortcutGroupLayout` "Layout" / "පිරිසැලසුම", `shortcutGroupApp` "App" / "යෙදුම".
   - Key cap (private widget): min 28×28, horizontal padding 7, border 1 with a 2 px bottom edge, radius 6, 13 px w600, from `colorScheme` roles (`outlineVariant` border, `surface` fill) — the board's look (`RefTabs.dc.html`).
   - Sinhala strings in this plan are drafts for the user's copy review.
 
@@ -427,7 +426,7 @@ testWidgets('the reader attaches to the keyboard bridge while mounted', (tester)
 
 ---
 
-### Task 7: Search box → results (↓, Tab, ↑, Shift+Tab)
+### Task 7: Search box → results (↓, ↑) and Tab into the panel
 
 **Files:**
 - Create: `lib/presentation/providers/search_results_focus_provider.dart`
@@ -441,8 +440,11 @@ testWidgets('the reader attaches to the keyboard bridge while mounted', (tester)
 - Produces:
   ```dart
   final searchResultsFocusNodeProvider = Provider<FocusNode>(...); // owned, canRequestFocus: false, skipTraversal: true
-  List<FocusNode> searchResultStops(FocusNode results); // focusable descendants, top then left
-  class MoveIntoSearchResultsIntent extends Intent { const MoveIntoSearchResultsIntent(); }
+  final searchPanelFocusNodeProvider = Provider<FocusNode>(...);   // same, around the whole panel
+  List<FocusNode> searchResultStops(FocusNode within); // focusable descendants, ReadingOrderTraversalPolicy.sort
+  enum SearchPanelStop { firstResult, firstControl }  // ↓, Tab
+  class MoveIntoSearchResultsIntent extends Intent { const MoveIntoSearchResultsIntent(this.stop); final SearchPanelStop stop; }
+  class BackToSearchBoxIntent extends Intent { const BackToSearchBoxIntent(); }
   class NextSearchResultIntent extends Intent { const NextSearchResultIntent(); }
   class PreviousSearchResultIntent extends Intent { const PreviousSearchResultIntent(); }
   ```
@@ -464,15 +466,18 @@ test('↓ tries results first, then scrolling', () {
 });
 ```
 
+Not in the repo yet (2026-11-12, Tab moved to follow the panel's own order): the host above has no header, so its two Tab tests pass either way. A scratch test on the real `SearchResultsPanel` with 20 title rows, scrolled 0 / 100 / 300 px, checked: Tab from the box lands on match options and Shift+Tab there returns to the box; Tab from the chips visits all four results tabs before any result; the first result Tab reaches is in view. Each failed on the code before its fix.
+
 - [ ] **Step 2: Run, expect FAIL.**
 
 - [ ] **Step 3: Implement.**
   - `shortcutMap`: group by `ShortcutKeys` (not by `SingleActivator`, which has no `==`); one intent stays as is, several become `PrioritizedIntents(orderedIntents: …)` in list order.
-  - `MoveIntoSearchResultsAction`: enabled when the main search node has focus, the results panel is visible and `searchResultStops` is not empty; focuses the first stop with `FocusTraversalPolicy.defaultTraversalRequestFocusCallback` (it scrolls the stop into view).
+  - `MoveIntoSearchResultsAction`: enabled when the main search node has focus, the results panel is visible and there is a target: the first of `searchResultStops(results)` for `firstResult`, or for `firstControl` the panel's first stop outside the results (a row scrolled up out of view sits above the header on screen, so it would sort first); focuses the first stop with `FocusTraversalPolicy.defaultTraversalRequestFocusCallback`, `keepVisibleAtStart` (scrolls back to it if it was scrolled away).
+  - `BackToSearchBoxAction`: enabled when the panel node has focus and the primary focus is that same first control; focuses the main search node. Anywhere else Shift+Tab is Flutter's own.
   - `NextSearchResultAction`: enabled when the results node has focus; next stop, or nothing on the last (still handled, so the reader can't scroll).
   - `PreviousSearchResultAction`: enabled when the results node has focus; previous stop, or the main search node from the first.
-  - Panel: `Focus(focusNode: …)` around `_ReferenceResultRow` and the results content. A `FocusTraversalGroup(policy: OrderedTraversalPolicy())` puts the results at `NumericFocusOrder(1)` and the header and tab bar at `2`.
-  - Entries, desktop only, **before the scroll entries**: `arrowDown` (`orKeys`: `tab`) → `MoveIntoSearchResultsIntent`, group search, label `shortcutGoToResults` "Go to results" / "ප්‍රතිඵල වෙත යන්න" (one row, "↓ or Tab"); then unlisted `arrowDown` → `NextSearchResultIntent`, `arrowUp` → `PreviousSearchResultIntent`, `tab, shift` → `PreviousSearchResultIntent`.
+  - Panel: `Focus(focusNode: …)` around `_ReferenceResultRow` and the results content, another around the whole panel. A `FocusTraversalGroup` around the panel, so Tab walks it as it shows (header, tabs, results) before leaving it, and one around the results, so they are one block placed where the list shows; without it, rows scrolled partly out of view sort in among the chips and tabs. Both use `ReadingOrderTraversalPolicy` with a focus callback that scrolls the stop into view either way, as a browser does: Flutter's forward Tab only scrolls down, so Tab into a scrolled list would land on a row above it, out of sight.
+  - Entries, desktop only, **before the scroll entries**: `arrowDown` → `MoveIntoSearchResultsIntent(firstResult)`, group search, label `shortcutGoToResults` "Go to results" / "ප්‍රතිඵල වෙත යන්න"; then unlisted `tab` → `MoveIntoSearchResultsIntent(firstControl)`, `tab, shift` → `BackToSearchBoxIntent`, `arrowDown` → `NextSearchResultIntent`, `arrowUp` → `PreviousSearchResultIntent`.
 
 - [ ] **Step 4: Run, expect PASS**, plus `test/presentation/widgets/search_results_panel_test.dart` and `test/presentation/widgets/search/`.
 

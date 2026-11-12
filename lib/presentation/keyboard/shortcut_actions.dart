@@ -341,8 +341,8 @@ class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
   }
 }
 
-/// Moves from the main search box to the first result, while the results
-/// panel shows and has something to focus.
+/// Moves from the main search box into the results panel — ↓ to the first
+/// result, Tab to the first control — while the panel shows and has one.
 class MoveIntoSearchResultsAction
     extends ContextAction<MoveIntoSearchResultsIntent> {
   final WidgetRef ref;
@@ -352,12 +352,53 @@ class MoveIntoSearchResultsAction
   bool isEnabled(MoveIntoSearchResultsIntent intent, [BuildContext? context]) =>
       (ref.read(mainSearchFocusNodeProvider)?.hasFocus ?? false) &&
       ref.read(searchStateProvider).isResultsPanelVisible &&
-      searchResultStops(ref.read(searchResultsFocusNodeProvider)).isNotEmpty;
+      _target(intent) != null;
 
   @override
   Object? invoke(MoveIntoSearchResultsIntent intent, [BuildContext? context]) {
-    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
-    _focusStop(stops.first, ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+    // The first stop is at the start of its list or chip row, so scroll back
+    // to it if it was scrolled away.
+    _focusStop(
+      _target(intent)!,
+      ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+    );
+    return null;
+  }
+
+  FocusNode? _target(MoveIntoSearchResultsIntent intent) =>
+      switch (intent.stop) {
+        SearchPanelStop.firstResult =>
+          searchResultStops(ref.read(searchResultsFocusNodeProvider))
+              .firstOrNull,
+        SearchPanelStop.firstControl => _firstPanelControl(ref),
+      };
+}
+
+/// The panel's first control, the match options button. Results are left
+/// out: a row scrolled up out of view still sits above the header on screen,
+/// so it would sort first. The header and tabs never scroll up or down.
+FocusNode? _firstPanelControl(WidgetRef ref) {
+  final results = ref.read(searchResultsFocusNodeProvider);
+  return searchResultStops(ref.read(searchPanelFocusNodeProvider))
+      .where((node) => !node.ancestors.contains(results))
+      .firstOrNull;
+}
+
+/// Shift+Tab from the panel's first control back to the search box, the way
+/// Tab came in. Elsewhere in the panel Shift+Tab is Flutter's own.
+class BackToSearchBoxAction extends ContextAction<BackToSearchBoxIntent> {
+  final WidgetRef ref;
+  BackToSearchBoxAction(this.ref);
+
+  @override
+  bool isEnabled(BackToSearchBoxIntent intent, [BuildContext? context]) =>
+      ref.read(mainSearchFocusNodeProvider) != null &&
+      ref.read(searchPanelFocusNodeProvider).hasFocus &&
+      _firstPanelControl(ref) == FocusManager.instance.primaryFocus;
+
+  @override
+  Object? invoke(BackToSearchBoxIntent intent, [BuildContext? context]) {
+    ref.read(mainSearchFocusNodeProvider)?.requestFocus();
     return null;
   }
 }

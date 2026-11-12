@@ -44,37 +44,33 @@ class SearchResultsPanel extends ConsumerWidget {
     // stored key stands in until it does.
     final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
 
-    // Tab reaches the results before the chips and the tab bar above them,
-    // and the results sit in the node the ↓ / Tab shortcuts look in
-    // (keyboard-shortcuts-sheet.md, Go to results). The whole panel
-    // sits in the node closing search releases focus from.
+    // Tab walks the panel as it shows: chips, tabs, then results, before it
+    // moves on. The results are one block in that order, placed where the
+    // list shows, so rows scrolled up out of view don't come before the
+    // chips. The results sit in the node ↓ looks in, the whole panel in the
+    // node Tab looks in and closing search releases focus from
+    // (keyboard-shortcuts-sheet.md, Go to results).
     return Material(
       color: theme.colorScheme.surface,
       child: Focus(
         focusNode: ref.watch(searchPanelFocusNodeProvider),
         child: FocusTraversalGroup(
-          policy: OrderedTraversalPolicy(),
+          policy: _panelTraversal(),
           child: Column(
             children: [
               // Header with the match options and filter chips
-              const FocusTraversalOrder(
-                order: NumericFocusOrder(2),
-                child: _PanelHeader(),
-              ),
+              const _PanelHeader(),
               // Category tabs
-              FocusTraversalOrder(
-                order: const NumericFocusOrder(2),
-                child: _SearchResultsTabBar(
-                  selectedResultType: searchState.selectedResultType,
-                  countByResultType: searchState.countByResultType,
-                  onResultTypeSelected: (type) => ref
-                      .read(searchStateProvider.notifier)
-                      .selectResultType(type),
-                ),
+              _SearchResultsTabBar(
+                selectedResultType: searchState.selectedResultType,
+                countByResultType: searchState.countByResultType,
+                onResultTypeSelected: (type) => ref
+                    .read(searchStateProvider.notifier)
+                    .selectResultType(type),
               ),
               Expanded(
-                child: FocusTraversalOrder(
-                  order: const NumericFocusOrder(1),
+                child: FocusTraversalGroup(
+                  policy: _panelTraversal(),
                   child: Focus(
                     focusNode: ref.watch(searchResultsFocusNodeProvider),
                     child: Column(
@@ -440,6 +436,31 @@ class SearchResultsPanel extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// Tab order inside the panel: where things sit on screen, and the stop Tab
+/// lands on is scrolled into view whichever side it is on, as in a browser.
+/// Flutter's own forward Tab only scrolls down, so Tab into a scrolled list
+/// would land on a row above it, out of sight.
+FocusTraversalPolicy _panelTraversal() =>
+    ReadingOrderTraversalPolicy(requestFocusCallback: _focusInView);
+
+void _focusInView(
+  FocusNode node, {
+  ScrollPositionAlignmentPolicy? alignmentPolicy,
+  double? alignment,
+  Duration? duration,
+  Curve? curve,
+}) {
+  // Down if it is below the view, then up if it is above: at most one moves.
+  FocusTraversalPolicy.defaultTraversalRequestFocusCallback(
+    node,
+    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+  );
+  Scrollable.ensureVisible(
+    node.context!,
+    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+  );
 }
 
 /// True when [results] come from two or more editions, so the edition badge

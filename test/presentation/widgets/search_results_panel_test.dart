@@ -308,7 +308,7 @@ void main() {
       expect(tester.widget<TabBar>(find.byType(TabBar)).controller!.index, 1);
     });
 
-    testWidgets('the results are where the ↓ / Tab keys look for them',
+    testWidgets('the results are where the ↓ key looks for them',
         (tester) async {
       await _pumpPanel(
         tester,
