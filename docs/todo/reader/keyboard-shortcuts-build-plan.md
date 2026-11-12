@@ -452,11 +452,14 @@ testWidgets('the reader attaches to the keyboard bridge while mounted', (tester)
 - [ ] **Step 1: Write the failing tests.** Host: a `TextField` whose node is set on `mainSearchFocusNodeProvider`, and a `Focus(focusNode: searchResultsFocusNodeProvider)` holding three `TextButton`s in a `Column`; search state from `FakeSearchStateNotifier` with the results panel visible.
 
 ```dart
-testWidgets('↓ and Tab go from the box to the first stop', ...); // macOS
+testWidgets('↓ goes from the box to the first stop', ...); // macOS
 testWidgets('↓ ↑ step through the stops; ↑ from the first returns to the box', ...);
-testWidgets('Shift+Tab from the first stop returns to the box', ...);
 testWidgets('↓ on the last stop stays there', ...);
 testWidgets('panel hidden: ↓ leaves focus in the box', ...);
+// On the real SearchResultsPanel (header, chips, tabs) with 20 title rows:
+testWidgets('Tab goes from the box to match options; Shift+Tab comes back', ...);
+testWidgets('Shift+Tab from the first result goes back to the tabs', ...);
+testWidgets('scrolled list: Tab walks the panel in order to a row in view', ...);
 test('↓ tries results first, then scrolling', () {
   final down = shortcutMap(TargetPlatform.macOS).entries.singleWhere((e) =>
       (e.key as SingleActivator).trigger == LogicalKeyboardKey.arrowDown &&
@@ -466,7 +469,7 @@ test('↓ tries results first, then scrolling', () {
 });
 ```
 
-Not in the repo yet (2026-11-12, Tab moved to follow the panel's own order): the host above has no header, so its two Tab tests pass either way. A scratch test on the real `SearchResultsPanel` with 20 title rows, scrolled 0 / 100 / 300 px, checked: Tab from the box lands on match options and Shift+Tab there returns to the box; Tab from the chips visits all four results tabs before any result; the first result Tab reaches is in view. Each failed on the code before its fix.
+The Tab tests use the real panel: the three-button host has no header, so Tab tests there pass either way. Mutation check 2026-11-13: each of these fails one of them: Tab to the first result, the old Shift+Tab, no group around the results, a focus callback that only scrolls down, a result taken as the first control, a plain outer policy. The scratch check before (2026-11-12) also tried 0 and 100 px; the test keeps 300, which shows both bugs.
 
 - [ ] **Step 2: Run, expect FAIL.**
 

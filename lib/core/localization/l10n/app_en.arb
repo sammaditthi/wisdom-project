@@ -1091,7 +1091,7 @@
   },
   "shortcutOr": "or",
   "@shortcutOr": {
-    "description": "Keyboard shortcuts tab: word between two keys that do the same thing (↓ or Tab)"
+    "description": "Keyboard shortcuts tab: word between two ways to press the same keys (on a Mac, PgUp or fn ↑)"
   },
   "shortcutGoToResults": "Go to results",
   "@shortcutGoToResults": {

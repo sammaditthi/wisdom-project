@@ -1376,7 +1376,7 @@ abstract class AppLocalizations {
   /// **'App'**
   String get shortcutGroupApp;
 
-  /// Keyboard shortcuts tab: word between two keys that do the same thing (↓ or Tab)
+  /// Keyboard shortcuts tab: word between two ways to press the same keys (on a Mac, PgUp or fn ↑)
   ///
   /// In en, this message translates to:
   /// **'or'**
