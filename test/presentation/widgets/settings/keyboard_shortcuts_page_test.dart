@@ -6,7 +6,7 @@ import 'package:the_wisdom_project/presentation/widgets/settings/settings_row.da
 import '../../../helpers/pump_app.dart';
 
 /// The Keyboard shortcuts tab shows the keys of the platform it runs on
-/// (`docs/todo/reader/keyboard-shortcuts-sheet.md`, rule 2).
+/// (`docs/done/reader/keyboard-shortcuts-sheet.md`, rule 2).
 void main() {
   testWidgets('Mac shows ⌘, not Ctrl', (tester) async {
     await tester.pumpAppWithScaffold(const KeyboardShortcutsPage());

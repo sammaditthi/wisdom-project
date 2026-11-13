@@ -6,7 +6,7 @@ import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart
 import 'package:the_wisdom_project/presentation/keyboard/keyboard_bindings.dart';
 import 'package:the_wisdom_project/presentation/keyboard/shortcut_intents.dart';
 
-/// The one shortcut list (`docs/todo/reader/keyboard-shortcuts-sheet.md`,
+/// The one shortcut list (`docs/done/reader/keyboard-shortcuts-sheet.md`,
 /// rules 1–3): one modifier per platform, desktop-only keys off desktop, and
 /// a label for every row the Settings tab shows.
 void main() {

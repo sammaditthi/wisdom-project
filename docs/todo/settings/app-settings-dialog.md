@@ -75,7 +75,7 @@ right for four tabs and wrong for two. Revisit when the reference tabs land.
    permission to use them.
 7. **Rail hidden on desktop.** The gear goes with the rail; the switch stays
    in the reader menu. Cmd/Ctrl+, opens Settings without the rail
-   (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
+   (`docs/done/reader/keyboard-shortcuts-sheet.md`).
 8. **First review round** (2026-10-24). Theme is icons with tooltips; Sinhala
    Dark is කාළ. Every `SegmentedButton` is a soft rectangle, from
    `AppSegmentedButtonTheme` in all three themes — except the search Refine

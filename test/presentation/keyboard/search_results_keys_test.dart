@@ -19,7 +19,7 @@ import '../../helpers/fake_search_state_notifier.dart';
 import 'shortcut_test_host.dart';
 
 /// From the search box into the results and back, as the static site's
-/// search dialog does (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
+/// search dialog does (`docs/done/reader/keyboard-shortcuts-sheet.md`).
 void main() {
   final mac = TargetPlatformVariant.only(TargetPlatform.macOS);
 

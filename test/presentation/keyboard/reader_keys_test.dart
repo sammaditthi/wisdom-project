@@ -8,7 +8,7 @@ import 'shortcut_test_host.dart';
 
 /// Keys that act on the mounted reader through its bridge: ⌥⌘< > step a
 /// sutta, ↑ ↓ PgUp PgDn scroll — only from the reader or from nowhere, never
-/// from a button or a text box (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
+/// from a button or a text box (`docs/done/reader/keyboard-shortcuts-sheet.md`).
 void main() {
   final mac = TargetPlatformVariant.only(TargetPlatform.macOS);
 

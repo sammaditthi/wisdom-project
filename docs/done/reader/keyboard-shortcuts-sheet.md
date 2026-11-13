@@ -1,8 +1,8 @@
 # Keyboard shortcuts — design
 
 Started 2026-10-11. Designed with the user 2026-11-10. Built 2026-11-10 on
-`feat/keyboard-shortcuts` (plan: `keyboard-shortcuts-build-plan.md`); the
-checks below that need a person are still open.
+`feat/keyboard-shortcuts` (plan: `keyboard-shortcuts-build-plan.md`). Checked
+by hand and done 2026-11-13.
 
 **Goal:** new shortcuts for reading with the keyboard, and a **Keyboard
 shortcuts** tab in Settings that lists every shortcut with the keys of the
@@ -68,6 +68,9 @@ Same keys on desktop and web. "Windows" also means Linux.
   can't.
 - Accepted trade-off: on the web, ⌘+ / ⌘− change the reading text size
   instead of zooming the page. The browser's zoom menu still works.
+- Accepted trade-off (2026-11-13): Safari keeps ⌘, and ⌥⌘W for its own menu,
+  so neither reaches the app there. Chrome and Firefox pass both. In Safari,
+  ⌘/ still opens Settings and the tab's ✕ still closes a tab.
 
 ## Rules
 
@@ -189,25 +192,25 @@ Same keys on desktop and web. "Windows" also means Linux.
 ## Must never happen
 
 - A key that types into, or takes over an editing key from, a text box.
-- A key that does nothing on the web because the browser keeps it.
+- A key that does nothing on the web because the browser keeps it. The two
+  Safari keys above are the one accepted exception.
 
 ## Check while building
 
 Done 2026-11-10: the full unit suite, and on macOS
 `integration_test/search_mode_test.dart` (now presses the platform's own
 modifier, and checks the other one does nothing) and `reader_panes_test.dart`.
-Open — each needs someone at the keyboard:
+By hand, all done 2026-11-13:
 
-1. **Safari and ⌘,.** If Safari keeps it for its own settings, stop and ask
-   the user before choosing another key.
+1. **Safari and ⌘,:** Safari keeps it. Accepted, no other key (see *How the
+   keys were chosen*).
 2. Every new key reaches the page in Chrome, Safari and Firefox on macOS and
-   in Chrome and Edge on Windows.
+   in Chrome and Edge on Windows, except ⌘, and ⌥⌘W in Safari.
 3. ⌘+ / ⌘− / ⌘0 change the text size, not the page zoom, in each of those.
-4. **macOS menu:** `MainMenu.xib` has "Preferences…" on ⌘, with no action.
-   Wire it to Settings or drop its key, so the menu never swallows ⌘,.
-5. **Sinhala keyboard layout on:** [ ] , . / and the digits still match.
-   Flutter falls back to US keys for these; the static site needed its own
-   fallback for letters (`site.js`), so confirm it on each platform.
+4. **macOS menu:** the "Preferences…" item in `MainMenu.xib` no longer holds
+   ⌘,, so ⌘, opens Settings.
+5. **Sinhala keyboard layout on:** [ ] , . / and the digits still match, in
+   the app and in the browser. Flutter's fallback to US keys covers them.
 6. **Sinhala IME composing:** with a candidate list open in the search box,
    ↓ and Tab go to the candidates, not into the results panel.
 
@@ -238,9 +241,9 @@ Open — each needs someone at the keyboard:
 
 ## Done when
 
-- [ ] Every key in the table works on macOS desktop and the web, and on
-      Windows desktop.
-- [ ] The Settings tab lists every entry, in English and Sinhala, with the
+- [x] Every key in the table works on macOS desktop and the web, and on
+      Windows desktop (except ⌘, and ⌥⌘W in Safari).
+- [x] The Settings tab lists every entry, in English and Sinhala, with the
       platform's keys.
-- [ ] The *Check while building* list is done.
-- [ ] The tests above pass.
+- [x] The *Check while building* list is done.
+- [x] The tests above pass.

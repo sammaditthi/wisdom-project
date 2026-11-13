@@ -9,7 +9,7 @@ import '../../helpers/test_view.dart';
 import 'shortcut_test_host.dart';
 
 /// ⌘, opens Settings and ⌘/ opens it on the shortcut list, from anywhere
-/// (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
+/// (`docs/done/reader/keyboard-shortcuts-sheet.md`).
 void main() {
   Future<void> pumpHost(WidgetTester tester) async {
     tester.useWindow(const Size(1024, 800));

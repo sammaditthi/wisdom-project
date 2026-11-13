@@ -12,7 +12,7 @@ import 'shortcut_intents.dart';
 ///
 /// `AppShortcuts` builds its key map from it and the Settings tab builds its
 /// rows from it, so no key combo is spelled anywhere else. How the keys were
-/// chosen: `docs/todo/reader/keyboard-shortcuts-sheet.md`.
+/// chosen: `docs/done/reader/keyboard-shortcuts-sheet.md`.
 
 /// Sections of the Settings tab, in the order they show.
 enum ShortcutGroup { search, reader, layout, app }

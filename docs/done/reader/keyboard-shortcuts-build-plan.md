@@ -8,7 +8,7 @@
 
 **Tech Stack:** Flutter `Shortcuts`/`Actions`/`PrioritizedIntents`, Riverpod 2 (`Provider`, `StateProvider`), flutter_test with `TargetPlatformVariant`.
 
-**Spec:** `docs/todo/reader/keyboard-shortcuts-sheet.md`
+**Spec:** `docs/done/reader/keyboard-shortcuts-sheet.md`
 
 ## Global Constraints
 
@@ -497,7 +497,7 @@ The Tab tests use the real panel: the three-button host has no header, so Tab te
 
 **Files:**
 - Maybe modify: `macos/Runner/Base.lproj/MainMenu.xib` (only if ⌘, is swallowed)
-- Modify: `docs/todo/reader/keyboard-shortcuts-sheet.md`, `docs/todo/settings/app-settings-dialog.md` (Decision 7, *Later* bullet), `test/presentation/screens/app_shell_test.dart:163` (the reason string), `CHANGELOG.md`
+- Modify: `docs/done/reader/keyboard-shortcuts-sheet.md`, `docs/todo/settings/app-settings-dialog.md` (Decision 7, *Later* bullet), `test/presentation/screens/app_shell_test.dart:163` (the reason string), `CHANGELOG.md`
 
 - [ ] **Step 1: Full test run** — `flutter test` (ask first), then `flutter test integration_test/search_mode_test.dart -d macos` (`caffeinate -d`; re-run alone before blaming the diff). Expected: all pass.
 - [ ] **Step 2: macOS app** — `flutter run -d macos`; press every key in the spec's table. ⌘, must open Settings; if the menu's dead "Preferences…" item swallows it, remove that item's `keyEquivalent=","` and re-check.

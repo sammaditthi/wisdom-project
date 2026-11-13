@@ -15,7 +15,7 @@ import 'shortcut_test_host.dart';
 
 /// Reader-tab keys: ⌥⌘[ ] between tabs, ⌥⌘1–4 for the layout, and none of
 /// them — close-tab included — while typing, where Ctrl+Alt is AltGr
-/// (`docs/todo/reader/keyboard-shortcuts-sheet.md`, rules 4 and 5).
+/// (`docs/done/reader/keyboard-shortcuts-sheet.md`, rules 4 and 5).
 void main() {
   final mac = TargetPlatformVariant.only(TargetPlatform.macOS);
   final windows = TargetPlatformVariant.only(TargetPlatform.windows);

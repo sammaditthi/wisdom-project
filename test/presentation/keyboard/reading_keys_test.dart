@@ -11,7 +11,7 @@ import 'package:the_wisdom_project/presentation/widgets/settings/settings_dialog
 import 'shortcut_test_host.dart';
 
 /// Text size (⌘+ ⌘− ⌘0) and the navigator (⌘B)
-/// (`docs/todo/reader/keyboard-shortcuts-sheet.md`).
+/// (`docs/done/reader/keyboard-shortcuts-sheet.md`).
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
