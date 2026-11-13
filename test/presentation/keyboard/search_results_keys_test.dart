@@ -40,12 +40,11 @@ void main() {
 
   /// A search box and three results, shown as the reader screen shows the
   /// panel: only while it is visible, which it is unless [panelOpen] is
-  /// false. [mountedWhileHidden] keeps the results, so a test can check the
-  /// keys' own visibility check. Focus starts in the box.
+  /// false. The keys go by what is built, not by the search state. Focus
+  /// starts in the box.
   Future<ProviderContainer> pumpSearch(
     WidgetTester tester, {
     bool panelOpen = true,
-    bool mountedWhileHidden = false,
   }) async {
     final c = await pumpShortcutHost(
       tester,
@@ -65,7 +64,7 @@ void main() {
                 final visible = ref.watch(
                   searchStateProvider.select((s) => s.isResultsPanelVisible),
                 );
-                if (!visible && !mountedWhileHidden) {
+                if (!visible) {
                   return const SizedBox.shrink();
                 }
                 return Focus(
@@ -142,7 +141,7 @@ void main() {
   }, variant: mac);
 
   testWidgets('panel hidden: ↓ leaves focus in the box', (tester) async {
-    await pumpSearch(tester, panelOpen: false, mountedWhileHidden: true);
+    await pumpSearch(tester, panelOpen: false);
 
     await pressKeys(tester, LogicalKeyboardKey.arrowDown);
     expect(box.hasPrimaryFocus, isTrue);

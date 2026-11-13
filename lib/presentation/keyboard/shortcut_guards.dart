@@ -20,10 +20,20 @@ bool isTypingInTextBox() {
 /// rule 5).
 bool readerKeysAllowed(WidgetRef ref) =>
     ref.read(selectedAppSectionProvider) == AppSection.reader &&
-    !(appNavigatorKey.currentState?.canPop() ?? false) &&
+    noRouteOpen() &&
     ref
         .read(overlayStackProvider)
         .every((o) => _alongsideReaderKeys.contains(o.id));
+
+/// True when no route sits over the app: no dialog, and no popup menu.
+bool noRouteOpen() => !(appNavigatorKey.currentState?.canPop() ?? false);
+
+/// True when focus is on nothing: no node has it, or only a scope or
+/// `AppShortcuts`' fallback [idleFocus] does (e.g. after a text box let go).
+bool isFocusOnNothing(FocusNode idleFocus) {
+  final primary = FocusManager.instance.primaryFocus;
+  return primary == null || primary is FocusScopeNode || primary == idleFocus;
+}
 
 /// Overlays that leave the reader keys working.
 const _alongsideReaderKeys = {

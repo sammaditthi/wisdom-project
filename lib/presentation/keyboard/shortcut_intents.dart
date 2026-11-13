@@ -86,18 +86,19 @@ enum SearchPanelStop {
   /// ↓: the first result.
   firstResult,
 
-  /// Tab: the panel's first control, so Tab walks it in the order it shows.
+  /// Tab: the first Tab stop — the panel's first control, or the first
+  /// recent search — so Tab walks what shows in its own order.
   firstControl,
 }
 
-/// From the main search box into the results panel (↓ or Tab).
+/// From the main search box into the results or recent searches (↓ or Tab).
 class MoveIntoSearchResultsIntent extends Intent {
   const MoveIntoSearchResultsIntent(this.stop);
 
   final SearchPanelStop stop;
 }
 
-/// From the panel's first control back to the search box (Shift+Tab).
+/// From the first Tab stop under the search box back to the box (Shift+Tab).
 class BackToSearchBoxIntent extends Intent {
   const BackToSearchBoxIntent();
 }

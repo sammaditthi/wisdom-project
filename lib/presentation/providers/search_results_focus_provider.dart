@@ -17,6 +17,18 @@ final searchPanelFocusNodeProvider = Provider<FocusNode>(
   (ref) => _wrapperNode(ref, 'Search panel'),
 );
 
+/// The node around the whole recent-searches card under the empty search box,
+/// so closing it can release focus from anywhere in it.
+final recentSearchesFocusNodeProvider = Provider<FocusNode>(
+  (ref) => _wrapperNode(ref, 'Recent searches'),
+);
+
+/// Just the card's rows, which ↓ / ↑ step through. Tab also visits each
+/// row's ✕, Show more and Clear all.
+final recentSearchRowsFocusNodeProvider = Provider<FocusNode>(
+  (ref) => _wrapperNode(ref, 'Recent search rows'),
+);
+
 FocusNode _wrapperNode(Ref ref, String label) {
   final node = FocusNode(
     debugLabel: label,

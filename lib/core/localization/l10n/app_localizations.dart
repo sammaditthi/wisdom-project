@@ -1382,10 +1382,10 @@ abstract class AppLocalizations {
   /// **'or'**
   String get shortcutOr;
 
-  /// Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results
+  /// Keyboard shortcuts tab: row for the down-arrow key that moves from the search box into the results, or into the recent searches while the box is empty
   ///
   /// In en, this message translates to:
-  /// **'Go to results'**
+  /// **'Go to results or recent searches'**
   String get shortcutGoToResults;
 
   /// Keyboard shortcuts tab: row for the key that moves to the previous reader tab

@@ -6,9 +6,11 @@ import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/search_results_focus_provider.dart';
 import '../../../domain/entities/search/recent_search.dart';
 import 'search_link_button.dart';
 import 'search_section_header.dart';
+import 'search_traversal_policy.dart';
 
 /// Simplified overlay that only shows recent searches
 /// Displayed when search bar is focused with an empty query.
@@ -110,8 +112,17 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
           constraints: BoxConstraints(maxHeight: maxHeight),
           child: ClipRRect(
             borderRadius: borderRadius,
-            child: SingleChildScrollView(
-              child: _buildRecentSearches(context, recentSearches),
+            // A group, so Tab walks the card in the order it shows before
+            // leaving it (keyboard-shortcuts-sheet.md, Go to results or
+            // recent searches), with the panel's policy.
+            child: FocusTraversalGroup(
+              policy: searchTraversalPolicy(),
+              child: SingleChildScrollView(
+                child: Focus(
+                  focusNode: ref.watch(recentSearchesFocusNodeProvider),
+                  child: _buildRecentSearches(context, recentSearches),
+                ),
+              ),
             ),
           ),
         ),
@@ -132,7 +143,15 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SearchSectionHeader(label: l10n.recentSearches),
-        ...visible.map((search) => _buildRow(context, search)),
+        // The rows ↓ / ↑ step through.
+        Focus(
+          focusNode: ref.watch(recentSearchRowsFocusNodeProvider),
+          child: Column(
+            children: [
+              for (final search in visible) _buildRow(context, search),
+            ],
+          ),
+        ),
         Padding(
           // List-wide links, so on the list's edges: under the history icons
           // (where the header starts) and under the ✕ icons. A result tile's

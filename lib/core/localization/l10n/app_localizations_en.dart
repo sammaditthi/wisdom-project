@@ -725,7 +725,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutOr => 'or';
 
   @override
-  String get shortcutGoToResults => 'Go to results';
+  String get shortcutGoToResults => 'Go to results or recent searches';
 
   @override
   String get shortcutPreviousTab => 'Previous tab';

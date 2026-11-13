@@ -27,7 +27,7 @@ Same keys on desktop and web. "Windows" also means Linux.
 | --- | --- | --- | --- | --- |
 | Search | Find in page | ⌘F | Ctrl+F | exists |
 | | Search | ⇧⌘F | Ctrl+Shift+F | exists |
-| | Go to results | ↓ | ↓ | new |
+| | Go to results or recent searches | ↓ | ↓ | new |
 | Reader | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
 | | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
 | | Close tab | ⌥⌘W | Ctrl+Alt+W | exists |
@@ -127,14 +127,23 @@ Same keys on desktop and web. "Windows" also means Linux.
   controller for every layout, so side by side scrolls as one. Only when
   focus is in the reader or on nothing. On a navigator row, a tab or a button
   the arrows keep their usual job of moving focus *(my call)*.
-- **Go to results:** with the main search box focused and results
-  showing, ↓ moves to the first stop in the visible results tab. The stops
-  are everything there that takes focus, in order: the reference row (e.g.
-  "SN 15.3"), result rows, "See all" and "Show N more", so nothing is
-  skipped *(my call)*. ↓ / ↑ step through them, and ↑ from the first goes
+- **Go to results or recent searches:** with the main search box focused
+  and results showing, ↓ moves to the first stop in the visible results tab.
+  The stops are everything there that takes focus, in order: the reference
+  row (e.g. "SN 15.3"), result rows, "See all" and "Show N more", so nothing
+  is skipped *(my call)*. ↓ / ↑ step through them, and ↑ from the first goes
   back to the box. Enter opens a row (already works). With no results, ↓
   works as today. Matches the static site's search dialog (`site.js`): the
   arrows are a shortcut, Tab stays Tab.
+  - **Recent searches** (the box is empty): ↓ / ↑ step through the rows
+    only, as in a browser's address bar; on "Show more" or "Clear all" they
+    do nothing. Tab walks everything in order — each row, its ✕, then "Show
+    more" and "Clear all" — then leaves the card, as it leaves the panel.
+    Tab from the box goes to the first row, Shift+Tab from it back to the
+    box. Enter runs a row, Esc closes the list.
+  - **After picking a recent search, or Enter in the box,** focus leaves the
+    box. ↓ with focus on nothing still goes to the first result; Tab doesn't.
+    Not while a dialog or menu is open.
 - **Tab in the panel** is not a shortcut, so it isn't listed: it walks the
   panel in the order it shows (WCAG 2.4.3, as VS Code's search sidebar
   does): match options, chips, results tabs, then the results. Two keys are
@@ -174,7 +183,6 @@ Same keys on desktop and web. "Windows" also means Linux.
 - Changing keys from the app.
 - New keys on the static site. Its ⇧⌘F stays as it is.
 - Phones and tablets.
-- Keyboard moves inside the recent-searches list.
 - Showing shortcuts in button tooltips.
 
 ## Must never happen

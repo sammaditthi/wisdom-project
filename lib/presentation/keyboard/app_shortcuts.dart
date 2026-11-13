@@ -68,7 +68,8 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
           ToggleNavigatorIntent: ToggleNavigatorAction(ref),
           StepSuttaIntent: StepSuttaAction(ref),
           ScrollReaderIntent: ScrollReaderAction(ref, _idleFocus),
-          MoveIntoSearchResultsIntent: MoveIntoSearchResultsAction(ref),
+          MoveIntoSearchResultsIntent:
+              MoveIntoSearchResultsAction(ref, _idleFocus),
           BackToSearchBoxIntent: BackToSearchBoxAction(ref),
           NextSearchResultIntent: NextSearchResultAction(ref),
           PreviousSearchResultIntent: PreviousSearchResultAction(ref),

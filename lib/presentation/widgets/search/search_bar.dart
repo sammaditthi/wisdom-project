@@ -7,6 +7,7 @@ import '../../providers/overlay_stack_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/reader_scroll_provider.dart';
 import '../../providers/search_provider.dart';
+import '../../providers/search_results_focus_provider.dart';
 import '../../providers/singlish_preview_provider.dart';
 import 'recent_search_overlay.dart';
 import 'singlish_preview.dart';
@@ -171,6 +172,9 @@ class _SearchBarState extends ConsumerState<SearchBar> {
   /// neither resets the filters.
   void _hideOverlay() {
     _hideRecentOverlay();
+    // Focus may be on a row (↓ from the box). Drop it there too: as the row
+    // goes, Flutter would hand focus back to the box, reopening the list.
+    ref.read(recentSearchesFocusNodeProvider).unfocus();
     _focusNode.unfocus();
   }
 

@@ -725,7 +725,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get shortcutOr => 'හෝ';
 
   @override
-  String get shortcutGoToResults => 'ප්‍රතිඵල වෙත යන්න';
+  String get shortcutGoToResults => 'ප්‍රතිඵල හෝ මෑත සෙවුම් වෙත යන්න';
 
   @override
   String get shortcutPreviousTab => 'පෙර ටැබ් එක';

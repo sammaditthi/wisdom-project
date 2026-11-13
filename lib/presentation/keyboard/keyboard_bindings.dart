@@ -92,7 +92,9 @@ class AppShortcut {
 /// macOS, Windows and Linux — as an app or in a browser. Flutter web reports
 /// an iPad as iOS, so phones and tablets are never desktop.
 bool isDesktopPlatform(TargetPlatform platform) => switch (platform) {
-      TargetPlatform.macOS || TargetPlatform.windows || TargetPlatform.linux =>
+      TargetPlatform.macOS ||
+      TargetPlatform.windows ||
+      TargetPlatform.linux =>
         true,
       _ => false,
     };
@@ -112,24 +114,26 @@ final List<AppShortcut> appShortcuts = [
     desktopOnly: false,
   ),
   AppShortcut(
-    keys: const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true, shift: true),
+    keys:
+        const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true, shift: true),
     intent: const OpenMainSearchIntent(),
     group: ShortcutGroup.search,
     // The search box's own word: it searches the commentaries too.
     label: (l10n) => l10n.searchHint,
     desktopOnly: false,
   ),
-  // Before the scroll keys, so in the search box ↓ means "to the results",
-  // not "scroll".
+  // Before the scroll keys, so in the search box ↓ means "to the results"
+  // (or the recent searches, while the box is empty), not "scroll".
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
     intent: const MoveIntoSearchResultsIntent(SearchPanelStop.firstResult),
     group: ShortcutGroup.search,
     label: (l10n) => l10n.shortcutGoToResults,
   ),
-  // Tab works as Tab, so it isn't listed. The panel is drawn over the reader,
-  // so plain Tab from the box would go on to the app bar and the reader behind
-  // it; these take it into the panel's first control and back.
+  // Tab works as Tab, so it isn't listed. The panel and the recent searches
+  // are drawn over the reader, so plain Tab from the box would go on to the
+  // app bar and the reader behind; these take it into their first stop and
+  // back.
   const AppShortcut(
     keys: ShortcutKeys(LogicalKeyboardKey.tab),
     intent: MoveIntoSearchResultsIntent(SearchPanelStop.firstControl),
@@ -185,7 +189,8 @@ final List<AppShortcut> appShortcuts = [
   // The , and . keys, marked < and >: they point the way the toolbar's ⏮ ⏭
   // do, and answer with or without ⇧. Not ⌥⌘← →, which Chrome keeps.
   AppShortcut(
-    keys: const ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true),
+    keys:
+        const ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true),
     alsoKeys: const [
       ShortcutKeys(
         LogicalKeyboardKey.comma,
@@ -251,7 +256,8 @@ final List<AppShortcut> appShortcuts = [
   // Same label: ↑ and ↓ share one row in the Settings tab, as do PgUp PgDn.
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowUp),
-    intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.line),
+    intent:
+        const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.line),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScroll,
   ),
@@ -264,7 +270,8 @@ final List<AppShortcut> appShortcuts = [
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.pageUp),
-    intent: const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.page),
+    intent:
+        const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.page),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScrollPage,
   ),

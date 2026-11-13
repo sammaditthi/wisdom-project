@@ -14,7 +14,6 @@ import '../providers/navigator_visibility_provider.dart';
 import '../providers/reader_keyboard_bridge_provider.dart';
 import '../providers/overlay_stack_provider.dart';
 import '../providers/search_mode_provider.dart';
-import '../providers/search_provider.dart';
 import '../providers/search_results_focus_provider.dart';
 import '../providers/tab_lifecycle_provider.dart';
 import '../providers/tab_provider.dart';
@@ -325,10 +324,7 @@ class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
     if (handle == null || !readerKeysAllowed(ref) || isTypingInTextBox()) {
       return false;
     }
-    final primary = FocusManager.instance.primaryFocus;
-    final idle =
-        primary == null || primary is FocusScopeNode || primary == idleFocus;
-    return idle || handle.hasFocus;
+    return isFocusOnNothing(idleFocus) || handle.hasFocus;
   }
 
   @override
@@ -341,18 +337,29 @@ class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
   }
 }
 
-/// Moves from the main search box into the results panel — ↓ to the first
-/// result, Tab to the first control — while the panel shows and has one.
+/// Moves from the main search box into what shows under it — ↓ to the first
+/// result or recent search, Tab to the first Tab stop there.
+///
+/// ↓ also starts from focus on nothing: picking a recent search, or Enter,
+/// lets go of the box. Tab from nothing stays Flutter's own.
 class MoveIntoSearchResultsAction
     extends ContextAction<MoveIntoSearchResultsIntent> {
   final WidgetRef ref;
-  MoveIntoSearchResultsAction(this.ref);
+
+  /// `AppShortcuts`' fallback node: focus there is focus on nothing.
+  final FocusNode idleFocus;
+
+  MoveIntoSearchResultsAction(this.ref, this.idleFocus);
 
   @override
   bool isEnabled(MoveIntoSearchResultsIntent intent, [BuildContext? context]) =>
-      (ref.read(mainSearchFocusNodeProvider)?.hasFocus ?? false) &&
-      ref.read(searchStateProvider).isResultsPanelVisible &&
-      _target(intent) != null;
+      _startsHere(intent) && _target(intent) != null;
+
+  bool _startsHere(MoveIntoSearchResultsIntent intent) =>
+      (ref.read(mainSearchFocusNodeProvider)?.hasFocus ?? false) ||
+      (intent.stop == SearchPanelStop.firstResult &&
+          noRouteOpen() &&
+          isFocusOnNothing(idleFocus));
 
   @override
   Object? invoke(MoveIntoSearchResultsIntent intent, [BuildContext? context]) {
@@ -367,12 +374,36 @@ class MoveIntoSearchResultsAction
 
   FocusNode? _target(MoveIntoSearchResultsIntent intent) =>
       switch (intent.stop) {
-        SearchPanelStop.firstResult =>
-          searchResultStops(ref.read(searchResultsFocusNodeProvider))
-              .firstOrNull,
-        SearchPanelStop.firstControl => _firstPanelControl(ref),
+        SearchPanelStop.firstResult => _arrowStops(ref).firstOrNull,
+        SearchPanelStop.firstControl => _firstTabStop(ref),
       };
 }
+
+/// True while focus is in the results, or anywhere in the recent-searches
+/// card.
+bool _listHasFocus(WidgetRef ref) =>
+    ref.read(searchResultsFocusNodeProvider).hasFocus ||
+    ref.read(recentSearchesFocusNodeProvider).hasFocus;
+
+/// What ↓ / ↑ step through under the search box: every result, else the
+/// recent-search rows. The panel is built only while it shows and the recent
+/// searches only while it doesn't, so the focus tree tells which, not the
+/// search state. A row's ✕ sits inside its row, so it is left to Tab, as are
+/// Show more and Clear all.
+List<FocusNode> _arrowStops(WidgetRef ref) {
+  final results = searchResultStops(ref.read(searchResultsFocusNodeProvider));
+  if (results.isNotEmpty) return results;
+  final rows = searchResultStops(ref.read(recentSearchRowsFocusNodeProvider));
+  return [
+    for (final row in rows)
+      if (!row.ancestors.any(rows.contains)) row
+  ];
+}
+
+/// Where Tab from the search box lands, and Shift+Tab goes back from: the
+/// panel's first control, or with no panel the first recent search.
+FocusNode? _firstTabStop(WidgetRef ref) =>
+    _firstPanelControl(ref) ?? _arrowStops(ref).firstOrNull;
 
 /// The panel's first control, the match options button. Results are left
 /// out: a row scrolled up out of view still sits above the header on screen,
@@ -384,8 +415,8 @@ FocusNode? _firstPanelControl(WidgetRef ref) {
       .firstOrNull;
 }
 
-/// Shift+Tab from the panel's first control back to the search box, the way
-/// Tab came in. Elsewhere in the panel Shift+Tab is Flutter's own.
+/// Shift+Tab from the first Tab stop under the search box back to the box,
+/// the way Tab came in. Elsewhere Shift+Tab is Flutter's own.
 class BackToSearchBoxAction extends ContextAction<BackToSearchBoxIntent> {
   final WidgetRef ref;
   BackToSearchBoxAction(this.ref);
@@ -393,8 +424,7 @@ class BackToSearchBoxAction extends ContextAction<BackToSearchBoxIntent> {
   @override
   bool isEnabled(BackToSearchBoxIntent intent, [BuildContext? context]) =>
       ref.read(mainSearchFocusNodeProvider) != null &&
-      ref.read(searchPanelFocusNodeProvider).hasFocus &&
-      _firstPanelControl(ref) == FocusManager.instance.primaryFocus;
+      (_firstTabStop(ref)?.hasPrimaryFocus ?? false);
 
   @override
   Object? invoke(BackToSearchBoxIntent intent, [BuildContext? context]) {
@@ -403,28 +433,31 @@ class BackToSearchBoxAction extends ContextAction<BackToSearchBoxIntent> {
   }
 }
 
-/// Moves to the next result. On the last one it stays — still handled, so
-/// the key doesn't fall through and scroll the reader.
+/// Moves to the next result or recent search. On the last one, and on Show
+/// more or Clear all, it stays — still handled, so the key doesn't fall
+/// through and scroll the reader.
 class NextSearchResultAction extends ContextAction<NextSearchResultIntent> {
   final WidgetRef ref;
   NextSearchResultAction(this.ref);
 
   @override
   bool isEnabled(NextSearchResultIntent intent, [BuildContext? context]) =>
-      ref.read(searchResultsFocusNodeProvider).hasFocus;
+      _listHasFocus(ref);
 
   @override
   Object? invoke(NextSearchResultIntent intent, [BuildContext? context]) {
-    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
-    final at = stops.indexOf(FocusManager.instance.primaryFocus!);
-    if (at + 1 < stops.length) {
+    final stops = _arrowStops(ref);
+    // The stop holding focus, also when its ✕ has it.
+    final at = stops.indexWhere((stop) => stop.hasFocus);
+    if (at >= 0 && at + 1 < stops.length) {
       _focusStop(stops[at + 1], ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
     }
     return null;
   }
 }
 
-/// Moves to the previous result, or from the first back to the search box.
+/// Moves to the previous result or recent search, or from the first back to
+/// the search box. On Show more or Clear all it stays.
 class PreviousSearchResultAction
     extends ContextAction<PreviousSearchResultIntent> {
   final WidgetRef ref;
@@ -432,18 +465,18 @@ class PreviousSearchResultAction
 
   @override
   bool isEnabled(PreviousSearchResultIntent intent, [BuildContext? context]) =>
-      ref.read(searchResultsFocusNodeProvider).hasFocus;
+      _listHasFocus(ref);
 
   @override
   Object? invoke(PreviousSearchResultIntent intent, [BuildContext? context]) {
-    final stops = searchResultStops(ref.read(searchResultsFocusNodeProvider));
-    final at = stops.indexOf(FocusManager.instance.primaryFocus!);
+    final stops = _arrowStops(ref);
+    final at = stops.indexWhere((stop) => stop.hasFocus);
     if (at > 0) {
       _focusStop(
         stops[at - 1],
         ScrollPositionAlignmentPolicy.keepVisibleAtStart,
       );
-    } else {
+    } else if (at == 0) {
       ref.read(mainSearchFocusNodeProvider)?.requestFocus();
     }
     return null;

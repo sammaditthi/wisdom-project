@@ -24,6 +24,7 @@ import 'scope_filter_chips.dart';
 import 'search_link_button.dart';
 import 'search_result_tile.dart';
 import 'search_section_header.dart';
+import 'search_traversal_policy.dart';
 
 /// Slide-out panel for displaying full search results
 /// Used as a side panel on desktop and full-screen overlay on mobile
@@ -55,7 +56,7 @@ class SearchResultsPanel extends ConsumerWidget {
       child: Focus(
         focusNode: ref.watch(searchPanelFocusNodeProvider),
         child: FocusTraversalGroup(
-          policy: _panelTraversal(),
+          policy: searchTraversalPolicy(),
           child: Column(
             children: [
               // Header with the match options and filter chips
@@ -70,7 +71,7 @@ class SearchResultsPanel extends ConsumerWidget {
               ),
               Expanded(
                 child: FocusTraversalGroup(
-                  policy: _panelTraversal(),
+                  policy: searchTraversalPolicy(),
                   child: Focus(
                     focusNode: ref.watch(searchResultsFocusNodeProvider),
                     child: Column(
@@ -436,31 +437,6 @@ class SearchResultsPanel extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// Tab order inside the panel: where things sit on screen, and the stop Tab
-/// lands on is scrolled into view whichever side it is on, as in a browser.
-/// Flutter's own forward Tab only scrolls down, so Tab into a scrolled list
-/// would land on a row above it, out of sight.
-FocusTraversalPolicy _panelTraversal() =>
-    ReadingOrderTraversalPolicy(requestFocusCallback: _focusInView);
-
-void _focusInView(
-  FocusNode node, {
-  ScrollPositionAlignmentPolicy? alignmentPolicy,
-  double? alignment,
-  Duration? duration,
-  Curve? curve,
-}) {
-  // Down if it is below the view, then up if it is above: at most one moves.
-  FocusTraversalPolicy.defaultTraversalRequestFocusCallback(
-    node,
-    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
-  );
-  Scrollable.ensureVisible(
-    node.context!,
-    alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtStart,
-  );
 }
 
 /// True when [results] come from two or more editions, so the edition badge

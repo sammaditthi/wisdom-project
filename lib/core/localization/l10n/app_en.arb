@@ -1093,9 +1093,9 @@
   "@shortcutOr": {
     "description": "Keyboard shortcuts tab: word between two ways to press the same keys (on a Mac, PgUp or fn ↑)"
   },
-  "shortcutGoToResults": "Go to results",
+  "shortcutGoToResults": "Go to results or recent searches",
   "@shortcutGoToResults": {
-    "description": "Keyboard shortcuts tab: row for the keys (down arrow, Tab) that move from the search box into the results"
+    "description": "Keyboard shortcuts tab: row for the down-arrow key that moves from the search box into the results, or into the recent searches while the box is empty"
   },
   "shortcutPreviousTab": "Previous tab",
   "@shortcutPreviousTab": {
