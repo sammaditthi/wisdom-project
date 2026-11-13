@@ -221,6 +221,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       _userScrollContext = notification.direction == ScrollDirection.idle
           ? null
           : notification.context;
+    } else if (notification is ScrollEndNotification) {
+      // Any scroll that stops hands the view back, a key scroll included.
+      _userScrollContext = null;
     } else if (notification is ScrollUpdateNotification &&
         notification.context == _userScrollContext &&
         _toolbarAutoHide.userScrolled(
@@ -307,29 +310,21 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     }
   }
 
-  /// Key scrolls still running.
-  int _keyScrolls = 0;
-
   /// Runs a key's scroll as the reader's own, so the toolbar follows it as it
-  /// follows the wheel. `animateTo` alone reports no user scroll.
+  /// follows the wheel. `animateTo` alone reports no user scroll; its end
+  /// hands the view back ([_onScrollNotification]).
   Future<void> _animateAsUser(
     ScrollPosition position,
     double target, {
     required Duration duration,
     required Curve curve,
   }) {
-    final view = position.context.notificationContext;
-    _userScrollContext = view;
-    _keyScrolls++;
-    return position
-        .animateTo(target, duration: duration, curve: curve)
-        // A new press cuts the last scroll short: only the last one out
-        // hands the view back.
-        .whenComplete(() {
-      if (--_keyScrolls == 0 && _userScrollContext == view) {
-        _userScrollContext = null;
-      }
-    });
+    final done = position.animateTo(target, duration: duration, curve: curve);
+    // Already at the target: no scroll ran, so no end will come.
+    if (position.isScrollingNotifier.value) {
+      _userScrollContext = position.context.notificationContext;
+    }
+    return done;
   }
 
   /// Where each position's running arrow scroll is heading.
