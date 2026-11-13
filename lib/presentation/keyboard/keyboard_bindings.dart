@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../core/localization/l10n/app_localizations.dart';
+import '../../core/utils/platform_utils.dart';
 import '../models/reader_layout.dart';
 import '../providers/reader_unit_provider.dart' show ReaderStep;
 import '../widgets/settings/settings_tab.dart';
@@ -89,20 +90,6 @@ class AppShortcut {
   final bool desktopOnly;
 }
 
-/// macOS, Windows and Linux — as an app or in a browser. Flutter web reports
-/// an iPad as iOS, so phones and tablets are never desktop.
-bool isDesktopPlatform(TargetPlatform platform) => switch (platform) {
-      TargetPlatform.macOS ||
-      TargetPlatform.windows ||
-      TargetPlatform.linux =>
-        true,
-      _ => false,
-    };
-
-/// Apple platforms use ⌘ where the others use Ctrl.
-bool usesCommandKey(TargetPlatform platform) =>
-    platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
-
 /// Every shortcut, in Settings-tab order within each group.
 final List<AppShortcut> appShortcuts = [
   // ─── Search ────────────────────────────────────────────────────────────
@@ -188,12 +175,19 @@ final List<AppShortcut> appShortcuts = [
   ),
   // The , and . keys, marked < and >: they point the way the toolbar's ⏮ ⏭
   // do, and answer with or without ⇧. Not ⌥⌘← →, which Chrome keeps.
+  // With ⇧ a browser can name the key by its typed character, < or >.
   AppShortcut(
     keys:
         const ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true),
     alsoKeys: const [
       ShortcutKeys(
         LogicalKeyboardKey.comma,
+        primary: true,
+        alt: true,
+        shift: true,
+      ),
+      ShortcutKeys(
+        LogicalKeyboardKey.less,
         primary: true,
         alt: true,
         shift: true,
@@ -214,6 +208,12 @@ final List<AppShortcut> appShortcuts = [
         alt: true,
         shift: true,
       ),
+      ShortcutKeys(
+        LogicalKeyboardKey.greater,
+        primary: true,
+        alt: true,
+        shift: true,
+      ),
     ],
     intent: const StepSuttaIntent(ReaderStep.next),
     group: ShortcutGroup.reader,
@@ -227,10 +227,13 @@ final List<AppShortcut> appShortcuts = [
     label: (l10n) => l10n.shortcutToggleNavigator,
   ),
   // The browser's own zoom keys: same meaning, so the reader takes them.
+  // ⇧= is `equal` on desktop and `add` in a browser, which names the key by
+  // its typed character.
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.equal, primary: true),
     alsoKeys: const [
       ShortcutKeys(LogicalKeyboardKey.equal, primary: true, shift: true),
+      ShortcutKeys(LogicalKeyboardKey.add, primary: true, shift: true),
       ShortcutKeys(LogicalKeyboardKey.numpadAdd, primary: true),
     ],
     intent: const TextSizeIntent(TextSizeChange.bigger),

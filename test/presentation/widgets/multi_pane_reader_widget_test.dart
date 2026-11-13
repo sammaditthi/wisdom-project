@@ -116,6 +116,47 @@ void main() {
 
       expect(position.pixels, lessThan(atUp));
     });
+
+    // Reading on with the keys hides the toolbar, as the wheel does.
+    testWidgets('a key scroll down hides the toolbar', (tester) async {
+      when(mockRepository.loadDocument('dn-1')).thenAnswer(
+        (_) async => Right(TestData.sampleDocument),
+      );
+      // Short, so the sample text scrolls.
+      tester.view.physicalSize = const Size(800, 200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpApp(
+        const MultiPaneReaderWidget(),
+        overrides: [
+          TestProviderOverrides.bjtDocumentRepository(mockRepository),
+          ..._readingDn1(),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      double toolbarOpacity() => tester
+          .widget<AnimatedOpacity>(
+            find
+                .descendant(
+                  of: find.byKey(const ValueKey('reader-actions-top')),
+                  matching: find.byType(AnimatedOpacity),
+                )
+                .first,
+          )
+          .opacity;
+      final reader = ProviderScope.containerOf(
+        tester.element(find.byType(MultiPaneReaderWidget)),
+      ).read(readerKeyboardBridgeProvider).handle!;
+      expect(toolbarOpacity(), 1.0);
+
+      // Two lines: past the top zone, where the toolbar always shows.
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      reader.scroll(AxisDirection.down, ScrollIncrementType.line);
+      await tester.pumpAndSettle();
+
+      expect(toolbarOpacity(), 0.0);
+    });
   });
 
   // ============================================================

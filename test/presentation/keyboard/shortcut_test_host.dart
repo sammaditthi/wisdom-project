@@ -39,12 +39,15 @@ Future<ProviderContainer> pumpShortcutHost(
 
 /// Presses [key] with the given modifiers. `primary` is ⌘ on macOS and iOS,
 /// Ctrl elsewhere — read from [defaultTargetPlatform], as the app does.
+/// [physicalKey]: the key [key] sits on, for a character the simulator can't
+/// place itself (`+` on the = key).
 Future<void> pressKeys(
   WidgetTester tester,
   LogicalKeyboardKey key, {
   bool primary = false,
   bool alt = false,
   bool shift = false,
+  PhysicalKeyboardKey? physicalKey,
 }) async {
   final apple = defaultTargetPlatform == TargetPlatform.macOS ||
       defaultTargetPlatform == TargetPlatform.iOS;
@@ -59,7 +62,7 @@ Future<void> pressKeys(
   for (final (logical, physical) in modifiers) {
     await tester.sendKeyDownEvent(logical, physicalKey: physical);
   }
-  await tester.sendKeyEvent(key);
+  await tester.sendKeyEvent(key, physicalKey: physicalKey);
   for (final (logical, physical) in modifiers.reversed) {
     await tester.sendKeyUpEvent(logical, physicalKey: physical);
   }

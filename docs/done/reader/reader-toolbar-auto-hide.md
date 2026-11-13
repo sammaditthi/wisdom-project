@@ -16,7 +16,7 @@ Design: [Reader toolbar · ways back canvas](https://claude.ai/artifact/1qPRDahE
 5. **The planned focus mode is dropped** (it was never built). "Hide navigation bar" stays as shipped.
 6. **Step 2 comes later**, phones only: [`phone-chrome-auto-hide.md`](../../todo/reader/phone-chrome-auto-hide.md).
 7. **Nothing freezes the rule.** An open menu closes when the toolbar hides. A freeze on a text selection or the dictionary sheet would leave the toolbar stuck hidden: on desktop a selection lasts until the next click, and the sheet stays open while reading.
-8. **Keyboard scrolling never moves the toolbar.** Flutter runs Page Up/Down, Space and the arrows as an animated jump, reported like a search jump (no user scroll direction). No code needed.
+8. **Keyboard scrolling moves the toolbar as the wheel does** (changed 2026-11-13, with the keyboard shortcuts). An animated scroll reports no user scroll direction, so the reader marks its own key scrolls as the user's (`_animateAsUser`).
 9. **No shared action list.** With the FAB gone the toolbar is the only reader of `reader_actions.dart`, so the toolbar lists its own buttons.
 
 ## What the reader sees

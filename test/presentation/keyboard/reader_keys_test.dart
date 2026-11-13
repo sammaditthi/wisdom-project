@@ -31,10 +31,28 @@ void main() {
         primary: true, alt: true);
     await pressKeys(tester, LogicalKeyboardKey.period,
         primary: true, alt: true, shift: true);
-    await pressKeys(tester, LogicalKeyboardKey.comma,
-        primary: true, alt: true);
+    await pressKeys(tester, LogicalKeyboardKey.comma, primary: true, alt: true);
 
     expect(fake.steps, [ReaderStep.next, ReaderStep.next, ReaderStep.previous]);
+  }, variant: mac);
+
+  // A browser names ⇧, and ⇧. by the characters they type.
+  testWidgets('⇧ with the keys from a browser, as < and >, steps too',
+      (tester) async {
+    final fake = await pumpWithFake(tester);
+
+    await pressKeys(tester, LogicalKeyboardKey.greater,
+        primary: true,
+        alt: true,
+        shift: true,
+        physicalKey: PhysicalKeyboardKey.period);
+    await pressKeys(tester, LogicalKeyboardKey.less,
+        primary: true,
+        alt: true,
+        shift: true,
+        physicalKey: PhysicalKeyboardKey.comma);
+
+    expect(fake.steps, [ReaderStep.next, ReaderStep.previous]);
   }, variant: mac);
 
   testWidgets('⌥⌘> at the last sutta does nothing', (tester) async {

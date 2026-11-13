@@ -44,6 +44,11 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
   /// lets the arrow keys scroll the reader.
   final FocusNode _idleFocus = FocusNode(debugLabel: 'AppShortcuts idle');
 
+  /// Built once: activators have no `==`, so a new map each build would make
+  /// `Shortcuts` index every key again.
+  final Map<ShortcutActivator, Intent> _shortcuts =
+      shortcutMap(defaultTargetPlatform);
+
   @override
   void dispose() {
     _idleFocus.dispose();
@@ -53,7 +58,7 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
   @override
   Widget build(BuildContext context) {
     return Shortcuts(
-      shortcuts: shortcutMap(defaultTargetPlatform),
+      shortcuts: _shortcuts,
       child: Actions(
         actions: <Type, Action<Intent>>{
           DismissTopOverlayIntent: DismissTopOverlayAction(ref),

@@ -119,8 +119,9 @@ class OpenMainSearchAction extends ContextAction<OpenMainSearchIntent> {
 /// shortcut share one code path (per-tab state cleanup, navigator sync,
 /// and the previous-tab-becomes-active behaviour all come for free).
 ///
-/// `isEnabled` returns false when no tab is open so Cmd+W bubbles past us
-/// rather than calling close on index `-1`.
+/// `isEnabled` returns false when no tab is open so ⌥⌘W bubbles past us
+/// rather than calling close on index `-1`. A reader key: needs the Reader,
+/// with nothing open over it.
 class CloseActiveTabAction extends ContextAction<CloseActiveTabIntent> {
   final WidgetRef ref;
   CloseActiveTabAction(this.ref);
@@ -136,7 +137,9 @@ class CloseActiveTabAction extends ContextAction<CloseActiveTabIntent> {
   @override
   bool isEnabled(CloseActiveTabIntent intent, [BuildContext? context]) {
     // Not while typing: Ctrl+Alt is AltGr, which types characters.
-    return ref.read(activeTabIndexProvider) >= 0 && !isTypingInTextBox();
+    return readerKeysAllowed(ref) &&
+        !isTypingInTextBox() &&
+        ref.read(activeTabIndexProvider) >= 0;
   }
 }
 
@@ -424,6 +427,9 @@ class BackToSearchBoxAction extends ContextAction<BackToSearchBoxIntent> {
   @override
   bool isEnabled(BackToSearchBoxIntent intent, [BuildContext? context]) =>
       ref.read(mainSearchFocusNodeProvider) != null &&
+      // Cheap check first: Shift+Tab is pressed all over the app.
+      (ref.read(searchPanelFocusNodeProvider).hasFocus ||
+          ref.read(recentSearchesFocusNodeProvider).hasFocus) &&
       (_firstTabStop(ref)?.hasPrimaryFocus ?? false);
 
   @override

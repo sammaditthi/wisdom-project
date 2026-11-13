@@ -96,10 +96,11 @@ Same keys on desktop and web. "Windows" also means Linux.
    (German AltGr+2 = ²). This changes close-tab, which today fires while
    typing *(my call)*. Same pattern as today: `isEnabled` returns false and
    the key passes on. The search box's ↓ / Tab is the one exception, below.
-5. **Reader keys need the Reader.** Tab, layout, navigator and scroll keys act
-   only while the Reader section shows (as `OpenMainSearchAction` checks), and
-   not while a dialog or the search results panel is open. An open in-page
-   find bar does not block them; its text box does, by rule 4.
+5. **Reader keys need the Reader.** Tab (switch and close), layout,
+   navigator, step and scroll keys act only while the Reader section shows
+   (as `OpenMainSearchAction` checks), and not while a dialog or the search
+   results panel is open. An open in-page find bar or dictionary sheet does
+   not block them; the find bar's text box does, by rule 4.
 
 ## How each one behaves
 
@@ -124,9 +125,10 @@ Same keys on desktop and web. "Windows" also means Linux.
   +. ⌘0 calls `FontScaleNotifier.reset()`. App-wide, so it works in every
   section.
 - **Scroll:** moves the active tab's reader. Each tab has one scroll
-  controller for every layout, so side by side scrolls as one. Only when
-  focus is in the reader or on nothing. On a navigator row, a tab or a button
-  the arrows keep their usual job of moving focus *(my call)*.
+  controller for every layout, so side by side scrolls as one. The toolbar
+  hides and comes back as it does for the wheel. Only when focus is in the
+  reader or on nothing. On a navigator row, a tab or a button the arrows keep
+  their usual job of moving focus *(my call)*.
 - **Go to results:** with the main search box focused
   and results showing, ↓ moves to the first stop in the visible results tab.
   The stops are everything there that takes focus, in order: the reference

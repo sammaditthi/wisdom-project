@@ -220,22 +220,25 @@ class _TabBarWidgetState extends ConsumerState<TabBarWidget> {
     final lo = math.min(atLeading, atTrailing);
     final hi = math.max(atLeading, atTrailing);
 
-    // Already fully inside the viewport — stay put.
-    if (pos.pixels >= lo - _revealEpsilon &&
-        pos.pixels <= hi + _revealEpsilon) {
+    // The chevrons float over the strip's outer edges, so the tab must also
+    // clear them: a chevron's width in from each end. At either end of the
+    // strip that side's chevron is hidden, so the clamp gives the edge back.
+    var clearLo = math.min(lo + _ScrollChevron._width, pos.maxScrollExtent);
+    var clearHi = math.max(hi - _ScrollChevron._width, 0.0);
+    // Too narrow a strip to clear both: just fit the tab.
+    if (clearLo > clearHi) {
+      clearLo = lo;
+      clearHi = hi;
+    }
+
+    // Already fully in view — stay put.
+    if (pos.pixels >= clearLo - _revealEpsilon &&
+        pos.pixels <= clearHi + _revealEpsilon) {
       return pos.pixels;
     }
     // Otherwise scroll the minimum amount: to the nearer edge of the band
-    // of offsets for which the tab is fully visible.
-    //
-    // KNOWN LIMITATION: this aligns the tab flush to the viewport edge, but
-    // the floating chevrons overlay the outer ~28px of that edge — so a
-    // mid-list reveal can leave ~28px of the tab under a visible chevron.
-    // The common paths are unaffected: the last tab reveals to
-    // maxScrollExtent (right chevron hidden) and the first to 0 (left
-    // chevron hidden). A small manual scroll recovers it; not worth the
-    // fragile chevron-width padding to correct.
-    final edge = pos.pixels < lo ? lo : hi;
+    // of offsets for which the tab is fully in view.
+    final edge = pos.pixels < clearLo ? clearLo : clearHi;
     return edge.clamp(0.0, pos.maxScrollExtent);
   }
 

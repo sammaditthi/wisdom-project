@@ -362,5 +362,26 @@ void main() {
 
       expectFullyOnScreen(tester, 'Tab Number 2');
     });
+
+    // The chevrons float over the strip's ends, 28 px wide each.
+    testWidgets('a tab brought in mid-strip stops clear of the chevron',
+        (tester) async {
+      Rect tabRect(String label) => tester.getRect(
+            find
+                .ancestor(of: find.text(label), matching: find.byType(Material))
+                .first,
+          );
+      await pumpTenTabs(tester);
+      final view = tester.getRect(strip);
+
+      await activate(tester, 6);
+      expect(tabRect('Tab Number 6').right, lessThanOrEqualTo(view.right - 28));
+
+      await activate(tester, 2);
+      expect(
+        tabRect('Tab Number 2').left,
+        greaterThanOrEqualTo(view.left + 28),
+      );
+    });
   });
 }

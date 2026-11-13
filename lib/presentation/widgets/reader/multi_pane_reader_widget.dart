@@ -213,7 +213,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
   }
 
   /// Feeds the reader's own scrolling to [_toolbarAutoHide]. A programmatic
-  /// jump carries no user scroll direction, so it never gets this far.
+  /// jump carries no user scroll direction, so it never gets this far; a key
+  /// scroll is let in by [_animateAsUser].
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification.depth != 0) return false;
     if (notification is UserScrollNotification) {
@@ -295,7 +296,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       if (type == ScrollIncrementType.line) {
         _scrollLine(position, sign * 50);
       } else {
-        position.animateTo(
+        _animateAsUser(
+          position,
           (position.pixels + sign * position.viewportDimension * 0.8)
               .clamp(position.minScrollExtent, position.maxScrollExtent),
           duration: const Duration(milliseconds: 100),
@@ -303,6 +305,31 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         );
       }
     }
+  }
+
+  /// Key scrolls still running.
+  int _keyScrolls = 0;
+
+  /// Runs a key's scroll as the reader's own, so the toolbar follows it as it
+  /// follows the wheel. `animateTo` alone reports no user scroll.
+  Future<void> _animateAsUser(
+    ScrollPosition position,
+    double target, {
+    required Duration duration,
+    required Curve curve,
+  }) {
+    final view = position.context.notificationContext;
+    _userScrollContext = view;
+    _keyScrolls++;
+    return position
+        .animateTo(target, duration: duration, curve: curve)
+        // A new press cuts the last scroll short: only the last one out
+        // hands the view back.
+        .whenComplete(() {
+      if (--_keyScrolls == 0 && _userScrollContext == view) {
+        _userScrollContext = null;
+      }
+    });
   }
 
   /// Where each position's running arrow scroll is heading.
@@ -322,8 +349,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // old scroll's whenComplete drop the entry while this one still runs.
     if (target == pending) return;
     _lineTargets[position] = target;
-    position
-        .animateTo(
+    _animateAsUser(
+      position,
       target,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,

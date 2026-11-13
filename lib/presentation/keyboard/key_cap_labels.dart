@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import '../../core/utils/platform_utils.dart';
 import 'keyboard_bindings.dart';
 
 /// The text on each key cap of [keys], for the Keyboard shortcuts tab.

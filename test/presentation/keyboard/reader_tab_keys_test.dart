@@ -121,8 +121,7 @@ void main() {
     await flushTabSaves(tester);
   }, variant: windows);
 
-  testWidgets('⌥⌘] still works with the dictionary sheet open',
-      (tester) async {
+  testWidgets('⌥⌘] still works with the dictionary sheet open', (tester) async {
     // Clicking a word opens the sheet; the reader keys must not go dead.
     final c = await pumpWithTabs(tester);
     c.read(overlayStackProvider.notifier).push(
@@ -147,6 +146,17 @@ void main() {
     await pressKeys(tester, LogicalKeyboardKey.bracketRight,
         primary: true, alt: true);
     expect(c.read(activeTabIndexProvider), 0);
+    await flushTabSaves(tester);
+  }, variant: mac);
+
+  testWidgets('⌥⌘W behind Settings keeps the tab', (tester) async {
+    final c = await pumpWithTabs(tester);
+    c.read(overlayStackProvider.notifier).push(
+          DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}),
+        );
+
+    await pressKeys(tester, LogicalKeyboardKey.keyW, primary: true, alt: true);
+    expect(c.read(tabsProvider), hasLength(2));
     await flushTabSaves(tester);
   }, variant: mac);
 }

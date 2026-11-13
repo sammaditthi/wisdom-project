@@ -29,6 +29,16 @@ void main() {
     expect(c.read(fontScaleProvider), 1.1);
   }, variant: mac);
 
+  // A browser names ⇧= by the character it types, so it arrives as `add`.
+  testWidgets('⌘⇧= from a browser, as +, steps up', (tester) async {
+    final c = await pumpShortcutHost(tester, home: const Scaffold());
+    await c.read(fontScaleProvider.notifier).setScale(0.9);
+
+    await pressKeys(tester, LogicalKeyboardKey.add,
+        primary: true, shift: true, physicalKey: PhysicalKeyboardKey.equal);
+    expect(c.read(fontScaleProvider), 1.0);
+  }, variant: mac);
+
   testWidgets('⌘+ stops at 1.5', (tester) async {
     final c = await pumpShortcutHost(tester, home: const Scaffold());
     await c.read(fontScaleProvider.notifier).setScale(1.45);

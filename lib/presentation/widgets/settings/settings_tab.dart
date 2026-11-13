@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
-import '../../keyboard/keyboard_bindings.dart';
+import '../../../core/utils/platform_utils.dart';
 
 /// The pages of the app Settings dialog, in sidebar order.
 ///
