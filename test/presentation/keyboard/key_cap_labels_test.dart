@@ -28,7 +28,7 @@ void main() {
     const previousSutta =
         ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true);
     const smaller = ShortcutKeys(LogicalKeyboardKey.minus, primary: true);
-    expect(keyCapLabels(pageUp, TargetPlatform.macOS), ['PgUp']);
+    expect(keyCapLabels(pageUp, TargetPlatform.macOS), ['fn', '↑']);
     expect(keyCapLabels(pageUp, TargetPlatform.windows), ['PgUp']);
     const settings = ShortcutKeys(LogicalKeyboardKey.comma, primary: true);
     expect(keyCapLabels(settings, TargetPlatform.macOS), ['⌘', ',']);

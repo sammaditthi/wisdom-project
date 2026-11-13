@@ -1376,16 +1376,10 @@ abstract class AppLocalizations {
   /// **'App'**
   String get shortcutGroupApp;
 
-  /// Keyboard shortcuts tab: word between two ways to press the same keys (on a Mac, PgUp or fn ↑)
-  ///
-  /// In en, this message translates to:
-  /// **'or'**
-  String get shortcutOr;
-
   /// Keyboard shortcuts tab: row for the down-arrow key that moves from the search box into the results, or into the recent searches while the box is empty
   ///
   /// In en, this message translates to:
-  /// **'Go to results or recent searches'**
+  /// **'Go to results'**
   String get shortcutGoToResults;
 
   /// Keyboard shortcuts tab: row for the key that moves to the previous reader tab

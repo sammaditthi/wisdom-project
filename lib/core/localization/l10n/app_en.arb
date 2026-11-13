@@ -1089,11 +1089,7 @@
   "@shortcutGroupApp": {
     "description": "Keyboard shortcuts tab: last section, the keys that work anywhere in the app (Settings, this list, copy, Esc)"
   },
-  "shortcutOr": "or",
-  "@shortcutOr": {
-    "description": "Keyboard shortcuts tab: word between two ways to press the same keys (on a Mac, PgUp or fn ↑)"
-  },
-  "shortcutGoToResults": "Go to results or recent searches",
+  "shortcutGoToResults": "Go to results",
   "@shortcutGoToResults": {
     "description": "Keyboard shortcuts tab: row for the down-arrow key that moves from the search box into the results, or into the recent searches while the box is empty"
   },

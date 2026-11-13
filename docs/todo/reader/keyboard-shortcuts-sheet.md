@@ -27,7 +27,7 @@ Same keys on desktop and web. "Windows" also means Linux.
 | --- | --- | --- | --- | --- |
 | Search | Find in page | ⌘F | Ctrl+F | exists |
 | | Search | ⇧⌘F | Ctrl+Shift+F | exists |
-| | Go to results or recent searches | ↓ | ↓ | new |
+| | Go to results | ↓ | ↓ | new |
 | Reader | Previous tab | ⌥⌘[ | Ctrl+Alt+[ | new |
 | | Next tab | ⌥⌘] | Ctrl+Alt+] | new |
 | | Close tab | ⌥⌘W | Ctrl+Alt+W | exists |
@@ -38,7 +38,7 @@ Same keys on desktop and web. "Windows" also means Linux.
 | | Decrease font size | ⌘− | Ctrl+− | new |
 | | Reset font size | ⌘0 | Ctrl+0 | new |
 | | Scroll | ↑ ↓ | ↑ ↓ | new |
-| | Scroll a page | PgUp PgDn or fn↑ fn↓ | PgUp PgDn | new |
+| | Scroll a page | fn↑ fn↓ | PgUp PgDn | new |
 | Layout | Pali only | ⌥⌘1 | Ctrl+Alt+1 | new |
 | | Sinhala only | ⌥⌘2 | Ctrl+Alt+2 | new |
 | | Side by side | ⌥⌘3 | Ctrl+Alt+3 | new |
@@ -127,7 +127,7 @@ Same keys on desktop and web. "Windows" also means Linux.
   controller for every layout, so side by side scrolls as one. Only when
   focus is in the reader or on nothing. On a navigator row, a tab or a button
   the arrows keep their usual job of moving focus *(my call)*.
-- **Go to results or recent searches:** with the main search box focused
+- **Go to results:** with the main search box focused
   and results showing, ↓ moves to the first stop in the visible results tab.
   The stops are everything there that takes focus, in order: the reference
   row (e.g. "SN 15.3"), result rows, "See all" and "Show N more", so nothing
@@ -167,10 +167,9 @@ Same keys on desktop and web. "Windows" also means Linux.
   entry, keys on the right as key caps, styled like the board.
 - **Mac:** symbols in Apple's order, ⌃ ⌥ ⇧ ⌘, then the key: `⌥ ⌘ W`.
   **Windows:** words: `Ctrl Alt W`. One key cap per key, as on the board.
-- **"or"** joins two ways to press the same keys: on a Mac, PgUp or fn ↑
-  (Mac laptops have no Page Up). Keys side by side without it are a pair:
-  ↑ ↓. Each way takes its own line (PgUp PgDn, then or fn ↑ fn ↓), so the
-  row stays narrow.
+- **Page Up / Page Down on a Mac** show as fn ↑ fn ↓ only: most Mac
+  keyboards have no Page Up key, and Apple's own shortcut list writes it
+  that way. A real PgUp key still works.
 - **Labels** (English and Sinhala reviewed with the user 2026-11-11): short,
   no "the", and the app's own words. "Text", not "sutta": the keys also step
   through commentaries. "Search", as on the search box: it searches the
