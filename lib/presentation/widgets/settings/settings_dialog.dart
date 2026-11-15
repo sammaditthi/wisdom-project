@@ -9,6 +9,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../providers/overlay_stack_provider.dart';
 import 'anumodana_page.dart';
+import 'buddhist_times_settings_page.dart';
 import 'general_settings_page.dart';
 import 'keyboard_shortcuts_page.dart';
 import 'settings_row.dart' show settingsGutter;
@@ -111,6 +112,7 @@ class _SettingsDialogState extends State<SettingsDialog>
 
   Widget _pageFor(SettingsTab tab) => switch (tab) {
         SettingsTab.general => const GeneralSettingsPage(),
+        SettingsTab.buddhistTimes => const BuddhistTimesSettingsPage(),
         SettingsTab.shortcuts => const KeyboardShortcutsPage(),
         SettingsTab.anumodana => const AnumodanaPage(),
       };

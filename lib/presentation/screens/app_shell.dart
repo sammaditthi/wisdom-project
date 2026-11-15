@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/feature_flags.dart';
 import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../providers/app_section_provider.dart';
@@ -11,10 +12,14 @@ import 'notes_screen.dart';
 import 'reader_screen.dart';
 import 'research_screen.dart';
 
-/// The sections the rail and the bottom bar offer, in display order. Home and
-/// Notes are hidden for the beta; they stay in [AppSection] so nothing else
-/// has to change to bring them back.
-const _navSections = [AppSection.reader, AppSection.research];
+/// The sections the rail and the bottom bar offer, in display order. Home
+/// waits on [kEnableHome] and Notes is hidden for the beta; both stay in
+/// [AppSection] so nothing else has to change to bring them back.
+const _navSections = [
+  if (kEnableHome) AppSection.home,
+  AppSection.reader,
+  AppSection.research,
+];
 
 /// The app's top-level shell: an icon-only [NavigationRail] on tablet/desktop
 /// and a labelled bottom [NavigationBar] on mobile, switching between the
@@ -129,7 +134,11 @@ class AppShell extends ConsumerWidget {
               children: [
                 for (final s in AppSection.values)
                   switch (s) {
-                    AppSection.home => const HomeScreen(),
+                    // Off, Home is not built at all, so its clock and sun
+                    // maths do not run behind the other sections.
+                    AppSection.home => kEnableHome
+                        ? const HomeScreen()
+                        : const SizedBox.shrink(),
                     AppSection.reader => const ReaderScreen(),
                     AppSection.research => const ResearchScreen(),
                     AppSection.notes => const NotesScreen(),

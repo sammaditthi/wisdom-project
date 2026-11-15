@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+/// Accents that are the same in every theme: the colour scheme's "fixed"
+/// roles. The Today card draws its sun, night and moon with them.
+class FixedAccentColors {
+  static const primaryFixed = Color(0xFFFAEBD7); // Light antique peach
+  static const primaryFixedDim = Color(0xFFFFB77C); // Light orange
+  static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue
+}
+
 /// Color palette for Light theme
 /// Warm cream background with dark brown text - perfect for daytime reading
 /// Color names follow M3 role semantics (primary = interactive brand color)
@@ -34,7 +42,6 @@ class LightThemeColors {
   // ============================================
   static const primary = Color(0xFF5A3A18); // Warm cinnamon brown (interactive)
   static const onPrimary = Color(0xFFFFFFFF); // White
-  //static const primaryContainer = Color(0xFFFAEBD7); // Light antique peach
   static const primaryContainer = Color(0xFFBAC095); // Olive green
   static const onPrimaryContainer = Color(0xFF2A2318); // Dark brown (= heading)
 

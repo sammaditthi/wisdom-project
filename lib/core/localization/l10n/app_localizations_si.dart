@@ -762,4 +762,175 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get shortcutCloseOverlay => 'මෙනුවක්, පැනලයක් හෝ සංවාද කොටුවක් වසන්න';
+
+  @override
+  String get settingsBuddhistTimes => 'බෞද්ධ වේලාවන්';
+
+  @override
+  String get buddhistTimesDatePattern => 'MMM d, EEE';
+
+  @override
+  String buddhistTimesMiddayIn(int minutes) {
+    return 'මධ්‍යාහ්නයට මිනි. $minutes';
+  }
+
+  @override
+  String get buddhistTimesUposathaTomorrow => 'හෙට උපෝසථ';
+
+  @override
+  String get buddhistTimesUposathaToday => 'අද උපෝසථ';
+
+  @override
+  String get buddhistTimesFullMoon => 'පුර පසළොස්වක';
+
+  @override
+  String get buddhistTimesNewMoon => 'අමාවක';
+
+  @override
+  String get buddhistTimesLocation => 'ස්ථානය';
+
+  @override
+  String get buddhistTimesLocationHint =>
+      'මධ්‍යාහ්නය සහ අරුණ ගණනය කරන්නේ මෙම ස්ථානයටයි.';
+
+  @override
+  String buddhistTimesMiddayAt(String time) {
+    return 'මධ්‍යාහ්නය $time';
+  }
+
+  @override
+  String get buddhistTimesDawn => 'අරුණ';
+
+  @override
+  String buddhistTimesDawnHint(String city) {
+    return 'අරුණෙන් විකාලය අවසන් වී දවස ඇරඹේ. පෙන්වන්නේ $city සඳහා හෙට වේලාවන්ය.';
+  }
+
+  @override
+  String get dawnMethodPaAuk => 'පා-අවුක්';
+
+  @override
+  String get dawnMethodPaAukRule => 'හිරු උදාවට මිනිත්තු 40කට පෙර';
+
+  @override
+  String get dawnMethodNaUyana => 'නා උයන';
+
+  @override
+  String get dawnMethodNaUyanaRule => 'හිරු උදාවට මිනිත්තු 30කට පෙර';
+
+  @override
+  String get dawnMethodCivilTwilight => 'සිවිල් අරුණාලෝකය';
+
+  @override
+  String get dawnMethodCivilTwilightRule => 'හිරු ක්ෂිතිජයට 6° පහළින්';
+
+  @override
+  String get dawnMethodSunrise => 'හිරු උදාව';
+
+  @override
+  String get dawnMethodSunriseRule => 'හිරුගේ ඉහළ දාරය ක්ෂිතිජයේ';
+
+  @override
+  String buddhistTimesSummaryTitle(String city) {
+    return '$city · අද';
+  }
+
+  @override
+  String buddhistTimesSummaryVikala(String time) {
+    return 'හෙට $time තෙක් විකාලය';
+  }
+
+  @override
+  String get buddhistTimesCalendarNote =>
+      'උපෝසථ දින සංඝ දින දර්ශනය අනුව වේ. ඒවා රජයේ පෝය දිනයෙන් වෙනස් විය හැක.';
+
+  @override
+  String get cityColombo => 'කොළඹ';
+
+  @override
+  String get cityKandy => 'මහනුවර';
+
+  @override
+  String get cityGalle => 'ගාල්ල';
+
+  @override
+  String get cityKurunegala => 'කුරුණෑගල';
+
+  @override
+  String get cityAnuradhapura => 'අනුරාධපුරය';
+
+  @override
+  String get cityJaffna => 'යාපනය';
+
+  @override
+  String get cityTrincomalee => 'ත්‍රිකුණාමලය';
+
+  @override
+  String get cityBatticaloa => 'මඩකලපුව';
+
+  @override
+  String get homeToday => 'අද';
+
+  @override
+  String get buddhistTimesFullDatePattern => 'y MMM d, EEE';
+
+  @override
+  String buddhistTimesChangeLocation(String city) {
+    return 'ස්ථානය: $city. වෙනස් කරන්න';
+  }
+
+  @override
+  String buddhistTimesArunaAt(String time) {
+    return 'අරුණ $time';
+  }
+
+  @override
+  String buddhistTimesSunsetAt(String time) {
+    return 'හිරු බැසීම $time';
+  }
+
+  @override
+  String buddhistTimesNowAt(String time) {
+    return 'දැන් $time';
+  }
+
+  @override
+  String buddhistTimesArcLabel(String dawn, String midday, String sunset) {
+    return 'අද හිරු ගමන: අරුණ $dawn, මධ්‍යාහ්නය $midday, හිරු බැසීම $sunset';
+  }
+
+  @override
+  String buddhistTimesMiddayInHours(int hours, int minutes) {
+    return 'මධ්‍යාහ්නයට පැය $hours මිනි. $minutes';
+  }
+
+  @override
+  String buddhistTimesVikalaSpan(String from, String until) {
+    return '$from සිට අරුණ $until තෙක් විකාලය';
+  }
+
+  @override
+  String buddhistTimesVikalaUntil(String time) {
+    return 'අරුණ $time තෙක් විකාලය';
+  }
+
+  @override
+  String buddhistTimesWaxing(int day, int total) {
+    return 'පුර පක්ෂය · $totalන් $day වන දිනය';
+  }
+
+  @override
+  String buddhistTimesWaning(int day, int total) {
+    return 'අව පක්ෂය · $totalන් $day වන දිනය';
+  }
+
+  @override
+  String buddhistTimesUposathaIn(int days) {
+    return 'උපෝසථයට දින $days';
+  }
+
+  @override
+  String buddhistTimesNightArcLabel(String sunset, String dawn) {
+    return 'අද රෑ සඳ ගමන: හිරු බැසීම $sunset, අරුණ $dawn';
+  }
 }

@@ -762,4 +762,175 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutCloseOverlay => 'Close menu, panel or dialog';
+
+  @override
+  String get settingsBuddhistTimes => 'Buddhist times';
+
+  @override
+  String get buddhistTimesDatePattern => 'EEE d MMM';
+
+  @override
+  String buddhistTimesMiddayIn(int minutes) {
+    return 'Midday in $minutes min';
+  }
+
+  @override
+  String get buddhistTimesUposathaTomorrow => 'Uposatha tomorrow';
+
+  @override
+  String get buddhistTimesUposathaToday => 'Uposatha today';
+
+  @override
+  String get buddhistTimesFullMoon => 'Full moon';
+
+  @override
+  String get buddhistTimesNewMoon => 'New moon';
+
+  @override
+  String get buddhistTimesLocation => 'Location';
+
+  @override
+  String get buddhistTimesLocationHint =>
+      'Midday and aruṇa are worked out for this place.';
+
+  @override
+  String buddhistTimesMiddayAt(String time) {
+    return 'Midday $time';
+  }
+
+  @override
+  String get buddhistTimesDawn => 'Aruṇa (dawn)';
+
+  @override
+  String buddhistTimesDawnHint(String city) {
+    return 'Aruṇa ends vikāla and begins the day. The times are tomorrow\'s, for $city.';
+  }
+
+  @override
+  String get dawnMethodPaAuk => 'Pa-Auk';
+
+  @override
+  String get dawnMethodPaAukRule => '40 minutes before sunrise';
+
+  @override
+  String get dawnMethodNaUyana => 'Na-Uyana';
+
+  @override
+  String get dawnMethodNaUyanaRule => '30 minutes before sunrise';
+
+  @override
+  String get dawnMethodCivilTwilight => 'Civil twilight';
+
+  @override
+  String get dawnMethodCivilTwilightRule => 'The sun 6° below the horizon';
+
+  @override
+  String get dawnMethodSunrise => 'Sunrise';
+
+  @override
+  String get dawnMethodSunriseRule => 'The sun\'s top edge on the horizon';
+
+  @override
+  String buddhistTimesSummaryTitle(String city) {
+    return '$city · today';
+  }
+
+  @override
+  String buddhistTimesSummaryVikala(String time) {
+    return 'Vikāla until $time tomorrow';
+  }
+
+  @override
+  String get buddhistTimesCalendarNote =>
+      'Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.';
+
+  @override
+  String get cityColombo => 'Colombo';
+
+  @override
+  String get cityKandy => 'Kandy';
+
+  @override
+  String get cityGalle => 'Galle';
+
+  @override
+  String get cityKurunegala => 'Kurunegala';
+
+  @override
+  String get cityAnuradhapura => 'Anuradhapura';
+
+  @override
+  String get cityJaffna => 'Jaffna';
+
+  @override
+  String get cityTrincomalee => 'Trincomalee';
+
+  @override
+  String get cityBatticaloa => 'Batticaloa';
+
+  @override
+  String get homeToday => 'Today';
+
+  @override
+  String get buddhistTimesFullDatePattern => 'EEE d MMM y';
+
+  @override
+  String buddhistTimesChangeLocation(String city) {
+    return 'Location: $city. Change';
+  }
+
+  @override
+  String buddhistTimesArunaAt(String time) {
+    return 'Aruṇa $time';
+  }
+
+  @override
+  String buddhistTimesSunsetAt(String time) {
+    return 'Sunset $time';
+  }
+
+  @override
+  String buddhistTimesNowAt(String time) {
+    return 'Now $time';
+  }
+
+  @override
+  String buddhistTimesArcLabel(String dawn, String midday, String sunset) {
+    return 'Sun path today: aruṇa $dawn, midday $midday, sunset $sunset';
+  }
+
+  @override
+  String buddhistTimesMiddayInHours(int hours, int minutes) {
+    return 'Midday in $hours h $minutes min';
+  }
+
+  @override
+  String buddhistTimesVikalaSpan(String from, String until) {
+    return 'Vikāla from $from until aruṇa $until';
+  }
+
+  @override
+  String buddhistTimesVikalaUntil(String time) {
+    return 'Vikāla until aruṇa $time';
+  }
+
+  @override
+  String buddhistTimesWaxing(int day, int total) {
+    return 'Waxing · day $day of $total';
+  }
+
+  @override
+  String buddhistTimesWaning(int day, int total) {
+    return 'Waning · day $day of $total';
+  }
+
+  @override
+  String buddhistTimesUposathaIn(int days) {
+    return 'Uposatha in $days days';
+  }
+
+  @override
+  String buddhistTimesNightArcLabel(String sunset, String dawn) {
+    return 'Moon path tonight: sunset $sunset, aruṇa $dawn';
+  }
 }

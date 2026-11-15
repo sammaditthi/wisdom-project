@@ -1,0 +1,138 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/storage/key_value_store.dart';
+import '../../core/storage/key_value_store_provider.dart';
+import '../../core/storage/storage_keys.dart';
+import '../../data/repositories/sun_times_repository_impl.dart';
+import '../../domain/entities/buddhist_times/city.dart';
+import '../../domain/entities/buddhist_times/dawn_method.dart';
+import '../../domain/entities/buddhist_times/uposatha_calendar.dart';
+import '../../domain/repositories/sun_times_repository.dart';
+import 'buddhist_times_state.dart';
+
+/// The next uposatha and the two after it.
+const _uposathasShown = 3;
+
+final sunTimesRepositoryProvider = Provider<SunTimesRepository>((ref) {
+  return const SunTimesRepositoryImpl();
+});
+
+/// The device clock, to the minute. Ticks on every minute boundary while
+/// something is watching.
+final minuteClockProvider =
+    StateNotifierProvider.autoDispose<MinuteClockNotifier, DateTime>((ref) {
+  return MinuteClockNotifier();
+});
+
+class MinuteClockNotifier extends StateNotifier<DateTime> {
+  MinuteClockNotifier() : super(_thisMinute()) {
+    _arm();
+  }
+
+  Timer? _timer;
+
+  static DateTime _thisMinute() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, now.hour, now.minute);
+  }
+
+  // One timer per minute, aimed at the boundary, so the clock never drifts
+  // and a late wake (sleep, a throttled tab) corrects itself on the next tick.
+  void _arm() {
+    final nextMinute = _thisMinute().add(const Duration(minutes: 1));
+    _timer = Timer(nextMinute.difference(DateTime.now()), () {
+      state = _thisMinute();
+      _arm();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+/// The city the times are worked out for.
+final buddhistTimesCityProvider =
+    StateNotifierProvider<SavedChoiceNotifier<City>, City>((ref) {
+  return SavedChoiceNotifier(
+    ref.watch(keyValueStoreProvider),
+    key: StorageKeys.buddhistTimesCity,
+    values: City.values,
+    fallback: City.fallback,
+  );
+});
+
+/// How aruṇa is reckoned.
+final dawnMethodProvider =
+    StateNotifierProvider<SavedChoiceNotifier<DawnMethod>, DawnMethod>((ref) {
+  return SavedChoiceNotifier(
+    ref.watch(keyValueStoreProvider),
+    key: StorageKeys.buddhistTimesDawnMethod,
+    values: DawnMethod.values,
+    fallback: DawnMethod.fallback,
+  );
+});
+
+/// One enum choice saved under [key] by its name; [fallback] until the user
+/// picks, or when the saved name is no longer a value.
+class SavedChoiceNotifier<T extends Enum> extends StateNotifier<T> {
+  SavedChoiceNotifier(
+    this._store, {
+    required String key,
+    required List<T> values,
+    required T fallback,
+  })  : _key = key,
+        super(values.asNameMap()[_store.getString(key)] ?? fallback);
+
+  final KeyValueStore _store;
+  final String _key;
+
+  /// Saving is best-effort: the UI already shows the new choice, so a failed
+  /// write is logged instead of surfacing as an unhandled async error.
+  Future<void> choose(T value) async {
+    if (state == value) return;
+    state = value;
+    try {
+      await _store.setString(_key, value.name);
+    } catch (e) {
+      debugPrint('Failed to save $_key: $e');
+    }
+  }
+}
+
+/// Today's times and the coming uposathas, for the saved city and dawn method.
+final buddhistTimesProvider = Provider.autoDispose<BuddhistTimesState>((ref) {
+  final now = ref.watch(minuteClockProvider);
+  final city = ref.watch(buddhistTimesCityProvider);
+  final method = ref.watch(dawnMethodProvider);
+  final sunTimes = ref.watch(sunTimesRepositoryProvider);
+
+  final today = City.dayAt(now);
+  final dawn = sunTimes.dawn(today, city, method);
+  final beforeDawn = now.isBefore(dawn);
+
+  // The day runs aruṇa to aruṇa: before today's aruṇa it is still yesterday.
+  final buddhistDay =
+      beforeDawn ? today.subtract(const Duration(days: 1)) : today;
+
+  return BuddhistTimesState(
+    now: now,
+    dawn: dawn,
+    midday: sunTimes.midday(today, city),
+    sunset: sunTimes.sunset(today, city),
+    vikalaEnds: beforeDawn
+        ? dawn
+        : sunTimes.dawn(today.add(const Duration(days: 1)), city, method),
+    nightStart: sunTimes.sunset(
+      beforeDawn ? today.subtract(const Duration(days: 1)) : today,
+      city,
+    ),
+    buddhistDay: buddhistDay,
+    uposathas: UposathaCalendar.upcoming(buddhistDay, _uposathasShown),
+  );
+});

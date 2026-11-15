@@ -59,6 +59,10 @@ class AppTheme {
       inverseSurface: LightThemeColors.inverseSurface,
       onInverseSurface: LightThemeColors.inverseOnSurface,
       inversePrimary: LightThemeColors.inversePrimary,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
       // Utility
       scrim: LightThemeColors.scrim,
       shadow: LightThemeColors.shadow,
@@ -111,6 +115,10 @@ class AppTheme {
       secondary: DarkThemeColors.accent,
       onSecondary: DarkThemeColors.onPrimary,
       tertiary: DarkThemeColors.secondaryAccent,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
       surface: DarkThemeColors.surface,
       onSurface: DarkThemeColors.onBackground,
       onSurfaceVariant: DarkThemeColors.onBackground.withValues(alpha: 0.7),
@@ -172,6 +180,10 @@ class AppTheme {
       secondary: WarmThemeColors.accent,
       onSecondary: WarmThemeColors.onPrimary,
       tertiary: WarmThemeColors.secondaryAccent,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
       surface: WarmThemeColors.surface,
       onSurface: WarmThemeColors.onBackground,
       onSurfaceVariant: WarmThemeColors.onBackground.withValues(alpha: 0.7),
