@@ -485,9 +485,6 @@ class _MoonPanel extends StatelessWidget {
                   photo,
                   width: moonSize,
                   height: moonSize,
-                  // The files are larger than they are shown, for sharp
-                  // screens; medium scales them down smoothly.
-                  filterQuality: FilterQuality.medium,
                   // No photo (web, offline, not yet stored): the drawn moon.
                   errorBuilder: (_, __, ___) => CustomPaint(
                     size: const Size.square(moonSize),

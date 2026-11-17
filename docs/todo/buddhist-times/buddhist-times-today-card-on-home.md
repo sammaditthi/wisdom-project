@@ -42,9 +42,10 @@ notifications.
 The moon panel shows a NASA image at 64, not the 44 drawing.
 
 - **Files:** `assets/moon/00.webp` to `29.webp`, 00 the new moon and 15 the
-  full moon, 384 px.
+  full moon, 256 px: sharp at 64 on screens up to 4×. Re-cut from 384 px on
+  2026-11-17, which took all thirty from 473 KiB to 263 KiB.
 - **Script:** `assets/make_moon.sh` fetches NASA's frames and cuts the
-  photos. A run on 2026-11-15 matches all thirty byte for byte. It sits
+  photos. A run on 2026-11-17 matches all thirty byte for byte. It sits
   outside `assets/moon/` because `pubspec.yaml` ships that whole folder.
 - **Credit:** an Images section on Anumodanā, shown only with the toggle.
   See *Licences*.

@@ -34,7 +34,7 @@ os.makedirs(frames, exist_ok=True)
 
 # One cycle of the moon, as frame numbers.
 NEW, FULL, NEXT_NEW = 429, 767, 1141
-SIZE = 384
+SIZE = 256
 
 
 def frame_of(photo):
