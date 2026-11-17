@@ -29,8 +29,8 @@ notifications.
 - **Removed:** the tree footer and its ochre theme extension. The tree is as it
   was before this branch.
 - **The `CHANGELOG.md` note is out.** A new one is owed when the toggle goes on.
-- **Tests:** none written. One existing check was changed and run: the link
-  count in `anumodana_page_test.dart` follows the toggle. See *Tests*.
+- **Tests:** only the Anumodanā page's, written and run: the link count
+  follows the toggle, and the NASA credit is found by name. See *Tests*.
 - **Still owed:** a look at the card running (see *Checked*), the
   Sinhala review, the colour check, one offline check of the photos on dev,
   *Validation* against a recent Na-Uyana sheet, the test agent's pass.
@@ -420,9 +420,10 @@ Uposatha dates the rule must give for 2026:
 
 ## Tests
 
-Not written with the build; the test agent writes them after. The one change
-so far: the link count in `anumodana_page_test.dart` is seven with the toggle
-on and six with it off. Only the "on" side has been run.
+Not written with the build; the test agent writes them after. Done so far,
+both in `anumodana_page_test.dart`: the link count is seven with the toggle on
+and six with it off, and the Images section with its NASA link, found by
+name, shows only with the toggle on. Only the "on" side has been run.
 
 With the toggle off, no existing test should change: the tree is as it was,
 and Settings on desktop still has three tabs.
@@ -446,8 +447,6 @@ To cover:
 - the Settings tab in both dialog shapes;
 - which photo each fortnight day picks, in 14 and 15 day fortnights, and the
   drawn moon when the photo cannot load;
-- the Images section on Anumodanā with the toggle on, and its link found by
-  name: today `anumodana_page_test.dart` only counts the links;
 - the toggle off: no Home destination, no Buddhist times tab, no Images
   section.
 

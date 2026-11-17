@@ -82,6 +82,21 @@ void main() {
       expect(find.byTooltip(l10n.openLinkTo('SuttaCentral')), findsOneWidget);
     });
 
+    testWidgets('the moon images are credited to NASA, only with Home',
+        (tester) async {
+      final l10n = await pumpPage(tester);
+
+      // The credit line NASA asks for, word for word, so a literal.
+      const nasa = "NASA's Scientific Visualization Studio";
+      const shown = kEnableHome ? findsOneWidget : findsNothing;
+
+      expect(find.text(l10n.anumodanaImages), shown);
+      expect(find.text(nasa), shown);
+      expect(find.text(l10n.anumodanaNasaMoonUse), shown);
+      // By name: the link count below cannot tell whose link is missing.
+      expect(find.byTooltip(l10n.openLinkTo(nasa)), shown);
+    });
+
     testWidgets('the sources carry their own logos, drawn as decoration',
         (tester) async {
       await pumpPage(tester);
