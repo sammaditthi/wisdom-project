@@ -75,8 +75,9 @@ self.addEventListener('fetch', (event) => {
 });
 
 // From a page this worker didn't serve: the URLs it loaded without the
-// worker, mostly answered from the HTTP cache. waitUntil, or the browser may
-// stop the worker halfway through.
+// worker, mostly answered from the HTTP cache. And from the app on every
+// start: the Today card's moon photos. waitUntil, or the browser may stop the
+// worker halfway through.
 self.addEventListener('message', (event) => {
   if (!Array.isArray(event.data)) return;
   const urls = [...new Set(event.data)].filter(storable);

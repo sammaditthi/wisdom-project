@@ -147,7 +147,8 @@ flutter:
     - assets/icons/sources/suttacentral.webp
     # The Today card's moon: 00 the new moon, 15 the full moon. From NASA's
     # Scientific Visualization Studio, "Moon Phase and Libration, 2026"
-    # (svs.gsfc.nasa.gov/5587), the 730px frames, cropped to the disc.
+    # (svs.gsfc.nasa.gov/5587), the 730px frames, cropped to the disc by
+    # assets/make_moon.sh, which sits outside this folder so it is not shipped.
     - assets/moon/
     # The bundled Noto faces' licence. Read at startup and handed to
     # LicenseRegistry (main.dart) so they appear in Open-source licences.

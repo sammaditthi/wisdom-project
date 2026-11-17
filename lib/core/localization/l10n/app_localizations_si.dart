@@ -683,6 +683,12 @@ class AppLocalizationsSi extends AppLocalizations {
       'රෝම අකුරින් ඇති පාළි පද සිංහල අකුරට හැරවීම.\nPath Nirvana Foundation. අවසර ඇතිව භාවිතා කෙරේ.';
 
   @override
+  String get anumodanaImages => 'රූප';
+
+  @override
+  String get anumodanaNasaMoonUse => 'මුල් පිටුවේ ඇති සඳෙහි රූප.';
+
+  @override
   String get anumodanaContributors => 'දායක වූ සැම';
 
   @override

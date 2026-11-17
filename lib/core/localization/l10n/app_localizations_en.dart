@@ -683,6 +683,12 @@ class AppLocalizationsEn extends AppLocalizations {
       'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.';
 
   @override
+  String get anumodanaImages => 'Images';
+
+  @override
+  String get anumodanaNasaMoonUse => 'The images of the moon on Home.';
+
+  @override
   String get anumodanaContributors => 'Those who contributed';
 
   @override

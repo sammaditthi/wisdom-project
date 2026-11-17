@@ -15,6 +15,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:the_wisdom_project/core/constants/feature_flags.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/theme/app_theme.dart';
 import 'package:the_wisdom_project/domain/entities/dictionary/dictionary_info.dart';
@@ -195,7 +196,11 @@ void main() {
 
       // Six links in all: the two sources, DPD and the three Transliteration
       // rows. No other dictionary has one, so DPD's is the only one among them.
-      expect(find.byIcon(Icons.open_in_new), findsNWidgets(6));
+      // A seventh, the moon images' credit, shows only with Home.
+      expect(
+        find.byIcon(Icons.open_in_new),
+        findsNWidgets(kEnableHome ? 7 : 6),
+      );
     });
   });
 

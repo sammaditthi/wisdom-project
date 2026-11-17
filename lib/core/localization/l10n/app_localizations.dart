@@ -1304,6 +1304,18 @@ abstract class AppLocalizations {
   /// **'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.'**
   String get anumodanaPaliConverterUse;
 
+  /// Settings > Anumodanā: section header above the credit for the moon images on Home's Today card
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get anumodanaImages;
+
+  /// Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Nothing that reads as NASA endorsing the app
+  ///
+  /// In en, this message translates to:
+  /// **'The images of the moon on Home.'**
+  String get anumodanaNasaMoonUse;
+
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
   ///
   /// In en, this message translates to:

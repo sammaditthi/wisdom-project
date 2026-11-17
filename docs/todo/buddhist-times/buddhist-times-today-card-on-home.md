@@ -3,7 +3,7 @@
 Started 2026-11-14 as a footer under the Tipiṭaka tree. On 2026-11-15 the user
 dropped the footer, which made the reader busy, and moved straight to the
 Today card on a Home section, hidden behind a toggle.
-Built on branch `feat/buddhist-times`, not committed, not merged.
+Built on branch `feat/buddhist-times`, committed, not merged.
 Design: [Buddhist times canvas](https://claude.ai/artifact/LrBxRfjRcrCqE5nPcVJKfn),
 the row titled *Phase 2 · Today card on Home*.
 
@@ -18,20 +18,50 @@ notifications.
 
 ## Handover
 
-**2026-11-15 — the card is built and hidden.** `kEnableHome` is `false`, so
-today's release shows neither Home nor the Settings tab.
+**2026-11-15 — the card is built, with the moon as a NASA photo.**
 
+- **`kEnableHome` is `true` on the branch**, for looking at the card. Main
+  still has no Home. Set it to `false` before a merge, unless *Done when* is
+  met by then.
 - **Done:** sun times with sunset, the calendar, the providers, the Settings
-  tab, the Today card, the Home screen, the toggle. The analyzer is clean.
+  tab, the Today card, the Home screen, the toggle, the moon photos with
+  their credit, web preload and script. The analyzer is clean.
 - **Removed:** the tree footer and its ochre theme extension. The tree is as it
   was before this branch.
 - **The `CHANGELOG.md` note is out.** A new one is owed when the toggle goes on.
-- **Tests:** none written, none run. See *Tests*.
-- **Still owed:** a look at the card running, the Sinhala review, the colour
-  check, *Validation* against a recent Na-Uyana sheet, the test agent's pass,
-  a commit.
+- **Tests:** none written. One existing check was changed and run: the link
+  count in `anumodana_page_test.dart` follows the toggle. See *Tests*.
+- **Still owed:** a look at the card running (see *Checked*), the
+  Sinhala review, the colour check, one offline check of the photos on dev,
+  *Validation* against a recent Na-Uyana sheet, the test agent's pass.
 - **Do not** copy code or calendar files from Buddhist Sun (GPL-3.0), and do
   not take dawn logic from the canvas.
+
+### Moon photos
+
+The moon panel shows a NASA image at 64, not the 44 drawing.
+
+- **Files:** `assets/moon/00.webp` to `29.webp`, 00 the new moon and 15 the
+  full moon, 384 px.
+- **Script:** `assets/make_moon.sh` fetches NASA's frames and cuts the
+  photos. A run on 2026-11-15 matches all thirty byte for byte. It sits
+  outside `assets/moon/` because `pubspec.yaml` ships that whole folder.
+- **Credit:** an Images section on Anumodanā, shown only with the toggle.
+  See *Licences*.
+- **Web, offline:** the offline worker stores a file only once it has
+  loaded, so every start hands it the thirty addresses, once the app shows
+  (`WebDatabaseInstaller`), and the worker fetches and stores them. Every
+  start and not only the first visit, so a browser that installed before
+  Home gets them too, and a re-cut photo replaces the stored one. A photo
+  that has not changed costs one small "still the same?" request. With no
+  worker, as under `flutter run`, nothing is fetched. **Not checked on dev.**
+- **Open:** the black dark side on the light card, worst near the new moon.
+  If it looks wrong, the next try is the same photo inside a small dark tile.
+- **If the photos go:** delete `assets/moon/`, `assets/make_moon.sh` and
+  `moon_photos.dart`; take out the folder in `pubspec.yaml`, the preload in
+  the installer, its sentence in the message comment of
+  `web/offline_worker.js`, the Images section and its two strings;
+  `_MoonPanel` goes back to `_MoonPainter` alone.
 
 ### Checked
 
@@ -68,6 +98,8 @@ For the user to correct. All in `app_si.arb`.
 | Pa-Auk / Na-Uyana | පා-අවුක් / නා උයන |
 | Civil twilight / Sunrise | සිවිල් අරුණාලෝකය / හිරු උදාව |
 | Date order, with and without the year | `y MMM d, EEE` / `MMM d, EEE` |
+| Images (Anumodanā section) | රූප |
+| The images of the moon on Home. | මුල් පිටුවේ ඇති සඳෙහි රූප. |
 
 The hints, the footnote, the screen-reader labels and the eight city names
 are drafts too.
@@ -78,7 +110,8 @@ are drafts too.
 constant. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
-- Settings has no Buddhist times tab.
+- Settings has no Buddhist times tab, and Anumodanā no Images section.
+- Web does not preload the moon photos.
 
 Turning it on is that one line, plus a `CHANGELOG.md` note under *Unreleased*.
 The app still opens on the Reader either way.
@@ -124,7 +157,7 @@ Moon panel:
 
 | Line | Shows |
 |---|---|
-| Moon drawing | The lit part for this day of the fortnight |
+| Moon photo | The moon on this day of its cycle; a drawing if the photo cannot load |
 | Fortnight | `Waxing · day 5 of 15`, or `Waning` before a new moon |
 | Headline | `Uposatha in 10 days`, `Uposatha tomorrow`, `Uposatha today` |
 | Next uposatha | `Tue 24 Nov · Full moon` |
@@ -200,6 +233,9 @@ By the user on 2026-11-14 unless marked.
     side. *(user, 2026-11-15)*
 18. **No small print and no Settings link on the card.** The city button is
     enough. *(user, 2026-11-15; which of the two buttons stays: my call)*
+19. **The moon is a NASA image, thirty to a cycle.** The drawing stays only
+    as the fallback. *(user, 2026-11-15, by committing it; the credit's
+    section and wording: my call)*
 
 ## Open question
 
@@ -263,6 +299,12 @@ Until then the dates rest on the Thai-identical table.
   Permission was not asked (user not in a position to, 2026-11-14).
 - **`nrel_spa`** is MIT. Flutter lists it under Open-source licences without
   any work from us.
+- **The moon images** are from NASA's Scientific Visualization Studio, "Moon
+  Phase and Libration, 2026" (svs.gsfc.nasa.gov/5587). NASA asks for that
+  credit line. Anumodanā carries it as text with a link. No NASA logo, which
+  is protected, and no wording that reads as NASA endorsing the app. They
+  are rendered from spacecraft data, so the app says "images", not
+  "photographs".
 
 ## How it is built
 
@@ -272,6 +314,8 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 ### Core — `lib/core/`
 
 - `constants/feature_flags.dart`: `kEnableHome`.
+- `constants/moon_photos.dart`: how many moon photos there are and the path
+  of each, for the card and the web installer.
 
 ### Domain — `lib/domain/`
 
@@ -290,6 +334,9 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 - `repositories/sun_times_repository_impl.dart`: the only file that imports
   `nrel_spa`. Applies the rounding in Decision 7.
+- `database/web_database_installer.dart`: every start on web sends the moon
+  photos' addresses to the offline worker, which fetches and stores them. It
+  cannot fail the install.
 
 ### Presentation — `lib/presentation/`
 
@@ -300,8 +347,11 @@ Pure Dart for the maths, so it works on every platform. Nothing in
   - the card's state, derived from those three.
 - `providers/buddhist_times_state.dart`: the card's state, in its own file
   like `search_state.dart`.
-- `widgets/home/today_card.dart`: the card. The arc and the moon are each a
-  `CustomPainter`; the arc's labels are ordinary text placed over it.
+- `widgets/home/today_card.dart`: the card. The arc is a `CustomPainter`;
+  its labels are ordinary text placed over it. The moon is an `Image.asset`,
+  with a `CustomPainter` as its fallback.
+- `widgets/settings/anumodana_page.dart`: the Images section, only with the
+  toggle.
 - `screens/home_screen.dart`: the heading and the card.
 - `screens/app_shell.dart`: Home joins the navigation, and is built, only
   when the toggle is on.
@@ -314,8 +364,8 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 ### Colours and text
 
 Colour-scheme roles and `AppTypography` only: `primaryFixedDim` for the kāla
-stretch, `primaryFixed` for the night stretch, `tertiaryFixed` for the moon,
-`surface` for the card, `surfaceContainerLow` for the moon panel,
+stretch, `primaryFixed` for the night stretch, `tertiaryFixed` for the arc's
+moon marker and the drawn fallback moon, `surface` for the card, `surfaceContainerLow` for the moon panel,
 `outlineVariant` for the borders and the rest of the arc. The three fixed
 colours are `FixedAccentColors` in `app_colors.dart`.
 
@@ -370,7 +420,9 @@ Uposatha dates the rule must give for 2026:
 
 ## Tests
 
-Not written with the build; the test agent writes them after. None were run.
+Not written with the build; the test agent writes them after. The one change
+so far: the link count in `anumodana_page_test.dart` is seven with the toggle
+on and six with it off. Only the "on" side has been run.
 
 With the toggle off, no existing test should change: the tree is as it was,
 and Settings on desktop still has three tabs.
@@ -392,7 +444,12 @@ To cover:
 - Colombo before any choice, and the saved city and method surviving a
   restart;
 - the Settings tab in both dialog shapes;
-- the toggle off: no Home destination, no Buddhist times tab.
+- which photo each fortnight day picks, in 14 and 15 day fortnights, and the
+  drawn moon when the photo cannot load;
+- the Images section on Anumodanā with the toggle on, and its link found by
+  name: today `anumodana_page_test.dart` only counts the links;
+- the toggle off: no Home destination, no Buddhist times tab, no Images
+  section.
 
 ## Done when
 
@@ -402,6 +459,7 @@ To cover:
 - [x] The sun and calendar numbers agree with *Reference values*.
 - [x] Every colour from the theme; every string in both ARB files.
 - [ ] The user has checked the colours and the Sinhala.
+- [ ] The moon photos show with no connection, checked once on dev.
 - [ ] The open question is answered and moved into *Decisions*.
 - [ ] *Validation* is done, or its absence is accepted in writing here.
 - [ ] The toggle is on, with a `CHANGELOG.md` note.

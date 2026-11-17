@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../core/constants/moon_photos.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../domain/entities/buddhist_times/uposatha_day.dart';
@@ -460,10 +461,12 @@ class _MoonPanel extends StatelessWidget {
     final day = state.fortnightDay!;
     final waxing = next.phase == MoonPhase.fullMoon;
     // The moon's age as an angle: 0 at new moon, pi at full.
-    final age =
-        math.pi * (waxing ? 0 : 1) + math.pi * day / next.fortnightDays;
-    // Thirty photos a cycle: 00 the new moon, 15 the full moon.
-    final photo = ((age / math.pi * 15).round() % 30).toString().padLeft(2, '0');
+    final age = math.pi * (waxing ? 0 : 1) + math.pi * day / next.fortnightDays;
+    // One photo a step round the cycle: the first the new moon, the middle
+    // one the full moon.
+    final photo = moonPhotoAsset(
+      (age / math.pi * (moonPhotoCount / 2)).round() % moonPhotoCount,
+    );
     const moonSize = 64.0;
 
     String line(UposathaDay uposatha) =>
@@ -483,7 +486,7 @@ class _MoonPanel extends StatelessWidget {
             children: [
               ExcludeSemantics(
                 child: Image.asset(
-                  'assets/moon/$photo.webp',
+                  photo,
                   width: moonSize,
                   height: moonSize,
                   // The files are larger than they are shown, for sharp

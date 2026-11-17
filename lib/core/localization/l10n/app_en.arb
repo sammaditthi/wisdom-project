@@ -1035,6 +1035,14 @@
   "@anumodanaPaliConverterUse": {
     "description": "Settings > Anumodanā: what pali-converter does for the app (at build time, in tools/dict-populate.js), who made it, and on what terms. Its source header requires the author's permission for any use, which the project holds in writing. Proper names are not translated"
   },
+  "anumodanaImages": "Images",
+  "@anumodanaImages": {
+    "description": "Settings > Anumodanā: section header above the credit for the moon images on Home's Today card"
+  },
+  "anumodanaNasaMoonUse": "The images of the moon on Home.",
+  "@anumodanaNasaMoonUse": {
+    "description": "Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Nothing that reads as NASA endorsing the app"
+  },
   "anumodanaContributors": "Those who contributed",
   "@anumodanaContributors": {
     "description": "Settings > Anumodanā: section header above the thanks to everyone who helped build the app"

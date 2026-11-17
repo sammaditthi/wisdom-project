@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
+import 'dart:ui_web' as ui_web;
 
 import 'package:drift/drift.dart';
 import 'package:drift/wasm.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' show basenameWithoutExtension;
 import 'package:web/web.dart' as web;
 
+import '../../core/constants/feature_flags.dart';
+import '../../core/constants/moon_photos.dart';
 import '../datasources/suttacentral_concordance_datasource.dart';
 import '../datasources/tree_local_datasource.dart';
 import 'database_install_status.dart';
@@ -149,6 +152,7 @@ class WebDatabaseInstaller {
       // before this one marks it in use, and the download that follows moves
       // the screen off ready.
       _emit(const DatabaseInstallStatus(phase: DatabaseInstallPhase.ready));
+      if (kEnableHome) unawaited(_preloadMoonPhotos());
     } catch (error, stack) {
       final failure = _asFailure(error, 'Installing the databases failed');
       debugPrint('[db] $failure\n$stack');
@@ -193,6 +197,38 @@ class WebDatabaseInstaller {
           'GET $path failed: $error',
         );
       }
+    }
+  }
+
+  /// Hands the Today card's moon photos to the offline worker to fetch and
+  /// store: every one, not only the one shown today.
+  ///
+  /// On every start, so a browser that installed before Home has them too and
+  /// a photo that changed replaces its stored copy. Without a worker
+  /// (`flutter run`) nothing happens, and nothing here can fail the install.
+  Future<void> _preloadMoonPhotos() async {
+    try {
+      // The URL `Image.asset` fetches, made whole: the worker stores by whole
+      // URLs.
+      final urls = [
+        for (var i = 0; i < moonPhotoCount; i++)
+          web
+              .URL(
+                ui_web.assetManager.getAssetUrl(moonPhotoAsset(i)),
+                web.document.baseURI,
+              )
+              .href
+              .toJS,
+      ];
+      // `ready` and not `controller`: a hard reload has a worker but is not
+      // controlled by it. With no worker registered it never completes.
+      final registration =
+          await web.window.navigator.serviceWorker.ready.toDart;
+      registration.active?.postMessage(urls.toJS);
+    } catch (error) {
+      // `navigator.serviceWorker` is missing on an insecure page and throws
+      // in a sandboxed frame.
+      debugPrint('[db] moon photos not handed to the offline worker: $error');
     }
   }
 
