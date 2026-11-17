@@ -5,7 +5,9 @@ dropped the footer, which made the reader busy, and moved straight to the
 Today card on a Home section, hidden behind a toggle.
 Built on branch `feat/buddhist-times`, committed, not merged.
 Design: [Vinaya times canvas](https://claude.ai/artifact/LrBxRfjRcrCqE5nPcVJKfn),
-the row titled *Phase 2 · Today card on Home*.
+the row titled *Phase 2 · Today card on Home*. The card's layout is *A · One
+sky* on the [Today card surface canvas](https://claude.ai/artifact/SeTDHs2h6igsuBsJ32Mzj2),
+chosen 2026-11-17. Its moon treatments and its 88 px moon are not taken yet.
 
 **Goal:** a Home section with one card for today: the sun's day with midday
 and vikāla, the moon's fortnight, and the next uposathas. A Settings tab picks
@@ -65,7 +67,7 @@ The moon panel shows a NASA image at 64, not the 44 drawing.
 - **If the photos go:** delete `assets/moon/`, `assets/make_moon.sh` and
   `moon_photos.dart`; take out the folder in `pubspec.yaml`, the photo
   loading in the installer, the Images section and its two strings;
-  `_MoonPanel` goes back to `_MoonPainter` alone.
+  `_MoonSky` goes back to `_MoonPainter` alone.
 
 ### Checked
 
@@ -133,25 +135,30 @@ A heading and the Today card, in one column no wider than a reading page.
 
 | Part | Shows |
 |---|---|
-| Header | `TODAY`, the date with its year, and a city button |
+| Header | `TODAY`, the date with its year, and a city button as small as its label |
 | Arc | A half circle: the sun's by day, the moon's by night |
 | Headline | One of the two states below |
-| Moon panel | The fortnight, the next uposatha, and the two after it |
+| Moon panel | The fortnight, the next uposatha, and the one after it |
 
-On a narrow card the moon panel drops under the arc.
+The moon panel has no box of its own. One dashed horizon runs under the arc
+and the moon. The fortnight line sits under it, level with the arc's end
+labels, and the two headlines start level. On a narrow card the moon panel
+drops under the arc, over a horizon of its own.
 
 Arc:
 
 | When | Runs | Coloured stretch | Marker |
 |---|---|---|---|
 | Aruṇa until sunset | Aruṇa to sunset, midday marked | Aruṇa to midday, kāla, in light orange | A ring, the sun |
-| Sunset until aruṇa | Sunset to the next aruṇa | All of it, in peach | A pale blue disc, the moon |
+| Sunset until aruṇa | Sunset to the next aruṇa | All of it, in midnight blue | An amber disc, the moon |
 
-`Now 08:30` keeps a fixed spot outside the arc, 45 degrees up: on the left in
-the arc's first half, on the right in its second. Its nearest corner sits on
-that line, past the marker's reach, so the marker never touches it. On a
-narrow card the arc stands in a little to make room. At a system text size
-where it still cannot fit, or would meet the midday label, it is left out.
+`Now 08:30` keeps a fixed spot outside the arc, centred on the line 45 degrees
+up, halfway between the arc's end and its top: on the left in the arc's first
+half, on the right in its second, mirrored. It sits as near the arc as it can
+while its nearest corner stays past the marker's reach, so the marker never
+touches it. On a narrow card the arc stands in a little to make room. At a
+system text size where it still cannot fit, or would meet the midday label,
+it is left out.
 
 Headline:
 
@@ -168,7 +175,7 @@ Moon panel:
 | Fortnight | `Waxing · day 5 of 15`, or `Waning` before a new moon |
 | Headline | `Uposatha in 10 days`, `Uposatha tomorrow`, `Uposatha today` |
 | Next uposatha | `Tue 24 Nov · Full moon` |
-| After that | The following two, same form, dimmed |
+| After that | The one after it, same form, smaller and dimmed |
 
 The day runs aruṇa to aruṇa, so the fortnight's day and "today" and
 "tomorrow" switch at aruṇa, not at midnight. In Sinhala the word is උපෝසථ.
@@ -234,10 +241,13 @@ By the user on 2026-11-14 unless marked.
     release. *(user, 2026-11-15; a constant and not a Settings switch: my
     call)*
 15. **No Continue reading card for now.** *(user, 2026-11-15)*
-16. **Colour-scheme roles only.** No theme extension. The card's three
-    accents are the scheme's "fixed" roles, the same in every theme: light
-    orange for kāla, the antique peach for the night, a pale blue for the
-    moon. *(user, 2026-11-15; the fixed roles: my call)*
+16. **Colour-scheme roles only.** No theme extension. The card's accents
+    are the scheme's "fixed" roles, the same in every theme: light orange
+    for kāla, a midnight blue for the night, light amber for the moon marker,
+    and a pale blue for the drawn fallback moon. The moon is lighter than
+    the night's arc, as against a night sky. *(user, 2026-11-15; the
+    midnight-blue night and the amber moon: user, 2026-11-17; the fixed
+    roles: my call)*
 17. **One arc, swapped at sunset and at aruṇa**, and not two arcs side by
     side. *(user, 2026-11-15)*
 18. **No small print and no Settings link on the card.** The city button is
@@ -376,10 +386,14 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 ### Colours and text
 
 Colour-scheme roles and `AppTypography` only: `primaryFixedDim` for the kāla
-stretch, `primaryFixed` for the night stretch, `tertiaryFixed` for the arc's
-moon marker and the drawn fallback moon, `surface` for the card, `surfaceContainerLow` for the moon panel,
-`outlineVariant` for the borders and the rest of the arc. The three fixed
-colours are `FixedAccentColors` in `app_colors.dart`.
+stretch, `tertiaryFixedDim` for the night stretch, `primaryFixed` for the
+arc's moon marker, `tertiaryFixed` for the drawn fallback moon, `surface` for
+the card, `outlineVariant` for the borders, the horizon and the rest of the
+arc. The fixed colours are `FixedAccentColors` in `app_colors.dart`.
+
+**Open:** the midnight blue almost vanishes on the dark and warm themes'
+cards. Both are off today. When one comes back, its night arc needs a
+lighter blue of its own.
 
 ### Strings
 

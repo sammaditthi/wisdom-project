@@ -63,6 +63,7 @@ class AppTheme {
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       // Utility
       scrim: LightThemeColors.scrim,
       shadow: LightThemeColors.shadow,
@@ -119,6 +120,7 @@ class AppTheme {
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: DarkThemeColors.surface,
       onSurface: DarkThemeColors.onBackground,
       onSurfaceVariant: DarkThemeColors.onBackground.withValues(alpha: 0.7),
@@ -184,6 +186,7 @@ class AppTheme {
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: WarmThemeColors.surface,
       onSurface: WarmThemeColors.onBackground,
       onSurfaceVariant: WarmThemeColors.onBackground.withValues(alpha: 0.7),

@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 /// Accents that are the same in every theme: the colour scheme's "fixed"
 /// roles. The Today card draws its sun, night and moon with them.
 class FixedAccentColors {
-  static const primaryFixed = Color(0xFFFAEBD7); // Light antique peach
+  static const primaryFixed = Color(0xFFF6D89C); // Light amber
   static const primaryFixedDim = Color(0xFFFFB77C); // Light orange
   static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue
+  static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue
 }
 
 /// Color palette for Light theme

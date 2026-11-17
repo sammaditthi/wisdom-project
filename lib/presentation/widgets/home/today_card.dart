@@ -15,11 +15,12 @@ import '../settings/settings_dialog.dart';
 import '../settings/settings_tab.dart';
 
 /// Home's Today card: the day's or the night's arc with midday and vikāla on
-/// one side, the moon's fortnight and the coming uposathas on the other.
+/// one side, the moon's fortnight and the coming uposathas on the other, both
+/// over one horizon.
 class TodayCard extends ConsumerWidget {
   const TodayCard({super.key});
 
-  /// Narrower than this, the moon panel drops under the sun arc.
+  /// Narrower than this, the moon's side drops under the sun's.
   static const _sideBySideWidth = 520.0;
 
   @override
@@ -30,9 +31,15 @@ class TodayCard extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final typography = context.typography;
 
-    final sun = _ArcSide(state: state);
-    // Past the calendar's end there is no uposatha to show, so no panel.
-    final moon = state.uposathas.isEmpty ? null : _MoonPanel(state: state);
+    final sunSky = Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: _SkyArc(state: state),
+      ),
+    );
+    final sunLines = _ArcHeadline(state: state);
+    // Past the calendar's end there is no uposatha to show, so no moon side.
+    final hasMoon = state.uposathas.isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -77,7 +84,15 @@ class TodayCard extends ConsumerWidget {
                     context,
                     initial: SettingsTab.vinayaTimes,
                   ),
-                  icon: const Icon(Icons.location_on_outlined, size: 16),
+                  // As small as its label allows. The theme still gives it
+                  // a 48px tap area on touch screens.
+                  style: OutlinedButton.styleFrom(
+                    textStyle: typography.actionLabel,
+                    minimumSize: Size.zero,
+                    padding: const EdgeInsetsDirectional.fromSTEB(6, 4, 10, 4),
+                    visualDensity: VisualDensity.standard,
+                  ),
+                  icon: const Icon(Icons.location_on_outlined, size: 14),
                   label: Text(city.label(l10n)),
                 ),
               ),
@@ -86,18 +101,40 @@ class TodayCard extends ConsumerWidget {
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              if (moon == null) return sun;
-              if (constraints.maxWidth < _sideBySideWidth) {
+              if (!hasMoon || constraints.maxWidth < _sideBySideWidth) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [sun, const SizedBox(height: 16), moon],
+                  children: [
+                    _Horizon(child: sunSky),
+                    const SizedBox(height: 8),
+                    sunLines,
+                    if (hasMoon) ...[
+                      const SizedBox(height: 16),
+                      _Horizon(child: _MoonSky(state: state)),
+                      const SizedBox(height: 8),
+                      _UposathaLines(state: state),
+                    ],
+                  ],
                 );
               }
-              return Row(
+              // The two skies share a bottom edge, so one horizon runs
+              // under both, and the lines under them start level.
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(flex: 3, child: sun),
-                  const SizedBox(width: 24),
-                  Expanded(flex: 2, child: moon),
+                  _Horizon(
+                    child: _columns(
+                      sunSky,
+                      _MoonSky(state: state),
+                      CrossAxisAlignment.end,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _columns(
+                    sunLines,
+                    _UposathaLines(state: state),
+                    CrossAxisAlignment.start,
+                  ),
                 ],
               );
             },
@@ -106,14 +143,34 @@ class TodayCard extends ConsumerWidget {
       ),
     );
   }
+
+  /// The sun's side and the moon's, three parts to two.
+  static Widget _columns(Widget sun, Widget moon, CrossAxisAlignment align) {
+    return Row(
+      crossAxisAlignment: align,
+      children: [
+        Expanded(flex: 3, child: sun),
+        const SizedBox(width: 24),
+        Expanded(flex: 2, child: moon),
+      ],
+    );
+  }
 }
 
 const _tabular = [FontFeature.tabularFigures()];
 
-/// The arc with its headline: how long until midday, or until when vikāla
+/// Gap between the arc and a label beside it, and between the horizon and
+/// the labels under it.
+const _labelGap = 8.0;
+
+/// Room for one line of label, which grows with the system text size.
+double _labelLineHeight(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(20);
+
+/// The headline under the arc: how long until midday, or until when vikāla
 /// lasts.
-class _ArcSide extends StatelessWidget {
-  const _ArcSide({required this.state});
+class _ArcHeadline extends StatelessWidget {
+  const _ArcHeadline({required this.state});
 
   final VinayaTimesState state;
 
@@ -140,11 +197,6 @@ class _ArcSide extends StatelessWidget {
 
     return Column(
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 360),
-          child: _SkyArc(state: state),
-        ),
-        const SizedBox(height: 8),
         Text(
           headline,
           textAlign: TextAlign.center,
@@ -168,7 +220,7 @@ class _ArcSide extends StatelessWidget {
 
 /// A half circle with a marker where the sun or the moon is now. By day it
 /// runs aruṇa to sunset with the kāla stretch, up to midday, in orange; by
-/// night it runs sunset to aruṇa, all of it in peach.
+/// night it runs sunset to aruṇa, all of it in midnight blue.
 class _SkyArc extends StatelessWidget {
   const _SkyArc({required this.state});
 
@@ -190,8 +242,7 @@ class _SkyArc extends StatelessWidget {
     final dark = label.copyWith(color: colors.onSurface);
     final strong = dark.copyWith(fontWeight: FontWeight.w600);
 
-    // Room for one line of label, which grows with the system text size.
-    final lineHeight = MediaQuery.textScalerOf(context).scale(20);
+    final lineHeight = _labelLineHeight(context);
 
     final day = state.sunIsUp;
     final start = day ? state.dawn : state.nightStart;
@@ -223,41 +274,57 @@ class _SkyArc extends StatelessWidget {
             // The end labels are centred on the arc's ends, so the arc
             // stands in by about half a label.
             final widest = width / 2 - 2 * lineHeight;
-            // It stands in a little more when the Now label needs the room.
-            // When even half the arc would not make room, the label goes.
-            final fitted = (width / 2 - nowWidth) * math.sqrt2 - _nowReach;
+
+            // Now is centred on the line 45 degrees up from the arc's centre,
+            // [out] along each axis: as near as it can be while its nearest
+            // corner, (out - w, out - h) from the centre, is past the
+            // marker's reach.
+            final w = nowWidth / 2;
+            final h = lineHeight / 2;
+            double out(double radius) {
+              final reach = radius + _nowReach;
+              final root = 2 * reach * reach - (w - h) * (w - h);
+              return (w + h + math.sqrt(math.max(0, root))) / 2;
+            }
+
+            // The arc stands in a little more when Now needs the room: the
+            // radius where out + w is half the width. When even half the arc
+            // would not make room, the label goes.
+            final room = width - 3 * w - h;
+            final fitted = room <= 0
+                ? 0.0
+                : math.sqrt((room * room + (w - h) * (w - h)) / 2) - _nowReach;
             final nowFits = fitted >= widest / 2;
             final radius = nowFits ? math.min(widest, fitted) : widest;
-            final centre = Offset(width / 2, lineHeight + 8 + radius);
+            final centre = Offset(width / 2, lineHeight + _labelGap + radius);
             Offset onArc(double fraction) {
               final angle = math.pi * (1 + fraction);
               return centre + Offset(math.cos(angle), math.sin(angle)) * radius;
             }
 
-            final belowEnd = Offset(0, 8 + lineHeight / 2);
+            final belowEnd = Offset(0, _labelGap + lineHeight / 2);
             final middayRect = Rect.fromCenter(
               center: onArc(stretchTo) - belowEnd,
               width: middayWidth,
               height: lineHeight,
             );
 
-            // Now keeps a fixed spot outside the arc, 45 degrees up on the
-            // marker's side. Its nearest corner sits on that line, so the
-            // whole label is further out than the marker ever reaches.
+            // On the marker's side, mirrored exactly on the other.
             final onLeft = nowAt < 0.5;
-            final corner = centre +
-                Offset(onLeft ? -1 : 1, -1) *
-                    ((radius + _nowReach) * math.sqrt1_2);
-            final nowRect = Rect.fromLTWH(
-              onLeft ? corner.dx - nowWidth : corner.dx,
-              corner.dy - lineHeight,
-              nowWidth,
-              lineHeight,
+            final nowRect = Rect.fromCenter(
+              center: centre + Offset(onLeft ? -1 : 1, -1) * out(radius),
+              width: nowWidth,
+              height: lineHeight,
             );
-            final showNow = nowFits && !(day && nowRect.overlaps(middayRect));
+            // A very small arc at a large text size would push it above the
+            // card's header gap; then it goes too.
+            final showNow = nowFits &&
+                nowRect.top >= 0 &&
+                !(day && nowRect.overlaps(middayRect));
 
             return SizedBox(
-              height: centre.dy + 8 + lineHeight,
+              // The horizon goes here, painted by [_Horizon] behind.
+              height: centre.dy + _labelGap + lineHeight,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
@@ -270,12 +337,13 @@ class _SkyArc extends StatelessWidget {
                         nowAt: nowAt,
                         stroke: _stroke,
                         markerRadius: _markerRadius,
-                        stretchColor:
-                            day ? colors.primaryFixedDim : colors.primaryFixed,
+                        stretchColor: day
+                            ? colors.primaryFixedDim
+                            : colors.tertiaryFixedDim,
                         restColor: colors.outlineVariant,
                         markerColor: colors.onSurface,
-                        // The sun is a ring, the moon a pale disc.
-                        markerFill: day ? colors.surface : colors.tertiaryFixed,
+                        // The sun is a ring, the moon an amber disc.
+                        markerFill: day ? colors.surface : colors.primaryFixed,
                         markerRing: day ? 3 : 1.5,
                       ),
                     ),
@@ -384,18 +452,6 @@ class _SkyArcPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // The horizon, dashed.
-    final horizon = Paint()
-      ..color = restColor
-      ..strokeWidth = 1;
-    for (var x = 0.0; x < size.width; x += 7) {
-      canvas.drawLine(
-        Offset(x, centre.dy),
-        Offset(math.min(x + 3, size.width), centre.dy),
-        horizon,
-      );
-    }
-
     final arc = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
@@ -438,22 +494,67 @@ class _SkyArcPainter extends CustomPainter {
       old.markerRing != markerRing;
 }
 
-/// The moon's fortnight: how far along it is, the uposatha it ends on, and
-/// the two uposathas after that.
-class _MoonPanel extends StatelessWidget {
-  const _MoonPanel({required this.state});
+/// [child] in front of a dashed horizon across its full width, as far above
+/// its bottom as the arc's end labels hang below the arc.
+class _Horizon extends StatelessWidget {
+  const _Horizon({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _HorizonPainter(
+        fromBottom: _labelGap + _labelLineHeight(context),
+        color: Theme.of(context).colorScheme.outlineVariant,
+      ),
+      child: child,
+    );
+  }
+}
+
+class _HorizonPainter extends CustomPainter {
+  const _HorizonPainter({required this.fromBottom, required this.color});
+
+  final double fromBottom;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final y = size.height - fromBottom;
+    final dash = Paint()
+      ..color = color
+      ..strokeWidth = 1;
+    for (var x = 0.0; x < size.width; x += 7) {
+      canvas.drawLine(
+        Offset(x, y),
+        Offset(math.min(x + 3, size.width), y),
+        dash,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_HorizonPainter old) =>
+      old.fromBottom != fromBottom || old.color != color;
+}
+
+/// The moon above the horizon and, under it level with the arc's end labels,
+/// how far along its fortnight it is.
+class _MoonSky extends StatelessWidget {
+  const _MoonSky({required this.state});
 
   final VinayaTimesState state;
+
+  /// Clear sky between the moon and the horizon.
+  static const _clearance = 20.0;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final typography = context.typography;
-    final date = DateFormat(l10n.vinayaTimesDatePattern, l10n.localeName);
 
     final next = state.uposathas.first;
-    final later = state.uposathas.skip(1);
     final day = state.fortnightDay!;
     final waxing = next.phase == MoonPhase.fullMoon;
     // The moon's age as an angle: 0 at new moon, pi at full.
@@ -465,82 +566,90 @@ class _MoonPanel extends StatelessWidget {
     );
     const moonSize = 64.0;
 
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ExcludeSemantics(
+          child: Image.asset(
+            photo,
+            width: moonSize,
+            height: moonSize,
+            // No photo (web, offline, not yet stored): the drawn moon.
+            errorBuilder: (_, __, ___) => CustomPaint(
+              size: const Size.square(moonSize),
+              painter: _MoonPainter(
+                age: age,
+                litColor: colors.tertiaryFixed,
+                darkColor: colors.surfaceContainerHighest,
+                rimColor: colors.outline,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: _clearance + _labelGap),
+        SizedBox(
+          height: _labelLineHeight(context),
+          // One line, like the end labels beside it: wrapping would push
+          // the label's top onto the horizon, so a long one shrinks.
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                waxing
+                    ? l10n.vinayaTimesWaxing(day, next.fortnightDays)
+                    : l10n.vinayaTimesWaning(day, next.fortnightDays),
+                maxLines: 1,
+                style: context.typography.menuSectionLabel,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// When the next uposatha is, its date, and the one after it.
+class _UposathaLines extends StatelessWidget {
+  const _UposathaLines({required this.state});
+
+  final VinayaTimesState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final typography = context.typography;
+    final date = DateFormat(l10n.vinayaTimesDatePattern, l10n.localeName);
+
     String line(UposathaDay uposatha) =>
         '${date.format(uposatha.date)} · ${uposatha.phase.label(l10n)}';
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              ExcludeSemantics(
-                child: Image.asset(
-                  photo,
-                  width: moonSize,
-                  height: moonSize,
-                  // No photo (web, offline, not yet stored): the drawn moon.
-                  errorBuilder: (_, __, ___) => CustomPaint(
-                    size: const Size.square(moonSize),
-                    painter: _MoonPainter(
-                      age: age,
-                      litColor: colors.tertiaryFixed,
-                      darkColor: colors.surfaceContainerHighest,
-                      rimColor: colors.outline,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      waxing
-                          ? l10n.vinayaTimesWaxing(day, next.fortnightDays)
-                          : l10n.vinayaTimesWaning(day, next.fortnightDays),
-                      style: typography.menuSectionLabel,
-                    ),
-                    Text(
-                      switch (state.daysToUposatha!) {
-                        0 => l10n.vinayaTimesUposathaToday,
-                        1 => l10n.vinayaTimesUposathaTomorrow,
-                        final days => l10n.vinayaTimesUposathaIn(days),
-                      },
-                      style: typography.resultTitle
-                          .copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
+    return Column(
+      children: [
+        Text(
+          switch (state.daysToUposatha!) {
+            0 => l10n.vinayaTimesUposathaToday,
+            1 => l10n.vinayaTimesUposathaTomorrow,
+            final days => l10n.vinayaTimesUposathaIn(days),
+          },
+          textAlign: TextAlign.center,
+          style: typography.resultTitle.copyWith(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          line(state.uposathas.first),
+          textAlign: TextAlign.center,
+          style: typography.listRowTitle.copyWith(fontWeight: FontWeight.w500),
+        ),
+        for (final uposatha in state.uposathas.skip(1)) ...[
+          const SizedBox(height: 2),
           Text(
-            line(next),
-            style: typography.listRowTitle.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            line(uposatha),
+            textAlign: TextAlign.center,
+            style: typography.menuSectionLabel,
           ),
-          if (later.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Divider(height: 1, color: colors.outlineVariant),
-            const SizedBox(height: 8),
-            for (final uposatha in later)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 1),
-                child: Text(line(uposatha), style: typography.resultSubtitle),
-              ),
-          ],
         ],
-      ),
+      ],
     );
   }
 }
