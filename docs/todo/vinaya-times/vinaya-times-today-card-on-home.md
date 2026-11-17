@@ -1,10 +1,10 @@
-# Buddhist times: the Today card on Home — plan
+# Vinaya times: the Today card on Home — plan
 
 Started 2026-11-14 as a footer under the Tipiṭaka tree. On 2026-11-15 the user
 dropped the footer, which made the reader busy, and moved straight to the
 Today card on a Home section, hidden behind a toggle.
 Built on branch `feat/buddhist-times`, committed, not merged.
-Design: [Buddhist times canvas](https://claude.ai/artifact/LrBxRfjRcrCqE5nPcVJKfn),
+Design: [Vinaya times canvas](https://claude.ai/artifact/LrBxRfjRcrCqE5nPcVJKfn),
 the row titled *Phase 2 · Today card on Home*.
 
 **Goal:** a Home section with one card for today: the sun's day with midday
@@ -84,7 +84,8 @@ For the user to correct. All in `app_si.arb`.
 
 | English | Draft |
 |---|---|
-| Buddhist times | බෞද්ධ වේලාවන් |
+| Time | කාලය |
+| Dawn, midday and uposatha days. | අරුණ, මධ්‍යාහ්නය සහ උපෝසථ දින. |
 | Today | අද |
 | Midday 11:54 | මධ්‍යාහ්නය 11:54 |
 | Midday in 42 min | මධ්‍යාහ්නයට මිනි. 42 |
@@ -114,7 +115,7 @@ are drafts too.
 constant. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
-- Settings has no Buddhist times tab, and Anumodanā no Images section.
+- Settings has no Time tab, and Anumodanā no Images section.
 
 Web still loads the moon photos on an install (see *Moon photos*), so a
 database update made while the toggle is off still counts.
@@ -172,13 +173,15 @@ Moon panel:
 The day runs aruṇa to aruṇa, so the fortnight's day and "today" and
 "tomorrow" switch at aruṇa, not at midnight. In Sinhala the word is උපෝසථ.
 
-The city button opens Settings → Buddhist times. It is the card's only way
+The city button opens Settings → Time. It is the card's only way
 in; the dawn method is named there and not on the card.
 
-### Settings → Buddhist times
+### Settings → Time
 
 A tab after General.
 
+- **Intro line:** "Dawn, midday and uposatha days." The tab name alone
+  could read as a clock setting.
 - **Location:** eight Sri Lankan cities, each with today's midday. Colombo
   until the user picks.
 - **Aruṇa (dawn):** the four methods, each with tomorrow's time for the chosen
@@ -242,6 +245,9 @@ By the user on 2026-11-14 unless marked.
 19. **The moon is a NASA image, thirty to a cycle.** The drawing stays only
     as the fallback. *(user, 2026-11-15, by committing it; the credit's
     section and wording: my call)*
+20. **The tab is "Time" / කාලය**, the Pali *kāla*, with one intro line under
+    it. Code and files say `VinayaTimes`. "Buddhist times" is dropped; the
+    branch keeps its name. *(user, 2026-11-17)*
 
 ## Open question
 
@@ -325,12 +331,12 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 ### Domain — `lib/domain/`
 
-- `entities/buddhist_times/city.dart`: an enum of the eight cities with their
+- `entities/vinaya_times/city.dart`: an enum of the eight cities with their
   coordinates. The enum name is the saved key.
-- `entities/buddhist_times/dawn_method.dart`: the four-value enum.
-- `entities/buddhist_times/uposatha_day.dart`: date, full or new moon, and the
+- `entities/vinaya_times/dawn_method.dart`: the four-value enum.
+- `entities/vinaya_times/uposatha_day.dart`: date, full or new moon, and the
   fortnight's length (14 or 15).
-- `entities/buddhist_times/uposatha_calendar.dart`: the rule and its inputs;
+- `entities/vinaya_times/uposatha_calendar.dart`: the rule and its inputs;
   `upcoming` returns the next few days.
 - `repositories/sun_times_repository.dart`: midday, dawn and sunset for a
   date and city. Plain return values, no `Either`: it is maths on a fixed city
@@ -345,12 +351,12 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 ### Presentation — `lib/presentation/`
 
-- `providers/buddhist_times_provider.dart`:
+- `providers/vinaya_times_provider.dart`:
   - a clock that ticks on the minute;
   - the saved city and dawn method, through `KeyValueStore` and two
     `StorageKeys`, sharing one `SavedChoiceNotifier`;
   - the card's state, derived from those three.
-- `providers/buddhist_times_state.dart`: the card's state, in its own file
+- `providers/vinaya_times_state.dart`: the card's state, in its own file
   like `search_state.dart`.
 - `widgets/home/today_card.dart`: the card. The arc is a `CustomPainter`;
   its labels are ordinary text placed over it. The moon is an `Image.asset`,
@@ -360,10 +366,10 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 - `screens/home_screen.dart`: the heading and the card.
 - `screens/app_shell.dart`: Home joins the navigation, and is built, only
   when the toggle is on.
-- `widgets/common/buddhist_times_labels.dart`: the ARB string of each city,
+- `widgets/common/vinaya_times_labels.dart`: the ARB string of each city,
   dawn method and moon phase, and `clockTime`, for the card and the Settings
   tab.
-- `widgets/settings/buddhist_times_settings_page.dart`: the tab, rows with a
+- `widgets/settings/vinaya_times_settings_page.dart`: the tab, rows with a
   tick and not the canvas's dropdowns, so every time stays in view.
 - `widgets/settings/settings_tab.dart`: the tab shows only with the toggle.
 
@@ -453,7 +459,7 @@ To cover:
 - the Settings tab in both dialog shapes;
 - which photo each fortnight day picks, in 14 and 15 day fortnights, and the
   drawn moon when the photo cannot load;
-- the toggle off: no Home destination, no Buddhist times tab, no Images
+- the toggle off: no Home destination, no Time tab, no Images
   section.
 
 ## Done when

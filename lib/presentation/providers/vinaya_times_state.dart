@@ -1,16 +1,16 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../domain/entities/buddhist_times/uposatha_day.dart';
+import '../../domain/entities/vinaya_times/uposatha_day.dart';
 
-part 'buddhist_times_state.freezed.dart';
+part 'vinaya_times_state.freezed.dart';
 
 /// What the Today card shows. Times are UTC instants; the widget shows them
 /// on the device clock.
 @freezed
-class BuddhistTimesState with _$BuddhistTimesState {
-  const BuddhistTimesState._();
+class VinayaTimesState with _$VinayaTimesState {
+  const VinayaTimesState._();
 
-  const factory BuddhistTimesState({
+  const factory VinayaTimesState({
     /// The device clock, to the minute.
     required DateTime now,
 
@@ -32,7 +32,7 @@ class BuddhistTimesState with _$BuddhistTimesState {
     /// The uposathas on or after [buddhistDay], soonest first; empty past the
     /// calendar's end.
     required List<UposathaDay> uposathas,
-  }) = _BuddhistTimesState;
+  }) = _VinayaTimesState;
 
   /// Kāla runs from aruṇa to midday; every other hour is vikāla.
   bool get isVikala => now.isBefore(dawn) || !now.isBefore(midday);

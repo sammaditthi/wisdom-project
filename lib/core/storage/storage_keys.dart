@@ -63,11 +63,11 @@ class StorageKeys {
   /// transcript key at once.
   static const researchChatPrefix = 'research_chat_v1_';
 
-  /// String ([City.name]) — the city the Buddhist times are worked out for.
+  /// String ([City.name]) — the city the Vinaya times are worked out for.
   /// Absent → [City.fallback].
-  static const buddhistTimesCity = 'buddhist_times_city_v1';
+  static const vinayaTimesCity = 'vinaya_times_city_v1';
 
   /// String ([DawnMethod.name]) — how aruṇa is reckoned. Absent →
   /// [DawnMethod.fallback].
-  static const buddhistTimesDawnMethod = 'buddhist_times_dawn_method_v1';
+  static const vinayaTimesDawnMethod = 'vinaya_times_dawn_method_v1';
 }

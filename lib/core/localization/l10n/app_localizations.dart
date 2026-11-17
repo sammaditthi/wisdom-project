@@ -1472,187 +1472,193 @@ abstract class AppLocalizations {
   /// **'Close menu, panel or dialog'**
   String get shortcutCloseOverlay;
 
-  /// Settings dialog: name of the tab that picks the city and the dawn method for the Today card on Home
+  /// Settings dialog: name of the tab that picks the city and the dawn method for the Today card on Home. Time as in the Pali kāla, the right time; not a clock setting
   ///
   /// In en, this message translates to:
-  /// **'Buddhist times'**
-  String get settingsBuddhistTimes;
+  /// **'Time'**
+  String get settingsVinayaTimes;
+
+  /// Settings > Time: one line at the top of the tab saying what it is for, since the tab name alone could read as a clock setting
+  ///
+  /// In en, this message translates to:
+  /// **'Dawn, midday and uposatha days.'**
+  String get vinayaTimesIntro;
 
   /// Today card: an intl DateFormat pattern, not words. An uposatha's weekday, day and month, all short: Tue 24 Nov. Reorder the letters for the language; do not translate them
   ///
   /// In en, this message translates to:
   /// **'EEE d MMM'**
-  String get buddhistTimesDatePattern;
+  String get vinayaTimesDatePattern;
 
   /// Today card: headline in the last hour before solar midday
   ///
   /// In en, this message translates to:
   /// **'Midday in {minutes} min'**
-  String buddhistTimesMiddayIn(int minutes);
+  String vinayaTimesMiddayIn(int minutes);
 
   /// Today card: moon panel headline on the day before an uposatha
   ///
   /// In en, this message translates to:
   /// **'Uposatha tomorrow'**
-  String get buddhistTimesUposathaTomorrow;
+  String get vinayaTimesUposathaTomorrow;
 
   /// Today card: moon panel headline on the uposatha day itself
   ///
   /// In en, this message translates to:
   /// **'Uposatha today'**
-  String get buddhistTimesUposathaToday;
+  String get vinayaTimesUposathaToday;
 
   /// Today card: after the date of a full-moon uposatha, e.g. Tue 24 Nov · Full moon
   ///
   /// In en, this message translates to:
   /// **'Full moon'**
-  String get buddhistTimesFullMoon;
+  String get vinayaTimesFullMoon;
 
   /// Today card: after the date of a new-moon uposatha, e.g. Wed 9 Dec · New moon
   ///
   /// In en, this message translates to:
   /// **'New moon'**
-  String get buddhistTimesNewMoon;
+  String get vinayaTimesNewMoon;
 
-  /// Settings > Buddhist times: section header above the list of cities
+  /// Settings > Time: section header above the list of cities
   ///
   /// In en, this message translates to:
   /// **'Location'**
-  String get buddhistTimesLocation;
+  String get vinayaTimesLocation;
 
-  /// Settings > Buddhist times: hint under the Location header
+  /// Settings > Time: hint under the Location header
   ///
   /// In en, this message translates to:
   /// **'Midday and aruṇa are worked out for this place.'**
-  String get buddhistTimesLocationHint;
+  String get vinayaTimesLocationHint;
 
-  /// Settings > Buddhist times: today's solar midday beside each city, and in the summary box, e.g. Midday 11:54
+  /// Settings > Time: today's solar midday beside each city, and in the summary box, e.g. Midday 11:54
   ///
   /// In en, this message translates to:
   /// **'Midday {time}'**
-  String buddhistTimesMiddayAt(String time);
+  String vinayaTimesMiddayAt(String time);
 
-  /// Settings > Buddhist times: section header above the four ways of reckoning dawn. Aruṇa is the Pali word
+  /// Settings > Time: section header above the four ways of reckoning dawn. Aruṇa is the Pali word
   ///
   /// In en, this message translates to:
   /// **'Aruṇa (dawn)'**
-  String get buddhistTimesDawn;
+  String get vinayaTimesDawn;
 
-  /// Settings > Buddhist times: hint under the Aruṇa header. Each method row shows the dawn time it gives tomorrow in the chosen city
+  /// Settings > Time: hint under the Aruṇa header. Each method row shows the dawn time it gives tomorrow in the chosen city
   ///
   /// In en, this message translates to:
   /// **'Aruṇa ends vikāla and begins the day. The times are tomorrow\'s, for {city}.'**
-  String buddhistTimesDawnHint(String city);
+  String vinayaTimesDawnHint(String city);
 
-  /// Settings > Buddhist times: a dawn method, named after the Pa-Auk forest monastery tradition
+  /// Settings > Time: a dawn method, named after the Pa-Auk forest monastery tradition
   ///
   /// In en, this message translates to:
   /// **'Pa-Auk'**
   String get dawnMethodPaAuk;
 
-  /// Settings > Buddhist times: the rule of the Pa-Auk dawn method
+  /// Settings > Time: the rule of the Pa-Auk dawn method
   ///
   /// In en, this message translates to:
   /// **'40 minutes before sunrise'**
   String get dawnMethodPaAukRule;
 
-  /// Settings > Buddhist times: a dawn method, named after the Na-Uyana forest monastery. The default
+  /// Settings > Time: a dawn method, named after the Na-Uyana forest monastery. The default
   ///
   /// In en, this message translates to:
   /// **'Na-Uyana'**
   String get dawnMethodNaUyana;
 
-  /// Settings > Buddhist times: the rule of the Na-Uyana dawn method
+  /// Settings > Time: the rule of the Na-Uyana dawn method
   ///
   /// In en, this message translates to:
   /// **'30 minutes before sunrise'**
   String get dawnMethodNaUyanaRule;
 
-  /// Settings > Buddhist times: a dawn method, the astronomical term
+  /// Settings > Time: a dawn method, the astronomical term
   ///
   /// In en, this message translates to:
   /// **'Civil twilight'**
   String get dawnMethodCivilTwilight;
 
-  /// Settings > Buddhist times: the rule of the civil twilight dawn method
+  /// Settings > Time: the rule of the civil twilight dawn method
   ///
   /// In en, this message translates to:
   /// **'The sun 6° below the horizon'**
   String get dawnMethodCivilTwilightRule;
 
-  /// Settings > Buddhist times: a dawn method, sunrise itself
+  /// Settings > Time: a dawn method, sunrise itself
   ///
   /// In en, this message translates to:
   /// **'Sunrise'**
   String get dawnMethodSunrise;
 
-  /// Settings > Buddhist times: the rule of the sunrise dawn method
+  /// Settings > Time: the rule of the sunrise dawn method
   ///
   /// In en, this message translates to:
   /// **'The sun\'s top edge on the horizon'**
   String get dawnMethodSunriseRule;
 
-  /// Settings > Buddhist times: small heading of the summary box under the two lists
+  /// Settings > Time: small heading of the summary box under the two lists
   ///
   /// In en, this message translates to:
   /// **'{city} · today'**
-  String buddhistTimesSummaryTitle(String city);
+  String vinayaTimesSummaryTitle(String city);
 
-  /// Settings > Buddhist times: summary box, the dawn that ends today's vikāla
+  /// Settings > Time: summary box, the dawn that ends today's vikāla
   ///
   /// In en, this message translates to:
   /// **'Vikāla until {time} tomorrow'**
-  String buddhistTimesSummaryVikala(String time);
+  String vinayaTimesSummaryVikala(String time);
 
-  /// Settings > Buddhist times: footnote under the summary box
+  /// Settings > Time: footnote under the summary box
   ///
   /// In en, this message translates to:
   /// **'Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.'**
-  String get buddhistTimesCalendarNote;
+  String get vinayaTimesCalendarNote;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Colombo'**
   String get cityColombo;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Kandy'**
   String get cityKandy;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Galle'**
   String get cityGalle;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Kurunegala'**
   String get cityKurunegala;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Anuradhapura'**
   String get cityAnuradhapura;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Jaffna'**
   String get cityJaffna;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Trincomalee'**
   String get cityTrincomalee;
 
-  /// Settings > Buddhist times: city name
+  /// Settings > Time: city name
   ///
   /// In en, this message translates to:
   /// **'Batticaloa'**
@@ -1668,79 +1674,79 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'EEE d MMM y'**
-  String get buddhistTimesFullDatePattern;
+  String get vinayaTimesFullDatePattern;
 
-  /// Today card: tooltip and screen-reader label of the city button, which opens Settings > Buddhist times
+  /// Today card: tooltip and screen-reader label of the city button, which opens Settings > Time
   ///
   /// In en, this message translates to:
   /// **'Location: {city}. Change'**
-  String buddhistTimesChangeLocation(String city);
+  String vinayaTimesChangeLocation(String city);
 
   /// Today card: label at the left end of the sun arc, today's dawn. Aruṇa is the Pali word
   ///
   /// In en, this message translates to:
   /// **'Aruṇa {time}'**
-  String buddhistTimesArunaAt(String time);
+  String vinayaTimesArunaAt(String time);
 
   /// Today card: label at the right end of the sun arc
   ///
   /// In en, this message translates to:
   /// **'Sunset {time}'**
-  String buddhistTimesSunsetAt(String time);
+  String vinayaTimesSunsetAt(String time);
 
   /// Today card: label beside the marker on the sun arc, the current time
   ///
   /// In en, this message translates to:
   /// **'Now {time}'**
-  String buddhistTimesNowAt(String time);
+  String vinayaTimesNowAt(String time);
 
   /// Today card: what a screen reader says for the sun arc drawing
   ///
   /// In en, this message translates to:
   /// **'Sun path today: aruṇa {dawn}, midday {midday}, sunset {sunset}'**
-  String buddhistTimesArcLabel(String dawn, String midday, String sunset);
+  String vinayaTimesArcLabel(String dawn, String midday, String sunset);
 
   /// Today card: headline from dawn until an hour before solar midday
   ///
   /// In en, this message translates to:
   /// **'Midday in {hours} h {minutes} min'**
-  String buddhistTimesMiddayInHours(int hours, int minutes);
+  String vinayaTimesMiddayInHours(int hours, int minutes);
 
   /// Today card: line under the midday headline. Vikāla, the wrong time for eating, runs from today's midday to tomorrow's dawn
   ///
   /// In en, this message translates to:
   /// **'Vikāla from {from} until aruṇa {until}'**
-  String buddhistTimesVikalaSpan(String from, String until);
+  String vinayaTimesVikalaSpan(String from, String until);
 
   /// Today card: headline from midday until the next dawn
   ///
   /// In en, this message translates to:
   /// **'Vikāla until aruṇa {time}'**
-  String buddhistTimesVikalaUntil(String time);
+  String vinayaTimesVikalaUntil(String time);
 
   /// Today card: the fortnight that ends on a full moon, and which of its 14 or 15 days today is
   ///
   /// In en, this message translates to:
   /// **'Waxing · day {day} of {total}'**
-  String buddhistTimesWaxing(int day, int total);
+  String vinayaTimesWaxing(int day, int total);
 
   /// Today card: the fortnight that ends on a new moon, and which of its 14 or 15 days today is
   ///
   /// In en, this message translates to:
   /// **'Waning · day {day} of {total}'**
-  String buddhistTimesWaning(int day, int total);
+  String vinayaTimesWaning(int day, int total);
 
   /// Today card: moon panel headline two or more days before an uposatha
   ///
   /// In en, this message translates to:
   /// **'Uposatha in {days} days'**
-  String buddhistTimesUposathaIn(int days);
+  String vinayaTimesUposathaIn(int days);
 
   /// Today card: what a screen reader says for the night arc drawing, shown from sunset to aruṇa
   ///
   /// In en, this message translates to:
   /// **'Moon path tonight: sunset {sunset}, aruṇa {dawn}'**
-  String buddhistTimesNightArcLabel(String sunset, String dawn);
+  String vinayaTimesNightArcLabel(String sunset, String dawn);
 }
 
 class _AppLocalizationsDelegate

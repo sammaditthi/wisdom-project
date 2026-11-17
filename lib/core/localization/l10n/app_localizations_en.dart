@@ -770,45 +770,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shortcutCloseOverlay => 'Close menu, panel or dialog';
 
   @override
-  String get settingsBuddhistTimes => 'Buddhist times';
+  String get settingsVinayaTimes => 'Time';
 
   @override
-  String get buddhistTimesDatePattern => 'EEE d MMM';
+  String get vinayaTimesIntro => 'Dawn, midday and uposatha days.';
 
   @override
-  String buddhistTimesMiddayIn(int minutes) {
+  String get vinayaTimesDatePattern => 'EEE d MMM';
+
+  @override
+  String vinayaTimesMiddayIn(int minutes) {
     return 'Midday in $minutes min';
   }
 
   @override
-  String get buddhistTimesUposathaTomorrow => 'Uposatha tomorrow';
+  String get vinayaTimesUposathaTomorrow => 'Uposatha tomorrow';
 
   @override
-  String get buddhistTimesUposathaToday => 'Uposatha today';
+  String get vinayaTimesUposathaToday => 'Uposatha today';
 
   @override
-  String get buddhistTimesFullMoon => 'Full moon';
+  String get vinayaTimesFullMoon => 'Full moon';
 
   @override
-  String get buddhistTimesNewMoon => 'New moon';
+  String get vinayaTimesNewMoon => 'New moon';
 
   @override
-  String get buddhistTimesLocation => 'Location';
+  String get vinayaTimesLocation => 'Location';
 
   @override
-  String get buddhistTimesLocationHint =>
+  String get vinayaTimesLocationHint =>
       'Midday and aruṇa are worked out for this place.';
 
   @override
-  String buddhistTimesMiddayAt(String time) {
+  String vinayaTimesMiddayAt(String time) {
     return 'Midday $time';
   }
 
   @override
-  String get buddhistTimesDawn => 'Aruṇa (dawn)';
+  String get vinayaTimesDawn => 'Aruṇa (dawn)';
 
   @override
-  String buddhistTimesDawnHint(String city) {
+  String vinayaTimesDawnHint(String city) {
     return 'Aruṇa ends vikāla and begins the day. The times are tomorrow\'s, for $city.';
   }
 
@@ -837,17 +840,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dawnMethodSunriseRule => 'The sun\'s top edge on the horizon';
 
   @override
-  String buddhistTimesSummaryTitle(String city) {
+  String vinayaTimesSummaryTitle(String city) {
     return '$city · today';
   }
 
   @override
-  String buddhistTimesSummaryVikala(String time) {
+  String vinayaTimesSummaryVikala(String time) {
     return 'Vikāla until $time tomorrow';
   }
 
   @override
-  String get buddhistTimesCalendarNote =>
+  String get vinayaTimesCalendarNote =>
       'Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.';
 
   @override
@@ -878,65 +881,65 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeToday => 'Today';
 
   @override
-  String get buddhistTimesFullDatePattern => 'EEE d MMM y';
+  String get vinayaTimesFullDatePattern => 'EEE d MMM y';
 
   @override
-  String buddhistTimesChangeLocation(String city) {
+  String vinayaTimesChangeLocation(String city) {
     return 'Location: $city. Change';
   }
 
   @override
-  String buddhistTimesArunaAt(String time) {
+  String vinayaTimesArunaAt(String time) {
     return 'Aruṇa $time';
   }
 
   @override
-  String buddhistTimesSunsetAt(String time) {
+  String vinayaTimesSunsetAt(String time) {
     return 'Sunset $time';
   }
 
   @override
-  String buddhistTimesNowAt(String time) {
+  String vinayaTimesNowAt(String time) {
     return 'Now $time';
   }
 
   @override
-  String buddhistTimesArcLabel(String dawn, String midday, String sunset) {
+  String vinayaTimesArcLabel(String dawn, String midday, String sunset) {
     return 'Sun path today: aruṇa $dawn, midday $midday, sunset $sunset';
   }
 
   @override
-  String buddhistTimesMiddayInHours(int hours, int minutes) {
+  String vinayaTimesMiddayInHours(int hours, int minutes) {
     return 'Midday in $hours h $minutes min';
   }
 
   @override
-  String buddhistTimesVikalaSpan(String from, String until) {
+  String vinayaTimesVikalaSpan(String from, String until) {
     return 'Vikāla from $from until aruṇa $until';
   }
 
   @override
-  String buddhistTimesVikalaUntil(String time) {
+  String vinayaTimesVikalaUntil(String time) {
     return 'Vikāla until aruṇa $time';
   }
 
   @override
-  String buddhistTimesWaxing(int day, int total) {
+  String vinayaTimesWaxing(int day, int total) {
     return 'Waxing · day $day of $total';
   }
 
   @override
-  String buddhistTimesWaning(int day, int total) {
+  String vinayaTimesWaning(int day, int total) {
     return 'Waning · day $day of $total';
   }
 
   @override
-  String buddhistTimesUposathaIn(int days) {
+  String vinayaTimesUposathaIn(int days) {
     return 'Uposatha in $days days';
   }
 
   @override
-  String buddhistTimesNightArcLabel(String sunset, String dawn) {
+  String vinayaTimesNightArcLabel(String sunset, String dawn) {
     return 'Moon path tonight: sunset $sunset, aruṇa $dawn';
   }
 }

@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'buddhist_times_state.dart';
+part of 'vinaya_times_state.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,7 +15,7 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$BuddhistTimesState {
+mixin _$VinayaTimesState {
   /// The device clock, to the minute.
   DateTime get now => throw _privateConstructorUsedError;
 
@@ -38,18 +38,18 @@ mixin _$BuddhistTimesState {
   /// calendar's end.
   List<UposathaDay> get uposathas => throw _privateConstructorUsedError;
 
-  /// Create a copy of BuddhistTimesState
+  /// Create a copy of VinayaTimesState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $BuddhistTimesStateCopyWith<BuddhistTimesState> get copyWith =>
+  $VinayaTimesStateCopyWith<VinayaTimesState> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $BuddhistTimesStateCopyWith<$Res> {
-  factory $BuddhistTimesStateCopyWith(
-          BuddhistTimesState value, $Res Function(BuddhistTimesState) then) =
-      _$BuddhistTimesStateCopyWithImpl<$Res, BuddhistTimesState>;
+abstract class $VinayaTimesStateCopyWith<$Res> {
+  factory $VinayaTimesStateCopyWith(
+          VinayaTimesState value, $Res Function(VinayaTimesState) then) =
+      _$VinayaTimesStateCopyWithImpl<$Res, VinayaTimesState>;
   @useResult
   $Res call(
       {DateTime now,
@@ -63,16 +63,16 @@ abstract class $BuddhistTimesStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$BuddhistTimesStateCopyWithImpl<$Res, $Val extends BuddhistTimesState>
-    implements $BuddhistTimesStateCopyWith<$Res> {
-  _$BuddhistTimesStateCopyWithImpl(this._value, this._then);
+class _$VinayaTimesStateCopyWithImpl<$Res, $Val extends VinayaTimesState>
+    implements $VinayaTimesStateCopyWith<$Res> {
+  _$VinayaTimesStateCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of BuddhistTimesState
+  /// Create a copy of VinayaTimesState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -124,11 +124,11 @@ class _$BuddhistTimesStateCopyWithImpl<$Res, $Val extends BuddhistTimesState>
 }
 
 /// @nodoc
-abstract class _$$BuddhistTimesStateImplCopyWith<$Res>
-    implements $BuddhistTimesStateCopyWith<$Res> {
-  factory _$$BuddhistTimesStateImplCopyWith(_$BuddhistTimesStateImpl value,
-          $Res Function(_$BuddhistTimesStateImpl) then) =
-      __$$BuddhistTimesStateImplCopyWithImpl<$Res>;
+abstract class _$$VinayaTimesStateImplCopyWith<$Res>
+    implements $VinayaTimesStateCopyWith<$Res> {
+  factory _$$VinayaTimesStateImplCopyWith(_$VinayaTimesStateImpl value,
+          $Res Function(_$VinayaTimesStateImpl) then) =
+      __$$VinayaTimesStateImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -143,14 +143,14 @@ abstract class _$$BuddhistTimesStateImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$BuddhistTimesStateImplCopyWithImpl<$Res>
-    extends _$BuddhistTimesStateCopyWithImpl<$Res, _$BuddhistTimesStateImpl>
-    implements _$$BuddhistTimesStateImplCopyWith<$Res> {
-  __$$BuddhistTimesStateImplCopyWithImpl(_$BuddhistTimesStateImpl _value,
-      $Res Function(_$BuddhistTimesStateImpl) _then)
+class __$$VinayaTimesStateImplCopyWithImpl<$Res>
+    extends _$VinayaTimesStateCopyWithImpl<$Res, _$VinayaTimesStateImpl>
+    implements _$$VinayaTimesStateImplCopyWith<$Res> {
+  __$$VinayaTimesStateImplCopyWithImpl(_$VinayaTimesStateImpl _value,
+      $Res Function(_$VinayaTimesStateImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of BuddhistTimesState
+  /// Create a copy of VinayaTimesState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -164,7 +164,7 @@ class __$$BuddhistTimesStateImplCopyWithImpl<$Res>
     Object? buddhistDay = null,
     Object? uposathas = null,
   }) {
-    return _then(_$BuddhistTimesStateImpl(
+    return _then(_$VinayaTimesStateImpl(
       now: null == now
           ? _value.now
           : now // ignore: cast_nullable_to_non_nullable
@@ -203,8 +203,8 @@ class __$$BuddhistTimesStateImplCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$BuddhistTimesStateImpl extends _BuddhistTimesState {
-  const _$BuddhistTimesStateImpl(
+class _$VinayaTimesStateImpl extends _VinayaTimesState {
+  const _$VinayaTimesStateImpl(
       {required this.now,
       required this.dawn,
       required this.midday,
@@ -256,14 +256,14 @@ class _$BuddhistTimesStateImpl extends _BuddhistTimesState {
 
   @override
   String toString() {
-    return 'BuddhistTimesState(now: $now, dawn: $dawn, midday: $midday, sunset: $sunset, vikalaEnds: $vikalaEnds, nightStart: $nightStart, buddhistDay: $buddhistDay, uposathas: $uposathas)';
+    return 'VinayaTimesState(now: $now, dawn: $dawn, midday: $midday, sunset: $sunset, vikalaEnds: $vikalaEnds, nightStart: $nightStart, buddhistDay: $buddhistDay, uposathas: $uposathas)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BuddhistTimesStateImpl &&
+            other is _$VinayaTimesStateImpl &&
             (identical(other.now, now) || other.now == now) &&
             (identical(other.dawn, dawn) || other.dawn == dawn) &&
             (identical(other.midday, midday) || other.midday == midday) &&
@@ -290,18 +290,18 @@ class _$BuddhistTimesStateImpl extends _BuddhistTimesState {
       buddhistDay,
       const DeepCollectionEquality().hash(_uposathas));
 
-  /// Create a copy of BuddhistTimesState
+  /// Create a copy of VinayaTimesState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$BuddhistTimesStateImplCopyWith<_$BuddhistTimesStateImpl> get copyWith =>
-      __$$BuddhistTimesStateImplCopyWithImpl<_$BuddhistTimesStateImpl>(
+  _$$VinayaTimesStateImplCopyWith<_$VinayaTimesStateImpl> get copyWith =>
+      __$$VinayaTimesStateImplCopyWithImpl<_$VinayaTimesStateImpl>(
           this, _$identity);
 }
 
-abstract class _BuddhistTimesState extends BuddhistTimesState {
-  const factory _BuddhistTimesState(
+abstract class _VinayaTimesState extends VinayaTimesState {
+  const factory _VinayaTimesState(
       {required final DateTime now,
       required final DateTime dawn,
       required final DateTime midday,
@@ -309,8 +309,8 @@ abstract class _BuddhistTimesState extends BuddhistTimesState {
       required final DateTime vikalaEnds,
       required final DateTime nightStart,
       required final DateTime buddhistDay,
-      required final List<UposathaDay> uposathas}) = _$BuddhistTimesStateImpl;
-  const _BuddhistTimesState._() : super._();
+      required final List<UposathaDay> uposathas}) = _$VinayaTimesStateImpl;
+  const _VinayaTimesState._() : super._();
 
   /// The device clock, to the minute.
   @override
@@ -342,10 +342,10 @@ abstract class _BuddhistTimesState extends BuddhistTimesState {
   @override
   List<UposathaDay> get uposathas;
 
-  /// Create a copy of BuddhistTimesState
+  /// Create a copy of VinayaTimesState
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BuddhistTimesStateImplCopyWith<_$BuddhistTimesStateImpl> get copyWith =>
+  _$$VinayaTimesStateImplCopyWith<_$VinayaTimesStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

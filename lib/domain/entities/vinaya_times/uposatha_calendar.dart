@@ -7,7 +7,7 @@ enum _Season { hemanta, gimhana, vassana }
 /// A year is three seasons of eight fortnights, each fortnight ending on an
 /// uposatha: new moon first, then full moon, and so on. A fortnight has 15
 /// days, except the 3rd and 7th of a season, which have 14. The rule's
-/// sources and checks are in the Buddhist times plan under `docs/`.
+/// sources and checks are in the Vinaya times plan under `docs/`.
 class UposathaCalendar {
   const UposathaCalendar._();
 

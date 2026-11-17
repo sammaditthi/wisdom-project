@@ -1,7 +1,7 @@
 import 'package:nrel_spa/nrel_spa.dart';
 
-import '../../domain/entities/buddhist_times/city.dart';
-import '../../domain/entities/buddhist_times/dawn_method.dart';
+import '../../domain/entities/vinaya_times/city.dart';
+import '../../domain/entities/vinaya_times/dawn_method.dart';
 import '../../domain/repositories/sun_times_repository.dart';
 
 /// [SunTimesRepository] on the NREL solar position algorithm.

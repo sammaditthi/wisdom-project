@@ -1,5 +1,5 @@
-import '../entities/buddhist_times/city.dart';
-import '../entities/buddhist_times/dawn_method.dart';
+import '../entities/vinaya_times/city.dart';
+import '../entities/vinaya_times/dawn_method.dart';
 
 /// Sun times for a city on a calendar day.
 ///

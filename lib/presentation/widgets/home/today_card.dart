@@ -7,10 +7,10 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/moon_photos.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../domain/entities/buddhist_times/uposatha_day.dart';
-import '../../providers/buddhist_times_provider.dart';
-import '../../providers/buddhist_times_state.dart';
-import '../common/buddhist_times_labels.dart';
+import '../../../domain/entities/vinaya_times/uposatha_day.dart';
+import '../../providers/vinaya_times_provider.dart';
+import '../../providers/vinaya_times_state.dart';
+import '../common/vinaya_times_labels.dart';
 import '../settings/settings_dialog.dart';
 import '../settings/settings_tab.dart';
 
@@ -24,8 +24,8 @@ class TodayCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(buddhistTimesProvider);
-    final city = ref.watch(buddhistTimesCityProvider);
+    final state = ref.watch(vinayaTimesProvider);
+    final city = ref.watch(vinayaTimesCityProvider);
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final typography = context.typography;
@@ -61,7 +61,7 @@ class TodayCard extends ConsumerWidget {
                     Text(
                       // The device's date, like the clock times beside it.
                       DateFormat(
-                        l10n.buddhistTimesFullDatePattern,
+                        l10n.vinayaTimesFullDatePattern,
                         l10n.localeName,
                       ).format(state.now),
                       style: typography.resultTitle,
@@ -71,11 +71,11 @@ class TodayCard extends ConsumerWidget {
               ),
               const SizedBox(width: 12),
               Tooltip(
-                message: l10n.buddhistTimesChangeLocation(city.label(l10n)),
+                message: l10n.vinayaTimesChangeLocation(city.label(l10n)),
                 child: OutlinedButton.icon(
                   onPressed: () => SettingsDialog.show(
                     context,
-                    initial: SettingsTab.buddhistTimes,
+                    initial: SettingsTab.vinayaTimes,
                   ),
                   icon: const Icon(Icons.location_on_outlined, size: 16),
                   label: Text(city.label(l10n)),
@@ -115,7 +115,7 @@ const _tabular = [FontFeature.tabularFigures()];
 class _ArcSide extends StatelessWidget {
   const _ArcSide({required this.state});
 
-  final BuddhistTimesState state;
+  final VinayaTimesState state;
 
   @override
   Widget build(BuildContext context) {
@@ -125,14 +125,14 @@ class _ArcSide extends StatelessWidget {
     final String headline;
     String? detail;
     if (state.isVikala) {
-      headline = l10n.buddhistTimesVikalaUntil(clockTime(state.vikalaEnds));
+      headline = l10n.vinayaTimesVikalaUntil(clockTime(state.vikalaEnds));
     } else {
       final left = state.midday.difference(state.now);
       final minutes = left.inMinutes.remainder(60);
       headline = left.inHours == 0
-          ? l10n.buddhistTimesMiddayIn(minutes)
-          : l10n.buddhistTimesMiddayInHours(left.inHours, minutes);
-      detail = l10n.buddhistTimesVikalaSpan(
+          ? l10n.vinayaTimesMiddayIn(minutes)
+          : l10n.vinayaTimesMiddayInHours(left.inHours, minutes);
+      detail = l10n.vinayaTimesVikalaSpan(
         clockTime(state.midday),
         clockTime(state.vikalaEnds),
       );
@@ -172,7 +172,7 @@ class _ArcSide extends StatelessWidget {
 class _SkyArc extends StatelessWidget {
   const _SkyArc({required this.state});
 
-  final BuddhistTimesState state;
+  final VinayaTimesState state;
 
   static const _stroke = 6.0;
   static const _markerRadius = 8.0;
@@ -203,19 +203,19 @@ class _SkyArc extends StatelessWidget {
     // Kāla ends at midday; the night is one stretch from end to end.
     final stretchTo = day ? along(state.midday) : 1.0;
 
-    final middayText = l10n.buddhistTimesMiddayAt(clockTime(state.midday));
+    final middayText = l10n.vinayaTimesMiddayAt(clockTime(state.midday));
     final middayWidth = _textWidth(context, middayText, strong);
-    final nowText = l10n.buddhistTimesNowAt(clockTime(state.now));
+    final nowText = l10n.vinayaTimesNowAt(clockTime(state.now));
     final nowWidth = _textWidth(context, nowText, dark);
 
     return Semantics(
       label: day
-          ? l10n.buddhistTimesArcLabel(
+          ? l10n.vinayaTimesArcLabel(
               clockTime(start),
               clockTime(state.midday),
               clockTime(end),
             )
-          : l10n.buddhistTimesNightArcLabel(clockTime(start), clockTime(end)),
+          : l10n.vinayaTimesNightArcLabel(clockTime(start), clockTime(end)),
       child: ExcludeSemantics(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -289,15 +289,15 @@ class _SkyArc extends StatelessWidget {
                   _ArcLabel(
                     at: onArc(0) + belowEnd,
                     text: day
-                        ? l10n.buddhistTimesArunaAt(clockTime(start))
-                        : l10n.buddhistTimesSunsetAt(clockTime(start)),
+                        ? l10n.vinayaTimesArunaAt(clockTime(start))
+                        : l10n.vinayaTimesSunsetAt(clockTime(start)),
                     style: label,
                   ),
                   _ArcLabel(
                     at: onArc(1) + belowEnd,
                     text: day
-                        ? l10n.buddhistTimesSunsetAt(clockTime(end))
-                        : l10n.buddhistTimesArunaAt(clockTime(end)),
+                        ? l10n.vinayaTimesSunsetAt(clockTime(end))
+                        : l10n.vinayaTimesArunaAt(clockTime(end)),
                     style: label,
                   ),
                   if (showNow)
@@ -443,14 +443,14 @@ class _SkyArcPainter extends CustomPainter {
 class _MoonPanel extends StatelessWidget {
   const _MoonPanel({required this.state});
 
-  final BuddhistTimesState state;
+  final VinayaTimesState state;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final typography = context.typography;
-    final date = DateFormat(l10n.buddhistTimesDatePattern, l10n.localeName);
+    final date = DateFormat(l10n.vinayaTimesDatePattern, l10n.localeName);
 
     final next = state.uposathas.first;
     final later = state.uposathas.skip(1);
@@ -504,15 +504,15 @@ class _MoonPanel extends StatelessWidget {
                   children: [
                     Text(
                       waxing
-                          ? l10n.buddhistTimesWaxing(day, next.fortnightDays)
-                          : l10n.buddhistTimesWaning(day, next.fortnightDays),
+                          ? l10n.vinayaTimesWaxing(day, next.fortnightDays)
+                          : l10n.vinayaTimesWaning(day, next.fortnightDays),
                       style: typography.menuSectionLabel,
                     ),
                     Text(
                       switch (state.daysToUposatha!) {
-                        0 => l10n.buddhistTimesUposathaToday,
-                        1 => l10n.buddhistTimesUposathaTomorrow,
-                        final days => l10n.buddhistTimesUposathaIn(days),
+                        0 => l10n.vinayaTimesUposathaToday,
+                        1 => l10n.vinayaTimesUposathaTomorrow,
+                        final days => l10n.vinayaTimesUposathaIn(days),
                       },
                       style: typography.resultTitle
                           .copyWith(fontWeight: FontWeight.w600),

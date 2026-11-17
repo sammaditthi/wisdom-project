@@ -78,7 +78,7 @@ dependencies:
   wisdom_shared:
     path: packages/wisdom_shared
 
-  # Sun position maths (NREL SPA) for the Buddhist times: midday, dawn, sunset
+  # Sun position maths (NREL SPA) for the Vinaya times: midday, dawn, sunset
   nrel_spa: ^1.2.0
 
   # URL launching (in-app browser for DPD "Read more" links)

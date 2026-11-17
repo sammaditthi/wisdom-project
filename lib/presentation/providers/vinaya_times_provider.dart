@@ -7,11 +7,11 @@ import '../../core/storage/key_value_store.dart';
 import '../../core/storage/key_value_store_provider.dart';
 import '../../core/storage/storage_keys.dart';
 import '../../data/repositories/sun_times_repository_impl.dart';
-import '../../domain/entities/buddhist_times/city.dart';
-import '../../domain/entities/buddhist_times/dawn_method.dart';
-import '../../domain/entities/buddhist_times/uposatha_calendar.dart';
+import '../../domain/entities/vinaya_times/city.dart';
+import '../../domain/entities/vinaya_times/dawn_method.dart';
+import '../../domain/entities/vinaya_times/uposatha_calendar.dart';
 import '../../domain/repositories/sun_times_repository.dart';
-import 'buddhist_times_state.dart';
+import 'vinaya_times_state.dart';
 
 /// The next uposatha and the two after it.
 const _uposathasShown = 3;
@@ -57,11 +57,11 @@ class MinuteClockNotifier extends StateNotifier<DateTime> {
 }
 
 /// The city the times are worked out for.
-final buddhistTimesCityProvider =
+final vinayaTimesCityProvider =
     StateNotifierProvider<SavedChoiceNotifier<City>, City>((ref) {
   return SavedChoiceNotifier(
     ref.watch(keyValueStoreProvider),
-    key: StorageKeys.buddhistTimesCity,
+    key: StorageKeys.vinayaTimesCity,
     values: City.values,
     fallback: City.fallback,
   );
@@ -72,7 +72,7 @@ final dawnMethodProvider =
     StateNotifierProvider<SavedChoiceNotifier<DawnMethod>, DawnMethod>((ref) {
   return SavedChoiceNotifier(
     ref.watch(keyValueStoreProvider),
-    key: StorageKeys.buddhistTimesDawnMethod,
+    key: StorageKeys.vinayaTimesDawnMethod,
     values: DawnMethod.values,
     fallback: DawnMethod.fallback,
   );
@@ -106,9 +106,9 @@ class SavedChoiceNotifier<T extends Enum> extends StateNotifier<T> {
 }
 
 /// Today's times and the coming uposathas, for the saved city and dawn method.
-final buddhistTimesProvider = Provider.autoDispose<BuddhistTimesState>((ref) {
+final vinayaTimesProvider = Provider.autoDispose<VinayaTimesState>((ref) {
   final now = ref.watch(minuteClockProvider);
-  final city = ref.watch(buddhistTimesCityProvider);
+  final city = ref.watch(vinayaTimesCityProvider);
   final method = ref.watch(dawnMethodProvider);
   final sunTimes = ref.watch(sunTimesRepositoryProvider);
 
@@ -120,7 +120,7 @@ final buddhistTimesProvider = Provider.autoDispose<BuddhistTimesState>((ref) {
   final buddhistDay =
       beforeDawn ? today.subtract(const Duration(days: 1)) : today;
 
-  return BuddhistTimesState(
+  return VinayaTimesState(
     now: now,
     dawn: dawn,
     midday: sunTimes.midday(today, city),

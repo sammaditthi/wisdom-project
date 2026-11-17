@@ -3,21 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
-import '../../../domain/entities/buddhist_times/city.dart';
-import '../../../domain/entities/buddhist_times/dawn_method.dart';
-import '../../providers/buddhist_times_provider.dart';
-import '../common/buddhist_times_labels.dart';
+import '../../../domain/entities/vinaya_times/city.dart';
+import '../../../domain/entities/vinaya_times/dawn_method.dart';
+import '../../providers/vinaya_times_provider.dart';
+import '../common/vinaya_times_labels.dart';
 import 'settings_row.dart';
 
-/// Settings → Buddhist times: the city and the dawn method behind the Today
+/// Settings → Time: the city and the dawn method behind the Today
 /// card, each option shown with the time it gives.
-class BuddhistTimesSettingsPage extends ConsumerWidget {
-  const BuddhistTimesSettingsPage({super.key});
+class VinayaTimesSettingsPage extends ConsumerWidget {
+  const VinayaTimesSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final city = ref.watch(buddhistTimesCityProvider);
+    final city = ref.watch(vinayaTimesCityProvider);
     final method = ref.watch(dawnMethodProvider);
     final sunTimes = ref.watch(sunTimesRepositoryProvider);
 
@@ -33,18 +33,22 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
         24,
       ),
       children: [
+        // The tab is named just "Time", which could read as a clock setting.
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: SettingsProse(l10n.vinayaTimesIntro),
+        ),
         SettingsSection(
-          title: l10n.buddhistTimesLocation,
-          hint: l10n.buddhistTimesLocationHint,
-          isFirst: true,
+          title: l10n.vinayaTimesLocation,
+          hint: l10n.vinayaTimesLocationHint,
           children: [
             for (final option in City.values)
               SettingsRow(
                 label: option.label(l10n),
                 onTap: () =>
-                    ref.read(buddhistTimesCityProvider.notifier).choose(option),
+                    ref.read(vinayaTimesCityProvider.notifier).choose(option),
                 trailing: _Choice(
-                  value: l10n.buddhistTimesMiddayAt(
+                  value: l10n.vinayaTimesMiddayAt(
                     clockTime(sunTimes.midday(today, option)),
                   ),
                   selected: option == city,
@@ -54,8 +58,8 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
           ],
         ),
         SettingsSection(
-          title: l10n.buddhistTimesDawn,
-          hint: l10n.buddhistTimesDawnHint(city.label(l10n)),
+          title: l10n.vinayaTimesDawn,
+          hint: l10n.vinayaTimesDawnHint(city.label(l10n)),
           children: [
             for (final option in DawnMethod.values)
               SettingsRow(
@@ -73,16 +77,16 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
         ),
         const SizedBox(height: 20),
         _Summary(
-          title: l10n.buddhistTimesSummaryTitle(city.label(l10n)),
-          midday: l10n.buddhistTimesMiddayAt(
+          title: l10n.vinayaTimesSummaryTitle(city.label(l10n)),
+          midday: l10n.vinayaTimesMiddayAt(
             clockTime(sunTimes.midday(today, city)),
           ),
-          vikala: l10n.buddhistTimesSummaryVikala(
+          vikala: l10n.vinayaTimesSummaryVikala(
             clockTime(sunTimes.dawn(tomorrow, city, method)),
           ),
         ),
         const SizedBox(height: 12),
-        SettingsProse(l10n.buddhistTimesCalendarNote),
+        SettingsProse(l10n.vinayaTimesCalendarNote),
       ],
     );
   }

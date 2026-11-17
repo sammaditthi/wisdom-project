@@ -1,4 +1,4 @@
-/// A place the Buddhist times are worked out for. The enum name is the saved
+/// A place the Vinaya times are worked out for. The enum name is the saved
 /// key, so renaming a value loses that user's choice.
 enum City {
   colombo(6.9271, 79.8612),

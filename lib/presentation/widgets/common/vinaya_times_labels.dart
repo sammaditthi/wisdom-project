@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
-import '../../../domain/entities/buddhist_times/city.dart';
-import '../../../domain/entities/buddhist_times/dawn_method.dart';
-import '../../../domain/entities/buddhist_times/uposatha_day.dart';
+import '../../../domain/entities/vinaya_times/city.dart';
+import '../../../domain/entities/vinaya_times/dawn_method.dart';
+import '../../../domain/entities/vinaya_times/uposatha_day.dart';
 
 // The domain enums carry no words; these give each value its ARB string. The
 // exhaustive switches mean a new value won't compile until it has one.
@@ -40,8 +40,8 @@ extension DawnMethodLabel on DawnMethod {
 
 extension MoonPhaseLabel on MoonPhase {
   String label(AppLocalizations l10n) => switch (this) {
-        MoonPhase.fullMoon => l10n.buddhistTimesFullMoon,
-        MoonPhase.newMoon => l10n.buddhistTimesNewMoon,
+        MoonPhase.fullMoon => l10n.vinayaTimesFullMoon,
+        MoonPhase.newMoon => l10n.vinayaTimesNewMoon,
       };
 }
 
