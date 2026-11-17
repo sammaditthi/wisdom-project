@@ -49,18 +49,21 @@ The moon panel shows a NASA image at 64, not the 44 drawing.
 - **Credit:** an Images section on Anumodanā, shown only with the toggle.
   See *Licences*.
 - **Web, offline:** the offline worker stores a file only once it has
-  loaded, so every start hands it the thirty addresses, once the app shows
-  (`WebDatabaseInstaller`), and the worker fetches and stores them. Every
-  start and not only the first visit, so a browser that installed before
-  Home gets them too, and a re-cut photo replaces the stored one. A photo
-  that has not changed costs one small "still the same?" request. With no
-  worker, as under `flutter run`, nothing is fetched. **Not checked on dev.**
+  loaded, so on an install (a first visit or a database update) the
+  installer loads all thirty, once the app shows, with the toggle on or
+  off. Other starts load none. Decided 2026-11-17: no requests for the
+  photos on every start, and the user times the toggle against database
+  updates.
+  - A browser that installed before Home stores each photo the first time
+    its day is opened online, and shows the drawn moon offline until then.
+    The next database update loads all thirty.
+  - A re-cut photo: the old copy offline until that day is opened online.
+  - **Not checked on dev.**
 - **Open:** the black dark side on the light card, worst near the new moon.
   If it looks wrong, the next try is the same photo inside a small dark tile.
 - **If the photos go:** delete `assets/moon/`, `assets/make_moon.sh` and
-  `moon_photos.dart`; take out the folder in `pubspec.yaml`, the preload in
-  the installer, its sentence in the message comment of
-  `web/offline_worker.js`, the Images section and its two strings;
+  `moon_photos.dart`; take out the folder in `pubspec.yaml`, the photo
+  loading in the installer, the Images section and its two strings;
   `_MoonPanel` goes back to `_MoonPainter` alone.
 
 ### Checked
@@ -111,7 +114,9 @@ constant. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
 - Settings has no Buddhist times tab, and Anumodanā no Images section.
-- Web does not preload the moon photos.
+
+Web still loads the moon photos on an install (see *Moon photos*), so a
+database update made while the toggle is off still counts.
 
 Turning it on is that one line, plus a `CHANGELOG.md` note under *Unreleased*.
 The app still opens on the Reader either way.
@@ -334,9 +339,8 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 - `repositories/sun_times_repository_impl.dart`: the only file that imports
   `nrel_spa`. Applies the rounding in Decision 7.
-- `database/web_database_installer.dart`: every start on web sends the moon
-  photos' addresses to the offline worker, which fetches and stores them. It
-  cannot fail the install.
+- `database/web_database_installer.dart`: on an install, web loads the thirty
+  moon photos so the offline worker stores them. It cannot fail the install.
 
 ### Presentation — `lib/presentation/`
 
@@ -356,7 +360,8 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 - `screens/app_shell.dart`: Home joins the navigation, and is built, only
   when the toggle is on.
 - `widgets/common/buddhist_times_labels.dart`: the ARB string of each city,
-  dawn method and moon phase, for the card and the Settings tab.
+  dawn method and moon phase, and `clockTime`, for the card and the Settings
+  tab.
 - `widgets/settings/buddhist_times_settings_page.dart`: the tab, rows with a
   tick and not the canvas's dropdowns, so every time stays in view.
 - `widgets/settings/settings_tab.dart`: the tab shows only with the toggle.

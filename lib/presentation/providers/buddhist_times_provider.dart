@@ -128,10 +128,7 @@ final buddhistTimesProvider = Provider.autoDispose<BuddhistTimesState>((ref) {
     vikalaEnds: beforeDawn
         ? dawn
         : sunTimes.dawn(today.add(const Duration(days: 1)), city, method),
-    nightStart: sunTimes.sunset(
-      beforeDawn ? today.subtract(const Duration(days: 1)) : today,
-      city,
-    ),
+    nightStart: sunTimes.sunset(buddhistDay, city),
     buddhistDay: buddhistDay,
     uposathas: UposathaCalendar.upcoming(buddhistDay, _uposathasShown),
   );

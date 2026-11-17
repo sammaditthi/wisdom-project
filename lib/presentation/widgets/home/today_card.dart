@@ -108,10 +108,6 @@ class TodayCard extends ConsumerWidget {
   }
 }
 
-// Sun times are instants, shown as the device clock reads them.
-final _clock = DateFormat('HH:mm');
-String _time(DateTime instant) => _clock.format(instant.toLocal());
-
 const _tabular = [FontFeature.tabularFigures()];
 
 /// The arc with its headline: how long until midday, or until when vikāla
@@ -129,7 +125,7 @@ class _ArcSide extends StatelessWidget {
     final String headline;
     String? detail;
     if (state.isVikala) {
-      headline = l10n.buddhistTimesVikalaUntil(_time(state.vikalaEnds));
+      headline = l10n.buddhistTimesVikalaUntil(clockTime(state.vikalaEnds));
     } else {
       final left = state.midday.difference(state.now);
       final minutes = left.inMinutes.remainder(60);
@@ -137,8 +133,8 @@ class _ArcSide extends StatelessWidget {
           ? l10n.buddhistTimesMiddayIn(minutes)
           : l10n.buddhistTimesMiddayInHours(left.inHours, minutes);
       detail = l10n.buddhistTimesVikalaSpan(
-        _time(state.midday),
-        _time(state.vikalaEnds),
+        clockTime(state.midday),
+        clockTime(state.vikalaEnds),
       );
     }
 
@@ -207,19 +203,19 @@ class _SkyArc extends StatelessWidget {
     // Kāla ends at midday; the night is one stretch from end to end.
     final stretchTo = day ? along(state.midday) : 1.0;
 
-    final middayText = l10n.buddhistTimesMiddayAt(_time(state.midday));
+    final middayText = l10n.buddhistTimesMiddayAt(clockTime(state.midday));
     final middayWidth = _textWidth(context, middayText, strong);
-    final nowText = l10n.buddhistTimesNowAt(_time(state.now));
+    final nowText = l10n.buddhistTimesNowAt(clockTime(state.now));
     final nowWidth = _textWidth(context, nowText, dark);
 
     return Semantics(
       label: day
           ? l10n.buddhistTimesArcLabel(
-              _time(start),
-              _time(state.midday),
-              _time(end),
+              clockTime(start),
+              clockTime(state.midday),
+              clockTime(end),
             )
-          : l10n.buddhistTimesNightArcLabel(_time(start), _time(end)),
+          : l10n.buddhistTimesNightArcLabel(clockTime(start), clockTime(end)),
       child: ExcludeSemantics(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -293,15 +289,15 @@ class _SkyArc extends StatelessWidget {
                   _ArcLabel(
                     at: onArc(0) + belowEnd,
                     text: day
-                        ? l10n.buddhistTimesArunaAt(_time(start))
-                        : l10n.buddhistTimesSunsetAt(_time(start)),
+                        ? l10n.buddhistTimesArunaAt(clockTime(start))
+                        : l10n.buddhistTimesSunsetAt(clockTime(start)),
                     style: label,
                   ),
                   _ArcLabel(
                     at: onArc(1) + belowEnd,
                     text: day
-                        ? l10n.buddhistTimesSunsetAt(_time(end))
-                        : l10n.buddhistTimesArunaAt(_time(end)),
+                        ? l10n.buddhistTimesSunsetAt(clockTime(end))
+                        : l10n.buddhistTimesArunaAt(clockTime(end)),
                     style: label,
                   ),
                   if (showNow)

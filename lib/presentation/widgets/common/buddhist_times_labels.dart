@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../domain/entities/buddhist_times/city.dart';
 import '../../../domain/entities/buddhist_times/dawn_method.dart';
@@ -42,3 +44,7 @@ extension MoonPhaseLabel on MoonPhase {
         MoonPhase.newMoon => l10n.buddhistTimesNewMoon,
       };
 }
+
+// Sun times are instants, shown as the device clock reads them.
+final _clock = DateFormat('HH:mm');
+String clockTime(DateTime instant) => _clock.format(instant.toLocal());

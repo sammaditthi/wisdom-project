@@ -186,6 +186,8 @@ final navigatorVisibleProvider =
 
 Callers switch from `ref.read(navigatorVisibleProvider.notifier).state = x` to methods such as `toggle()`. If step 2 is done, the active tab's saving moves into that notifier.
 
+**One notifier per kind of saved setting.** Noted 2026-11-17 in the Buddhist times review. Two generic notifiers already exist, each in a feature file: `BoolSettingNotifier` (`pali_letter_options_provider.dart`) and `SavedChoiceNotifier<T extends Enum>` (`buddhist_times_provider.dart`, from `feat/buddhist-times`). `ContentLanguageNotifier` and `AppLanguageNotifier` repeat `SavedChoiceNotifier` by hand: load the enum by name, save best-effort. App language works out its fallback from the device locales, so it can pass that in. Move both generics into one shared file, convert them to `Notifier` here, and replace the two hand-written ones. `LastReaderLayoutNotifier` stays as it is: "nothing saved" is a real state for it (`null`), not a fallback.
+
 ### Step 4 — Theme and font size load like other settings (S)
 
 `ThemeNotifier` and `FontScaleNotifier` load late: `main.dart` calls `loadSavedTheme()` / `loadSavedScale()` in a startup microtask, and they call `SharedPreferences.getInstance()` themselves. Every other setting reads `keyValueStoreProvider` straight away, in its constructor. Make these two match and delete the two calls in `main.dart`. This also closes the TODO at the top of `lib/core/theme/theme_notifier.dart`.

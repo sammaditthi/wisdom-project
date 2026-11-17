@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
@@ -26,10 +25,6 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
     final today = City.dayAt(ref.watch(minuteClockProvider));
     final tomorrow = today.add(const Duration(days: 1));
 
-    // Sun times are instants, shown as the device clock reads them.
-    final clock = DateFormat('HH:mm');
-    String time(DateTime instant) => clock.format(instant.toLocal());
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         settingsGutter,
@@ -50,7 +45,7 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
                     ref.read(buddhistTimesCityProvider.notifier).choose(option),
                 trailing: _Choice(
                   value: l10n.buddhistTimesMiddayAt(
-                    time(sunTimes.midday(today, option)),
+                    clockTime(sunTimes.midday(today, option)),
                   ),
                   selected: option == city,
                 ),
@@ -69,7 +64,7 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
                 onTap: () =>
                     ref.read(dawnMethodProvider.notifier).choose(option),
                 trailing: _Choice(
-                  value: time(sunTimes.dawn(tomorrow, city, option)),
+                  value: clockTime(sunTimes.dawn(tomorrow, city, option)),
                   selected: option == method,
                 ),
                 showDivider: option != DawnMethod.values.last,
@@ -80,10 +75,10 @@ class BuddhistTimesSettingsPage extends ConsumerWidget {
         _Summary(
           title: l10n.buddhistTimesSummaryTitle(city.label(l10n)),
           midday: l10n.buddhistTimesMiddayAt(
-            time(sunTimes.midday(today, city)),
+            clockTime(sunTimes.midday(today, city)),
           ),
           vikala: l10n.buddhistTimesSummaryVikala(
-            time(sunTimes.dawn(tomorrow, city, method)),
+            clockTime(sunTimes.dawn(tomorrow, city, method)),
           ),
         ),
         const SizedBox(height: 12),
