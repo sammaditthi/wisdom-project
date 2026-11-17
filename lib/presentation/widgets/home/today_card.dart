@@ -118,7 +118,8 @@ class TodayCard extends ConsumerWidget {
                 );
               }
               // The two skies share a bottom edge, so one horizon runs
-              // under both, and the lines under them start level.
+              // under both. The headlines under them differ in size, so they
+              // sit on one baseline.
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -133,7 +134,7 @@ class TodayCard extends ConsumerWidget {
                   _columns(
                     sunLines,
                     _UposathaLines(state: state),
-                    CrossAxisAlignment.start,
+                    CrossAxisAlignment.baseline,
                   ),
                 ],
               );
@@ -148,6 +149,9 @@ class TodayCard extends ConsumerWidget {
   static Widget _columns(Widget sun, Widget moon, CrossAxisAlignment align) {
     return Row(
       crossAxisAlignment: align,
+      // Used only by CrossAxisAlignment.baseline; a column lines up by its
+      // first line.
+      textBaseline: TextBaseline.alphabetic,
       children: [
         Expanded(flex: 3, child: sun),
         const SizedBox(width: 24),
@@ -564,7 +568,7 @@ class _MoonSky extends StatelessWidget {
     final photo = moonPhotoAsset(
       (age / math.pi * (moonPhotoCount / 2)).round() % moonPhotoCount,
     );
-    const moonSize = 64.0;
+    const moonSize = 72.0;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -624,32 +628,32 @@ class _UposathaLines extends StatelessWidget {
     String line(UposathaDay uposatha) =>
         '${date.format(uposatha.date)} · ${uposatha.phase.label(l10n)}';
 
-    return Column(
-      children: [
-        Text(
-          switch (state.daysToUposatha!) {
-            0 => l10n.vinayaTimesUposathaToday,
-            1 => l10n.vinayaTimesUposathaTomorrow,
-            final days => l10n.vinayaTimesUposathaIn(days),
-          },
-          textAlign: TextAlign.center,
-          style: typography.resultTitle.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          line(state.uposathas.first),
-          textAlign: TextAlign.center,
-          style: typography.listRowTitle.copyWith(fontWeight: FontWeight.w500),
-        ),
-        for (final uposatha in state.uposathas.skip(1)) ...[
-          const SizedBox(height: 2),
+    // The block sits centred under the moon, its lines starting at one left
+    // edge. A height factor of 1 keeps Center as tall as the lines, no taller.
+    return Center(
+      heightFactor: 1,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Text(
-            line(uposatha),
-            textAlign: TextAlign.center,
-            style: typography.menuSectionLabel,
+            switch (state.daysToUposatha!) {
+              0 => l10n.vinayaTimesUposathaToday,
+              1 => l10n.vinayaTimesUposathaTomorrow,
+              final days => l10n.vinayaTimesUposathaIn(days),
+            },
+            // A step under the vikāla headline beside it, which matters more.
+            style: typography.listRowTitle.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          // More room under the headline than between the dates.
+          for (final (i, uposatha) in state.uposathas.indexed) ...[
+            SizedBox(height: i == 0 ? 4 : 2),
+            Text(line(uposatha), style: typography.menuSectionLabel),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
