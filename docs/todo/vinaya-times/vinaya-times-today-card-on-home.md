@@ -253,8 +253,8 @@ By the user on 2026-11-14 unless marked.
     2026-11-18; the fixed roles: my call)*
 17. **One arc, swapped at sunset and at aruṇa**, and not two arcs side by
     side. *(user, 2026-11-15)*
-18. **No small print and no Settings link on the card.** The city button is
-    enough. *(user, 2026-11-15; which of the two buttons stays: my call)*
+18. **No small print and no Settings link on the card.** The date-and-city
+    button is enough. *(user, 2026-11-15; which of the two buttons stays: my call)*
 19. **The moon is a NASA image, thirty to a cycle.** The drawing stays only
     as the fallback. *(user, 2026-11-15, by committing it; the credit's
     section and wording: my call)*
