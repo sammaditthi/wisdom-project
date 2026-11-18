@@ -20,7 +20,7 @@ class AppTheme {
   static ThemeData light({double fontScale = 1.0}) {
     // Create ColorScheme once and reuse
     const colorScheme = ColorScheme.light(
-      // Primary group (interactive brand color — cinnamon orange)
+      // Primary group (interactive brand color — cinnamon brown)
       primary: LightThemeColors.primary,
       onPrimary: LightThemeColors.onPrimary,
       primaryContainer: LightThemeColors.primaryContainer,
@@ -30,7 +30,7 @@ class AppTheme {
       onSecondary: LightThemeColors.onSecondary,
       secondaryContainer: LightThemeColors.secondaryContainer,
       onSecondaryContainer: LightThemeColors.onSecondaryContainer,
-      // Tertiary group (contrasting accent — golden amber)
+      // Tertiary group (contrasting accent — mint green)
       tertiary: LightThemeColors.tertiary,
       onTertiary: LightThemeColors.onTertiary,
       tertiaryContainer: LightThemeColors.tertiaryContainer,
