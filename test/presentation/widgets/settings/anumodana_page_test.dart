@@ -88,7 +88,7 @@ void main() {
 
       // The credit line NASA asks for, word for word, so a literal.
       const nasa = "NASA's Scientific Visualization Studio";
-      const shown = kEnableHome ? findsOneWidget : findsNothing;
+      final shown = kEnableHome ? findsOneWidget : findsNothing;
 
       expect(find.text(l10n.anumodanaImages), shown);
       expect(find.text(nasa), shown);

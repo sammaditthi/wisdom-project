@@ -15,11 +15,11 @@ import 'research_screen.dart';
 /// The sections the rail and the bottom bar offer, in display order. Home
 /// waits on [kEnableHome] and Notes is hidden for the beta; both stay in
 /// [AppSection] so nothing else has to change to bring them back.
-const _navSections = [
-  if (kEnableHome) AppSection.home,
-  AppSection.reader,
-  AppSection.research,
-];
+List<AppSection> get _navSections => [
+      if (kEnableHome) AppSection.home,
+      AppSection.reader,
+      AppSection.research,
+    ];
 
 /// The app's top-level shell: an icon-only [NavigationRail] on tablet/desktop
 /// and a labelled bottom [NavigationBar] on mobile, switching between the
