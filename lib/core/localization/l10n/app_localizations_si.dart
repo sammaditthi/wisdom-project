@@ -784,16 +784,16 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String get vinayaTimesUposathaTomorrow => 'හෙට උපෝසථ';
+  String get vinayaTimesUposathaTomorrow => 'උපෝසථය හෙට';
 
   @override
-  String get vinayaTimesUposathaToday => 'අද උපෝසථ';
+  String get vinayaTimesUposathaToday => 'උපෝසථය අද';
 
   @override
-  String get vinayaTimesFullMoon => 'පුර පසළොස්වක උපෝසථ';
+  String get vinayaTimesFullMoon => 'පුර පසළොස්වක උපෝසථය';
 
   @override
-  String get vinayaTimesNewMoon => 'අමාවක උපෝසථ';
+  String get vinayaTimesNewMoon => 'අමාවක උපෝසථය';
 
   @override
   String get vinayaTimesLocation => 'ස්ථානය';
@@ -935,7 +935,7 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String vinayaTimesUposathaIn(int days) {
-    return 'උපෝසථයට දින $days';
+    return 'උපෝසථය දින $daysකින්';
   }
 
   @override

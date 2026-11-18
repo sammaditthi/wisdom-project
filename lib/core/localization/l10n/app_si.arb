@@ -405,10 +405,10 @@
   "vinayaTimesIntro": "අරුණ, මධ්‍යාහ්නය සහ උපෝසථ දින.",
   "vinayaTimesDatePattern": "MMM d, EEE",
   "vinayaTimesMiddayIn": "මධ්‍යාහ්නයට මිනි. {minutes}",
-  "vinayaTimesUposathaTomorrow": "හෙට උපෝසථ",
-  "vinayaTimesUposathaToday": "අද උපෝසථ",
-  "vinayaTimesFullMoon": "පුර පසළොස්වක උපෝසථ",
-  "vinayaTimesNewMoon": "අමාවක උපෝසථ",
+  "vinayaTimesUposathaTomorrow": "උපෝසථය හෙට",
+  "vinayaTimesUposathaToday": "උපෝසථය අද",
+  "vinayaTimesFullMoon": "පුර පසළොස්වක උපෝසථය",
+  "vinayaTimesNewMoon": "අමාවක උපෝසථය",
   "vinayaTimesLocation": "ස්ථානය",
   "vinayaTimesLocationHint": "මධ්‍යාහ්නය සහ අරුණ ගණනය කරන්නේ මෙම ස්ථානයටයි.",
   "vinayaTimesMiddayAt": "මධ්‍යාහ්නය {time}",
@@ -445,6 +445,6 @@
   "vinayaTimesVikalaUntil": "අරුණ {time} තෙක් විකාලය",
   "vinayaTimesWaxing": "පුර පක්ෂය · {total}න් {day} වන දිනය",
   "vinayaTimesWaning": "අව පක්ෂය · {total}න් {day} වන දිනය",
-  "vinayaTimesUposathaIn": "උපෝසථයට දින {days}",
+  "vinayaTimesUposathaIn": "උපෝසථය දින {days}කින්",
   "vinayaTimesNightArcLabel": "අද රෑ සඳ ගමන: හිරු බැසීම {sunset}, අරුණ {dawn}"
 }
