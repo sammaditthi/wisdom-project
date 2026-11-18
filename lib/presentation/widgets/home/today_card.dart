@@ -258,8 +258,11 @@ class _ArcHeadline extends StatelessWidget {
       style = typography.resultSubtitle;
     } else {
       final left = state.midday.difference(state.now);
-      final minutes = left.inMinutes.remainder(60);
-      headline = switch ((left.inHours, minutes)) {
+      // Round up, as a countdown does: 40 s left reads "1 min", not "0 min".
+      final totalMinutes =
+          (left.inMicroseconds / Duration.microsecondsPerMinute).ceil();
+      final minutes = totalMinutes % 60;
+      headline = switch ((totalMinutes ~/ 60, minutes)) {
         (0, _) => l10n.vinayaTimesMiddayIn(minutes),
         // On the hour, no "0 min".
         (final hours, 0) => l10n.vinayaTimesMiddayInWholeHours(hours),
