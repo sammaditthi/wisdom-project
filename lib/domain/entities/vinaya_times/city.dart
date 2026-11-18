@@ -16,7 +16,7 @@ enum City {
   final double longitude;
 
   /// The city used until the user picks one.
-  static const fallback = City.colombo;
+  static const fallback = City.anuradhapura;
 
   /// Sri Lanka's clock, the same all year. Every city in the list is on it.
   static const utcOffset = Duration(hours: 5, minutes: 30);

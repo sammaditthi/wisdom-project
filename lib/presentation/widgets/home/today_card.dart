@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/moon_photos.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../domain/entities/vinaya_times/city.dart';
 import '../../../domain/entities/vinaya_times/uposatha_day.dart';
 import '../../providers/vinaya_times_provider.dart';
 import '../../providers/vinaya_times_state.dart';
@@ -15,8 +16,8 @@ import '../settings/settings_dialog.dart';
 import '../settings/settings_tab.dart';
 
 /// Home's Today card: the day's or the night's arc with midday and vikāla on
-/// one side, the moon's fortnight and the coming uposathas on the other, both
-/// over one horizon.
+/// one side, the moon's fortnight and the next uposatha on the other. Bold is
+/// only for what is near.
 class TodayCard extends ConsumerWidget {
   const TodayCard({super.key});
 
@@ -52,48 +53,21 @@ class TodayCard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // TODAY sits on the date's first line.
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.homeToday.toUpperCase(),
-                      style: typography
-                          .sectionHeaderFor(l10n.homeToday)
-                          .copyWith(color: colors.onSurfaceVariant),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      // The device's date, like the clock times beside it.
-                      DateFormat(
-                        l10n.vinayaTimesFullDatePattern,
-                        l10n.localeName,
-                      ).format(state.now),
-                      style: typography.resultTitle,
-                    ),
-                  ],
-                ),
+              Text(
+                l10n.homeToday.toUpperCase(),
+                style: typography
+                    .sectionHeaderFor(l10n.homeToday)
+                    .copyWith(color: colors.onSurfaceVariant),
               ),
               const SizedBox(width: 12),
-              Tooltip(
-                message: l10n.vinayaTimesChangeLocation(city.label(l10n)),
-                child: OutlinedButton.icon(
-                  onPressed: () => SettingsDialog.show(
-                    context,
-                    initial: SettingsTab.vinayaTimes,
-                  ),
-                  // As small as its label allows. The theme still gives it
-                  // a 48px tap area on touch screens.
-                  style: OutlinedButton.styleFrom(
-                    textStyle: typography.actionLabel,
-                    minimumSize: Size.zero,
-                    padding: const EdgeInsetsDirectional.fromSTEB(6, 4, 10, 4),
-                    visualDensity: VisualDensity.standard,
-                  ),
-                  icon: const Icon(Icons.location_on_outlined, size: 14),
-                  label: Text(city.label(l10n)),
+              Expanded(
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: _DateAndCity(now: state.now, city: city),
                 ),
               ),
             ],
@@ -109,16 +83,18 @@ class TodayCard extends ConsumerWidget {
                     const SizedBox(height: 8),
                     sunLines,
                     if (hasMoon) ...[
-                      const SizedBox(height: 16),
-                      _Horizon(child: _MoonSky(state: state)),
-                      const SizedBox(height: 8),
-                      _UposathaLines(state: state),
+                      // A solid rule, not a second horizon: here the moon
+                      // has no sky of its own.
+                      const SizedBox(height: 20),
+                      Divider(height: 1, color: colors.outlineVariant),
+                      const SizedBox(height: 20),
+                      _MoonRow(state: state),
                     ],
                   ],
                 );
               }
               // The two skies share a bottom edge, so one horizon runs
-              // under both. The headlines under them differ in size, so they
+              // under both. The lines under them differ in size, so they
               // sit on one baseline.
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -133,7 +109,13 @@ class TodayCard extends ConsumerWidget {
                   const SizedBox(height: 8),
                   _columns(
                     sunLines,
-                    _UposathaLines(state: state),
+                    Center(
+                      heightFactor: 1,
+                      child: _UposathaLine(
+                        state: state,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                     CrossAxisAlignment.baseline,
                   ),
                 ],
@@ -161,17 +143,100 @@ class TodayCard extends ConsumerWidget {
   }
 }
 
+/// Today's date with the city under it, as one button that opens
+/// Settings > Time.
+class _DateAndCity extends StatelessWidget {
+  const _DateAndCity({required this.now, required this.city});
+
+  final DateTime now;
+  final City city;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final typography = context.typography;
+    final locale = l10n.localeName;
+
+    // The device's date, like the clock times on the card. The weekday is
+    // bold wherever the language puts it, so it is found in the full date.
+    final date =
+        DateFormat(l10n.vinayaTimesFullDatePattern, locale).format(now);
+    final weekday = DateFormat('EEEE', locale).format(now);
+    final at = date.indexOf(weekday);
+    final rest = typography.menuSectionLabel.copyWith(color: colors.onSurface);
+
+    return Tooltip(
+      message: l10n.vinayaTimesChangeLocation(city.label(l10n)),
+      child: TextButton(
+        onPressed: () => SettingsDialog.show(
+          context,
+          initial: SettingsTab.vinayaTimes,
+        ),
+        // As small as its two lines allow. The theme still gives it a 48px
+        // tap area on touch screens.
+        style: TextButton.styleFrom(
+          foregroundColor: colors.onSurfaceVariant,
+          textStyle: typography.menuSectionLabel,
+          minimumSize: Size.zero,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          visualDensity: VisualDensity.standard,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text.rich(
+              TextSpan(
+                style: rest,
+                children: at < 0
+                    ? [TextSpan(text: date)]
+                    : [
+                        TextSpan(text: date.substring(0, at)),
+                        TextSpan(
+                          text: weekday,
+                          style: typography.listRowTitle.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        TextSpan(text: date.substring(at + weekday.length)),
+                      ],
+              ),
+              textAlign: TextAlign.end,
+            ),
+            Text(
+              city.label(l10n),
+              textAlign: TextAlign.end,
+              style: typography.menuSectionLabel,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 const _tabular = [FontFeature.tabularFigures()];
 
 /// Gap between the arc and a label beside it, and between the horizon and
 /// the labels under it.
 const _labelGap = 8.0;
 
-/// Room for one line of label, which grows with the system text size.
-double _labelLineHeight(BuildContext context) =>
-    MediaQuery.textScalerOf(context).scale(20);
+/// Room for one line of label at the app's and the system's text size, sized
+/// for the largest drawn in it: the 14px countdown under the moon. One value
+/// for both sides, since they share the horizon.
+double _labelLineHeight(BuildContext context) {
+  final style = context.typography.listRowTitle;
+  return MediaQuery.textScalerOf(context).scale(style.fontSize!) *
+      style.height!;
+}
 
-/// The headline under the arc: how long until midday, or until when vikāla
+/// Midday's countdown turns orange inside the hour, red inside the half hour.
+const _middaySoon = Duration(hours: 1);
+const _middayVerySoon = Duration(minutes: 30);
+
+/// The line under the arc: how long until midday, or until when vikāla
 /// lasts.
 class _ArcHeadline extends StatelessWidget {
   const _ArcHeadline({required this.state});
@@ -181,18 +246,31 @@ class _ArcHeadline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     final typography = context.typography;
 
     final String headline;
+    final TextStyle style;
     String? detail;
     if (state.isVikala) {
       headline = l10n.vinayaTimesVikalaUntil(clockTime(state.vikalaEnds));
+      // Nothing is near once midday has passed.
+      style = typography.resultSubtitle;
     } else {
       final left = state.midday.difference(state.now);
       final minutes = left.inMinutes.remainder(60);
       headline = left.inHours == 0
           ? l10n.vinayaTimesMiddayIn(minutes)
           : l10n.vinayaTimesMiddayInHours(left.inHours, minutes);
+      style = typography.resultTitle.copyWith(
+        fontWeight: FontWeight.w600,
+        // The words carry it too; the colour only adds to them.
+        color: switch (left) {
+          <= _middayVerySoon => colors.error,
+          <= _middaySoon => colors.onPrimaryFixedVariant,
+          _ => colors.onSurface,
+        },
+      );
       detail = l10n.vinayaTimesVikalaSpan(
         clockTime(state.midday),
         clockTime(state.vikalaEnds),
@@ -204,10 +282,7 @@ class _ArcHeadline extends StatelessWidget {
         Text(
           headline,
           textAlign: TextAlign.center,
-          style: typography.resultTitle.copyWith(
-            fontWeight: FontWeight.w600,
-            fontFeatures: _tabular,
-          ),
+          style: style.copyWith(fontFeatures: _tabular),
         ),
         if (detail != null) ...[
           const SizedBox(height: 2),
@@ -245,7 +320,9 @@ class _SkyArc extends StatelessWidget {
       fontFeatures: _tabular,
     );
     final dark = label.copyWith(color: colors.onSurface);
-    final strong = dark.copyWith(fontWeight: FontWeight.w600);
+    // Bold until midday, regular once it has passed.
+    final middayStyle =
+        state.isVikala ? dark : dark.copyWith(fontWeight: FontWeight.w600);
 
     final lineHeight = _labelLineHeight(context);
 
@@ -260,7 +337,7 @@ class _SkyArc extends StatelessWidget {
     final stretchTo = day ? along(state.midday) : 1.0;
 
     final middayText = l10n.vinayaTimesMiddayAt(clockTime(state.midday));
-    final middayWidth = _textWidth(context, middayText, strong);
+    final middayWidth = _textWidth(context, middayText, middayStyle);
     final nowText = l10n.vinayaTimesNowAt(clockTime(state.now));
     final nowWidth = _textWidth(context, nowText, dark);
 
@@ -359,7 +436,7 @@ class _SkyArc extends StatelessWidget {
                     _ArcLabel(
                       at: middayRect.center,
                       text: middayText,
-                      style: strong,
+                      style: middayStyle,
                     ),
                   _ArcLabel(
                     at: onArc(0) + belowEnd,
@@ -546,8 +623,8 @@ class _HorizonPainter extends CustomPainter {
       old.fromBottom != fromBottom || old.color != color;
 }
 
-/// The moon above the horizon and, under it level with the arc's end labels,
-/// how far along its fortnight it is.
+/// The wide card's moon: above the horizon, with its line under it level
+/// with the arc's end labels.
 class _MoonSky extends StatelessWidget {
   const _MoonSky({required this.state});
 
@@ -558,41 +635,10 @@ class _MoonSky extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-
-    final next = state.uposathas.first;
-    final day = state.fortnightDay!;
-    final waxing = next.phase == MoonPhase.fullMoon;
-    // The moon's age as an angle: 0 at new moon, pi at full.
-    final age = math.pi * (waxing ? 0 : 1) + math.pi * day / next.fortnightDays;
-    // One photo a step round the cycle: the first the new moon, the middle
-    // one the full moon.
-    final photo = moonPhotoAsset(
-      (age / math.pi * (moonPhotoCount / 2)).round() % moonPhotoCount,
-    );
-    const moonSize = 72.0;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ExcludeSemantics(
-          child: Image.asset(
-            photo,
-            width: moonSize,
-            height: moonSize,
-            // No photo (web, offline, not yet stored): the drawn moon.
-            errorBuilder: (_, __, ___) => CustomPaint(
-              size: const Size.square(moonSize),
-              painter: _MoonPainter(
-                age: age,
-                litColor: colors.tertiaryFixed,
-                darkColor: colors.surfaceContainerHighest,
-                rimColor: colors.outline,
-              ),
-            ),
-          ),
-        ),
+        _MoonImage(state: state, size: 72),
         const SizedBox(height: _clearance + _labelGap),
         SizedBox(
           height: _labelLineHeight(context),
@@ -601,13 +647,7 @@ class _MoonSky extends StatelessWidget {
           child: Center(
             child: FittedBox(
               fit: BoxFit.scaleDown,
-              child: Text(
-                waxing
-                    ? l10n.vinayaTimesWaxing(day, next.fortnightDays)
-                    : l10n.vinayaTimesWaning(day, next.fortnightDays),
-                maxLines: 1,
-                style: context.typography.menuSectionLabel,
-              ),
+              child: _MoonLine(state: state),
             ),
           ),
         ),
@@ -616,47 +656,137 @@ class _MoonSky extends StatelessWidget {
   }
 }
 
-/// When the next uposatha is, its date, and the one after it.
-class _UposathaLines extends StatelessWidget {
-  const _UposathaLines({required this.state});
+/// The narrow card's moon: the photo beside its two lines, with no sky.
+class _MoonRow extends StatelessWidget {
+  const _MoonRow({required this.state});
 
   final VinayaTimesState state;
 
   @override
   Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _MoonImage(state: state, size: 56),
+        const SizedBox(width: 16),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _MoonLine(state: state),
+              const SizedBox(height: 2),
+              _UposathaLine(state: state),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Today's moon photo, or the drawn moon when there is no photo.
+class _MoonImage extends StatelessWidget {
+  const _MoonImage({required this.state, required this.size});
+
+  final VinayaTimesState state;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final next = state.uposathas.first;
+    final waxing = next.phase == MoonPhase.fullMoon;
+    // The moon's age as an angle: 0 at new moon, pi at full.
+    final age = math.pi * (waxing ? 0 : 1) +
+        math.pi * state.fortnightDay! / next.fortnightDays;
+    // One photo a step round the cycle: the first the new moon, the middle
+    // one the full moon.
+    final photo = moonPhotoAsset(
+      (age / math.pi * (moonPhotoCount / 2)).round() % moonPhotoCount,
+    );
+
+    return ExcludeSemantics(
+      child: Image.asset(
+        photo,
+        width: size,
+        height: size,
+        // No photo (web, offline, not yet stored): the drawn moon.
+        errorBuilder: (_, __, ___) => CustomPaint(
+          size: Size.square(size),
+          painter: _MoonPainter(
+            age: age,
+            litColor: colors.tertiaryFixed,
+            darkColor: colors.surfaceContainerHighest,
+            rimColor: colors.outline,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The line under the moon. From five days before the uposatha, how near it
+/// is, bold in the last two; before that, how far along its fortnight the
+/// moon is.
+class _MoonLine extends StatelessWidget {
+  const _MoonLine({required this.state});
+
+  final VinayaTimesState state;
+
+  /// The countdown takes the fortnight line's place from this many days out.
+  static const _countdownFrom = 5;
+
+  /// ...and is bold from this many.
+  static const _nearFrom = 2;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final typography = context.typography;
+    final next = state.uposathas.first;
+    final days = state.daysToUposatha!;
+
+    if (days > _countdownFrom) {
+      final day = state.fortnightDay!;
+      return Text(
+        next.phase == MoonPhase.fullMoon
+            ? l10n.vinayaTimesWaxing(day, next.fortnightDays)
+            : l10n.vinayaTimesWaning(day, next.fortnightDays),
+        style: typography.menuSectionLabel,
+      );
+    }
+    return Text(
+      switch (days) {
+        0 => l10n.vinayaTimesUposathaToday,
+        1 => l10n.vinayaTimesUposathaTomorrow,
+        _ => l10n.vinayaTimesUposathaIn(days),
+      },
+      style: days <= _nearFrom
+          ? typography.listRowTitle.copyWith(fontWeight: FontWeight.w600)
+          : typography.menuSectionLabel,
+    );
+  }
+}
+
+/// The next uposatha's date and which moon it falls on.
+class _UposathaLine extends StatelessWidget {
+  const _UposathaLine({required this.state, this.textAlign});
+
+  final VinayaTimesState state;
+  final TextAlign? textAlign;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final next = state.uposathas.first;
     final date = DateFormat(l10n.vinayaTimesDatePattern, l10n.localeName);
 
-    String line(UposathaDay uposatha) =>
-        '${date.format(uposatha.date)} · ${uposatha.phase.label(l10n)}';
-
-    // The block sits centred under the moon, its lines starting at one left
-    // edge. A height factor of 1 keeps Center as tall as the lines, no taller.
-    return Center(
-      heightFactor: 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            switch (state.daysToUposatha!) {
-              0 => l10n.vinayaTimesUposathaToday,
-              1 => l10n.vinayaTimesUposathaTomorrow,
-              final days => l10n.vinayaTimesUposathaIn(days),
-            },
-            // A step under the vikāla headline beside it, which matters more.
-            style: typography.listRowTitle.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          // More room under the headline than between the dates.
-          for (final (i, uposatha) in state.uposathas.indexed) ...[
-            SizedBox(height: i == 0 ? 4 : 2),
-            Text(line(uposatha), style: typography.menuSectionLabel),
-          ],
-        ],
-      ),
+    return Text(
+      '${date.format(next.date)} · ${next.phase.label(l10n)}',
+      textAlign: textAlign,
+      style: context.typography.menuSectionLabel,
     );
   }
 }

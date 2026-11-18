@@ -1176,19 +1176,19 @@
   },
   "vinayaTimesUposathaTomorrow": "Uposatha tomorrow",
   "@vinayaTimesUposathaTomorrow": {
-    "description": "Today card: moon panel headline on the day before an uposatha"
+    "description": "Today card: the line under the moon on the day before an uposatha"
   },
   "vinayaTimesUposathaToday": "Uposatha today",
   "@vinayaTimesUposathaToday": {
-    "description": "Today card: moon panel headline on the uposatha day itself"
+    "description": "Today card: the line under the moon on the uposatha day itself"
   },
-  "vinayaTimesFullMoon": "Full moon",
+  "vinayaTimesFullMoon": "Full moon uposatha",
   "@vinayaTimesFullMoon": {
-    "description": "Today card: after the date of a full-moon uposatha, e.g. Tue 24 Nov · Full moon"
+    "description": "Today card: after the date of the next uposatha when it falls on the full moon, e.g. Tue 24 Nov · Full moon uposatha"
   },
-  "vinayaTimesNewMoon": "New moon",
+  "vinayaTimesNewMoon": "New moon uposatha",
   "@vinayaTimesNewMoon": {
-    "description": "Today card: after the date of a new-moon uposatha, e.g. Wed 9 Dec · New moon"
+    "description": "Today card: after the date of the next uposatha when it falls on the new moon, e.g. Wed 9 Dec · New moon uposatha"
   },
   "vinayaTimesLocation": "Location",
   "@vinayaTimesLocation": {
@@ -1308,15 +1308,15 @@
   },
   "homeToday": "Today",
   "@homeToday": {
-    "description": "Home: small heading of the Today card, above the date"
+    "description": "Home: small heading at the top left of the Today card, level with the date"
   },
-  "vinayaTimesFullDatePattern": "EEE d MMM y",
+  "vinayaTimesFullDatePattern": "EEEE d MMM y",
   "@vinayaTimesFullDatePattern": {
-    "description": "Today card: an intl DateFormat pattern, not words. Today's weekday, day, month and year: Sat 14 Nov 2026. Reorder the letters for the language; do not translate them"
+    "description": "Today card: an intl DateFormat pattern, not words. Today's full weekday, day, month and year: Wednesday 18 Nov 2026. The weekday is drawn bold wherever it falls. Reorder the letters for the language; do not translate them"
   },
   "vinayaTimesChangeLocation": "Location: {city}. Change",
   "@vinayaTimesChangeLocation": {
-    "description": "Today card: tooltip and screen-reader label of the city button, which opens Settings > Time",
+    "description": "Today card: tooltip and screen-reader label of the date-and-city button, which opens Settings > Time",
     "placeholders": {
       "city": {
         "type": "String"
@@ -1424,7 +1424,7 @@
   },
   "vinayaTimesUposathaIn": "Uposatha in {days} days",
   "@vinayaTimesUposathaIn": {
-    "description": "Today card: moon panel headline two or more days before an uposatha",
+    "description": "Today card: the line under the moon two to five days before an uposatha; earlier, the fortnight line shows instead",
     "placeholders": {
       "days": {
         "type": "int"

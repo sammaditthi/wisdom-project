@@ -135,15 +135,16 @@ A heading and the Today card, in one column no wider than a reading page.
 
 | Part | Shows |
 |---|---|
-| Header | `TODAY`, the date with its year, and a city button as small as its label |
+| Header | `TODAY` on the left; on the right the date, weekday in bold, with the city under it, as one small button |
 | Arc | A half circle: the sun's by day, the moon's by night |
 | Headline | One of the two states below |
-| Moon panel | The fortnight, the next uposatha, and the one after it |
+| Moon panel | The moon, its line, and the next uposatha |
 
 The moon panel has no box of its own. One dashed horizon runs under the arc
-and the moon. The fortnight line sits under it, level with the arc's end
-labels, and the two headlines start level. On a narrow card the moon panel
-drops under the arc, over a horizon of its own.
+and the moon. The moon's line sits under it, level with the arc's end labels,
+and the next uposatha sits level with the arc's headline. On a narrow card the
+moon panel drops under the arc, below a solid rule: a smaller photo with its
+two lines beside it, and no horizon.
 
 Arc:
 
@@ -164,23 +165,21 @@ Headline:
 
 | When | Headline | Line under it |
 |---|---|---|
-| Aruṇa until midday | `Midday in 3 h 24 min` | `Vikāla from 11:54 until aruṇa 05:31` |
-| Midday until the next aruṇa | `Vikāla until aruṇa 05:31` | none |
+| Aruṇa until midday | `Midday in 3 h 24 min`, bold; orange inside the hour, red inside the half hour | `Vikāla from 11:54 until aruṇa 05:31` |
+| Midday until the next aruṇa | `Vikāla until aruṇa 05:31`, smaller and muted | none |
 
 Moon panel:
 
 | Line | Shows |
 |---|---|
 | Moon photo | The moon on this day of its cycle; a drawing if the photo cannot load |
-| Fortnight | `Waxing · day 5 of 15`, or `Waning` before a new moon |
-| Headline | `Uposatha in 10 days`, `Uposatha tomorrow`, `Uposatha today` |
-| Next uposatha | `Tue 24 Nov · Full moon` |
-| After that | The one after it, same form, smaller and dimmed |
+| Moon's line | `Waxing · day 5 of 15`, or `Waning` before a new moon. From five days out the countdown instead: `Uposatha in 3 days`, `Uposatha tomorrow`, `Uposatha today`, bold from two days out |
+| Next uposatha | `Tue 24 Nov · Full moon uposatha` |
 
 The day runs aruṇa to aruṇa, so the fortnight's day and "today" and
 "tomorrow" switch at aruṇa, not at midnight. In Sinhala the word is උපෝසථ.
 
-The city button opens Settings → Time. It is the card's only way
+The date-and-city button opens Settings → Time. It is the card's only way
 in; the dawn method is named there and not on the card.
 
 ### Settings → Time
@@ -189,7 +188,7 @@ A tab after General.
 
 - **Intro line:** "Dawn, midday and uposatha days." The tab name alone
   could read as a clock setting.
-- **Location:** eight Sri Lankan cities, each with today's midday. Colombo
+- **Location:** eight Sri Lankan cities, each with today's midday. Anuradhapura
   until the user picks.
 - **Aruṇa (dawn):** the four methods, each with tomorrow's time for the chosen
   city.
@@ -219,8 +218,9 @@ By the user on 2026-11-14 unless marked.
    with standard refraction (centre 0.833° below).
 5. **Eight Sri Lankan cities with fixed coordinates.** No GPS, no cities
    abroad. The list is in *Reference values*.
-6. **Colombo is the default city.** The card names the city on its button, so
-   a user elsewhere can see the times are not theirs.
+6. **Anuradhapura is the default city.** The card names the city on its
+   button, so a user elsewhere can see the times are not theirs.
+   *(user, 2026-11-18)*
 7. **No safety margin.** Rounding only: midday rounds down to the minute and
    dawn rounds up, so the shown time is never on the unsafe side. The
    countdown and the state changes use the shown times. Sunset times nothing,
@@ -473,7 +473,7 @@ To cover:
 - the card's two headlines, the switch at aruṇa, the arc's swap at sunset
   and at aruṇa, the Now label's side, the fortnight's day on an uposatha and the day after, and the moon panel hidden
   outside the range;
-- Colombo before any choice, and the saved city and method surviving a
+- Anuradhapura before any choice, and the saved city and method surviving a
   restart;
 - the Settings tab in both dialog shapes;
 - which photo each fortnight day picks, in 14 and 15 day fortnights, and the

@@ -13,8 +13,8 @@ import '../../domain/entities/vinaya_times/uposatha_calendar.dart';
 import '../../domain/repositories/sun_times_repository.dart';
 import 'vinaya_times_state.dart';
 
-/// The next uposatha and the one after it.
-const _uposathasShown = 2;
+/// Only the next uposatha; a list of them belongs in a calendar view.
+const _uposathasShown = 1;
 
 final sunTimesRepositoryProvider = Provider<SunTimesRepository>((ref) {
   return const SunTimesRepositoryImpl();

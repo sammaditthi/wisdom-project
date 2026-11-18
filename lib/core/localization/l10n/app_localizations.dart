@@ -1496,28 +1496,28 @@ abstract class AppLocalizations {
   /// **'Midday in {minutes} min'**
   String vinayaTimesMiddayIn(int minutes);
 
-  /// Today card: moon panel headline on the day before an uposatha
+  /// Today card: the line under the moon on the day before an uposatha
   ///
   /// In en, this message translates to:
   /// **'Uposatha tomorrow'**
   String get vinayaTimesUposathaTomorrow;
 
-  /// Today card: moon panel headline on the uposatha day itself
+  /// Today card: the line under the moon on the uposatha day itself
   ///
   /// In en, this message translates to:
   /// **'Uposatha today'**
   String get vinayaTimesUposathaToday;
 
-  /// Today card: after the date of a full-moon uposatha, e.g. Tue 24 Nov · Full moon
+  /// Today card: after the date of the next uposatha when it falls on the full moon, e.g. Tue 24 Nov · Full moon uposatha
   ///
   /// In en, this message translates to:
-  /// **'Full moon'**
+  /// **'Full moon uposatha'**
   String get vinayaTimesFullMoon;
 
-  /// Today card: after the date of a new-moon uposatha, e.g. Wed 9 Dec · New moon
+  /// Today card: after the date of the next uposatha when it falls on the new moon, e.g. Wed 9 Dec · New moon uposatha
   ///
   /// In en, this message translates to:
-  /// **'New moon'**
+  /// **'New moon uposatha'**
   String get vinayaTimesNewMoon;
 
   /// Settings > Time: section header above the list of cities
@@ -1664,19 +1664,19 @@ abstract class AppLocalizations {
   /// **'Batticaloa'**
   String get cityBatticaloa;
 
-  /// Home: small heading of the Today card, above the date
+  /// Home: small heading at the top left of the Today card, level with the date
   ///
   /// In en, this message translates to:
   /// **'Today'**
   String get homeToday;
 
-  /// Today card: an intl DateFormat pattern, not words. Today's weekday, day, month and year: Sat 14 Nov 2026. Reorder the letters for the language; do not translate them
+  /// Today card: an intl DateFormat pattern, not words. Today's full weekday, day, month and year: Wednesday 18 Nov 2026. The weekday is drawn bold wherever it falls. Reorder the letters for the language; do not translate them
   ///
   /// In en, this message translates to:
-  /// **'EEE d MMM y'**
+  /// **'EEEE d MMM y'**
   String get vinayaTimesFullDatePattern;
 
-  /// Today card: tooltip and screen-reader label of the city button, which opens Settings > Time
+  /// Today card: tooltip and screen-reader label of the date-and-city button, which opens Settings > Time
   ///
   /// In en, this message translates to:
   /// **'Location: {city}. Change'**
@@ -1736,7 +1736,7 @@ abstract class AppLocalizations {
   /// **'Waning · day {day} of {total}'**
   String vinayaTimesWaning(int day, int total);
 
-  /// Today card: moon panel headline two or more days before an uposatha
+  /// Today card: the line under the moon two to five days before an uposatha; earlier, the fortnight line shows instead
   ///
   /// In en, this message translates to:
   /// **'Uposatha in {days} days'**

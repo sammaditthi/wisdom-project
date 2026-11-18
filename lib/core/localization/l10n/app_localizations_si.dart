@@ -790,10 +790,10 @@ class AppLocalizationsSi extends AppLocalizations {
   String get vinayaTimesUposathaToday => 'අද උපෝසථ';
 
   @override
-  String get vinayaTimesFullMoon => 'පුර පසළොස්වක';
+  String get vinayaTimesFullMoon => 'පුර පසළොස්වක උපෝසථ';
 
   @override
-  String get vinayaTimesNewMoon => 'අමාවක';
+  String get vinayaTimesNewMoon => 'අමාවක උපෝසථ';
 
   @override
   String get vinayaTimesLocation => 'ස්ථානය';
@@ -881,7 +881,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get homeToday => 'අද';
 
   @override
-  String get vinayaTimesFullDatePattern => 'y MMM d, EEE';
+  String get vinayaTimesFullDatePattern => 'y MMM d, EEEE';
 
   @override
   String vinayaTimesChangeLocation(String city) {
