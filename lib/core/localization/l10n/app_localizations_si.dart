@@ -914,6 +914,11 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
+  String vinayaTimesMiddayInWholeHours(int hours) {
+    return 'මධ්‍යාහ්නයට පැය $hours';
+  }
+
+  @override
   String vinayaTimesVikalaSpan(String from, String until) {
     return '$from සිට අරුණ $until තෙක් විකාලය';
   }

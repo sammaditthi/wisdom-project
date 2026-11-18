@@ -1712,6 +1712,12 @@ abstract class AppLocalizations {
   /// **'Midday in {hours} h {minutes} min'**
   String vinayaTimesMiddayInHours(int hours, int minutes);
 
+  /// Today card: the midday headline when the time left is a whole number of hours, e.g. Midday in 2 h
+  ///
+  /// In en, this message translates to:
+  /// **'Midday in {hours} h'**
+  String vinayaTimesMiddayInWholeHours(int hours);
+
   /// Today card: line under the midday headline. Vikāla, the wrong time for eating, runs from today's midday to tomorrow's dawn
   ///
   /// In en, this message translates to:

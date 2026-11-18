@@ -259,9 +259,12 @@ class _ArcHeadline extends StatelessWidget {
     } else {
       final left = state.midday.difference(state.now);
       final minutes = left.inMinutes.remainder(60);
-      headline = left.inHours == 0
-          ? l10n.vinayaTimesMiddayIn(minutes)
-          : l10n.vinayaTimesMiddayInHours(left.inHours, minutes);
+      headline = switch ((left.inHours, minutes)) {
+        (0, _) => l10n.vinayaTimesMiddayIn(minutes),
+        // On the hour, no "0 min".
+        (final hours, 0) => l10n.vinayaTimesMiddayInWholeHours(hours),
+        (final hours, _) => l10n.vinayaTimesMiddayInHours(hours, minutes),
+      };
       style = typography.resultTitle.copyWith(
         fontWeight: FontWeight.w600,
         // The words carry it too; the colour only adds to them.

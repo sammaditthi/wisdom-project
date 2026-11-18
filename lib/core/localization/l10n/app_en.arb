@@ -1377,6 +1377,15 @@
       }
     }
   },
+  "vinayaTimesMiddayInWholeHours": "Midday in {hours} h",
+  "@vinayaTimesMiddayInWholeHours": {
+    "description": "Today card: the midday headline when the time left is a whole number of hours, e.g. Midday in 2 h",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
   "vinayaTimesVikalaSpan": "Vikāla from {from} until aruṇa {until}",
   "@vinayaTimesVikalaSpan": {
     "description": "Today card: line under the midday headline. Vikāla, the wrong time for eating, runs from today's midday to tomorrow's dawn",
