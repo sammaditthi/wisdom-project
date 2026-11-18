@@ -149,7 +149,7 @@ Arc:
 
 | When | Runs | Coloured stretch | Marker |
 |---|---|---|---|
-| Aruṇa until sunset | Aruṇa to sunset, midday marked | Aruṇa to midday, kāla, in light orange | A ring, the sun |
+| Aruṇa until sunset | Aruṇa to sunset, midday marked | Aruṇa to midday, kāla, in sky blue; the afternoon in slate grey | An orange disc, the sun |
 | Sunset until aruṇa | Sunset to the next aruṇa | All of it, in midnight blue | An amber disc, the moon |
 
 `Now 08:30` keeps a fixed spot outside the arc, centred on the line 45 degrees
@@ -242,12 +242,15 @@ By the user on 2026-11-14 unless marked.
     call)*
 15. **No Continue reading card for now.** *(user, 2026-11-15)*
 16. **Colour-scheme roles only.** No theme extension. The card's accents
-    are the scheme's "fixed" roles, the same in every theme: light orange
-    for kāla, a midnight blue for the night, light amber for the moon marker,
-    and a pale blue for the drawn fallback moon. The moon is lighter than
-    the night's arc, as against a night sky. *(user, 2026-11-15; the
-    midnight-blue night and the amber moon: user, 2026-11-17; the fixed
-    roles: my call)*
+    are the scheme's "fixed" roles, the same in every theme. The arc is the
+    sky and darkens through the day: sky blue for kāla, slate grey for the
+    afternoon, midnight blue for the night, so light means kāla and dark
+    vikāla. Sun and moon are both filled discs, the sun bright orange and the
+    moon light amber. The drawn fallback moon keeps its own pale blue: the
+    sky blue would make its lit side darker than its shadow. *(user,
+    2026-11-15; the midnight-blue night and the amber moon: user,
+    2026-11-17; the day's sky blue, slate afternoon and orange sun: user,
+    2026-11-18; the fixed roles: my call)*
 17. **One arc, swapped at sunset and at aruṇa**, and not two arcs side by
     side. *(user, 2026-11-15)*
 18. **No small print and no Settings link on the card.** The city button is
@@ -385,11 +388,13 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 ### Colours and text
 
-Colour-scheme roles and `AppTypography` only: `primaryFixedDim` for the kāla
-stretch, `tertiaryFixedDim` for the night stretch, `primaryFixed` for the
-arc's moon marker, `tertiaryFixed` for the drawn fallback moon, `surface` for
-the card, `outlineVariant` for the borders, the horizon and the rest of the
-arc. The fixed colours are `FixedAccentColors` in `app_colors.dart`.
+Colour-scheme roles and `AppTypography` only. The fixed roles pair up:
+primary for the bodies (`primaryFixed` the moon marker, `primaryFixedDim` the
+sun), secondary for the day's sky (`secondaryFixed` kāla, `secondaryFixedDim`
+the afternoon), tertiary for the night's (`tertiaryFixedDim` the night arc,
+`tertiaryFixed` the drawn fallback moon). `surface` for the card,
+`outlineVariant` for the borders and the horizon. The fixed colours are
+`FixedAccentColors` in `app_colors.dart`.
 
 **Open:** the midnight blue almost vanishes on the dark and warm themes'
 cards. Both are off today. When one comes back, its night arc needs a

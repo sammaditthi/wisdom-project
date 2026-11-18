@@ -223,7 +223,7 @@ class _ArcHeadline extends StatelessWidget {
 }
 
 /// A half circle with a marker where the sun or the moon is now. By day it
-/// runs aruṇa to sunset with the kāla stretch, up to midday, in orange; by
+/// runs aruṇa to sunset, sky blue up to midday (kāla) and slate after; by
 /// night it runs sunset to aruṇa, all of it in midnight blue.
 class _SkyArc extends StatelessWidget {
   const _SkyArc({required this.state});
@@ -232,6 +232,7 @@ class _SkyArc extends StatelessWidget {
 
   static const _stroke = 6.0;
   static const _markerRadius = 8.0;
+  static const _markerRing = 1.5;
 
   /// How far outside the arc the Now label keeps: past the marker, plus a gap.
   static const _nowReach = _markerRadius + 6;
@@ -342,13 +343,15 @@ class _SkyArc extends StatelessWidget {
                         stroke: _stroke,
                         markerRadius: _markerRadius,
                         stretchColor: day
-                            ? colors.primaryFixedDim
+                            ? colors.secondaryFixed
                             : colors.tertiaryFixedDim,
-                        restColor: colors.outlineVariant,
+                        // The afternoon; the night's stretch covers it all.
+                        restColor: colors.secondaryFixedDim,
                         markerColor: colors.onSurface,
-                        // The sun is a ring, the moon an amber disc.
-                        markerFill: day ? colors.surface : colors.primaryFixed,
-                        markerRing: day ? 3 : 1.5,
+                        // Both are discs: the sun orange, the moon amber.
+                        markerFill:
+                            day ? colors.primaryFixedDim : colors.primaryFixed,
+                        markerRing: _markerRing,
                       ),
                     ),
                   ),

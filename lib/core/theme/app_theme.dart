@@ -62,6 +62,8 @@ class AppTheme {
       // Fixed accents, the same in every theme
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
       tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       // Utility
@@ -119,6 +121,8 @@ class AppTheme {
       // Fixed accents, the same in every theme
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
       tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: DarkThemeColors.surface,
@@ -185,6 +189,8 @@ class AppTheme {
       // Fixed accents, the same in every theme
       primaryFixed: FixedAccentColors.primaryFixed,
       primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
       tertiaryFixed: FixedAccentColors.tertiaryFixed,
       tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: WarmThemeColors.surface,

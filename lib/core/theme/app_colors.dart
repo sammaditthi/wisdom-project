@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 /// Accents that are the same in every theme: the colour scheme's "fixed"
-/// roles. The Today card draws its sun, night and moon with them.
+/// roles. The Today card draws with them: primary the moon and the sun,
+/// secondary the day's sky, tertiary the night's.
 class FixedAccentColors {
-  static const primaryFixed = Color(0xFFF6D89C); // Light amber
-  static const primaryFixedDim = Color(0xFFFFB77C); // Light orange
-  static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue
-  static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue
+  static const primaryFixed = Color(0xFFF6D89C); // Light amber: the moon
+  static const primaryFixedDim = Color(0xFFFF8C00); // Bright orange: the sun
+  static const secondaryFixed = Color(0xFFA9CBEA); // Sky blue: kāla
+  static const secondaryFixedDim = Color(0xFF75839B); // Slate grey: afternoon
+  static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue: drawn moon
+  static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue: night
 }
 
 /// Color palette for Light theme
