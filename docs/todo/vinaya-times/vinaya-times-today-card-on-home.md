@@ -22,20 +22,18 @@ notifications.
 
 **2026-11-15 — the card is built, with the moon as a NASA photo.**
 
-- **`kEnableHome` is `true` on the branch**, for looking at the card. Main
-  still has no Home. Set it to `false` before a merge, unless *Done when* is
-  met by then.
+- **`kEnableHome` is on only in the macOS app**, off on web and mobile. The
+  user chose to keep it so (2026-11-18). Main still has no Home.
 - **Done:** sun times with sunset, the calendar, the providers, the Settings
   tab, the Today card, the Home screen, the toggle, the moon photos with
   their credit, web preload and script. The analyzer is clean.
 - **Removed:** the tree footer and its ochre theme extension. The tree is as it
   was before this branch.
 - **The `CHANGELOG.md` note is out.** A new one is owed when the toggle goes on.
-- **Tests:** only the Anumodanā page's, written and run: the link count
-  follows the toggle, and the NASA credit is found by name. See *Tests*.
+- **Tests:** written and run, 2026-11-19. See *Tests*.
 - **Still owed:** a look at the card running (see *Checked*), the
   Sinhala review, the colour check, one offline check of the photos on dev,
-  *Validation* against a recent Na-Uyana sheet, the test agent's pass.
+  *Validation* against a recent Na-Uyana sheet.
 - **Do not** copy code or calendar files from Buddhist Sun (GPL-3.0), and do
   not take dawn logic from the canvas.
 
@@ -113,8 +111,8 @@ are drafts too.
 
 ## The toggle
 
-`kEnableHome` in `lib/core/constants/feature_flags.dart`, a compile-time
-constant. Off:
+`kEnableHome` in `lib/core/constants/feature_flags.dart`, a getter that is on
+only in the macOS app. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
 - Settings has no Time tab, and Anumodanā no Images section.
@@ -237,9 +235,9 @@ By the user on 2026-11-14 unless marked.
 12. **Outside the calendar's range the moon panel is hidden.** No guessed
     dates.
 13. **No tree footer.** It made the reader busy. *(user, 2026-11-15)*
-14. **Home sits behind a compile-time toggle**, off for the 2026-11-15
-    release. *(user, 2026-11-15; a constant and not a Settings switch: my
-    call)*
+14. **Home sits behind a toggle in code, on only in the macOS app.** *(user,
+    2026-11-15; macOS only: user, 2026-11-18; in code and not a Settings
+    switch: my call)*
 15. **No Continue reading card for now.** *(user, 2026-11-15)*
 16. **Colour-scheme roles only.** No theme extension. The card's accents
     are the scheme's "fixed" roles, the same in every theme. The arc is the
@@ -316,6 +314,10 @@ fortnight.
 Get one recent Na-Uyana uposatha sheet (2025 or later). Compare every date.
 A mismatch means the start date or an extra day is wrong; fix the input list.
 Until then the dates rest on the Thai-identical table.
+
+Every year after: in December and January, `scripts/deploy.sh --prod` prints
+a reminder to check the coming year's dates the same way. It only reminds.
+The card shows one uposatha, so ask for the year's dates to be printed.
 
 ## Licences
 
@@ -451,35 +453,34 @@ Uposatha dates the rule must give for 2026:
 
 ## Tests
 
-Not written with the build; the test agent writes them after. Done so far,
-both in `anumodana_page_test.dart`: the link count is seven with the toggle on
-and six with it off, and the Images section with its NASA link, found by
-name, shows only with the toggle on. Only the "on" side has been run.
+What can break a Vinaya rule: aruṇa, midday, kāla against vikāla, and which
+day is the uposatha. Plus the card's midday countdown, the one set of words
+the card works out itself. No integration test.
 
-With the toggle off, no existing test should change: the tree is as it was,
-and Settings on desktop still has three tabs.
+- `test/domain/entities/vinaya_times/uposatha_calendar_test.dart`: the 2026
+  dates above, and every fortnight to 20 Jun 2035, one line per year. A
+  changed input means changing its year's line too.
+- `test/data/repositories/sun_times_repository_impl_test.dart`: every city
+  against *Reference values*, aruṇa by all four methods. Every time must be a
+  whole minute, and the seconds check that aruṇa rounds up and midday down.
+- `test/presentation/providers/vinaya_times_provider_test.dart`: kāla from
+  aruṇa to midday; the uposatha running aruṇa to aruṇa, as day 15 of 15 or 14
+  of 14; Anuradhapura and Na-Uyana until chosen; each choice changing the
+  open card at once, and kept after a restart.
+- `test/presentation/widgets/home/today_card_test.dart`: the midday countdown
+  rounds up (40 s reads "1 min") and says "1 h", not "1 h 0 min".
+- `anumodana_page_test.dart`, run as macOS, where Home is on: seven links,
+  and the Images section with its NASA link.
 
-With the toggle on, expect these to need work:
+Left out on purpose: the sky, the moon photo, sunset, the arc, the card's
+other words (they read the tested state as is), and the calendar's end on
+the card.
 
-- `app_shell_test.dart`: Home is built inside the shell and reads
-  `keyValueStoreProvider`, and the rail gains a destination.
-- `settings_dialog_test.dart` says "desktop has three tabs". There are four.
-
-To cover:
-
-- the calendar against the 2026 dates above, the extra-month year's ten
-  fortnights, the 2032 extra day, and the end of the range;
-- the sun repository against *Reference values*, and the three roundings;
-- the card's two headlines, the switch at aruṇa, the arc's swap at sunset
-  and at aruṇa, the Now label's side, the fortnight's day on an uposatha and the day after, and the moon panel hidden
-  outside the range;
-- Anuradhapura before any choice, and the saved city and method surviving a
-  restart;
-- the Settings tab in both dialog shapes;
-- which photo each fortnight day picks, in 14 and 15 day fortnights, and the
-  drawn moon when the photo cannot load;
-- the toggle off: no Home destination, no Time tab, no Images
-  section.
+`kEnableHome` is off under `flutter test`, where the platform is Android, so
+only the Anumodanā checks above, run as macOS, see Home. When Home ships,
+`app_shell_test.dart` (Home reads `keyValueStoreProvider`, the rail gains a
+destination) and `settings_dialog_test.dart` ("three tabs" becomes four) need
+work.
 
 ## Done when
 

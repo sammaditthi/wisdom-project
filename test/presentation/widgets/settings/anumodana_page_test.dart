@@ -15,7 +15,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:the_wisdom_project/core/constants/feature_flags.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/theme/app_theme.dart';
 import 'package:the_wisdom_project/domain/entities/dictionary/dictionary_info.dart';
@@ -82,20 +81,20 @@ void main() {
       expect(find.byTooltip(l10n.openLinkTo('SuttaCentral')), findsOneWidget);
     });
 
-    testWidgets('the moon images are credited to NASA, only with Home',
+    // Home, and with it the moon images, is only in the macOS app.
+    testWidgets('the moon images are credited to NASA in the macOS app',
         (tester) async {
       final l10n = await pumpPage(tester);
 
       // The credit line NASA asks for, word for word, so a literal.
       const nasa = "NASA's Scientific Visualization Studio";
-      final shown = kEnableHome ? findsOneWidget : findsNothing;
 
-      expect(find.text(l10n.anumodanaImages), shown);
-      expect(find.text(nasa), shown);
-      expect(find.text(l10n.anumodanaNasaMoonUse), shown);
+      expect(find.text(l10n.anumodanaImages), findsOneWidget);
+      expect(find.text(nasa), findsOneWidget);
+      expect(find.text(l10n.anumodanaNasaMoonUse), findsOneWidget);
       // By name: the link count below cannot tell whose link is missing.
-      expect(find.byTooltip(l10n.openLinkTo(nasa)), shown);
-    });
+      expect(find.byTooltip(l10n.openLinkTo(nasa)), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
     testWidgets('the sources carry their own logos, drawn as decoration',
         (tester) async {
@@ -209,14 +208,11 @@ void main() {
       expect(find.text(l10n.anumodanaDpdLicence), findsOneWidget);
       expect(find.byTooltip(l10n.openLinkTo(dpd.name)), findsOneWidget);
 
-      // Six links in all: the two sources, DPD and the three Transliteration
-      // rows. No other dictionary has one, so DPD's is the only one among them.
-      // A seventh, the moon images' credit, shows only with Home.
-      expect(
-        find.byIcon(Icons.open_in_new),
-        findsNWidgets(kEnableHome ? 7 : 6),
-      );
-    });
+      // Seven links in all, as in the macOS app: the two sources, DPD, the
+      // three Transliteration rows and the moon images' credit. No other
+      // dictionary has one, so DPD's is the only one among them.
+      expect(find.byIcon(Icons.open_in_new), findsNWidgets(7));
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
   });
 
   testWidgets('nothing overflows at a phone width', (tester) async {

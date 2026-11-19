@@ -122,6 +122,20 @@ fi
 
 # --- The question, then the tag ----------------------------------------------
 echo ""
+# Uposatha dates depend on which years the Sangha adds a month or a day.
+# A reminder only: nothing checks the answer. One read of the clock, so a run
+# at midnight on 31 Dec can't pair December with the new year.
+read -r MONTH YEAR <<< "$(date '+%m %Y')"
+case "$MONTH" in
+  12) UPOSATHA_YEAR=$((YEAR + 1)) ;;   # December: next year
+  01) UPOSATHA_YEAR=$YEAR ;;           # January: this year
+esac
+if [ -n "${UPOSATHA_YEAR-}" ]; then
+  echo "reminder: check the app's uposatha dates for $UPOSATHA_YEAR against the"
+  echo "          Na-Uyana sheet. One is off or missing → fix"
+  echo "          lib/domain/entities/vinaya_times/uposatha_calendar.dart"
+  echo ""
+fi
 if [ "$ASSUME_YES" = false ]; then
   confirm_release "Release $RELEASE_TAG to PRODUCTION: ${PRODUCTS[*]}?"
 fi
