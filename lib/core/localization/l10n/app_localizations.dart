@@ -1310,11 +1310,23 @@ abstract class AppLocalizations {
   /// **'Images'**
   String get anumodanaImages;
 
-  /// Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Nothing that reads as NASA endorsing the app
+  /// Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Sinhala says ඡායාරූප all the same: රූප alone reads as the Dhamma term. Nothing that reads as NASA endorsing the app
   ///
   /// In en, this message translates to:
-  /// **'The images of the moon on Home.'**
+  /// **'The images of the moon.'**
   String get anumodanaNasaMoonUse;
+
+  /// Settings > Anumodanā: section header above Buddhist Sun, the app whose ideas the dawn, midday and uposatha times follow
+  ///
+  /// In en, this message translates to:
+  /// **'Inspiration'**
+  String get anumodanaInspiration;
+
+  /// Settings > Anumodanā: what Buddhist Sun inspired, and who made it. Ideas only, no code: nothing that says we use or adapt it. Proper names are not translated
+  ///
+  /// In en, this message translates to:
+  /// **'Initial idea about Vinaya times.\nBhante Subhuti.'**
+  String get anumodanaBuddhistSunUse;
 
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
   ///

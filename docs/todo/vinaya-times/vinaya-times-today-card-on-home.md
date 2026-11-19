@@ -324,14 +324,20 @@ The card shows one uposatha, so ask for the year's dates to be printed.
 - **Buddhist Sun** is GPL-3.0. We take ideas only: which settings exist, the
   dawn methods, a rule-built calendar. No code and no data file is copied.
   Permission was not asked (user not in a position to, 2026-11-14).
+  Checked against its repo on 2026-11-19: nothing of ours matches its code.
+  Anumodanā credits it under *Inspiration*, with a link, as a courtesy
+  (user, 2026-11-19).
+- **SunCalc** (BSD-2-Clause): `moon_position.dart` follows its moon
+  formulas, so `main.dart` registers its notice under Open-source licences.
 - **`nrel_spa`** is MIT. Flutter lists it under Open-source licences without
   any work from us.
 - **The moon images** are from NASA's Scientific Visualization Studio, "Moon
   Phase and Libration, 2026" (svs.gsfc.nasa.gov/5587). NASA asks for that
   credit line. Anumodanā carries it as text with a link. No NASA logo, which
   is protected, and no wording that reads as NASA endorsing the app. They
-  are rendered from spacecraft data, so the app says "images", not
-  "photographs".
+  are rendered from spacecraft data, so the English says "images", not
+  "photographs". The Sinhala says ඡායාරූප: රූප alone reads as the Dhamma
+  term (user, 2026-11-19).
 
 ## How it is built
 

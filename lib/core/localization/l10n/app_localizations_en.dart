@@ -686,7 +686,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get anumodanaImages => 'Images';
 
   @override
-  String get anumodanaNasaMoonUse => 'The images of the moon on Home.';
+  String get anumodanaNasaMoonUse => 'The images of the moon.';
+
+  @override
+  String get anumodanaInspiration => 'Inspiration';
+
+  @override
+  String get anumodanaBuddhistSunUse =>
+      'Initial idea about Vinaya times.\nBhante Subhuti.';
 
   @override
   String get anumodanaContributors => 'Those who contributed';

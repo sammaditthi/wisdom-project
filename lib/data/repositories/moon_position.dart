@@ -10,8 +10,9 @@ const _earthRadiusKm = 6378.14;
 
 /// The moon's altitude in degrees at [instant], as seen from the ground at
 /// [latitude], [longitude]: parallax and refraction included. Low precision
-/// (Meeus's truncated lunar terms, as SunCalc uses): rise and set to within a
-/// few minutes, enough for a glow that fades in over the first 5°.
+/// (Meeus's truncated lunar terms, after SunCalc, BSD-2-Clause, registered in
+/// main.dart): rise and set to within a few minutes, enough for a glow that
+/// fades in over the first 5°.
 double moonAltitude(DateTime instant, double latitude, double longitude) {
   final d =
       instant.millisecondsSinceEpoch / Duration.millisecondsPerDay - _j2000;

@@ -30,6 +30,9 @@ class AnumodanaPage extends StatelessWidget {
   static const _nasaSvs = "NASA's Scientific Visualization Studio";
   static const _nasaSvsMoonUrl = 'https://svs.gsfc.nasa.gov/5587';
 
+  static const _buddhistSun = 'Buddhist Sun';
+  static const _buddhistSunUrl = 'https://github.com/bksubhuti/buddhist_sun';
+
   /// Each source's own logo, unmodified — see the plan doc for provenance.
   /// The one place in the app that shows them.
   static const _tipitakaLkLogo = 'assets/icons/sources/tipitaka_lk.webp';
@@ -141,6 +144,23 @@ class AnumodanaPage extends StatelessWidget {
                 trailing: const _OpenLinkButton(
                   name: _nasaSvs,
                   url: _nasaSvsMoonUrl,
+                ),
+              ),
+            ],
+          ),
+        // A courtesy, not a licence term: Buddhist Sun is GPL-3.0 and we took
+        // ideas only, no code or data. Hidden with the card.
+        if (kEnableHome)
+          SettingsSection(
+            title: l10n.anumodanaInspiration,
+            children: [
+              SettingsRow(
+                label: _buddhistSun,
+                hint: l10n.anumodanaBuddhistSunUse,
+                leading: const SettingsTile(icon: Icons.wb_sunny_outlined),
+                trailing: const _OpenLinkButton(
+                  name: _buddhistSun,
+                  url: _buddhistSunUrl,
                 ),
               ),
             ],
