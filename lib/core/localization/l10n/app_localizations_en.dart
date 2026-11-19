@@ -693,7 +693,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get anumodanaBuddhistSunUse =>
-      'Initial idea about Vinaya times.\nBhante Subhuti.';
+      'The first idea for Vinaya times.\nBhante Subhuti.';
 
   @override
   String get anumodanaContributors => 'Those who contributed';

@@ -1325,7 +1325,7 @@ abstract class AppLocalizations {
   /// Settings > Anumodanā: what Buddhist Sun inspired, and who made it. Ideas only, no code: nothing that says we use or adapt it. Proper names are not translated
   ///
   /// In en, this message translates to:
-  /// **'Initial idea about Vinaya times.\nBhante Subhuti.'**
+  /// **'The first idea for Vinaya times.\nBhante Subhuti.'**
   String get anumodanaBuddhistSunUse;
 
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app

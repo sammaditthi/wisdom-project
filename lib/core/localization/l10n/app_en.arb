@@ -1047,7 +1047,7 @@
   "@anumodanaInspiration": {
     "description": "Settings > Anumodanā: section header above Buddhist Sun, the app whose ideas the dawn, midday and uposatha times follow"
   },
-  "anumodanaBuddhistSunUse": "Initial idea about Vinaya times.\nBhante Subhuti.",
+  "anumodanaBuddhistSunUse": "The first idea for Vinaya times.\nBhante Subhuti.",
   "@anumodanaBuddhistSunUse": {
     "description": "Settings > Anumodanā: what Buddhist Sun inspired, and who made it. Ideas only, no code: nothing that says we use or adapt it. Proper names are not translated"
   },
