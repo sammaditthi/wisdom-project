@@ -6,6 +6,7 @@ import 'app_segmented_button_theme.dart';
 import 'app_typography.dart';
 import 'dictionary_badge_theme.dart';
 import 'text_entry_theme.dart';
+import 'today_sky_theme.dart';
 
 /// Application theme builder
 /// Combines color palettes with typography to create complete Material 3 themes.
@@ -103,6 +104,8 @@ class AppTheme {
         AppTypography.fromColorScheme(colorScheme, fontScale: fontScale),
         // Dictionary badge colours — one shared palette across all themes.
         DictionaryBadgeColors.standard(),
+        // The Today card's sky; dark and warm have none yet.
+        TodaySkyTheme.standard(),
       ],
     );
   }

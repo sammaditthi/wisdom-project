@@ -113,8 +113,8 @@ final vinayaTimesProvider = Provider.autoDispose<VinayaTimesState>((ref) {
   final sunTimes = ref.watch(sunTimesRepositoryProvider);
 
   final today = City.dayAt(now);
-  final dawn = sunTimes.dawn(today, city, method);
-  final beforeDawn = now.isBefore(dawn);
+  final sun = sunTimes.sunDay(today, city, method);
+  final beforeDawn = now.isBefore(sun.dawn);
 
   // The day runs aruṇa to aruṇa: before today's aruṇa it is still yesterday.
   final buddhistDay =
@@ -122,13 +122,21 @@ final vinayaTimesProvider = Provider.autoDispose<VinayaTimesState>((ref) {
 
   return VinayaTimesState(
     now: now,
-    dawn: dawn,
-    midday: sunTimes.midday(today, city),
-    sunset: sunTimes.sunset(today, city),
+    dawn: sun.dawn,
+    midday: sun.midday,
+    sunset: sun.sunset,
+    sunrise: sun.sunrise,
+    moonAltitude: sunTimes.moonAltitude(now, city),
+    // Before aruṇa the night began yesterday; after it, it ends tomorrow.
+    // Either way one more day is worked out.
     vikalaEnds: beforeDawn
-        ? dawn
-        : sunTimes.dawn(today.add(const Duration(days: 1)), city, method),
-    nightStart: sunTimes.sunset(buddhistDay, city),
+        ? sun.dawn
+        : sunTimes
+            .sunDay(today.add(const Duration(days: 1)), city, method)
+            .dawn,
+    nightStart: beforeDawn
+        ? sunTimes.sunDay(buddhistDay, city, method).sunset
+        : sun.sunset,
     buddhistDay: buddhistDay,
     uposathas: UposathaCalendar.upcoming(buddhistDay, _uposathasShown),
   );

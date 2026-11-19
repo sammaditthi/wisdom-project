@@ -3,8 +3,10 @@ import 'package:nrel_spa/nrel_spa.dart';
 import '../../domain/entities/vinaya_times/city.dart';
 import '../../domain/entities/vinaya_times/dawn_method.dart';
 import '../../domain/repositories/sun_times_repository.dart';
+import 'moon_position.dart' as moon;
 
-/// [SunTimesRepository] on the NREL solar position algorithm.
+/// [SunTimesRepository] on the NREL solar position algorithm, with a
+/// low-precision lunar position for the moon.
 ///
 /// Sunrise is the package's default: the sun's top edge on a sea-level
 /// horizon with standard refraction.
@@ -18,30 +20,36 @@ class SunTimesRepositoryImpl implements SunTimesRepository {
   static const _microsPerMinute = Duration.microsecondsPerMinute;
 
   @override
-  DateTime midday(DateTime day, City city) {
-    final micros = _micros(day, _spa(day, city).solarNoon);
-    // Rounded down: the shown midday is never after the real one.
-    return _fromMicros(micros - micros % _microsPerMinute);
-  }
-
-  @override
-  DateTime dawn(DateTime day, City city, DawnMethod method) {
+  SunDay sunDay(DateTime day, City city, DawnMethod method) {
+    // The civil angle leaves sunrise, noon and sunset as they are.
     final spa = _spa(day, city, civil: method == DawnMethod.civilTwilight);
-    final hours = switch (method) {
+    final dawnHours = switch (method) {
       DawnMethod.paAuk => spa.sunrise - 40 / 60,
       DawnMethod.naUyana => spa.sunrise - 30 / 60,
       DawnMethod.civilTwilight => spa.angles.single.sunrise,
       DawnMethod.sunrise => spa.sunrise,
     };
-    final micros = _micros(day, hours);
-    // Rounded up: the shown dawn is never before the real one.
+    return (
+      dawn: _minuteUp(_micros(day, dawnHours)),
+      sunrise: _nearestMinute(_micros(day, spa.sunrise)),
+      midday: _minuteDown(_micros(day, spa.solarNoon)),
+      sunset: _nearestMinute(_micros(day, spa.sunset)),
+    );
+  }
+
+  @override
+  double moonAltitude(DateTime instant, City city) =>
+      moon.moonAltitude(instant, city.latitude, city.longitude);
+
+  DateTime _minuteDown(int micros) =>
+      _fromMicros(micros - micros % _microsPerMinute);
+
+  DateTime _minuteUp(int micros) {
     final over = micros % _microsPerMinute;
     return _fromMicros(over == 0 ? micros : micros - over + _microsPerMinute);
   }
 
-  @override
-  DateTime sunset(DateTime day, City city) {
-    final micros = _micros(day, _spa(day, city).sunset);
+  DateTime _nearestMinute(int micros) {
     final over = micros % _microsPerMinute;
     final down = micros - over;
     return _fromMicros(

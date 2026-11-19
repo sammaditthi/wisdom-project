@@ -19,6 +19,13 @@ class VinayaTimesState with _$VinayaTimesState {
     required DateTime midday,
     required DateTime sunset,
 
+    /// Sunrise of the city's calendar day. Only the card's sky is anchored
+    /// on it, never on aruṇa, which moves with the Dawn setting.
+    required DateTime sunrise,
+
+    /// The moon's altitude in degrees at [now]; negative while it is down.
+    required double moonAltitude,
+
     /// The aruṇa that ends the current vikāla, or the coming one.
     required DateTime vikalaEnds,
 

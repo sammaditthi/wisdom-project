@@ -24,6 +24,13 @@ mixin _$VinayaTimesState {
   DateTime get midday => throw _privateConstructorUsedError;
   DateTime get sunset => throw _privateConstructorUsedError;
 
+  /// Sunrise of the city's calendar day. Only the card's sky is anchored
+  /// on it, never on aruṇa, which moves with the Dawn setting.
+  DateTime get sunrise => throw _privateConstructorUsedError;
+
+  /// The moon's altitude in degrees at [now]; negative while it is down.
+  double get moonAltitude => throw _privateConstructorUsedError;
+
   /// The aruṇa that ends the current vikāla, or the coming one.
   DateTime get vikalaEnds => throw _privateConstructorUsedError;
 
@@ -56,6 +63,8 @@ abstract class $VinayaTimesStateCopyWith<$Res> {
       DateTime dawn,
       DateTime midday,
       DateTime sunset,
+      DateTime sunrise,
+      double moonAltitude,
       DateTime vikalaEnds,
       DateTime nightStart,
       DateTime buddhistDay,
@@ -81,6 +90,8 @@ class _$VinayaTimesStateCopyWithImpl<$Res, $Val extends VinayaTimesState>
     Object? dawn = null,
     Object? midday = null,
     Object? sunset = null,
+    Object? sunrise = null,
+    Object? moonAltitude = null,
     Object? vikalaEnds = null,
     Object? nightStart = null,
     Object? buddhistDay = null,
@@ -103,6 +114,14 @@ class _$VinayaTimesStateCopyWithImpl<$Res, $Val extends VinayaTimesState>
           ? _value.sunset
           : sunset // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      sunrise: null == sunrise
+          ? _value.sunrise
+          : sunrise // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      moonAltitude: null == moonAltitude
+          ? _value.moonAltitude
+          : moonAltitude // ignore: cast_nullable_to_non_nullable
+              as double,
       vikalaEnds: null == vikalaEnds
           ? _value.vikalaEnds
           : vikalaEnds // ignore: cast_nullable_to_non_nullable
@@ -136,6 +155,8 @@ abstract class _$$VinayaTimesStateImplCopyWith<$Res>
       DateTime dawn,
       DateTime midday,
       DateTime sunset,
+      DateTime sunrise,
+      double moonAltitude,
       DateTime vikalaEnds,
       DateTime nightStart,
       DateTime buddhistDay,
@@ -159,6 +180,8 @@ class __$$VinayaTimesStateImplCopyWithImpl<$Res>
     Object? dawn = null,
     Object? midday = null,
     Object? sunset = null,
+    Object? sunrise = null,
+    Object? moonAltitude = null,
     Object? vikalaEnds = null,
     Object? nightStart = null,
     Object? buddhistDay = null,
@@ -181,6 +204,14 @@ class __$$VinayaTimesStateImplCopyWithImpl<$Res>
           ? _value.sunset
           : sunset // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      sunrise: null == sunrise
+          ? _value.sunrise
+          : sunrise // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      moonAltitude: null == moonAltitude
+          ? _value.moonAltitude
+          : moonAltitude // ignore: cast_nullable_to_non_nullable
+              as double,
       vikalaEnds: null == vikalaEnds
           ? _value.vikalaEnds
           : vikalaEnds // ignore: cast_nullable_to_non_nullable
@@ -209,6 +240,8 @@ class _$VinayaTimesStateImpl extends _VinayaTimesState {
       required this.dawn,
       required this.midday,
       required this.sunset,
+      required this.sunrise,
+      required this.moonAltitude,
       required this.vikalaEnds,
       required this.nightStart,
       required this.buddhistDay,
@@ -227,6 +260,15 @@ class _$VinayaTimesStateImpl extends _VinayaTimesState {
   final DateTime midday;
   @override
   final DateTime sunset;
+
+  /// Sunrise of the city's calendar day. Only the card's sky is anchored
+  /// on it, never on aruṇa, which moves with the Dawn setting.
+  @override
+  final DateTime sunrise;
+
+  /// The moon's altitude in degrees at [now]; negative while it is down.
+  @override
+  final double moonAltitude;
 
   /// The aruṇa that ends the current vikāla, or the coming one.
   @override
@@ -256,7 +298,7 @@ class _$VinayaTimesStateImpl extends _VinayaTimesState {
 
   @override
   String toString() {
-    return 'VinayaTimesState(now: $now, dawn: $dawn, midday: $midday, sunset: $sunset, vikalaEnds: $vikalaEnds, nightStart: $nightStart, buddhistDay: $buddhistDay, uposathas: $uposathas)';
+    return 'VinayaTimesState(now: $now, dawn: $dawn, midday: $midday, sunset: $sunset, sunrise: $sunrise, moonAltitude: $moonAltitude, vikalaEnds: $vikalaEnds, nightStart: $nightStart, buddhistDay: $buddhistDay, uposathas: $uposathas)';
   }
 
   @override
@@ -268,6 +310,9 @@ class _$VinayaTimesStateImpl extends _VinayaTimesState {
             (identical(other.dawn, dawn) || other.dawn == dawn) &&
             (identical(other.midday, midday) || other.midday == midday) &&
             (identical(other.sunset, sunset) || other.sunset == sunset) &&
+            (identical(other.sunrise, sunrise) || other.sunrise == sunrise) &&
+            (identical(other.moonAltitude, moonAltitude) ||
+                other.moonAltitude == moonAltitude) &&
             (identical(other.vikalaEnds, vikalaEnds) ||
                 other.vikalaEnds == vikalaEnds) &&
             (identical(other.nightStart, nightStart) ||
@@ -285,6 +330,8 @@ class _$VinayaTimesStateImpl extends _VinayaTimesState {
       dawn,
       midday,
       sunset,
+      sunrise,
+      moonAltitude,
       vikalaEnds,
       nightStart,
       buddhistDay,
@@ -306,6 +353,8 @@ abstract class _VinayaTimesState extends VinayaTimesState {
       required final DateTime dawn,
       required final DateTime midday,
       required final DateTime sunset,
+      required final DateTime sunrise,
+      required final double moonAltitude,
       required final DateTime vikalaEnds,
       required final DateTime nightStart,
       required final DateTime buddhistDay,
@@ -323,6 +372,15 @@ abstract class _VinayaTimesState extends VinayaTimesState {
   DateTime get midday;
   @override
   DateTime get sunset;
+
+  /// Sunrise of the city's calendar day. Only the card's sky is anchored
+  /// on it, never on aruṇa, which moves with the Dawn setting.
+  @override
+  DateTime get sunrise;
+
+  /// The moon's altitude in degrees at [now]; negative while it is down.
+  @override
+  double get moonAltitude;
 
   /// The aruṇa that ends the current vikāla, or the coming one.
   @override

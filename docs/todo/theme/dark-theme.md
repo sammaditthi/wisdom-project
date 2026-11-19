@@ -29,6 +29,12 @@ Two ways to fix. The warm dark spec takes the root fix (a solid `onSurfaceVarian
 
 The multiply is right under both options: with an opaque colour `a` is 1.0, so it still gives 0.7.
 
+### The Today card's sky pops in and out on a theme switch
+
+Only light registers `TodaySkyTheme` (`today_sky_theme.dart`); dark and warm have none, so `context.todaySky` is null and the card has no sky. `ThemeData.lerp` can only fade an extension both themes have. So light → dark keeps the full sky through the 200 ms colour fade and drops it in one frame; dark → light shows it at full from the first frame.
+
+Fix: give dark and warm a `TodaySkyTheme` too. With one on both sides, `TodaySkyTheme.lerp` fades it. Until they get real skies, a sky at `strength: 0` gives the fade on its own. Then "no sky" means strength 0 rather than null, and `TodaySkyPainter` should skip painting at 0: its off-screen layer costs the same at any strength.
+
 ### Search filter row and match menu (to check by hand)
 
 Found while building the search pane redesign, chunk C (2026-10-07). The row and chip colours are the ones from before that chunk (kept on purpose); only the menu is new. These come from reading the dark and warm palettes, not from looking.

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/moon_photos.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/today_sky_theme.dart';
 import '../../../domain/entities/vinaya_times/city.dart';
 import '../../../domain/entities/vinaya_times/uposatha_day.dart';
 import '../../providers/vinaya_times_provider.dart';
@@ -14,15 +15,32 @@ import '../../providers/vinaya_times_state.dart';
 import '../common/vinaya_times_labels.dart';
 import '../settings/settings_dialog.dart';
 import '../settings/settings_tab.dart';
+import 'today_sky_painter.dart';
 
 /// Home's Today card: the day's or the night's arc with midday and vikāla on
 /// one side, the moon's fortnight and the next uposatha on the other. Bold is
-/// only for what is near.
+/// only for what is near. In the light theme a sky of the time of day runs
+/// behind the header and the arc.
 class TodayCard extends ConsumerWidget {
   const TodayCard({super.key});
 
   /// Narrower than this, the moon's side drops under the sun's.
   static const _sideBySideWidth = 520.0;
+
+  static const _padding = 20.0;
+  static const _radius = 16.0;
+  static const _border = 1.0;
+
+  /// Side by side, the sun's side and the moon's share the row three parts
+  /// to two.
+  static const _sunFlex = 3;
+  static const _moonFlex = 2;
+  static const _columnGap = 24.0;
+
+  static const _arcMaxWidth = 360.0;
+
+  /// The moon's glow is full once it is this many degrees up.
+  static const _moonUpAt = 5.0;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -31,103 +49,155 @@ class TodayCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final typography = context.typography;
+    final sky = context.todaySky;
 
-    final sunSky = Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 360),
-        child: _SkyArc(state: state),
-      ),
+    final header = Row(
+      // TODAY sits on the date's first line.
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          l10n.homeToday.toUpperCase(),
+          style: typography
+              .sectionHeaderFor(l10n.homeToday)
+              .copyWith(color: colors.onSurfaceVariant),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: _DateAndCity(now: state.now, city: city),
+          ),
+        ),
+      ],
     );
     final sunLines = _ArcHeadline(state: state);
     // Past the calendar's end there is no uposatha to show, so no moon side.
     final hasMoon = state.uposathas.isNotEmpty;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
+    final card = Container(
+      padding: const EdgeInsets.all(_padding),
       decoration: BoxDecoration(
         color: colors.surface,
-        border: Border.all(color: colors.outlineVariant),
-        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant, width: _border),
+        borderRadius: BorderRadius.circular(_radius),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            // TODAY sits on the date's first line.
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                l10n.homeToday.toUpperCase(),
-                style: typography
-                    .sectionHeaderFor(l10n.homeToday)
-                    .copyWith(color: colors.onSurfaceVariant),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final wide = hasMoon && width >= _sideBySideWidth;
+          // As the row's Expanded children share it out.
+          final share = (width - _columnGap) / (_sunFlex + _moonFlex);
+          final sunWidth = wide ? share * _sunFlex : width;
+          final arc = _ArcLayout.of(
+            context,
+            state,
+            width: math.min(_arcMaxWidth, sunWidth),
+          );
+          final sunSky = Center(child: _SkyArc(state: state, arc: arc));
+
+          // The header and the row above the horizon, with the sky behind
+          // them both: the sky reaches the card's top.
+          Widget overSky(Widget row) {
+            final top = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                header,
+                const SizedBox(height: 16),
+                _Horizon(child: row),
+              ],
+            );
+            if (sky == null) return top;
+
+            final (:look, :night) = sky.at(
+              state.now,
+              sunrise: state.sunrise,
+              sunset: state.sunset,
+            );
+            final moonUp = (state.moonAltitude / _moonUpAt).clamp(0.0, 1.0);
+            return CustomPaint(
+              // Worth keeping as a bitmap where the renderer can (Skia).
+              isComplex: true,
+              painter: TodaySkyPainter(
+                look: look,
+                night: night,
+                strength: sky.strength,
+                stars: sky.stars,
+                fromBottom: _Horizon.fromBottom(context),
+                inset: _padding,
+                corner: _radius - _border,
+                // The arc is centred in the sun's column, its centre on the
+                // horizon.
+                marker: Offset((sunWidth - arc.width) / 2, -arc.centre.dy) +
+                    arc.marker,
+                moon: wide
+                    ? Offset(
+                        sunWidth + _columnGap + share * _moonFlex / 2,
+                        -_MoonSky.centreAboveHorizon,
+                      )
+                    : null,
+                moonGlow: hasMoon ? _moonLit(_moonAge(state)) * moonUp : 0,
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: _DateAndCity(now: state.now, city: city),
+              // The date button's hover and ripple repaint this layer only,
+              // not the sky behind it.
+              child: RepaintBoundary(child: top),
+            );
+          }
+
+          if (!wide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                overSky(sunSky),
+                const SizedBox(height: 8),
+                sunLines,
+                if (hasMoon) ...[
+                  // A solid rule, not a second horizon: here the moon has no
+                  // sky of its own.
+                  const SizedBox(height: 20),
+                  Divider(height: 1, color: colors.outlineVariant),
+                  const SizedBox(height: 20),
+                  _MoonRow(state: state),
+                ],
+              ],
+            );
+          }
+          // The two skies share a bottom edge, so one horizon runs under
+          // both. The lines under them differ in size, so they sit on one
+          // baseline.
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              overSky(
+                _columns(
+                  sunSky,
+                  _MoonSky(state: state),
+                  CrossAxisAlignment.end,
                 ),
               ),
+              const SizedBox(height: 8),
+              _columns(
+                sunLines,
+                Center(
+                  heightFactor: 1,
+                  child: _UposathaLine(
+                    state: state,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                CrossAxisAlignment.baseline,
+              ),
             ],
-          ),
-          const SizedBox(height: 16),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              if (!hasMoon || constraints.maxWidth < _sideBySideWidth) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _Horizon(child: sunSky),
-                    const SizedBox(height: 8),
-                    sunLines,
-                    if (hasMoon) ...[
-                      // A solid rule, not a second horizon: here the moon
-                      // has no sky of its own.
-                      const SizedBox(height: 20),
-                      Divider(height: 1, color: colors.outlineVariant),
-                      const SizedBox(height: 20),
-                      _MoonRow(state: state),
-                    ],
-                  ],
-                );
-              }
-              // The two skies share a bottom edge, so one horizon runs
-              // under both. The lines under them differ in size, so they
-              // sit on one baseline.
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _Horizon(
-                    child: _columns(
-                      sunSky,
-                      _MoonSky(state: state),
-                      CrossAxisAlignment.end,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _columns(
-                    sunLines,
-                    Center(
-                      heightFactor: 1,
-                      child: _UposathaLine(
-                        state: state,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    CrossAxisAlignment.baseline,
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
+          );
+        },
       ),
     );
+
+    // Its own layer, so scrolling Home moves the card instead of repainting it.
+    return RepaintBoundary(child: card);
   }
 
-  /// The sun's side and the moon's, three parts to two.
+  /// The sun's side and the moon's.
   static Widget _columns(Widget sun, Widget moon, CrossAxisAlignment align) {
     return Row(
       crossAxisAlignment: align,
@@ -135,9 +205,9 @@ class TodayCard extends ConsumerWidget {
       // first line.
       textBaseline: TextBaseline.alphabetic,
       children: [
-        Expanded(flex: 3, child: sun),
-        const SizedBox(width: 24),
-        Expanded(flex: 2, child: moon),
+        Expanded(flex: _sunFlex, child: sun),
+        const SizedBox(width: _columnGap),
+        Expanded(flex: _moonFlex, child: moon),
       ],
     );
   }
@@ -303,13 +373,142 @@ class _ArcHeadline extends StatelessWidget {
   }
 }
 
+/// The arc's labels: small, with figures of one width.
+TextStyle _arcLabelStyle(BuildContext context) =>
+    context.typography.menuSectionLabel.copyWith(fontFeatures: _tabular);
+
+/// The Now label over the arc, as [_SkyArc] draws it and [_ArcLayout] makes
+/// room for it.
+({String text, TextStyle style}) _nowLabel(BuildContext context, DateTime now) {
+  return (
+    text: AppLocalizations.of(context).vinayaTimesNowAt(clockTime(now)),
+    style: _arcLabelStyle(context)
+        .copyWith(color: Theme.of(context).colorScheme.onSurface),
+  );
+}
+
+/// The arc in a box [width] wide: its size, where it stands and where its
+/// marker is. Worked out once for the arc and for the sky behind it, so the
+/// sky's glow sits on the marker.
+class _ArcLayout {
+  const _ArcLayout._({
+    required this.width,
+    required this.lineHeight,
+    required this.day,
+    required this.start,
+    required this.end,
+    required this.nowAt,
+    required this.stretchTo,
+    required this.radius,
+    required this.nowFits,
+    required this.nowSize,
+  });
+
+  factory _ArcLayout.of(
+    BuildContext context,
+    VinayaTimesState state, {
+    required double width,
+  }) {
+    final lineHeight = _labelLineHeight(context);
+    final day = state.sunIsUp;
+    final start = day ? state.dawn : state.nightStart;
+    final end = day ? state.sunset : state.vikalaEnds;
+    final span = end.difference(start).inSeconds;
+    double along(DateTime instant) =>
+        instant.difference(start).inSeconds / span;
+
+    final now = _nowLabel(context, state.now);
+    final nowWidth = _textWidth(context, now.text, now.style);
+
+    // The end labels are centred on the arc's ends, so the arc stands in by
+    // about half a label.
+    final widest = width / 2 - 2 * lineHeight;
+
+    // The arc stands in a little more when Now needs the room: the radius
+    // where Now's far edge (see [nowRect]) is at the box's edge. When even
+    // half the arc would not make room, the label goes.
+    final w = nowWidth / 2;
+    final h = lineHeight / 2;
+    final room = width - 3 * w - h;
+    final fitted = room <= 0
+        ? 0.0
+        : math.sqrt((room * room + (w - h) * (w - h)) / 2) - _SkyArc._nowReach;
+    final nowFits = fitted >= widest / 2;
+
+    return _ArcLayout._(
+      width: width,
+      lineHeight: lineHeight,
+      day: day,
+      start: start,
+      end: end,
+      nowAt: along(state.now),
+      // Kāla ends at midday; the night is one stretch from end to end.
+      stretchTo: day ? along(state.midday) : 1.0,
+      radius: nowFits ? math.min(widest, fitted) : widest,
+      nowFits: nowFits,
+      nowSize: Size(nowWidth, lineHeight),
+    );
+  }
+
+  final double width;
+  final double lineHeight;
+
+  /// The day's arc, aruṇa to sunset, or the night's, sunset to aruṇa.
+  final bool day;
+  final DateTime start;
+  final DateTime end;
+
+  /// Where the marker is and where the coloured stretch ends, as fractions
+  /// of the way along the arc.
+  final double nowAt;
+  final double stretchTo;
+
+  final double radius;
+
+  /// Whether the Now label has room beside the arc.
+  final bool nowFits;
+  final Size nowSize;
+
+  /// On the horizon, which runs a label gap above the end labels.
+  Offset get centre => Offset(width / 2, lineHeight + _labelGap + radius);
+
+  /// Down to the end labels' bottom.
+  double get height => centre.dy + _labelGap + lineHeight;
+
+  Offset onArc(double fraction) {
+    final angle = math.pi * (1 + fraction);
+    return centre + Offset(math.cos(angle), math.sin(angle)) * radius;
+  }
+
+  /// The sun by day, the moon by night.
+  Offset get marker => onArc(nowAt);
+
+  /// Now is centred on the line 45 degrees up from the arc's centre, [out]
+  /// along each axis: as near as it can be while its nearest corner,
+  /// (out - w, out - h) from the centre, is past the marker's reach. It goes
+  /// on the marker's side, mirrored exactly on the other.
+  Rect get nowRect {
+    final w = nowSize.width / 2;
+    final h = nowSize.height / 2;
+    final reach = radius + _SkyArc._nowReach;
+    final root = 2 * reach * reach - (w - h) * (w - h);
+    final out = (w + h + math.sqrt(math.max(0, root))) / 2;
+    return Rect.fromCenter(
+      center: centre + Offset(nowAt < 0.5 ? -1 : 1, -1) * out,
+      width: nowSize.width,
+      height: nowSize.height,
+    );
+  }
+}
+
 /// A half circle with a marker where the sun or the moon is now. By day it
 /// runs aruṇa to sunset, sky blue up to midday (kāla) and slate after; by
 /// night it runs sunset to aruṇa, all of it in midnight blue.
 class _SkyArc extends StatelessWidget {
-  const _SkyArc({required this.state});
+  const _SkyArc({required this.state, required this.arc});
 
   final VinayaTimesState state;
+  final _ArcLayout arc;
 
   static const _stroke = 6.0;
   static const _markerRadius = 8.0;
@@ -322,148 +521,99 @@ class _SkyArc extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final label = context.typography.menuSectionLabel.copyWith(
-      fontFeatures: _tabular,
-    );
-    final dark = label.copyWith(color: colors.onSurface);
+    final label = _arcLabelStyle(context);
+    final now = _nowLabel(context, state.now);
+    final dark = now.style;
     // Bold until midday, regular once it has passed.
     final middayStyle =
         state.isVikala ? dark : dark.copyWith(fontWeight: FontWeight.w600);
 
-    final lineHeight = _labelLineHeight(context);
-
-    final day = state.sunIsUp;
-    final start = day ? state.dawn : state.nightStart;
-    final end = day ? state.sunset : state.vikalaEnds;
-    final span = end.difference(start).inSeconds;
-    double along(DateTime instant) =>
-        instant.difference(start).inSeconds / span;
-    final nowAt = along(state.now);
-    // Kāla ends at midday; the night is one stretch from end to end.
-    final stretchTo = day ? along(state.midday) : 1.0;
+    final lineHeight = arc.lineHeight;
+    final day = arc.day;
 
     final middayText = l10n.vinayaTimesMiddayAt(clockTime(state.midday));
     final middayWidth = _textWidth(context, middayText, middayStyle);
-    final nowText = l10n.vinayaTimesNowAt(clockTime(state.now));
-    final nowWidth = _textWidth(context, nowText, dark);
+
+    final belowEnd = Offset(0, _labelGap + lineHeight / 2);
+    final middayRect = Rect.fromCenter(
+      center: arc.onArc(arc.stretchTo) - belowEnd,
+      width: middayWidth,
+      height: lineHeight,
+    );
+    final nowRect = arc.nowRect;
+    // A very small arc at a large text size would push it above the card's
+    // header gap; then it goes too.
+    final showNow = arc.nowFits &&
+        nowRect.top >= 0 &&
+        !(day && nowRect.overlaps(middayRect));
 
     return Semantics(
       label: day
           ? l10n.vinayaTimesArcLabel(
-              clockTime(start),
+              clockTime(arc.start),
               clockTime(state.midday),
-              clockTime(end),
+              clockTime(arc.end),
             )
-          : l10n.vinayaTimesNightArcLabel(clockTime(start), clockTime(end)),
+          : l10n.vinayaTimesNightArcLabel(
+              clockTime(arc.start),
+              clockTime(arc.end),
+            ),
       child: ExcludeSemantics(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final width = constraints.maxWidth;
-            // The end labels are centred on the arc's ends, so the arc
-            // stands in by about half a label.
-            final widest = width / 2 - 2 * lineHeight;
-
-            // Now is centred on the line 45 degrees up from the arc's centre,
-            // [out] along each axis: as near as it can be while its nearest
-            // corner, (out - w, out - h) from the centre, is past the
-            // marker's reach.
-            final w = nowWidth / 2;
-            final h = lineHeight / 2;
-            double out(double radius) {
-              final reach = radius + _nowReach;
-              final root = 2 * reach * reach - (w - h) * (w - h);
-              return (w + h + math.sqrt(math.max(0, root))) / 2;
-            }
-
-            // The arc stands in a little more when Now needs the room: the
-            // radius where out + w is half the width. When even half the arc
-            // would not make room, the label goes.
-            final room = width - 3 * w - h;
-            final fitted = room <= 0
-                ? 0.0
-                : math.sqrt((room * room + (w - h) * (w - h)) / 2) - _nowReach;
-            final nowFits = fitted >= widest / 2;
-            final radius = nowFits ? math.min(widest, fitted) : widest;
-            final centre = Offset(width / 2, lineHeight + _labelGap + radius);
-            Offset onArc(double fraction) {
-              final angle = math.pi * (1 + fraction);
-              return centre + Offset(math.cos(angle), math.sin(angle)) * radius;
-            }
-
-            final belowEnd = Offset(0, _labelGap + lineHeight / 2);
-            final middayRect = Rect.fromCenter(
-              center: onArc(stretchTo) - belowEnd,
-              width: middayWidth,
-              height: lineHeight,
-            );
-
-            // On the marker's side, mirrored exactly on the other.
-            final onLeft = nowAt < 0.5;
-            final nowRect = Rect.fromCenter(
-              center: centre + Offset(onLeft ? -1 : 1, -1) * out(radius),
-              width: nowWidth,
-              height: lineHeight,
-            );
-            // A very small arc at a large text size would push it above the
-            // card's header gap; then it goes too.
-            final showNow = nowFits &&
-                nowRect.top >= 0 &&
-                !(day && nowRect.overlaps(middayRect));
-
-            return SizedBox(
-              // The horizon goes here, painted by [_Horizon] behind.
-              height: centre.dy + _labelGap + lineHeight,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _SkyArcPainter(
-                        centre: centre,
-                        radius: radius,
-                        stretchTo: stretchTo,
-                        nowAt: nowAt,
-                        stroke: _stroke,
-                        markerRadius: _markerRadius,
-                        stretchColor: day
-                            ? colors.secondaryFixed
-                            : colors.tertiaryFixedDim,
-                        // The afternoon; the night's stretch covers it all.
-                        restColor: colors.secondaryFixedDim,
-                        markerColor: colors.onSurface,
-                        // Both are discs: the sun orange, the moon amber.
-                        markerFill:
-                            day ? colors.primaryFixedDim : colors.primaryFixed,
-                        markerRing: _markerRing,
-                      ),
-                    ),
+        child: SizedBox(
+          width: arc.width,
+          // The horizon goes through the arc's centre, painted by [_Horizon]
+          // behind.
+          height: arc.height,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _SkyArcPainter(
+                    centre: arc.centre,
+                    radius: arc.radius,
+                    stretchTo: arc.stretchTo,
+                    marker: arc.marker,
+                    stroke: _stroke,
+                    markerRadius: _markerRadius,
+                    // Keeps the arc clear of the sky behind it.
+                    casingColor: colors.surface,
+                    stretchColor:
+                        day ? colors.secondaryFixed : colors.tertiaryFixedDim,
+                    // The afternoon; the night's stretch covers it all.
+                    restColor: colors.secondaryFixedDim,
+                    markerColor: colors.onSurface,
+                    // Both are discs: the sun orange, the moon amber.
+                    markerFill:
+                        day ? colors.primaryFixedDim : colors.primaryFixed,
+                    markerRing: _markerRing,
                   ),
-                  if (day)
-                    _ArcLabel(
-                      at: middayRect.center,
-                      text: middayText,
-                      style: middayStyle,
-                    ),
-                  _ArcLabel(
-                    at: onArc(0) + belowEnd,
-                    text: day
-                        ? l10n.vinayaTimesArunaAt(clockTime(start))
-                        : l10n.vinayaTimesSunsetAt(clockTime(start)),
-                    style: label,
-                  ),
-                  _ArcLabel(
-                    at: onArc(1) + belowEnd,
-                    text: day
-                        ? l10n.vinayaTimesSunsetAt(clockTime(end))
-                        : l10n.vinayaTimesArunaAt(clockTime(end)),
-                    style: label,
-                  ),
-                  if (showNow)
-                    _ArcLabel(at: nowRect.center, text: nowText, style: dark),
-                ],
+                ),
               ),
-            );
-          },
+              if (day)
+                _ArcLabel(
+                  at: middayRect.center,
+                  text: middayText,
+                  style: middayStyle,
+                ),
+              _ArcLabel(
+                at: arc.onArc(0) + belowEnd,
+                text: day
+                    ? l10n.vinayaTimesArunaAt(clockTime(arc.start))
+                    : l10n.vinayaTimesSunsetAt(clockTime(arc.start)),
+                style: label,
+              ),
+              _ArcLabel(
+                at: arc.onArc(1) + belowEnd,
+                text: day
+                    ? l10n.vinayaTimesSunsetAt(clockTime(arc.end))
+                    : l10n.vinayaTimesArunaAt(clockTime(arc.end)),
+                style: label,
+              ),
+              if (showNow)
+                _ArcLabel(at: nowRect.center, text: now.text, style: dark),
+            ],
+          ),
         ),
       ),
     );
@@ -512,9 +662,10 @@ class _SkyArcPainter extends CustomPainter {
     required this.centre,
     required this.radius,
     required this.stretchTo,
-    required this.nowAt,
+    required this.marker,
     required this.stroke,
     required this.markerRadius,
+    required this.casingColor,
     required this.stretchColor,
     required this.restColor,
     required this.markerColor,
@@ -525,13 +676,16 @@ class _SkyArcPainter extends CustomPainter {
   final Offset centre;
   final double radius;
 
-  /// Where the coloured stretch ends and where the marker is, as fractions
-  /// of the way along the arc.
+  /// Where the coloured stretch ends, as a fraction of the way along.
   final double stretchTo;
-  final double nowAt;
+  final Offset marker;
 
   final double stroke;
   final double markerRadius;
+
+  /// A wider stroke under the coloured ones, so a blue sky behind does not
+  /// swallow the sky-blue stretch.
+  final Color casingColor;
   final Color stretchColor;
   final Color restColor;
   final Color markerColor;
@@ -549,6 +703,17 @@ class _SkyArcPainter extends CustomPainter {
     final rect = Rect.fromCircle(center: centre, radius: radius);
     // Angles run clockwise from three o'clock, so the left end is pi and
     // the sweep over the top to the right end is another pi.
+    canvas.drawArc(
+      rect,
+      math.pi,
+      math.pi,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke + 3
+        ..strokeCap = StrokeCap.round
+        ..color = casingColor,
+    );
     canvas.drawArc(rect, math.pi, math.pi, false, arc..color = restColor);
     canvas.drawArc(
       rect,
@@ -558,8 +723,6 @@ class _SkyArcPainter extends CustomPainter {
       arc..color = stretchColor,
     );
 
-    final angle = math.pi * (1 + nowAt);
-    final marker = centre + Offset(math.cos(angle), math.sin(angle)) * radius;
     canvas.drawCircle(marker, markerRadius, Paint()..color = markerFill);
     canvas.drawCircle(
       marker,
@@ -576,7 +739,8 @@ class _SkyArcPainter extends CustomPainter {
       old.centre != centre ||
       old.radius != radius ||
       old.stretchTo != stretchTo ||
-      old.nowAt != nowAt ||
+      old.marker != marker ||
+      old.casingColor != casingColor ||
       old.stretchColor != stretchColor ||
       old.restColor != restColor ||
       old.markerColor != markerColor ||
@@ -591,11 +755,15 @@ class _Horizon extends StatelessWidget {
 
   final Widget child;
 
+  /// How far above the bottom the horizon runs.
+  static double fromBottom(BuildContext context) =>
+      _labelGap + _labelLineHeight(context);
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: _HorizonPainter(
-        fromBottom: _labelGap + _labelLineHeight(context),
+        fromBottom: fromBottom(context),
         color: Theme.of(context).colorScheme.outlineVariant,
       ),
       child: child,
@@ -636,15 +804,20 @@ class _MoonSky extends StatelessWidget {
 
   final VinayaTimesState state;
 
+  static const _size = 72.0;
+
   /// Clear sky between the moon and the horizon.
   static const _clearance = 20.0;
+
+  /// The photo's centre stands this far above the horizon.
+  static const centreAboveHorizon = _clearance + _size / 2;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _MoonImage(state: state, size: 72),
+        _MoonImage(state: state, size: _size),
         const SizedBox(height: _clearance + _labelGap),
         SizedBox(
           height: _labelLineHeight(context),
@@ -691,6 +864,18 @@ class _MoonRow extends StatelessWidget {
   }
 }
 
+/// The moon's age as an angle, by the uposatha count: 0 at new moon, pi at
+/// full. Only while an uposatha is ahead.
+double _moonAge(VinayaTimesState state) {
+  final next = state.uposathas.first;
+  final waxing = next.phase == MoonPhase.fullMoon;
+  return math.pi * (waxing ? 0 : 1) +
+      math.pi * state.fortnightDay! / next.fortnightDays;
+}
+
+/// How much of the moon's face is lit: 0 at new moon, 1 at full.
+double _moonLit(double age) => (1 - math.cos(age)) / 2;
+
 /// Today's moon photo, or the drawn moon when there is no photo.
 class _MoonImage extends StatelessWidget {
   const _MoonImage({required this.state, required this.size});
@@ -702,11 +887,7 @@ class _MoonImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    final next = state.uposathas.first;
-    final waxing = next.phase == MoonPhase.fullMoon;
-    // The moon's age as an angle: 0 at new moon, pi at full.
-    final age = math.pi * (waxing ? 0 : 1) +
-        math.pi * state.fortnightDay! / next.fortnightDays;
+    final age = _moonAge(state);
     // One photo a step round the cycle: the first the new moon, the middle
     // one the full moon.
     final photo = moonPhotoAsset(

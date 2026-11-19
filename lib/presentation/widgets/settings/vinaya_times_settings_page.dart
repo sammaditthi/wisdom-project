@@ -49,7 +49,7 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
                     ref.read(vinayaTimesCityProvider.notifier).choose(option),
                 trailing: _Choice(
                   value: l10n.vinayaTimesMiddayAt(
-                    clockTime(sunTimes.midday(today, option)),
+                    clockTime(sunTimes.sunDay(today, option, method).midday),
                   ),
                   selected: option == city,
                 ),
@@ -68,7 +68,8 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
                 onTap: () =>
                     ref.read(dawnMethodProvider.notifier).choose(option),
                 trailing: _Choice(
-                  value: clockTime(sunTimes.dawn(tomorrow, city, option)),
+                  value:
+                      clockTime(sunTimes.sunDay(tomorrow, city, option).dawn),
                   selected: option == method,
                 ),
                 showDivider: option != DawnMethod.values.last,
@@ -79,10 +80,10 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
         _Summary(
           title: l10n.vinayaTimesSummaryTitle(city.label(l10n)),
           midday: l10n.vinayaTimesMiddayAt(
-            clockTime(sunTimes.midday(today, city)),
+            clockTime(sunTimes.sunDay(today, city, method).midday),
           ),
           vikala: l10n.vinayaTimesSummaryVikala(
-            clockTime(sunTimes.dawn(tomorrow, city, method)),
+            clockTime(sunTimes.sunDay(tomorrow, city, method).dawn),
           ),
         ),
         const SizedBox(height: 12),
