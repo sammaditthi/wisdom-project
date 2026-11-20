@@ -1,5 +1,8 @@
 /// A place the Vinaya times are worked out for. The enum name is the saved
 /// key, so renaming a value loses that user's choice.
+// TODO(vinaya-times): let the user set their own location (GPS or typed
+// lat/long). Each city is one fixed point, and midday moves about 2 s per km
+// east or west of it.
 enum City {
   colombo(6.9271, 79.8612),
   kandy(7.2906, 80.6337),

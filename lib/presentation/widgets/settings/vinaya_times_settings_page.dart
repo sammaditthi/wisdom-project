@@ -38,6 +38,9 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
           padding: const EdgeInsets.only(top: 8),
           child: SettingsProse(l10n.vinayaTimesIntro),
         ),
+        // TODO(vinaya-times): tell the user how the times are worked out:
+        // from the city's one fixed point, so not exact to the second where
+        // they are, and midday is rounded down to the minute to stay safe.
         SettingsSection(
           title: l10n.vinayaTimesLocation,
           hint: l10n.vinayaTimesLocationHint,
