@@ -1394,18 +1394,6 @@
       }
     }
   },
-  "vinayaTimesVikalaSpan": "Vikāla from {from} until aruṇa {until}",
-  "@vinayaTimesVikalaSpan": {
-    "description": "Today card: line under the midday headline. Vikāla, the wrong time for eating, runs from today's midday to tomorrow's dawn",
-    "placeholders": {
-      "from": {
-        "type": "String"
-      },
-      "until": {
-        "type": "String"
-      }
-    }
-  },
   "vinayaTimesVikalaUntil": "Vikāla until aruṇa {time}",
   "@vinayaTimesVikalaUntil": {
     "description": "Today card: headline from midday until the next dawn",

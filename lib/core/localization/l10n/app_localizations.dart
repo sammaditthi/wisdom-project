@@ -1730,12 +1730,6 @@ abstract class AppLocalizations {
   /// **'Midday in {hours} h'**
   String vinayaTimesMiddayInWholeHours(int hours);
 
-  /// Today card: line under the midday headline. Vikāla, the wrong time for eating, runs from today's midday to tomorrow's dawn
-  ///
-  /// In en, this message translates to:
-  /// **'Vikāla from {from} until aruṇa {until}'**
-  String vinayaTimesVikalaSpan(String from, String until);
-
   /// Today card: headline from midday until the next dawn
   ///
   /// In en, this message translates to:

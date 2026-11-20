@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 /// Accents that are the same in every theme: the colour scheme's "fixed"
 /// roles. The Today card draws with them: primary the moon and the sun,
-/// secondary the day's sky, tertiary the night's; onPrimaryFixedVariant is
-/// text, the midday countdown in its last hour.
+/// secondary the day's sky, tertiary the night's. The midday countdown in its
+/// last hour is onPrimaryFixedVariant on a light card, primaryFixedDim on a
+/// dark one.
 class FixedAccentColors {
   static const primaryFixed = Color(0xFFF6D89C); // Light amber: the moon
-  static const primaryFixedDim = Color(0xFFFF8C00); // Bright orange: the sun
+  static const primaryFixedDim =
+      Color(0xFFFF8C00); // Bright orange: the sun; midday near, 7.1:1 on dark
   static const onPrimaryFixedVariant =
       Color(0xFFA65200); // Dark orange: midday near, 5.5:1 on white
   static const secondaryFixed = Color(0xFFA9CBEA); // Sky blue: kāla

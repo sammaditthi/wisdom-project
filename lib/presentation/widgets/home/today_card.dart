@@ -71,7 +71,7 @@ class TodayCard extends ConsumerWidget {
         ),
       ],
     );
-    final sunLines = _ArcHeadline(state: state);
+    final sunLine = _ArcHeadline(state: state);
     // Past the calendar's end there is no uposatha to show, so no moon side.
     final hasMoon = state.uposathas.isNotEmpty;
 
@@ -150,7 +150,7 @@ class TodayCard extends ConsumerWidget {
               children: [
                 overSky(sunSky),
                 const SizedBox(height: 8),
-                sunLines,
+                sunLine,
                 if (hasMoon) ...[
                   // A solid rule, not a second horizon: here the moon has no
                   // sky of its own.
@@ -177,7 +177,7 @@ class TodayCard extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               _columns(
-                sunLines,
+                sunLine,
                 Center(
                   heightFactor: 1,
                   child: _UposathaLine(
@@ -295,11 +295,14 @@ const _labelGap = 8.0;
 
 /// Room for one line of label at the app's and the system's text size, sized
 /// for the largest drawn in it: the 14px countdown under the moon. One value
-/// for both sides, since they share the horizon.
+/// for both sides, since they share the horizon. Rounded up, as the text
+/// engine draws a line a whole number of pixels tall: a 19.6 box would shrink
+/// a 20px line.
 double _labelLineHeight(BuildContext context) {
   final style = context.typography.listRowTitle;
-  return MediaQuery.textScalerOf(context).scale(style.fontSize!) *
-      style.height!;
+  return (MediaQuery.textScalerOf(context).scale(style.fontSize!) *
+          style.height!)
+      .ceilToDouble();
 }
 
 /// Midday's countdown turns orange inside the hour, red inside the half hour.
@@ -321,11 +324,11 @@ class _ArcHeadline extends StatelessWidget {
 
     final String headline;
     final TextStyle style;
-    String? detail;
     if (state.isVikala) {
       headline = l10n.vinayaTimesVikalaUntil(clockTime(state.vikalaEnds));
-      // Nothing is near once midday has passed.
-      style = typography.resultSubtitle;
+      // Nothing is near once midday has passed: the uposatha line's style,
+      // so the two lines under the horizon match.
+      style = typography.menuSectionLabel;
     } else {
       final left = state.midday.difference(state.now);
       // Round up, as a countdown does: 40 s left reads "1 min", not "0 min".
@@ -338,37 +341,26 @@ class _ArcHeadline extends StatelessWidget {
         (final hours, 0) => l10n.vinayaTimesMiddayInWholeHours(hours),
         (final hours, _) => l10n.vinayaTimesMiddayInHours(hours, minutes),
       };
-      style = typography.resultTitle.copyWith(
+      // The size of the moon's near countdown: one size for what is near.
+      style = typography.listRowTitle.copyWith(
         fontWeight: FontWeight.w600,
         // The words carry it too; the colour only adds to them.
         color: switch (left) {
           <= _middayVerySoon => colors.error,
-          <= _middaySoon => colors.onPrimaryFixedVariant,
+          // Dark orange reads on a light card only; a dark one takes the
+          // sun's orange.
+          <= _middaySoon => colors.brightness == Brightness.light
+              ? colors.onPrimaryFixedVariant
+              : colors.primaryFixedDim,
           _ => colors.onSurface,
         },
       );
-      detail = l10n.vinayaTimesVikalaSpan(
-        clockTime(state.midday),
-        clockTime(state.vikalaEnds),
-      );
     }
 
-    return Column(
-      children: [
-        Text(
-          headline,
-          textAlign: TextAlign.center,
-          style: style.copyWith(fontFeatures: _tabular),
-        ),
-        if (detail != null) ...[
-          const SizedBox(height: 2),
-          Text(
-            detail,
-            textAlign: TextAlign.center,
-            style: typography.resultSubtitle.copyWith(fontFeatures: _tabular),
-          ),
-        ],
-      ],
+    return Text(
+      headline,
+      textAlign: TextAlign.center,
+      style: style.copyWith(fontFeatures: _tabular),
     );
   }
 }

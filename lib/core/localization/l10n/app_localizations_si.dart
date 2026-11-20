@@ -926,11 +926,6 @@ class AppLocalizationsSi extends AppLocalizations {
   }
 
   @override
-  String vinayaTimesVikalaSpan(String from, String until) {
-    return '$from සිට අරුණ $until තෙක් විකාලය';
-  }
-
-  @override
   String vinayaTimesVikalaUntil(String time) {
     return 'අරුණ $time තෙක් විකාලය';
   }

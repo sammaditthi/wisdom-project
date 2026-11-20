@@ -90,7 +90,6 @@ For the user to correct. All in `app_si.arb`.
 | Midday 11:54 | මධ්‍යාහ්නය 11:54 |
 | Midday in 42 min | මධ්‍යාහ්නයට මිනි. 42 |
 | Midday in 3 h 24 min | මධ්‍යාහ්නයට පැය 3 මිනි. 24 |
-| Vikāla from 11:54 until aruṇa 05:31 | 11:54 සිට අරුණ 05:31 තෙක් විකාලය |
 | Vikāla until aruṇa 05:31 | අරුණ 05:31 තෙක් විකාලය |
 | Aruṇa / Sunset / Now, each with a time | අරුණ / හිරු බැසීම / දැන් |
 | Waxing · day 5 of 15 | පුර පක්ෂය · 15න් 5 වන දිනය |
@@ -161,10 +160,10 @@ it is left out.
 
 Headline:
 
-| When | Headline | Line under it |
-|---|---|---|
-| Aruṇa until midday | `Midday in 3 h 24 min`, bold; orange inside the hour, red inside the half hour | `Vikāla from 11:54 until aruṇa 05:31` |
-| Midday until the next aruṇa | `Vikāla until aruṇa 05:31`, smaller and muted | none |
+| When | Headline |
+|---|---|
+| Aruṇa until midday | `Midday in 3 h 24 min`, bold; orange inside the hour, red inside the half hour |
+| Midday until the next aruṇa | `Vikāla until aruṇa 05:31`, small and muted, the same style as the next uposatha's date |
 
 Moon panel:
 

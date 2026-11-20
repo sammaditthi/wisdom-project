@@ -444,7 +444,6 @@
   "vinayaTimesArcLabel": "අද හිරු ගමන: අරුණ {dawn}, මධ්‍යාහ්නය {midday}, හිරු බැසීම {sunset}",
   "vinayaTimesMiddayInHours": "මධ්‍යාහ්නයට පැය {hours} මිනි. {minutes}",
   "vinayaTimesMiddayInWholeHours": "මධ්‍යාහ්නයට පැය {hours}",
-  "vinayaTimesVikalaSpan": "{from} සිට අරුණ {until} තෙක් විකාලය",
   "vinayaTimesVikalaUntil": "අරුණ {time} තෙක් විකාලය",
   "vinayaTimesWaxing": "පුර පක්ෂය · {total}න් {day} වන දිනය",
   "vinayaTimesWaning": "අව පක්ෂය · {total}න් {day} වන දිනය",
