@@ -149,8 +149,13 @@ Arc:
 
 | When | Runs | Coloured stretch | Marker |
 |---|---|---|---|
-| Aruṇa until sunset | Aruṇa to sunset, midday marked | Aruṇa to midday, kāla, in sky blue; the afternoon in slate grey | An orange disc, the sun |
+| Aruṇa until sunset | Aruṇa to sunset, midday marked | Aruṇa to midday, kāla, in sky blue; the afternoon in slate grey | An orange disc, the sun; red while low |
 | Sunset until aruṇa | Sunset to the next aruṇa | All of it, in midnight blue | An amber disc, the moon |
+
+The sun is red while the real sun is low. It is red from aruṇa to sunrise,
+then fades to orange by 25 min after sunrise. From 25 min before sunset it
+fades back to red. The fades are timed from the city's real sunrise and
+sunset, eased like the sky. Both themes.
 
 `Now 08:30` keeps a fixed spot outside the arc, centred on the line 45 degrees
 up, halfway between the arc's end and its top: on the left in the arc's first
@@ -260,6 +265,21 @@ By the user on 2026-11-14 unless marked.
 20. **The tab is "Time" / කාලය**, the Pali *kāla*, with one intro line under
     it. Code and files say `VinayaTimes`. "Buddhist times" is dropped; the
     branch keeps its name. *(user, 2026-11-17)*
+21. **A low sun is red.** The arc is a clock, so its horizon is aruṇa and
+    sunset, not the real one. The colour follows the real sun: red from
+    aruṇa to sunrise, not a dim "not yet risen" disc, which would argue with
+    where the disc is drawn. Every city is in Sri Lanka, where the sun climbs
+    fast, so fixed minutes match the sun's angle. A custom location would
+    move both the sky and the sun onto the sun's angle. *(user, 2026-11-22;
+    25 min and the roles: my call)*
+22. **The sun's colours are the real sun's.** Red `#FF4D00` is the sun 1° up,
+    orange `#FFA700` 5° up, through haze. A sunlight-through-air model and
+    the user's color-hex palette agree on both. The red stays well clear of
+    the error reds. *(user, 2026-11-22)*
+23. **The midday countdown has its own orange.** It no longer borrows the
+    sun's, so the sun can change without moving it. Its last half hour keeps
+    the error red: it is a warning. *(detaching: user, 2026-11-22; the
+    error red: my call)*
 
 ## Open question
 
@@ -399,9 +419,12 @@ Pure Dart for the maths, so it works on every platform. Nothing in
 
 Colour-scheme roles and `AppTypography` only. The fixed roles pair up:
 primary for the bodies (`primaryFixed` the moon marker, `primaryFixedDim` the
-sun), secondary for the day's sky (`secondaryFixed` kāla, `secondaryFixedDim`
-the afternoon), tertiary for the night's (`tertiaryFixedDim` the night arc,
-`tertiaryFixed` the drawn fallback moon). `surface` for the card,
+sun, `onPrimaryFixed` the low sun's red), secondary for the day's sky
+(`secondaryFixed` kāla, `secondaryFixedDim` the afternoon), tertiary for the
+night's (`tertiaryFixedDim` the night arc, `tertiaryFixed` the drawn fallback
+moon). The countdown's last hour is `onPrimaryFixedVariant` on a light card
+and `onSecondaryFixed` on a dark one; its last half hour is `error`.
+`surface` for the card,
 `outlineVariant` for the borders and the horizon. The fixed colours are
 `FixedAccentColors` in `app_colors.dart`.
 

@@ -348,11 +348,11 @@ class _ArcHeadline extends StatelessWidget {
         // The words carry it too; the colour only adds to them.
         color: switch (left) {
           <= _middayVerySoon => colors.error,
-          // Dark orange reads on a light card only; a dark one takes the
-          // sun's orange.
+          // Dark orange reads on a light card only; a dark one takes a
+          // brighter orange, its own and not the sun's.
           <= _middaySoon => colors.brightness == Brightness.light
               ? colors.onPrimaryFixedVariant
-              : colors.primaryFixedDim,
+              : colors.onSecondaryFixed,
           _ => colors.onSurface,
         },
       );
@@ -510,6 +510,21 @@ class _SkyArc extends StatelessWidget {
   /// How far outside the arc the Now label keeps: past the marker, plus a gap.
   static const _nowReach = _markerRadius + 6;
 
+  /// How long the sun stays red after sunrise and before sunset: about 6° of
+  /// climb in Sri Lanka, where the sun rises steeply.
+  static const _lowSun = Duration(minutes: 25);
+
+  /// How red the sun is, 1 to 0: red until sunrise, orange by [_lowSun]
+  /// after it, red again by sunset. Eased like the sky.
+  static double _sunRedness(VinayaTimesState state) {
+    // Time from whichever end of the day is nearer; negative before sunrise.
+    final sinceRise = state.now.difference(state.sunrise);
+    final toSet = state.sunset.difference(state.now);
+    final fromLow = sinceRise < toSet ? sinceRise : toSet;
+    final t = (fromLow.inSeconds / _lowSun.inSeconds).clamp(0.0, 1.0);
+    return 1 - t * t * (3 - 2 * t);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -576,9 +591,12 @@ class _SkyArc extends StatelessWidget {
                     // The afternoon; the night's stretch covers it all.
                     restColor: colors.secondaryFixedDim,
                     markerColor: colors.onSurface,
-                    // Both are discs: the sun orange, the moon amber.
-                    markerFill:
-                        day ? colors.primaryFixedDim : colors.primaryFixed,
+                    // Both are discs: the sun orange, red while low; the
+                    // moon amber.
+                    markerFill: day
+                        ? Color.lerp(colors.primaryFixedDim,
+                            colors.onPrimaryFixed, _sunRedness(state))!
+                        : colors.primaryFixed,
                     markerRing: _markerRing,
                   ),
                 ),
