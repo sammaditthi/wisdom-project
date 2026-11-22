@@ -124,7 +124,7 @@ class _Choice extends StatelessWidget {
           SizedBox(
             width: 20,
             child: selected
-                ? Icon(Icons.check, size: 20, color: colors.primary)
+                ? Icon(Icons.check, size: 20, color: colors.onPrimaryContainer)
                 : null,
           ),
         ],

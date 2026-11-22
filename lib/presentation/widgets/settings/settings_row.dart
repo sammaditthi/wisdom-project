@@ -210,7 +210,7 @@ class SettingsTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: icon != null
-          ? Icon(icon, size: 20, color: colors.primary)
+          ? Icon(icon, size: 20, color: colors.onPrimaryContainer)
           // The tile is a fixed square but `badgeLabel` follows the font-size
           // slider, so at 1.5x a four-letter abbreviation ("DPDC") is wider
           // than the tile. Shrink the text rather than widen the tile, which
@@ -223,7 +223,7 @@ class SettingsTile extends StatelessWidget {
                   text!,
                   maxLines: 1,
                   style: context.typography.badgeLabel.copyWith(
-                    color: colors.primary,
+                    color: colors.onPrimaryContainer,
                   ),
                 ),
               ),

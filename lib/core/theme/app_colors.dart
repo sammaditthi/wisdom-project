@@ -25,9 +25,14 @@ class FixedAccentColors {
 /// band's first constant instead of repeating its hex.
 ///   #2A2318 (16%) — heading, onPrimaryContainer, onTertiary, onSecondaryContainer, shadow
 ///   #422701 (26%) — onSurface (body text)
-///   #5A3A18 (31%) — primary, surfaceTint (interactive elements)
+///   #5A3A18 (31%) — primary, surfaceTint (interactive text, focus lines)
 ///   #705E46 (48%) — onSurfaceVariant, secondary (muted/taupe)
 /// Apart from them, #362F25 (22%) — inverseSurface (snackbar bg)
+///
+/// Icon ink, in every theme: full-strength icons (toolbar, menus, ticks,
+/// settings tiles) take onPrimaryContainer, the heading ink, so they stand
+/// out like headings. Helper glyphs inside fields and chips (carets, search,
+/// ✕) stay onSurfaceVariant.
 class LightThemeColors {
   // ============================================
   // Background & Surface

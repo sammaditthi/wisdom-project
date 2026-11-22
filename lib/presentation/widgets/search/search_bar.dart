@@ -289,7 +289,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
                           icon: Icon(
                             Icons.clear,
                             size: 20,
-                            color: theme.colorScheme.primary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           tooltip: l10n.clear,
                           onPressed: () {

@@ -748,7 +748,7 @@ class _ReferenceResultTile extends ConsumerWidget {
         trailing: Icon(
           Icons.arrow_forward,
           size: 18,
-          color: theme.colorScheme.primary,
+          color: theme.colorScheme.onPrimaryContainer,
         ),
         onTap: onTap,
       ),

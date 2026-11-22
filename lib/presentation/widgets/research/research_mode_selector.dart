@@ -92,10 +92,10 @@ class _ModeMenuRow extends StatelessWidget {
         SizedBox(
           width: 24,
           child: selected
-              ? Icon(Icons.check, size: 18, color: colors.primary)
+              ? Icon(Icons.check, size: 18, color: colors.onPrimaryContainer)
               : null,
         ),
-        Icon(icon, size: 18, color: colors.onSurfaceVariant),
+        Icon(icon, size: 18, color: colors.onPrimaryContainer),
         const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
