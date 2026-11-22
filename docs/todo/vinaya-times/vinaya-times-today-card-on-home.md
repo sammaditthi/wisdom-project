@@ -22,8 +22,9 @@ notifications.
 
 **2026-11-15 — the card is built, with the moon as a NASA photo.**
 
-- **`kEnableHome` is on only in the macOS app**, off on web and mobile. The
-  user chose to keep it so (2026-11-18). Main still has no Home.
+- **`kEnableHome` is on in the macOS app and the web dev deploy**, off on
+  prod web and mobile. Dev added 2026-11-22 so testers can check it (user).
+  Prod still has no Home.
 - **Done:** sun times with sunset, the calendar, the providers, the Settings
   tab, the Today card, the Home screen, the toggle, the moon photos with
   their credit, web preload and script. The analyzer is clean.
@@ -111,7 +112,8 @@ are drafts too.
 ## The toggle
 
 `kEnableHome` in `lib/core/constants/feature_flags.dart`, a getter that is on
-only in the macOS app. Off:
+in the macOS app and in any build made with `--dart-define=ENABLE_HOME=true`.
+`scripts/app/web/deploy.sh` passes `true` for dev and `false` for prod. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
 - Settings has no Time tab, and Anumodanā no Images section.
@@ -119,8 +121,8 @@ only in the macOS app. Off:
 Web still loads the moon photos on an install (see *Moon photos*), so a
 database update made while the toggle is off still counts.
 
-Turning it on is that one line, plus a `CHANGELOG.md` note under *Unreleased*.
-The app still opens on the Reader either way.
+Turning it on everywhere is that one line, plus a `CHANGELOG.md` note under
+*Unreleased*. The app still opens on the Reader either way.
 
 ## What the user sees
 
@@ -234,9 +236,9 @@ By the user on 2026-11-14 unless marked.
 12. **Outside the calendar's range the moon panel is hidden.** No guessed
     dates.
 13. **No tree footer.** It made the reader busy. *(user, 2026-11-15)*
-14. **Home sits behind a toggle in code, on only in the macOS app.** *(user,
-    2026-11-15; macOS only: user, 2026-11-18; in code and not a Settings
-    switch: my call)*
+14. **Home sits behind a toggle in code, on in the macOS app and the web dev
+    deploy.** *(user, 2026-11-15; macOS: user, 2026-11-18; web dev: user,
+    2026-11-22; in code and not a Settings switch: my call)*
 15. **No Continue reading card for now.** *(user, 2026-11-15)*
 16. **Colour-scheme roles only.** No theme extension. The card's accents
     are the scheme's "fixed" roles, the same in every theme. The arc is the

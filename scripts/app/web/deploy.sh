@@ -32,7 +32,8 @@
 # DATABASE_BASE_URL from scripts/config/targets.env and LINK_BASE_URL set to
 # the same target's static site, minus the two .db files (manifest.json stays:
 # the app reads each version from it). `_headers` comes from web/_headers:
-# cross-origin isolation for the databases, noindex on every host.
+# cross-origin isolation for the databases, noindex on every host. Dev also
+# gets ENABLE_HOME=true, so testers see Home before it ships (kEnableHome).
 #
 # A dry run uploads nothing and needs no credentials, so
 # scripts/release_all_dryrun.sh can run it anywhere.
@@ -74,11 +75,13 @@ if [ "$TARGET" = "prod" ]; then
   BRANCH=$(target APP_WEB_PROD_BRANCH)
   ORIGIN=$(target APP_WEB_PROD_ORIGIN)
   LINK_BASE_URL=$(target STATIC_SITE_PROD_ORIGIN)
+  ENABLE_HOME=false
 else
   PROJECT=$(target APP_WEB_DEV_PROJECT)
   BRANCH=$(target APP_WEB_DEV_BRANCH)
   ORIGIN="https://$PROJECT.pages.dev"
   LINK_BASE_URL="https://$(target STATIC_SITE_DEV_PROJECT).pages.dev"
+  ENABLE_HOME=true
 fi
 BUCKET=$(target DATABASE_BUCKET)
 DATABASE_BASE_URL=$(target DATABASE_BASE_URL)
@@ -172,7 +175,8 @@ env -u CLOUDFLARE_API_TOKEN -u CLOUDFLARE_ACCOUNT_ID flutter build web --release
   --output "$OUT" \
   --dart-define=RESEARCH_BASE_URL="$RESEARCH_BASE_URL" \
   --dart-define=DATABASE_BASE_URL="$DATABASE_BASE_URL" \
-  --dart-define=LINK_BASE_URL="$LINK_BASE_URL"
+  --dart-define=LINK_BASE_URL="$LINK_BASE_URL" \
+  --dart-define=ENABLE_HOME="$ENABLE_HOME"
 cleanup_cache
 BUILD_STARTED=false
 echo ""
