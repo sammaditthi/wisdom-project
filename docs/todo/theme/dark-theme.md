@@ -35,12 +35,6 @@ Only light registers `TodaySkyTheme` (`today_sky_theme.dart`); dark and warm hav
 
 Fix: give dark and warm a `TodaySkyTheme` too. With one on both sides, `TodaySkyTheme.lerp` fades it. Until they get real skies, a sky at `strength: 0` gives the fade on its own. Then "no sky" means strength 0 rather than null, and `TodaySkyPainter` should skip painting at 0: its off-screen layer costs the same at any strength.
 
-### The Today card's two oranges almost match
-
-In the hour before midday the dark card shows the sun (`primaryFixedDim`, `#FFA700`) and the orange countdown (`onSecondaryFixed`, `#FF8C00`) at once. They are close enough to look like one colour gone slightly wrong. Light is fine: its countdown is the dark `#A65200`.
-
-Fix: give the dark countdown an orange clearly apart from the sun's. It must not go back to the sun's own colour: the two were split on purpose (Vinaya times plan, decision 23).
-
 ### Search filter row and match menu (to check by hand)
 
 Found while building the search pane redesign, chunk C (2026-10-07). The row and chip colours are the ones from before that chunk (kept on purpose); only the menu is new. These come from reading the dark and warm palettes, not from looking.

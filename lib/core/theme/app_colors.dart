@@ -16,7 +16,7 @@ class FixedAccentColors {
   static const secondaryFixed = Color(0xFFA9CBEA); // Sky blue: kāla
   static const secondaryFixedDim = Color(0xFF75839B); // Slate grey: afternoon
   static const onSecondaryFixed =
-      Color(0xFFFF8C00); // Bright orange: midday near, 7.1:1 on dark
+      Color(0xFFFF6D00); // Deep orange: midday near, 5.9:1 on dark
   static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue: drawn moon
   static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue: night
 }

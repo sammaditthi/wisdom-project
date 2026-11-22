@@ -277,9 +277,10 @@ By the user on 2026-11-14 unless marked.
     the user's color-hex palette agree on both. The red stays well clear of
     the error reds. *(user, 2026-11-22)*
 23. **The midday countdown has its own orange.** It no longer borrows the
-    sun's, so the sun can change without moving it. Its last half hour keeps
-    the error red: it is a warning. *(detaching: user, 2026-11-22; the
-    error red: my call)*
+    sun's, so the sun can change without moving it. On a dark card it is a
+    deep orange, `#FF6D00`, redder than the sun so the two never look alike.
+    Its last half hour keeps the error red: it is a warning. *(detaching and
+    the deep orange: user, 2026-11-22; the error red: my call)*
 
 ## Open question
 
