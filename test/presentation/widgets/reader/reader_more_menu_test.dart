@@ -12,8 +12,8 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 import '../../../helpers/pump_app.dart';
 
 void main() {
-  /// Pumps the toolbar on [nodeKey] and opens its Share menu.
-  Future<void> openShareMenu(
+  /// Pumps the toolbar on [nodeKey] and opens its ⋮ menu.
+  Future<void> openMoreMenu(
     WidgetTester tester,
     String nodeKey, {
     required SuttaCentralRefResolver resolver,
@@ -34,11 +34,11 @@ void main() {
         ),
       ),
     );
-    await tester.tap(find.byTooltip('Share'));
+    await tester.tap(find.byTooltip('More options'));
     await tester.pumpAndSettle();
   }
 
-  group('Reader Share menu: Open on SuttaCentral', () {
+  group('Reader ⋮ menu: Open on SuttaCentral', () {
     late SuttaCentralRefResolver concordance;
 
     // The bundled concordance, so each node really opens what it claims.
@@ -54,7 +54,7 @@ void main() {
       ('vp-prj-1', 'Ven. Brahmali'), // the Vinaya
     ]) {
       testWidgets('$nodeKey shows $translator', (tester) async {
-        await openShareMenu(tester, nodeKey, resolver: concordance);
+        await openMoreMenu(tester, nodeKey, resolver: concordance);
 
         expect(find.text('Open on SuttaCentral'), findsOneWidget);
         expect(find.text(translator), findsOneWidget);
@@ -67,7 +67,7 @@ void main() {
       'vp-prj-3', // the Vinaya's Saṅghādisesa chapter
     ]) {
       testWidgets('$nodeKey shows no translator', (tester) async {
-        await openShareMenu(tester, nodeKey, resolver: concordance);
+        await openMoreMenu(tester, nodeKey, resolver: concordance);
 
         expect(find.text('Open on SuttaCentral'), findsOneWidget);
         expect(find.textContaining('Ven.'), findsNothing);
@@ -75,7 +75,7 @@ void main() {
     }
 
     testWidgets('a commentary has no row', (tester) async {
-      await openShareMenu(tester, 'atta-dn-1-1', resolver: concordance);
+      await openMoreMenu(tester, 'atta-dn-1-1', resolver: concordance);
 
       expect(find.text('Copy link'), findsOneWidget);
       expect(find.text('Open on SuttaCentral'), findsNothing);
@@ -83,7 +83,7 @@ void main() {
 
     // A rebuilt concordance may bring a translator the app has no name for.
     testWidgets('names no one for a translator without a name', (tester) async {
-      await openShareMenu(
+      await openMoreMenu(
         tester,
         'dn-1-1',
         resolver: const SuttaCentralRefResolver(
@@ -104,7 +104,7 @@ void main() {
       // tear-downs run.
       final handle = tester.ensureSemantics();
 
-      await openShareMenu(tester, 'dn-1-1', resolver: concordance);
+      await openMoreMenu(tester, 'dn-1-1', resolver: concordance);
 
       expect(
         find.bySemanticsLabel(RegExp(r'Open on SuttaCentral\s+Ven\. Bodhi')),

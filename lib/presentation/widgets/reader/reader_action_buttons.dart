@@ -19,11 +19,10 @@ import 'reader_link_actions.dart';
 /// Where a step button goes, named by the sutta it steps to.
 typedef ReaderStepTarget = ({String name, VoidCallback onTap});
 
-/// Width of the Share menu, fixed so it lines up with its button's right
-/// edge.
+/// Width of the ⋮ menu, fixed so it lines up with its button's right edge.
 const double _endMenuWidth = 280;
 
-/// Every reader action in one pill at the top-right. Layout and Share open
+/// Every reader action in one pill at the top-right. Layout and ⋮ open
 /// menus.
 class ReaderActionToolbar extends ConsumerWidget {
   final VoidCallback onSearchTap;
@@ -102,7 +101,7 @@ class ReaderActionToolbar extends ConsumerWidget {
         if (previous != null) step(previous, Icons.skip_previous),
         if (next != null) step(next, Icons.skip_next),
       ],
-      [_ShareMenuButton(visible: visible)],
+      [_MoreMenuButton(visible: visible)],
     ].where((group) => group.isNotEmpty);
 
     return Material(
@@ -188,12 +187,13 @@ class _LayoutMenuButton extends ConsumerWidget {
   }
 }
 
-/// Share ▾: Copy link, Open on SuttaCentral where the text has a counterpart
-/// there, and on the web Open as HTML page.
-class _ShareMenuButton extends ConsumerWidget {
+/// ⋮ More options: Copy link, Open on SuttaCentral where the text has a
+/// counterpart there, and on the web Open as HTML page. A generic menu, since
+/// most of its rows open the text elsewhere rather than share it.
+class _MoreMenuButton extends ConsumerWidget {
   final bool visible;
 
-  const _ShareMenuButton({required this.visible});
+  const _MoreMenuButton({required this.visible});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -202,7 +202,7 @@ class _ShareMenuButton extends ConsumerWidget {
     final onSuttaCentral = ref.watch(activeSuttaCentralUrlProvider) != null;
 
     return DismissibleMenuAnchor(
-      overlayId: 'reader-share-menu',
+      overlayId: 'reader-more-menu',
       visible: visible,
       endAlignedWidth: _endMenuWidth,
       menuChildren: [
@@ -226,8 +226,8 @@ class _ShareMenuButton extends ConsumerWidget {
           ),
       ],
       builder: (context, controller, focusNode) => _ToolbarButton.icon(
-        Icons.adaptive.share,
-        tooltip: l10n.share,
+        Icons.more_vert,
+        tooltip: l10n.moreOptions,
         onTap: controller.toggle,
         menuOpen: controller.isOpen,
         focusNode: focusNode,

@@ -57,18 +57,19 @@
 
 | | |
 |---|---|
-| **Entry point** | **Share** (`Icons.adaptive.share`), last in the reader's action toolbar after a hairline divider (`docs/done/reader/reader-toolbar-merge.md`, 2026-10-16). The toolbar is the reader's only one since the FAB went (`docs/done/reader/reader-toolbar-auto-hide.md`, 2026-10-17). Nothing new in the `AppBar`. Code: `widgets/reader/reader_link_actions.dart`. |
-| **Share** | Opens a menu holding **Copy link**, which copies and shows a `linkCopied` SnackBar, and on the web **Open as HTML page**. The same menu at every width, on every platform. An extra tap, accepted 2026-10-05 because the menu is where sharing grows (see below). |
-| **Open as HTML page** | In the Share menu since 2026-10-16. It is not sharing, which is why it was its own button until then; as one it would have widened the merged toolbar past a phone browser. Named for what it opens: on the web the reader is already on a web page (2026-11-06). Web only: inside a native app it has no use (decided 2026-10-05, re-confirmed 2026-10-16 and 2026-11-06). Printing, the one use it would have there, goes to a planned in-app Save as PDF instead. `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on web. Static is BJT-only, so it must hide for a non-BJT tab; every tab is BJT today, so there is no check yet. |
-| **`MenuAnchor`** | The toolbar's Share is a `MenuAnchor`, so the menu lives with its button. (Until 2026-10-16 one `showMenu` popup served the pill and the FAB, because the old FAB's item vanished as the FAB closed.) |
+| **Entry point** | **⋮ More options** (`Icons.more_vert`), last in the reader's action toolbar after a hairline divider (`docs/done/reader/reader-toolbar-merge.md`, 2026-10-16). The toolbar is the reader's only one since the FAB went (`docs/done/reader/reader-toolbar-auto-hide.md`, 2026-10-17). Nothing new in the `AppBar`. A Share icon until 2026-11-22: most rows open the text elsewhere rather than share it, so a generic menu fits. Code: `widgets/reader/reader_link_actions.dart`. |
+| **⋮ menu** | Holds **Copy link**, which copies and shows a `linkCopied` SnackBar, **Open on SuttaCentral** where the text has a counterpart there, and on the web **Open as HTML page**. The same menu at every width, on every platform. An extra tap, accepted 2026-10-05 because the menu is where these actions grow (see below). |
+| **Open as HTML page** | In the menu since 2026-10-16. It is not sharing, which is why it was its own button until then; as one it would have widened the merged toolbar past a phone browser. Named for what it opens: on the web the reader is already on a web page (2026-11-06). Web only: inside a native app it has no use (decided 2026-10-05, re-confirmed 2026-10-16 and 2026-11-06). Printing, the one use it would have there, goes to a planned in-app Save as PDF instead. `UrlLauncherUtils.launchInAppBrowser`, which opens a new tab on web. Static is BJT-only, so it must hide for a non-BJT tab; every tab is BJT today, so there is no check yet. |
+| **`MenuAnchor`** | The toolbar's ⋮ is a `MenuAnchor`, so the menu lives with its button. (Until 2026-10-16 one `showMenu` popup served the pill and the FAB, because the old FAB's item vanished as the FAB closed.) |
 | **Not built, on purpose** | The design's phone sheet and the menu's URL footer line. The URL added nothing, and "Link copied" confirms the copy (decided 2026-10-05). |
 | **URL** | `tipitakaLinkUrlBuilderProvider` with the tab's `nodeKey`, through `SitePlan.servingLink`, so a folded leaf comes out as `…/<pageKey>#<leafKey>`. No `?e=`: a tab drops its landing spot once it lands, so the link opens the text at its start (decided 2026-10-05). Non-BJT, once `?edition=` exists → `app.` + `?edition=…`. |
 | **Origins** | `LINK_BASE_URL`, default the apex. `scripts/app/web/deploy.sh` passes dev's static site, `https://<STATIC_SITE_DEV_PROJECT>.pages.dev`. |
-| **Strings** | `researchCopyLink` / `researchLinkCopied` became `copyLink` / `linkCopied`. New: `share` (`බෙදාගන්න`) and `openAsHtmlPage` (`සරල වෙබ් පිටුවට`). |
+| **Strings** | `researchCopyLink` / `researchLinkCopied` became `copyLink` / `linkCopied`. The button reads `moreOptions` (`තවත් විකල්ප`), the static site's ⋮ label too. `openAsHtmlPage` is `සරල වෙබ් පිටුවට`. `share` (`බෙදාගන්න`) waits for the share sheet's row. |
 
-**Later: the Share menu grows.** Next is the OS share sheet, on web and
-native. It needs a share plugin (none in `pubspec.yaml`). Before showing it in a
-browser with no share sheet, check what the plugin falls back to there.
+**Later: the menu grows.** Next is the OS share sheet, on web and native, as
+a **Share…** row with the share icon. It needs a share plugin (none in
+`pubspec.yaml`). Before showing it in a browser with no share sheet, check what
+the plugin falls back to there.
 
 **Done when:** every reading page has the link in its toolbar at every
 width, one visible at a time (**A: done**); reader tabs on all platforms produce a link that
@@ -172,7 +173,7 @@ https://app.sammaditthi.net/tipitaka/sn-2-3-1-3?e=12.4&layout=sideBySide&edition
   picks below — identical on native and web. This is why go_router isn't needed
   for correctness.
 - **go_router (optional, later).** Adds live address-bar sync + browser
-  back/forward + copy-straight-from-the-bar. Additive; the share button already
+  back/forward + copy-straight-from-the-bar. Additive; Copy link already
   covers sharing.
 
 ### Sharing & resolution *(open sub-decision resolved 2026-07-21)*
@@ -199,7 +200,7 @@ is bound for the *web* (recipient has no app), the default surface is the
 *still* opens the native app if installed, *still* offers "Open in app" if not.
 Static is BJT-only, so the emit rule keys on **edition**, not on where you clicked:
 
-| Reading | Share button emits | Web-fallback lands on |
+| Reading | Copy link emits | Web-fallback lands on |
 |---|---|---|
 | **BJT** | apex `/tipitaka/<nodeKey>` | static site — the better gift |
 | **non-BJT** (SC, A.P. de Zoysa) | `https://app.sammaditthi.net/tipitaka/<nodeKey>?edition=…` | Flutter web — the only surface that can render it |
@@ -210,8 +211,8 @@ the apex `/tipitaka/` form; a non-BJT reading can only be the `app.` form with
 link instead" for someone who explicitly wants the Flutter-web form — one smart
 default, never two co-equal buttons.
 
-**Golden rules — invariant of the emit choice** (they live a layer *below* the
-share button, so no emit model can compromise them):
+**Golden rules — invariant of the emit choice** (they live a layer *below*
+Copy link, so no emit model can compromise them):
 - *Installed → native app opens* — guaranteed by the App-Links files
   (`apple-app-site-association` / `assetlinks.json`) served on **both origins**:
   the apex claims `/tipitaka/*`, and the `app.` project serves its own pair
@@ -330,11 +331,11 @@ to all of SN 15. The full map for the whole canon is since built
    `openTipitakaLinkProvider` (null/unknown → `resolveSeedLayout`), a `layout`
    argument through `openTabFromNodeKeyProvider`, and the ~8-line static-site
    enhancement in the static plan §7.
-2. **Share… on reader tabs.** The Share button is built (Static ⇄ app
-   cross-links, B), with Copy link in its menu; Open as HTML page sits beside it
-   on the web. Left: the OS share sheet, and `?layout=` on the link once 1
-   lands. The button is what *produces* `?layout=`, so that half is small.
-3. **`?edition=` param** — a modifier on the URL the share button builds, so it
+2. **Share… on reader tabs.** The reader's ⋮ menu is built (Static ⇄ app
+   cross-links, B), with Copy link and, on the web, Open as HTML page. Left:
+   the OS share sheet, and `?layout=` on the link once 1 lands. Copy link is
+   what *produces* `?layout=`, so that half is small.
+3. **`?edition=` param** — a modifier on the URL Copy link builds, so it
    follows 2.
 4. **Universal / App Links**: `/.well-known` files on **both** origins +
    entitlement + Android `autoVerify` intent-filter (see above), Flutter web's
@@ -369,7 +370,7 @@ to all of SN 15. The full map for the whole canon is since built
     map as the outbound half, so both directions agree with the site. The tree
     remains the fallback if the plan cannot be built — opening a link must not
     be where a snapshot problem first surfaces as an exception.
-  - **Outbound.** The share button emits the URL the site actually serves —
+  - **Outbound.** Copy link emits the URL the site actually serves —
     `plan.servingLink(link)` fills in the page, the fragment keeps the leaf —
     rather than a bare leaf URL that 404s. **This is a deliberate deviation from
     the line this bullet used to end on** ("the share button never needs to know

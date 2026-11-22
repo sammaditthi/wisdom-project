@@ -394,7 +394,7 @@ closes the moment the apex is attached, and it does not. **The site has never
 been published**, so no folded-leaf URL has ever been linked, shared, saved or
 crawled: there is no ranking to preserve with a 301 and no live link to keep
 alive. Every producer we own already emits the URL the site serves —
-`SitePlan.servingLink` for the app's share button, `…/<chapter>#<key>` for
+`SitePlan.servingLink` for the app's Copy link, `…/<chapter>#<key>` for
 search rows — so the only visitor who can reach a folded-leaf URL is one who
 built it from the published grammar. Whether that visitor exists is a question
 the 404 logs answer after launch and nothing answers before it.

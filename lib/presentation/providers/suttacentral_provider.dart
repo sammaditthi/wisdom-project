@@ -17,7 +17,7 @@ final suttaCentralConcordanceDataSourceProvider =
 ///
 /// Async because the asset load is async. Readers treat "not loaded yet" (or a
 /// load error) as "no resolver": FTS keeps working, and the jump row, the
-/// citation link and the Share menu row simply don't show.
+/// citation link and the reader's ⋮ menu row simply don't show.
 final suttaCentralRefResolverProvider = FutureProvider<SuttaCentralRefResolver>(
   (ref) => ref.watch(suttaCentralConcordanceDataSourceProvider).load(),
 );
@@ -31,8 +31,8 @@ final activeSuttaCentralUrlProvider = Provider<Uri?>((ref) {
   return resolver.suttaCentralUrl(nodeKey);
 });
 
-/// How the Share menu names each SuttaCentral translator, the same in every
-/// app language. A translator missing here is shown without a name.
+/// How the reader's ⋮ menu names each SuttaCentral translator, the same in
+/// every app language. A translator missing here is shown without a name.
 const _translatorNames = {
   'bodhi': 'Ven. Bodhi',
   'sujato': 'Ven. Sujato',

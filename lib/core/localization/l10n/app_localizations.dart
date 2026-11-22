@@ -908,7 +908,7 @@ abstract class AppLocalizations {
   /// **'This source isn\'t linked to this edition yet.'**
   String get researchCitationNotLinked;
 
-  /// Action that copies the shareable URL of a text (citation sheet, the reader's Share menu)
+  /// Action that copies the shareable URL of a text (citation sheet, the reader's ⋮ menu)
   ///
   /// In en, this message translates to:
   /// **'Copy link'**
@@ -1124,25 +1124,25 @@ abstract class AppLocalizations {
   /// **'Read in the app'**
   String get readInApp;
 
-  /// Static web site only: accessible name of the toolbar's ⋮ menu on narrow screens
+  /// Tooltip and accessible name of a ⋮ menu: the reader toolbar's in the app, and the static web site toolbar's on narrow screens
   ///
   /// In en, this message translates to:
   /// **'More options'**
   String get moreOptions;
 
-  /// Reader toolbar button that opens the share menu
+  /// Not shown yet: kept for the system share sheet, a planned row in the reader's ⋮ menu
   ///
   /// In en, this message translates to:
   /// **'Share'**
   String get share;
 
-  /// App on the web only: item in the reader's Share menu that opens the text being read on the static web site, in a new tab
+  /// App on the web only: item in the reader's ⋮ menu that opens the text being read on the static web site, in a new tab
   ///
   /// In en, this message translates to:
   /// **'Open as HTML page'**
   String get openAsHtmlPage;
 
-  /// Item in the reader's Share menu that opens the text being read on suttacentral.net, in its English translation where there is one. SuttaCentral is a name: never translated
+  /// Item in the reader's ⋮ menu that opens the text being read on suttacentral.net, in its English translation where there is one. SuttaCentral is a name: never translated
   ///
   /// In en, this message translates to:
   /// **'Open on SuttaCentral'**

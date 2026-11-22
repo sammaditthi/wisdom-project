@@ -9,9 +9,9 @@ import '../../providers/suttacentral_provider.dart'
     show activeSuttaCentralUrlProvider;
 import '../../providers/tab_provider.dart';
 
-// The reader's outward actions (deep-linking doc, Section B): Copy link, in
-// the Share menu where sharing grows, Open on SuttaCentral, and on the web
-// Open as HTML page.
+// The reader's outward actions (deep-linking doc, Section B), all in the
+// toolbar's ⋮ menu: Copy link, Open on SuttaCentral, and on the web Open as
+// HTML page.
 
 /// Copies the active tab's shareable link and confirms with a SnackBar.
 Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
@@ -35,7 +35,7 @@ Future<void> openAsHtmlPage(BuildContext context, WidgetRef ref) async {
 
 /// Opens the active tab's text on SuttaCentral: Bhikkhu Bodhi's translation
 /// when SuttaCentral has it, else Bhikkhu Sujato's (Ajahn Brahmali's for the
-/// Vinaya). The Share menu leaves the row out when there is no counterpart.
+/// Vinaya). The ⋮ menu leaves the row out when there is no counterpart.
 Future<void> openOnSuttaCentral(BuildContext context, WidgetRef ref) async {
   final url = ref.read(activeSuttaCentralUrlProvider);
   if (url == null) return;

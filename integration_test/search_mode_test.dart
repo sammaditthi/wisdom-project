@@ -355,7 +355,7 @@ void main() {
 
       // ---- 14. System back closes a toolbar menu, not the app ----
       // Flutter's menus don't take back themselves.
-      await tester.tap(find.byTooltip('Share'));
+      await tester.tap(find.byTooltip('More options'));
       await pumpForSettle(tester);
       expect(find.text('Copy link'), findsOneWidget, reason: '14. menu open');
       expect(await pressSystemBack(tester), isTrue,
