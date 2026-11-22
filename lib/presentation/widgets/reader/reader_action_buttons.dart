@@ -105,7 +105,8 @@ class ReaderActionToolbar extends ConsumerWidget {
     ].where((group) => group.isNotEmpty);
 
     return Material(
-      elevation: 1,
+      // Enough shadow to lift the pill off the page.
+      elevation: 3,
       borderRadius: BorderRadius.circular(24),
       color: colorScheme.surfaceContainer,
       // Go to beginning comes and goes while the toolbar shows: the pill
@@ -146,7 +147,8 @@ class _LayoutMenuButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final primary = Theme.of(context).colorScheme.primary;
+    // The toolbar icons' ink.
+    final ink = Theme.of(context).colorScheme.onPrimaryContainer;
     final current = ref.watch(activeReaderLayoutProvider);
 
     return DismissibleMenuAnchor(
@@ -155,7 +157,7 @@ class _LayoutMenuButton extends ConsumerWidget {
       menuChildren: [
         for (final layout in ReaderLayout.values)
           _MenuRow(
-            icon: _LayoutGlyph(layout: layout, color: primary),
+            icon: _LayoutGlyph(layout: layout, color: ink),
             label: layout.label(l10n),
             selected: layout == current,
             onSelected: () => ref.read(updateActiveTabLayoutProvider)(layout),
@@ -199,7 +201,8 @@ class _MoreMenuButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final primary = Theme.of(context).colorScheme.primary;
+    // The toolbar icons' ink.
+    final ink = Theme.of(context).colorScheme.onPrimaryContainer;
     final onSuttaCentral = ref.watch(activeSuttaCentralUrlProvider) != null;
 
     return DismissibleMenuAnchor(
@@ -208,20 +211,20 @@ class _MoreMenuButton extends ConsumerWidget {
       endAlignedWidth: _endMenuWidth,
       menuChildren: [
         _MenuRow(
-          icon: Icon(Icons.content_copy, size: 20, color: primary),
+          icon: Icon(Icons.content_copy, size: 20, color: ink),
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
         ),
         if (onSuttaCentral)
           _MenuRow(
-            icon: Icon(Icons.open_in_new, size: 20, color: primary),
+            icon: Icon(Icons.open_in_new, size: 20, color: ink),
             label: l10n.openOnSuttaCentral,
             note: ref.watch(activeSuttaCentralTranslatorProvider),
             onSelected: () => openOnSuttaCentral(context, ref),
           ),
         if (kIsWeb)
           _MenuRow(
-            icon: Icon(Icons.open_in_new, size: 20, color: primary),
+            icon: Icon(Icons.open_in_new, size: 20, color: ink),
             label: l10n.openAsHtmlPage,
             onSelected: () => openAsHtmlPage(context, ref),
           ),
@@ -272,7 +275,7 @@ class _MenuRow extends StatelessWidget {
       // Lines up glyphs of different widths (icons, "P", "S").
       leadingIcon: SizedBox(width: 24, child: Center(child: icon)),
       trailingIcon: isSelected
-          ? Icon(Icons.check, size: 18, color: colorScheme.primary)
+          ? Icon(Icons.check, size: 18, color: colorScheme.onPrimaryContainer)
           : null,
       // A choice is read out like a radio button.
       child: Semantics(
@@ -373,10 +376,12 @@ class _ToolbarButton extends StatelessWidget {
                 child: Center(
                   widthFactor: 1,
                   heightFactor: 1,
+                  // onPrimaryContainer is the reader headings' colour in
+                  // every theme: the strongest ink, so the icons stand out.
                   child: content(
                     highlighted
                         ? colorScheme.onSecondaryContainer
-                        : colorScheme.primary,
+                        : colorScheme.onPrimaryContainer,
                   ),
                 ),
               ),
@@ -387,7 +392,6 @@ class _ToolbarButton extends StatelessWidget {
     );
   }
 }
-
 
 /// Icons for the two-language layouts; the single-language ones show their
 /// letter instead.
