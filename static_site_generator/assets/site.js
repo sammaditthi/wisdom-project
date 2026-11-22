@@ -93,6 +93,9 @@
   var trail = document.querySelector('.breadcrumb');
   if (trail) {
     document.addEventListener('copy', function (event) {
+      /* What is copied, not only what is selected: Firefox keeps the page's
+       * selection while a copy runs in the search box. */
+      if (!trail.contains(event.target)) return;
       var selection = window.getSelection();
       if (!selection.rangeCount) return;
       var range = selection.getRangeAt(0);
