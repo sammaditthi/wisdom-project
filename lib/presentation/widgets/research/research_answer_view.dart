@@ -228,7 +228,8 @@ class _CitationChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Material(
         color: colors.primaryContainer,
-        borderRadius: BorderRadius.circular(6),
+        // A pill, like the app's filter chips.
+        shape: const StadiumBorder(),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => CitationSourceSheet.show(context, citation),

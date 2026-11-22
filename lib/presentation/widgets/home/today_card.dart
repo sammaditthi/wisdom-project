@@ -249,9 +249,10 @@ class _DateAndCity extends StatelessWidget {
           foregroundColor: colors.onSurfaceVariant,
           textStyle: typography.menuSectionLabel,
           minimumSize: Size.zero,
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          // TextButton's own pill shape; its round ends need this much room
+          // or they cut into the text.
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
           visualDensity: VisualDensity.standard,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
