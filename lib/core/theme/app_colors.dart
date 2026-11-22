@@ -29,10 +29,10 @@ class FixedAccentColors {
 ///   #705E46 (48%) — onSurfaceVariant, secondary (muted/taupe)
 /// Apart from them, #362F25 (22%) — inverseSurface (snackbar bg)
 ///
-/// Icon ink, in every theme: full-strength icons (toolbar, menus, ticks,
-/// settings tiles) take onPrimaryContainer, the heading ink, so they stand
-/// out like headings. Helper glyphs inside fields and chips (carets, search,
-/// ✕) stay onSurfaceVariant.
+/// Icon ink, in every theme: full-strength icons (toolbar, menus, ticks)
+/// take onPrimaryContainer, the heading ink, so they stand out like headings.
+/// Helper glyphs inside fields and chips (carets, search, ✕) and decorative
+/// leading marks (Anumodanā tiles) stay onSurfaceVariant.
 class LightThemeColors {
   // ============================================
   // Background & Surface
