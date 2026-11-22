@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' show basenameWithoutExtension;
 import 'package:web/web.dart' as web;
 
+import '../../core/constants/moon_photos.dart';
 import '../datasources/suttacentral_concordance_datasource.dart';
 import '../datasources/tree_local_datasource.dart';
 import 'database_install_status.dart';
@@ -149,6 +150,9 @@ class WebDatabaseInstaller {
       // before this one marks it in use, and the download that follows moves
       // the screen off ready.
       _emit(const DatabaseInstallStatus(phase: DatabaseInstallPhase.ready));
+      // Whatever the Home toggle: a database update while it is off still
+      // leaves every browser with the photos for when it goes on.
+      if (!reload) unawaited(_loadMoonPhotos());
     } catch (error, stack) {
       final failure = _asFailure(error, 'Installing the databases failed');
       debugPrint('[db] $failure\n$stack');
@@ -193,6 +197,19 @@ class WebDatabaseInstaller {
           'GET $path failed: $error',
         );
       }
+    }
+  }
+
+  /// Loads every Today card moon photo on an install, so the offline worker
+  /// stores all thirty, not only today's. Cannot fail the install.
+  Future<void> _loadMoonPhotos() async {
+    try {
+      for (var i = 0; i < moonPhotoCount; i++) {
+        await rootBundle.load(moonPhotoAsset(i));
+      }
+    } catch (error) {
+      // The rest would most likely fail too; the card draws the moon instead.
+      debugPrint('[db] moon photos not loaded: $error');
     }
   }
 

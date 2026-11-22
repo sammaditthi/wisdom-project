@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/feature_flags.dart';
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/url_launcher_utils.dart';
@@ -24,6 +25,13 @@ class AnumodanaPage extends StatelessWidget {
   static const _sinhalaUnicodeConverterUrl =
       'https://github.com/Open-SL/sinhala-unicode-converter';
   static const _paliConverterUrl = 'https://github.com/pnfo/pali-converter';
+
+  /// The credit line NASA asks for, word for word.
+  static const _nasaSvs = "NASA's Scientific Visualization Studio";
+  static const _nasaSvsMoonUrl = 'https://svs.gsfc.nasa.gov/5587';
+
+  static const _buddhistSun = 'Buddhist Sun';
+  static const _buddhistSunUrl = 'https://github.com/bksubhuti/buddhist_sun';
 
   /// Each source's own logo, unmodified — see the plan doc for provenance.
   /// The one place in the app that shows them.
@@ -123,6 +131,40 @@ class AnumodanaPage extends StatelessWidget {
             ),
           ],
         ),
+        // The Today card's moon. Hidden with the card. No NASA logo: it is
+        // protected, and a credit must not read as an endorsement.
+        if (kEnableHome)
+          SettingsSection(
+            title: l10n.anumodanaImages,
+            children: [
+              SettingsRow(
+                label: _nasaSvs,
+                hint: l10n.anumodanaNasaMoonUse,
+                leading: const SettingsTile(icon: Icons.nightlight_outlined),
+                trailing: const _OpenLinkButton(
+                  name: _nasaSvs,
+                  url: _nasaSvsMoonUrl,
+                ),
+              ),
+            ],
+          ),
+        // A courtesy, not a licence term: Buddhist Sun is GPL-3.0 and we took
+        // ideas only, no code or data. Hidden with the card.
+        if (kEnableHome)
+          SettingsSection(
+            title: l10n.anumodanaInspiration,
+            children: [
+              SettingsRow(
+                label: _buddhistSun,
+                hint: l10n.anumodanaBuddhistSunUse,
+                leading: const SettingsTile(icon: Icons.wb_sunny_outlined),
+                trailing: const _OpenLinkButton(
+                  name: _buddhistSun,
+                  url: _buddhistSunUrl,
+                ),
+              ),
+            ],
+          ),
         SettingsSection(
           title: l10n.anumodanaContributors,
           children: [SettingsProse(l10n.anumodanaContributorsBody)],

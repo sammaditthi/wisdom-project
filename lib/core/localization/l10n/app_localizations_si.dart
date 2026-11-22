@@ -683,6 +683,19 @@ class AppLocalizationsSi extends AppLocalizations {
       'රෝම අකුරින් ඇති පාළි පද සිංහල අකුරට හැරවීම.\nPath Nirvana Foundation. අවසර ඇතිව භාවිතා කෙරේ.';
 
   @override
+  String get anumodanaImages => 'ඡායාරූප';
+
+  @override
+  String get anumodanaNasaMoonUse => 'සඳෙහි ඡායාරූප.';
+
+  @override
+  String get anumodanaInspiration => 'ආභාසය';
+
+  @override
+  String get anumodanaBuddhistSunUse =>
+      'විනය වේලාවන් සම්බන්ධ මූලික අදහස.\nBhante Subhuti.';
+
+  @override
   String get anumodanaContributors => 'දායක වූ සැම';
 
   @override
@@ -762,4 +775,178 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get shortcutCloseOverlay => 'මෙනුවක්, පැනලයක් හෝ සංවාද කොටුවක් වසන්න';
+
+  @override
+  String get settingsVinayaTimes => 'කාලය';
+
+  @override
+  String get vinayaTimesIntro => 'අරුණ, මධ්‍යාහ්නය සහ උපෝසථ දින.';
+
+  @override
+  String get vinayaTimesDatePattern => 'MMM d, EEE';
+
+  @override
+  String vinayaTimesMiddayIn(int minutes) {
+    return 'මධ්‍යාහ්නයට මිනි. $minutes';
+  }
+
+  @override
+  String get vinayaTimesUposathaTomorrow => 'හෙට උපෝසථය';
+
+  @override
+  String get vinayaTimesUposathaToday => 'අද උපෝසථය';
+
+  @override
+  String get vinayaTimesFullMoon => 'පුර පසළොස්වක';
+
+  @override
+  String get vinayaTimesNewMoon => 'අමාවක';
+
+  @override
+  String get vinayaTimesLocation => 'ස්ථානය';
+
+  @override
+  String get vinayaTimesLocationHint =>
+      'මධ්‍යාහ්නය සහ අරුණ ගණනය කරන්නේ මෙම ස්ථානයටයි.';
+
+  @override
+  String vinayaTimesMiddayAt(String time) {
+    return 'මධ්‍යාහ්නය $time';
+  }
+
+  @override
+  String get vinayaTimesDawn => 'අරුණ';
+
+  @override
+  String vinayaTimesDawnHint(String city) {
+    return 'අරුණෙන් විකාලය අවසන් වී දවස ඇරඹේ. පෙන්වන්නේ $city සඳහා හෙට වේලාවන්ය.';
+  }
+
+  @override
+  String get dawnMethodPaAuk => 'පා-අවුක්';
+
+  @override
+  String get dawnMethodPaAukRule => 'හිරු උදාවට මිනිත්තු 40කට පෙර';
+
+  @override
+  String get dawnMethodNaUyana => 'නා උයන';
+
+  @override
+  String get dawnMethodNaUyanaRule => 'හිරු උදාවට මිනිත්තු 30කට පෙර';
+
+  @override
+  String get dawnMethodCivilTwilight => 'සිවිල් අරුණාලෝකය';
+
+  @override
+  String get dawnMethodCivilTwilightRule => 'හිරු ක්ෂිතිජයට 6° පහළින්';
+
+  @override
+  String get dawnMethodSunrise => 'හිරු උදාව';
+
+  @override
+  String get dawnMethodSunriseRule => 'හිරුගේ ඉහළ දාරය ක්ෂිතිජයේ';
+
+  @override
+  String vinayaTimesSummaryTitle(String city) {
+    return '$city · අද';
+  }
+
+  @override
+  String vinayaTimesSummaryVikala(String time) {
+    return 'හෙට $time තෙක් විකාලය';
+  }
+
+  @override
+  String get vinayaTimesCalendarNote =>
+      'උපෝසථ දින සංඝ දින දර්ශනය අනුව වේ. ඒවා රජයේ පෝය දිනයෙන් වෙනස් විය හැක.';
+
+  @override
+  String get cityColombo => 'කොළඹ';
+
+  @override
+  String get cityKandy => 'මහනුවර';
+
+  @override
+  String get cityGalle => 'ගාල්ල';
+
+  @override
+  String get cityKurunegala => 'කුරුණෑගල';
+
+  @override
+  String get cityAnuradhapura => 'අනුරාධපුරය';
+
+  @override
+  String get cityJaffna => 'යාපනය';
+
+  @override
+  String get cityTrincomalee => 'ත්‍රිකුණාමලය';
+
+  @override
+  String get cityBatticaloa => 'මඩකලපුව';
+
+  @override
+  String get homeToday => 'අද';
+
+  @override
+  String get vinayaTimesFullDatePattern => 'y MMM d, EEEE';
+
+  @override
+  String vinayaTimesChangeLocation(String city) {
+    return 'ස්ථානය: $city. වෙනස් කරන්න';
+  }
+
+  @override
+  String vinayaTimesArunaAt(String time) {
+    return 'අරුණ $time';
+  }
+
+  @override
+  String vinayaTimesSunsetAt(String time) {
+    return 'හිරු බැසීම $time';
+  }
+
+  @override
+  String vinayaTimesNowAt(String time) {
+    return 'දැන් $time';
+  }
+
+  @override
+  String vinayaTimesArcLabel(String dawn, String midday, String sunset) {
+    return 'අද හිරු ගමන: අරුණ $dawn, මධ්‍යාහ්නය $midday, හිරු බැසීම $sunset';
+  }
+
+  @override
+  String vinayaTimesMiddayInHours(int hours, int minutes) {
+    return 'මධ්‍යාහ්නයට පැය $hours මිනි. $minutes';
+  }
+
+  @override
+  String vinayaTimesMiddayInWholeHours(int hours) {
+    return 'මධ්‍යාහ්නයට පැය $hours';
+  }
+
+  @override
+  String vinayaTimesVikalaUntil(String time) {
+    return 'අරුණ $time තෙක් විකාලය';
+  }
+
+  @override
+  String vinayaTimesWaxing(int day, int total) {
+    return 'පුර පක්ෂය · $totalන් $day වන දිනය';
+  }
+
+  @override
+  String vinayaTimesWaning(int day, int total) {
+    return 'අව පක්ෂය · $totalන් $day වන දිනය';
+  }
+
+  @override
+  String vinayaTimesUposathaIn(int days) {
+    return 'උපෝසථයට දින $days';
+  }
+
+  @override
+  String vinayaTimesNightArcLabel(String sunset, String dawn) {
+    return 'අද රෑ සඳ ගමන: හිරු බැසීම $sunset, අරුණ $dawn';
+  }
 }

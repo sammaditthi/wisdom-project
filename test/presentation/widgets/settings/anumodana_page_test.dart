@@ -81,6 +81,21 @@ void main() {
       expect(find.byTooltip(l10n.openLinkTo('SuttaCentral')), findsOneWidget);
     });
 
+    // Home, and with it the moon images, is only in the macOS app.
+    testWidgets('the moon images are credited to NASA in the macOS app',
+        (tester) async {
+      final l10n = await pumpPage(tester);
+
+      // The credit line NASA asks for, word for word, so a literal.
+      const nasa = "NASA's Scientific Visualization Studio";
+
+      expect(find.text(l10n.anumodanaImages), findsOneWidget);
+      expect(find.text(nasa), findsOneWidget);
+      expect(find.text(l10n.anumodanaNasaMoonUse), findsOneWidget);
+      // By name: the link count below cannot tell whose link is missing.
+      expect(find.byTooltip(l10n.openLinkTo(nasa)), findsOneWidget);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
     testWidgets('the sources carry their own logos, drawn as decoration',
         (tester) async {
       await pumpPage(tester);
@@ -193,10 +208,11 @@ void main() {
       expect(find.text(l10n.anumodanaDpdLicence), findsOneWidget);
       expect(find.byTooltip(l10n.openLinkTo(dpd.name)), findsOneWidget);
 
-      // Six links in all: the two sources, DPD and the three Transliteration
-      // rows. No other dictionary has one, so DPD's is the only one among them.
-      expect(find.byIcon(Icons.open_in_new), findsNWidgets(6));
-    });
+      // Seven links in all, as in the macOS app: the two sources, DPD, the
+      // three Transliteration rows and the moon images' credit. No other
+      // dictionary has one, so DPD's is the only one among them.
+      expect(find.byIcon(Icons.open_in_new), findsNWidgets(7));
+    }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
   });
 
   testWidgets('nothing overflows at a phone width', (tester) async {

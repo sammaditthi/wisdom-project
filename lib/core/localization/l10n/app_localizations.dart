@@ -1304,6 +1304,30 @@ abstract class AppLocalizations {
   /// **'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.'**
   String get anumodanaPaliConverterUse;
 
+  /// Settings > Anumodanā: section header above the credit for the moon images on Home's Today card
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get anumodanaImages;
+
+  /// Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Sinhala says ඡායාරූප all the same: රූප alone reads as the Dhamma term. Nothing that reads as NASA endorsing the app
+  ///
+  /// In en, this message translates to:
+  /// **'The images of the moon.'**
+  String get anumodanaNasaMoonUse;
+
+  /// Settings > Anumodanā: section header above Buddhist Sun, the app whose ideas the dawn, midday and uposatha times follow
+  ///
+  /// In en, this message translates to:
+  /// **'Inspiration'**
+  String get anumodanaInspiration;
+
+  /// Settings > Anumodanā: what Buddhist Sun inspired, and who made it. Ideas only, no code: nothing that says we use or adapt it. Proper names are not translated
+  ///
+  /// In en, this message translates to:
+  /// **'The first idea for Vinaya times.\nBhante Subhuti.'**
+  String get anumodanaBuddhistSunUse;
+
   /// Settings > Anumodanā: section header above the thanks to everyone who helped build the app
   ///
   /// In en, this message translates to:
@@ -1459,6 +1483,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close menu, panel or dialog'**
   String get shortcutCloseOverlay;
+
+  /// Settings dialog: name of the tab that picks the city and the dawn method for the Today card on Home. Time as in the Pali kāla, the right time; not a clock setting
+  ///
+  /// In en, this message translates to:
+  /// **'Time'**
+  String get settingsVinayaTimes;
+
+  /// Settings > Time: one line at the top of the tab saying what it is for, since the tab name alone could read as a clock setting
+  ///
+  /// In en, this message translates to:
+  /// **'Dawn, midday and uposatha days.'**
+  String get vinayaTimesIntro;
+
+  /// Today card: an intl DateFormat pattern, not words. An uposatha's weekday, day and month, all short: Tue 24 Nov. Reorder the letters for the language; do not translate them
+  ///
+  /// In en, this message translates to:
+  /// **'EEE d MMM'**
+  String get vinayaTimesDatePattern;
+
+  /// Today card: headline in the last hour before solar midday
+  ///
+  /// In en, this message translates to:
+  /// **'Midday in {minutes} min'**
+  String vinayaTimesMiddayIn(int minutes);
+
+  /// Today card: the line under the moon on the day before an uposatha
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha tomorrow'**
+  String get vinayaTimesUposathaTomorrow;
+
+  /// Today card: the line under the moon on the uposatha day itself
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha today'**
+  String get vinayaTimesUposathaToday;
+
+  /// Today card: after the date of the next uposatha when it falls on the full moon, e.g. Tue 24 Nov · Full moon uposatha
+  ///
+  /// In en, this message translates to:
+  /// **'Full moon uposatha'**
+  String get vinayaTimesFullMoon;
+
+  /// Today card: after the date of the next uposatha when it falls on the new moon, e.g. Wed 9 Dec · New moon uposatha
+  ///
+  /// In en, this message translates to:
+  /// **'New moon uposatha'**
+  String get vinayaTimesNewMoon;
+
+  /// Settings > Time: section header above the list of cities
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get vinayaTimesLocation;
+
+  /// Settings > Time: hint under the Location header
+  ///
+  /// In en, this message translates to:
+  /// **'Midday and aruṇa are worked out for this place.'**
+  String get vinayaTimesLocationHint;
+
+  /// Settings > Time: today's solar midday beside each city, and in the summary box, e.g. Midday 11:54
+  ///
+  /// In en, this message translates to:
+  /// **'Midday {time}'**
+  String vinayaTimesMiddayAt(String time);
+
+  /// Settings > Time: section header above the four ways of reckoning dawn. Aruṇa is the Pali word
+  ///
+  /// In en, this message translates to:
+  /// **'Aruṇa (dawn)'**
+  String get vinayaTimesDawn;
+
+  /// Settings > Time: hint under the Aruṇa header. Each method row shows the dawn time it gives tomorrow in the chosen city
+  ///
+  /// In en, this message translates to:
+  /// **'Aruṇa ends vikāla and begins the day. The times are tomorrow\'s, for {city}.'**
+  String vinayaTimesDawnHint(String city);
+
+  /// Settings > Time: a dawn method, named after the Pa-Auk forest monastery tradition
+  ///
+  /// In en, this message translates to:
+  /// **'Pa-Auk'**
+  String get dawnMethodPaAuk;
+
+  /// Settings > Time: the rule of the Pa-Auk dawn method
+  ///
+  /// In en, this message translates to:
+  /// **'40 minutes before sunrise'**
+  String get dawnMethodPaAukRule;
+
+  /// Settings > Time: a dawn method, named after the Na-Uyana forest monastery. The default
+  ///
+  /// In en, this message translates to:
+  /// **'Na-Uyana'**
+  String get dawnMethodNaUyana;
+
+  /// Settings > Time: the rule of the Na-Uyana dawn method
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes before sunrise'**
+  String get dawnMethodNaUyanaRule;
+
+  /// Settings > Time: a dawn method, the astronomical term
+  ///
+  /// In en, this message translates to:
+  /// **'Civil twilight'**
+  String get dawnMethodCivilTwilight;
+
+  /// Settings > Time: the rule of the civil twilight dawn method
+  ///
+  /// In en, this message translates to:
+  /// **'The sun 6° below the horizon'**
+  String get dawnMethodCivilTwilightRule;
+
+  /// Settings > Time: a dawn method, sunrise itself
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get dawnMethodSunrise;
+
+  /// Settings > Time: the rule of the sunrise dawn method
+  ///
+  /// In en, this message translates to:
+  /// **'The sun\'s top edge on the horizon'**
+  String get dawnMethodSunriseRule;
+
+  /// Settings > Time: small heading of the summary box under the two lists
+  ///
+  /// In en, this message translates to:
+  /// **'{city} · today'**
+  String vinayaTimesSummaryTitle(String city);
+
+  /// Settings > Time: summary box, the dawn that ends today's vikāla
+  ///
+  /// In en, this message translates to:
+  /// **'Vikāla until {time} tomorrow'**
+  String vinayaTimesSummaryVikala(String time);
+
+  /// Settings > Time: footnote under the summary box
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.'**
+  String get vinayaTimesCalendarNote;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Colombo'**
+  String get cityColombo;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Kandy'**
+  String get cityKandy;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Galle'**
+  String get cityGalle;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Kurunegala'**
+  String get cityKurunegala;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Anuradhapura'**
+  String get cityAnuradhapura;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Jaffna'**
+  String get cityJaffna;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Trincomalee'**
+  String get cityTrincomalee;
+
+  /// Settings > Time: city name
+  ///
+  /// In en, this message translates to:
+  /// **'Batticaloa'**
+  String get cityBatticaloa;
+
+  /// Home: small heading at the top left of the Today card, level with the date
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get homeToday;
+
+  /// Today card: an intl DateFormat pattern, not words. Today's full weekday, day, month and year: Wednesday 18 Nov 2026. The weekday is drawn bold wherever it falls. Reorder the letters for the language; do not translate them
+  ///
+  /// In en, this message translates to:
+  /// **'EEEE d MMM y'**
+  String get vinayaTimesFullDatePattern;
+
+  /// Today card: tooltip and screen-reader label of the date-and-city button, which opens Settings > Time
+  ///
+  /// In en, this message translates to:
+  /// **'Location: {city}. Change'**
+  String vinayaTimesChangeLocation(String city);
+
+  /// Today card: label at the left end of the sun arc, today's dawn. Aruṇa is the Pali word
+  ///
+  /// In en, this message translates to:
+  /// **'Aruṇa {time}'**
+  String vinayaTimesArunaAt(String time);
+
+  /// Today card: label at the right end of the sun arc
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset {time}'**
+  String vinayaTimesSunsetAt(String time);
+
+  /// Today card: label beside the marker on the sun arc, the current time
+  ///
+  /// In en, this message translates to:
+  /// **'Now {time}'**
+  String vinayaTimesNowAt(String time);
+
+  /// Today card: what a screen reader says for the sun arc drawing
+  ///
+  /// In en, this message translates to:
+  /// **'Sun path today: aruṇa {dawn}, midday {midday}, sunset {sunset}'**
+  String vinayaTimesArcLabel(String dawn, String midday, String sunset);
+
+  /// Today card: headline from dawn until an hour before solar midday
+  ///
+  /// In en, this message translates to:
+  /// **'Midday in {hours} h {minutes} min'**
+  String vinayaTimesMiddayInHours(int hours, int minutes);
+
+  /// Today card: the midday headline when the time left is a whole number of hours, e.g. Midday in 2 h
+  ///
+  /// In en, this message translates to:
+  /// **'Midday in {hours} h'**
+  String vinayaTimesMiddayInWholeHours(int hours);
+
+  /// Today card: headline from midday until the next dawn
+  ///
+  /// In en, this message translates to:
+  /// **'Vikāla until aruṇa {time}'**
+  String vinayaTimesVikalaUntil(String time);
+
+  /// Today card: the fortnight that ends on a full moon, and which of its 14 or 15 days today is
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing · day {day} of {total}'**
+  String vinayaTimesWaxing(int day, int total);
+
+  /// Today card: the fortnight that ends on a new moon, and which of its 14 or 15 days today is
+  ///
+  /// In en, this message translates to:
+  /// **'Waning · day {day} of {total}'**
+  String vinayaTimesWaning(int day, int total);
+
+  /// Today card: the line under the moon two to five days before an uposatha; earlier, the fortnight line shows instead
+  ///
+  /// In en, this message translates to:
+  /// **'Uposatha in {days} days'**
+  String vinayaTimesUposathaIn(int days);
+
+  /// Today card: what a screen reader says for the night arc drawing, shown from sunset to aruṇa
+  ///
+  /// In en, this message translates to:
+  /// **'Moon path tonight: sunset {sunset}, aruṇa {dawn}'**
+  String vinayaTimesNightArcLabel(String sunset, String dawn);
 }
 
 class _AppLocalizationsDelegate

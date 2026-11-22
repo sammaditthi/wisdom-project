@@ -6,6 +6,7 @@ import 'app_segmented_button_theme.dart';
 import 'app_typography.dart';
 import 'dictionary_badge_theme.dart';
 import 'text_entry_theme.dart';
+import 'today_sky_theme.dart';
 
 /// Application theme builder
 /// Combines color palettes with typography to create complete Material 3 themes.
@@ -20,7 +21,7 @@ class AppTheme {
   static ThemeData light({double fontScale = 1.0}) {
     // Create ColorScheme once and reuse
     const colorScheme = ColorScheme.light(
-      // Primary group (interactive brand color — cinnamon orange)
+      // Primary group (interactive brand color — cinnamon brown)
       primary: LightThemeColors.primary,
       onPrimary: LightThemeColors.onPrimary,
       primaryContainer: LightThemeColors.primaryContainer,
@@ -30,7 +31,7 @@ class AppTheme {
       onSecondary: LightThemeColors.onSecondary,
       secondaryContainer: LightThemeColors.secondaryContainer,
       onSecondaryContainer: LightThemeColors.onSecondaryContainer,
-      // Tertiary group (contrasting accent — golden amber)
+      // Tertiary group (contrasting accent — mint green)
       tertiary: LightThemeColors.tertiary,
       onTertiary: LightThemeColors.onTertiary,
       tertiaryContainer: LightThemeColors.tertiaryContainer,
@@ -59,6 +60,14 @@ class AppTheme {
       inverseSurface: LightThemeColors.inverseSurface,
       onInverseSurface: LightThemeColors.inverseOnSurface,
       inversePrimary: LightThemeColors.inversePrimary,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      onPrimaryFixedVariant: FixedAccentColors.onPrimaryFixedVariant,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       // Utility
       scrim: LightThemeColors.scrim,
       shadow: LightThemeColors.shadow,
@@ -95,6 +104,8 @@ class AppTheme {
         AppTypography.fromColorScheme(colorScheme, fontScale: fontScale),
         // Dictionary badge colours — one shared palette across all themes.
         DictionaryBadgeColors.standard(),
+        // The Today card's sky; dark and warm have none yet.
+        TodaySkyTheme.standard(),
       ],
     );
   }
@@ -111,6 +122,14 @@ class AppTheme {
       secondary: DarkThemeColors.accent,
       onSecondary: DarkThemeColors.onPrimary,
       tertiary: DarkThemeColors.secondaryAccent,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      onPrimaryFixedVariant: FixedAccentColors.onPrimaryFixedVariant,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: DarkThemeColors.surface,
       onSurface: DarkThemeColors.onBackground,
       onSurfaceVariant: DarkThemeColors.onBackground.withValues(alpha: 0.7),
@@ -172,6 +191,14 @@ class AppTheme {
       secondary: WarmThemeColors.accent,
       onSecondary: WarmThemeColors.onPrimary,
       tertiary: WarmThemeColors.secondaryAccent,
+      // Fixed accents, the same in every theme
+      primaryFixed: FixedAccentColors.primaryFixed,
+      primaryFixedDim: FixedAccentColors.primaryFixedDim,
+      onPrimaryFixedVariant: FixedAccentColors.onPrimaryFixedVariant,
+      secondaryFixed: FixedAccentColors.secondaryFixed,
+      secondaryFixedDim: FixedAccentColors.secondaryFixedDim,
+      tertiaryFixed: FixedAccentColors.tertiaryFixed,
+      tertiaryFixedDim: FixedAccentColors.tertiaryFixedDim,
       surface: WarmThemeColors.surface,
       onSurface: WarmThemeColors.onBackground,
       onSurfaceVariant: WarmThemeColors.onBackground.withValues(alpha: 0.7),

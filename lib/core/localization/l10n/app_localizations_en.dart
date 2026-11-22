@@ -683,6 +683,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Conversion of romanized Pali into Sinhala letters.\nPath Nirvana Foundation. Used with permission.';
 
   @override
+  String get anumodanaImages => 'Images';
+
+  @override
+  String get anumodanaNasaMoonUse => 'The images of the moon.';
+
+  @override
+  String get anumodanaInspiration => 'Inspiration';
+
+  @override
+  String get anumodanaBuddhistSunUse =>
+      'The first idea for Vinaya times.\nBhante Subhuti.';
+
+  @override
   String get anumodanaContributors => 'Those who contributed';
 
   @override
@@ -762,4 +775,178 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shortcutCloseOverlay => 'Close menu, panel or dialog';
+
+  @override
+  String get settingsVinayaTimes => 'Time';
+
+  @override
+  String get vinayaTimesIntro => 'Dawn, midday and uposatha days.';
+
+  @override
+  String get vinayaTimesDatePattern => 'EEE d MMM';
+
+  @override
+  String vinayaTimesMiddayIn(int minutes) {
+    return 'Midday in $minutes min';
+  }
+
+  @override
+  String get vinayaTimesUposathaTomorrow => 'Uposatha tomorrow';
+
+  @override
+  String get vinayaTimesUposathaToday => 'Uposatha today';
+
+  @override
+  String get vinayaTimesFullMoon => 'Full moon uposatha';
+
+  @override
+  String get vinayaTimesNewMoon => 'New moon uposatha';
+
+  @override
+  String get vinayaTimesLocation => 'Location';
+
+  @override
+  String get vinayaTimesLocationHint =>
+      'Midday and aruṇa are worked out for this place.';
+
+  @override
+  String vinayaTimesMiddayAt(String time) {
+    return 'Midday $time';
+  }
+
+  @override
+  String get vinayaTimesDawn => 'Aruṇa (dawn)';
+
+  @override
+  String vinayaTimesDawnHint(String city) {
+    return 'Aruṇa ends vikāla and begins the day. The times are tomorrow\'s, for $city.';
+  }
+
+  @override
+  String get dawnMethodPaAuk => 'Pa-Auk';
+
+  @override
+  String get dawnMethodPaAukRule => '40 minutes before sunrise';
+
+  @override
+  String get dawnMethodNaUyana => 'Na-Uyana';
+
+  @override
+  String get dawnMethodNaUyanaRule => '30 minutes before sunrise';
+
+  @override
+  String get dawnMethodCivilTwilight => 'Civil twilight';
+
+  @override
+  String get dawnMethodCivilTwilightRule => 'The sun 6° below the horizon';
+
+  @override
+  String get dawnMethodSunrise => 'Sunrise';
+
+  @override
+  String get dawnMethodSunriseRule => 'The sun\'s top edge on the horizon';
+
+  @override
+  String vinayaTimesSummaryTitle(String city) {
+    return '$city · today';
+  }
+
+  @override
+  String vinayaTimesSummaryVikala(String time) {
+    return 'Vikāla until $time tomorrow';
+  }
+
+  @override
+  String get vinayaTimesCalendarNote =>
+      'Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.';
+
+  @override
+  String get cityColombo => 'Colombo';
+
+  @override
+  String get cityKandy => 'Kandy';
+
+  @override
+  String get cityGalle => 'Galle';
+
+  @override
+  String get cityKurunegala => 'Kurunegala';
+
+  @override
+  String get cityAnuradhapura => 'Anuradhapura';
+
+  @override
+  String get cityJaffna => 'Jaffna';
+
+  @override
+  String get cityTrincomalee => 'Trincomalee';
+
+  @override
+  String get cityBatticaloa => 'Batticaloa';
+
+  @override
+  String get homeToday => 'Today';
+
+  @override
+  String get vinayaTimesFullDatePattern => 'EEEE d MMM y';
+
+  @override
+  String vinayaTimesChangeLocation(String city) {
+    return 'Location: $city. Change';
+  }
+
+  @override
+  String vinayaTimesArunaAt(String time) {
+    return 'Aruṇa $time';
+  }
+
+  @override
+  String vinayaTimesSunsetAt(String time) {
+    return 'Sunset $time';
+  }
+
+  @override
+  String vinayaTimesNowAt(String time) {
+    return 'Now $time';
+  }
+
+  @override
+  String vinayaTimesArcLabel(String dawn, String midday, String sunset) {
+    return 'Sun path today: aruṇa $dawn, midday $midday, sunset $sunset';
+  }
+
+  @override
+  String vinayaTimesMiddayInHours(int hours, int minutes) {
+    return 'Midday in $hours h $minutes min';
+  }
+
+  @override
+  String vinayaTimesMiddayInWholeHours(int hours) {
+    return 'Midday in $hours h';
+  }
+
+  @override
+  String vinayaTimesVikalaUntil(String time) {
+    return 'Vikāla until aruṇa $time';
+  }
+
+  @override
+  String vinayaTimesWaxing(int day, int total) {
+    return 'Waxing · day $day of $total';
+  }
+
+  @override
+  String vinayaTimesWaning(int day, int total) {
+    return 'Waning · day $day of $total';
+  }
+
+  @override
+  String vinayaTimesUposathaIn(int days) {
+    return 'Uposatha in $days days';
+  }
+
+  @override
+  String vinayaTimesNightArcLabel(String sunset, String dawn) {
+    return 'Moon path tonight: sunset $sunset, aruṇa $dawn';
+  }
 }

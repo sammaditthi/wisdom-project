@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 
+/// Accents that are the same in every theme: the colour scheme's "fixed"
+/// roles. The Today card draws with them: primary the moon and the sun,
+/// secondary the day's sky, tertiary the night's. The midday countdown in its
+/// last hour is onPrimaryFixedVariant on a light card, primaryFixedDim on a
+/// dark one.
+class FixedAccentColors {
+  static const primaryFixed = Color(0xFFF6D89C); // Light amber: the moon
+  static const primaryFixedDim =
+      Color(0xFFFF8C00); // Bright orange: the sun; midday near, 7.1:1 on dark
+  static const onPrimaryFixedVariant =
+      Color(0xFFA65200); // Dark orange: midday near, 5.5:1 on white
+  static const secondaryFixed = Color(0xFFA9CBEA); // Sky blue: kāla
+  static const secondaryFixedDim = Color(0xFF75839B); // Slate grey: afternoon
+  static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue: drawn moon
+  static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue: night
+}
+
 /// Color palette for Light theme
 /// Warm cream background with dark brown text - perfect for daytime reading
 /// Color names follow M3 role semantics (primary = interactive brand color)
 ///
-/// Brown tonal bands (4 distinct values, dark → light):
+/// Brown tonal bands, dark → light. A role that shares a band names the
+/// band's first constant instead of repeating its hex.
 ///   #2A2318 (16%) — heading, onPrimaryContainer, onTertiary, onSecondaryContainer, shadow
 ///   #422701 (26%) — onSurface (body text)
 ///   #5A3A18 (31%) — primary, surfaceTint (interactive elements)
-///   #705E46 (48%) — secondary, onSurfaceVariant (muted/taupe)
-///   #362F25 (22%) — inverseSurface (snackbar bg, separate context)
+///   #705E46 (48%) — onSurfaceVariant, secondary (muted/taupe)
+/// Apart from them, #362F25 (22%) — inverseSurface (snackbar bg)
 class LightThemeColors {
   // ============================================
   // Background & Surface
@@ -26,35 +44,32 @@ class LightThemeColors {
   static const surfaceContainerHighest =
       Color(0xFFE0D7C8); // Dialogs, active tabs
   static const surfaceDim = Color(0xFFDED8CE); // Dimmer canvas
-  static const surfaceBright = Color(0xFFFAF9F5); // Bright canvas (= bg)
-  static const surfaceTint = Color(0xFF5A3A18); // Elevation tint (= primary)
+  static const surfaceBright = background; // Bright canvas
+  static const surfaceTint = primary; // Elevation tint
 
   // ============================================
   // Primary group (interactive brand color)
   // ============================================
   static const primary = Color(0xFF5A3A18); // Warm cinnamon brown (interactive)
   static const onPrimary = Color(0xFFFFFFFF); // White
-  //static const primaryContainer = Color(0xFFFAEBD7); // Light antique peach
   static const primaryContainer = Color(0xFFBAC095); // Olive green
-  static const onPrimaryContainer = Color(0xFF2A2318); // Dark brown (= heading)
+  static const onPrimaryContainer = heading; // Dark brown
 
   // ============================================
   // Secondary group (complementary understated accent)
   // ============================================
-  static const secondary = Color(0xFF705E46); // Warm taupe
+  static const secondary = onSurfaceVariant; // Warm taupe
   static const onSecondary = Color(0xFFFFFFFF); // White
   static const secondaryContainer =
       Color(0xFFD0CABE); // Warm greige (selected pill bg)
-  static const onSecondaryContainer =
-      Color(0xFF2A2318); // Dark brown (= heading)
+  static const onSecondaryContainer = heading; // Dark brown
 
   // ============================================
   // Tertiary group (contrasting accent)
   // ============================================
   static const tertiary = Color(0xFFADEBB3); // Mint green (match highlight)
-  static const onTertiary = Color(0xFF2A2318); // Dark brown (= heading)
-  static const tertiaryContainer =
-      Color(0xFFD3D3FF); // Lavender. Old - Light orange FFDBBB
+  static const onTertiary = heading; // Dark brown
+  static const tertiaryContainer = Color(0xFFD3D3FF); // Lavender
   static const onTertiaryContainer = Color(0xFF26282F); // Cool Charcoal
 
   // ============================================
@@ -83,7 +98,7 @@ class LightThemeColors {
   // Utility
   // ============================================
   static const scrim = Color(0xFF000000); // Modal overlay
-  static const shadow = Color(0xFF2A2318); // Dark brown (= heading)
+  static const shadow = heading; // Dark brown
 
   // ============================================
   // Custom (not M3 roles — app-specific)

@@ -13,6 +13,7 @@ import 'general_settings_page.dart';
 import 'keyboard_shortcuts_page.dart';
 import 'settings_row.dart' show settingsGutter;
 import 'settings_tab.dart';
+import 'vinaya_times_settings_page.dart';
 
 /// The app's Settings dialog, opened from the gear at the foot of the
 /// navigation rail.
@@ -111,6 +112,7 @@ class _SettingsDialogState extends State<SettingsDialog>
 
   Widget _pageFor(SettingsTab tab) => switch (tab) {
         SettingsTab.general => const GeneralSettingsPage(),
+        SettingsTab.vinayaTimes => const VinayaTimesSettingsPage(),
         SettingsTab.shortcuts => const KeyboardShortcutsPage(),
         SettingsTab.anumodana => const AnumodanaPage(),
       };

@@ -78,6 +78,9 @@ dependencies:
   wisdom_shared:
     path: packages/wisdom_shared
 
+  # Sun position maths (NREL SPA) for the Vinaya times: midday, dawn, sunset
+  nrel_spa: ^1.2.0
+
   # URL launching (in-app browser for DPD "Read more" links)
   url_launcher: ^6.2.0
 
@@ -142,6 +145,11 @@ flutter:
     # listing as the emblem, so Flutter picks up 2.0x/ and 3.0x/ itself.
     - assets/icons/sources/tipitaka_lk.webp
     - assets/icons/sources/suttacentral.webp
+    # The Today card's moon: 00 the new moon, 15 the full moon. From NASA's
+    # Scientific Visualization Studio, "Moon Phase and Libration, 2026"
+    # (svs.gsfc.nasa.gov/5587), the 730px frames, cropped to the disc by
+    # assets/make_moon.sh, which sits outside this folder so it is not shipped.
+    - assets/moon/
     # The bundled Noto faces' licence. Read at startup and handed to
     # LicenseRegistry (main.dart) so they appear in Open-source licences.
     - assets/fonts/OFL.txt

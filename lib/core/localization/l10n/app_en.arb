@@ -1035,6 +1035,22 @@
   "@anumodanaPaliConverterUse": {
     "description": "Settings > Anumodanā: what pali-converter does for the app (at build time, in tools/dict-populate.js), who made it, and on what terms. Its source header requires the author's permission for any use, which the project holds in writing. Proper names are not translated"
   },
+  "anumodanaImages": "Images",
+  "@anumodanaImages": {
+    "description": "Settings > Anumodanā: section header above the credit for the moon images on Home's Today card"
+  },
+  "anumodanaNasaMoonUse": "The images of the moon.",
+  "@anumodanaNasaMoonUse": {
+    "description": "Settings > Anumodanā: what NASA's Scientific Visualization Studio supplies. 'Images', not 'photographs': they are rendered from spacecraft data. Sinhala says ඡායාරූප all the same: රූප alone reads as the Dhamma term. Nothing that reads as NASA endorsing the app"
+  },
+  "anumodanaInspiration": "Inspiration",
+  "@anumodanaInspiration": {
+    "description": "Settings > Anumodanā: section header above Buddhist Sun, the app whose ideas the dawn, midday and uposatha times follow"
+  },
+  "anumodanaBuddhistSunUse": "The first idea for Vinaya times.\nBhante Subhuti.",
+  "@anumodanaBuddhistSunUse": {
+    "description": "Settings > Anumodanā: what Buddhist Sun inspired, and who made it. Ideas only, no code: nothing that says we use or adapt it. Proper names are not translated"
+  },
   "anumodanaContributors": "Those who contributed",
   "@anumodanaContributors": {
     "description": "Settings > Anumodanā: section header above the thanks to everyone who helped build the app"
@@ -1144,5 +1160,292 @@
   "shortcutCloseOverlay": "Close menu, panel or dialog",
   "@shortcutCloseOverlay": {
     "description": "Keyboard shortcuts tab: row for Esc, which closes the most recently opened menu, panel or dialog"
+  },
+  "settingsVinayaTimes": "Time",
+  "@settingsVinayaTimes": {
+    "description": "Settings dialog: name of the tab that picks the city and the dawn method for the Today card on Home. Time as in the Pali kāla, the right time; not a clock setting"
+  },
+  "vinayaTimesIntro": "Dawn, midday and uposatha days.",
+  "@vinayaTimesIntro": {
+    "description": "Settings > Time: one line at the top of the tab saying what it is for, since the tab name alone could read as a clock setting"
+  },
+  "vinayaTimesDatePattern": "EEE d MMM",
+  "@vinayaTimesDatePattern": {
+    "description": "Today card: an intl DateFormat pattern, not words. An uposatha's weekday, day and month, all short: Tue 24 Nov. Reorder the letters for the language; do not translate them"
+  },
+  "vinayaTimesMiddayIn": "Midday in {minutes} min",
+  "@vinayaTimesMiddayIn": {
+    "description": "Today card: headline in the last hour before solar midday",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesUposathaTomorrow": "Uposatha tomorrow",
+  "@vinayaTimesUposathaTomorrow": {
+    "description": "Today card: the line under the moon on the day before an uposatha"
+  },
+  "vinayaTimesUposathaToday": "Uposatha today",
+  "@vinayaTimesUposathaToday": {
+    "description": "Today card: the line under the moon on the uposatha day itself"
+  },
+  "vinayaTimesFullMoon": "Full moon uposatha",
+  "@vinayaTimesFullMoon": {
+    "description": "Today card: after the date of the next uposatha when it falls on the full moon, e.g. Tue 24 Nov · Full moon uposatha"
+  },
+  "vinayaTimesNewMoon": "New moon uposatha",
+  "@vinayaTimesNewMoon": {
+    "description": "Today card: after the date of the next uposatha when it falls on the new moon, e.g. Wed 9 Dec · New moon uposatha"
+  },
+  "vinayaTimesLocation": "Location",
+  "@vinayaTimesLocation": {
+    "description": "Settings > Time: section header above the list of cities"
+  },
+  "vinayaTimesLocationHint": "Midday and aruṇa are worked out for this place.",
+  "@vinayaTimesLocationHint": {
+    "description": "Settings > Time: hint under the Location header"
+  },
+  "vinayaTimesMiddayAt": "Midday {time}",
+  "@vinayaTimesMiddayAt": {
+    "description": "Settings > Time: today's solar midday beside each city, and in the summary box, e.g. Midday 11:54",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesDawn": "Aruṇa (dawn)",
+  "@vinayaTimesDawn": {
+    "description": "Settings > Time: section header above the four ways of reckoning dawn. Aruṇa is the Pali word"
+  },
+  "vinayaTimesDawnHint": "Aruṇa ends vikāla and begins the day. The times are tomorrow's, for {city}.",
+  "@vinayaTimesDawnHint": {
+    "description": "Settings > Time: hint under the Aruṇa header. Each method row shows the dawn time it gives tomorrow in the chosen city",
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "dawnMethodPaAuk": "Pa-Auk",
+  "@dawnMethodPaAuk": {
+    "description": "Settings > Time: a dawn method, named after the Pa-Auk forest monastery tradition"
+  },
+  "dawnMethodPaAukRule": "40 minutes before sunrise",
+  "@dawnMethodPaAukRule": {
+    "description": "Settings > Time: the rule of the Pa-Auk dawn method"
+  },
+  "dawnMethodNaUyana": "Na-Uyana",
+  "@dawnMethodNaUyana": {
+    "description": "Settings > Time: a dawn method, named after the Na-Uyana forest monastery. The default"
+  },
+  "dawnMethodNaUyanaRule": "30 minutes before sunrise",
+  "@dawnMethodNaUyanaRule": {
+    "description": "Settings > Time: the rule of the Na-Uyana dawn method"
+  },
+  "dawnMethodCivilTwilight": "Civil twilight",
+  "@dawnMethodCivilTwilight": {
+    "description": "Settings > Time: a dawn method, the astronomical term"
+  },
+  "dawnMethodCivilTwilightRule": "The sun 6° below the horizon",
+  "@dawnMethodCivilTwilightRule": {
+    "description": "Settings > Time: the rule of the civil twilight dawn method"
+  },
+  "dawnMethodSunrise": "Sunrise",
+  "@dawnMethodSunrise": {
+    "description": "Settings > Time: a dawn method, sunrise itself"
+  },
+  "dawnMethodSunriseRule": "The sun's top edge on the horizon",
+  "@dawnMethodSunriseRule": {
+    "description": "Settings > Time: the rule of the sunrise dawn method"
+  },
+  "vinayaTimesSummaryTitle": "{city} · today",
+  "@vinayaTimesSummaryTitle": {
+    "description": "Settings > Time: small heading of the summary box under the two lists",
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesSummaryVikala": "Vikāla until {time} tomorrow",
+  "@vinayaTimesSummaryVikala": {
+    "description": "Settings > Time: summary box, the dawn that ends today's vikāla",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesCalendarNote": "Uposatha dates follow the Sangha calendar, which can differ from the public Poya day.",
+  "@vinayaTimesCalendarNote": {
+    "description": "Settings > Time: footnote under the summary box"
+  },
+  "cityColombo": "Colombo",
+  "@cityColombo": {
+    "description": "Settings > Time: city name"
+  },
+  "cityKandy": "Kandy",
+  "@cityKandy": {
+    "description": "Settings > Time: city name"
+  },
+  "cityGalle": "Galle",
+  "@cityGalle": {
+    "description": "Settings > Time: city name"
+  },
+  "cityKurunegala": "Kurunegala",
+  "@cityKurunegala": {
+    "description": "Settings > Time: city name"
+  },
+  "cityAnuradhapura": "Anuradhapura",
+  "@cityAnuradhapura": {
+    "description": "Settings > Time: city name"
+  },
+  "cityJaffna": "Jaffna",
+  "@cityJaffna": {
+    "description": "Settings > Time: city name"
+  },
+  "cityTrincomalee": "Trincomalee",
+  "@cityTrincomalee": {
+    "description": "Settings > Time: city name"
+  },
+  "cityBatticaloa": "Batticaloa",
+  "@cityBatticaloa": {
+    "description": "Settings > Time: city name"
+  },
+  "homeToday": "Today",
+  "@homeToday": {
+    "description": "Home: small heading at the top left of the Today card, level with the date"
+  },
+  "vinayaTimesFullDatePattern": "EEEE d MMM y",
+  "@vinayaTimesFullDatePattern": {
+    "description": "Today card: an intl DateFormat pattern, not words. Today's full weekday, day, month and year: Wednesday 18 Nov 2026. The weekday is drawn bold wherever it falls. Reorder the letters for the language; do not translate them"
+  },
+  "vinayaTimesChangeLocation": "Location: {city}. Change",
+  "@vinayaTimesChangeLocation": {
+    "description": "Today card: tooltip and screen-reader label of the date-and-city button, which opens Settings > Time",
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesArunaAt": "Aruṇa {time}",
+  "@vinayaTimesArunaAt": {
+    "description": "Today card: label at the left end of the sun arc, today's dawn. Aruṇa is the Pali word",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesSunsetAt": "Sunset {time}",
+  "@vinayaTimesSunsetAt": {
+    "description": "Today card: label at the right end of the sun arc",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesNowAt": "Now {time}",
+  "@vinayaTimesNowAt": {
+    "description": "Today card: label beside the marker on the sun arc, the current time",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesArcLabel": "Sun path today: aruṇa {dawn}, midday {midday}, sunset {sunset}",
+  "@vinayaTimesArcLabel": {
+    "description": "Today card: what a screen reader says for the sun arc drawing",
+    "placeholders": {
+      "dawn": {
+        "type": "String"
+      },
+      "midday": {
+        "type": "String"
+      },
+      "sunset": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesMiddayInHours": "Midday in {hours} h {minutes} min",
+  "@vinayaTimesMiddayInHours": {
+    "description": "Today card: headline from dawn until an hour before solar midday",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesMiddayInWholeHours": "Midday in {hours} h",
+  "@vinayaTimesMiddayInWholeHours": {
+    "description": "Today card: the midday headline when the time left is a whole number of hours, e.g. Midday in 2 h",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesVikalaUntil": "Vikāla until aruṇa {time}",
+  "@vinayaTimesVikalaUntil": {
+    "description": "Today card: headline from midday until the next dawn",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "vinayaTimesWaxing": "Waxing · day {day} of {total}",
+  "@vinayaTimesWaxing": {
+    "description": "Today card: the fortnight that ends on a full moon, and which of its 14 or 15 days today is",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesWaning": "Waning · day {day} of {total}",
+  "@vinayaTimesWaning": {
+    "description": "Today card: the fortnight that ends on a new moon, and which of its 14 or 15 days today is",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesUposathaIn": "Uposatha in {days} days",
+  "@vinayaTimesUposathaIn": {
+    "description": "Today card: the line under the moon two to five days before an uposatha; earlier, the fortnight line shows instead",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "vinayaTimesNightArcLabel": "Moon path tonight: sunset {sunset}, aruṇa {dawn}",
+  "@vinayaTimesNightArcLabel": {
+    "description": "Today card: what a screen reader says for the night arc drawing, shown from sunset to aruṇa",
+    "placeholders": {
+      "sunset": {
+        "type": "String"
+      },
+      "dawn": {
+        "type": "String"
+      }
+    }
   }
 }
