@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/presentation/providers/breadcrumb_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/last_selected_text_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/breadcrumb_widget.dart';
 
 import '../../helpers/pump_app.dart';
@@ -94,18 +95,26 @@ void main() {
     expectAtEnd(tester, 'opened');
   });
 
-  testWidgets('a mouse drag and a touch drag reach the first parent',
+  testWidgets('a mouse drag selects, a touch drag reaches the first parent',
       (tester) async {
-    await pumpBreadcrumb(tester);
-    final overflow = trail(tester).width;
+    final container = await pumpBreadcrumb(tester);
 
-    await drag(tester, overflow, PointerDeviceKind.mouse);
-    expectAtStart(tester, 'mouse drag');
+    // Across what shows, ending inside it: past the edge would auto-scroll.
+    final shown = window(tester);
+    await tester.dragFrom(
+      shown.centerRight - const Offset(2, 0),
+      Offset(-(shown.width - 4), 0),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pumpAndSettle();
+    expectAtEnd(tester, 'mouse drag');
+    final selected = container.read(lastSelectedTextProvider);
+    expect(selected, isNotEmpty, reason: 'mouse drag: text is selected');
+    expect(
+        _brahmajala.map((s) => s.displayName).join(' › '), contains(selected),
+        reason: 'mouse drag: the selection is the trail as shown');
 
-    await drag(tester, -overflow, PointerDeviceKind.mouse);
-    expectAtEnd(tester, 'mouse drag back');
-
-    await drag(tester, overflow, PointerDeviceKind.touch);
+    await drag(tester, trail(tester).width, PointerDeviceKind.touch);
     expectAtStart(tester, 'touch drag');
   });
 

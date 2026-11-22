@@ -108,6 +108,7 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
         alignment: AlignmentDirectional.centerStart,
         widthFactor: 1,
         child: SelectionArea(
+          focusNode: ref.watch(breadcrumbFocusNodeProvider),
           // Feeds SmartCopyAction's fallback, which rescues Cmd+C on web
           // when focus has left the selection.
           onSelectionChanged: (selection) =>
@@ -115,23 +116,28 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
                   (selection == null || selection.plainText.isEmpty)
                       ? null
                       : selection.plainText,
-          child: SingleChildScrollView(
-            // A new path opens at its end again.
-            key: ObjectKey(segments),
-            scrollDirection: Axis.horizontal,
-            // Scroll offset 0 is the end of the trail.
-            reverse: true,
-            // RichText, not Text.rich: Text would add the AppBar's default
-            // style and system text scaling. These two hooks are what Text
-            // adds to make it selectable; Builder gives a context below the
-            // SelectionArea to find them.
-            child: Builder(
-              builder: (context) => RichText(
-                text: TextSpan(children: spans),
-                softWrap: false,
-                selectionRegistrar: SelectionContainer.maybeOf(context),
-                selectionColor:
-                    DefaultSelectionStyle.of(context).selectionColor,
+          // No stretch past the trail's ends on Android.
+          child: ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(overscroll: false),
+            child: SingleChildScrollView(
+              // A new path opens at its end again.
+              key: ObjectKey(segments),
+              scrollDirection: Axis.horizontal,
+              // Scroll offset 0 is the end of the trail.
+              reverse: true,
+              // RichText, not Text.rich: Text would add the AppBar's default
+              // style and system text scaling. These two hooks are what Text
+              // adds to make it selectable; Builder gives a context below the
+              // SelectionArea to find them.
+              child: Builder(
+                builder: (context) => RichText(
+                  text: TextSpan(children: spans),
+                  softWrap: false,
+                  selectionRegistrar: SelectionContainer.maybeOf(context),
+                  selectionColor:
+                      DefaultSelectionStyle.of(context).selectionColor,
+                ),
               ),
             ),
           ),

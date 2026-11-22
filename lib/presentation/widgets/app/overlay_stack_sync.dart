@@ -9,7 +9,8 @@ import '../../providers/last_selected_text_provider.dart';
 import '../../providers/overlay_stack_provider.dart';
 import '../../providers/search_mode_provider.dart';
 import '../../providers/search_provider.dart' show searchStateProvider;
-import '../../providers/tab_provider.dart' show activeTabIndexProvider;
+import '../../providers/tab_provider.dart'
+    show activeNodeKeyProvider, activeTabIndexProvider;
 
 /// Keeps `overlayStackProvider` in sync with the visibility of every
 /// dismissible overlay in the app.
@@ -96,8 +97,14 @@ class OverlayStackSync extends ConsumerWidget {
     // switches to tab B, then presses Ctrl+C with nothing selected on B,
     // they'd silently copy A's text. Clearing the provider on every tab
     // switch makes Ctrl+C either copy what's actually visible/selected on
-    // the new tab or be a no-op — never the wrong tab's text.
+    // the new tab or be a no-op — never the wrong tab's text. The same goes
+    // for another sutta opening in the same tab (prev/next): its text and
+    // breadcrumb replace the selected ones without reporting the selection
+    // gone.
     ref.listen<int>(activeTabIndexProvider, (_, __) {
+      ref.read(lastSelectedTextProvider.notifier).state = null;
+    });
+    ref.listen<String?>(activeNodeKeyProvider, (_, __) {
       ref.read(lastSelectedTextProvider.notifier).state = null;
     });
 
