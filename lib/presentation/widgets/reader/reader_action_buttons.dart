@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/localization/l10n/app_localizations.dart';
-import '../../../core/theme/app_menu_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../models/reader_layout.dart';
@@ -14,6 +13,7 @@ import '../../providers/suttacentral_provider.dart'
 import '../../providers/tab_provider.dart'
     show activeReaderLayoutProvider, updateActiveTabLayoutProvider;
 import '../common/dismissible_menu_anchor.dart';
+import '../common/menu_row.dart';
 import 'reader_link_actions.dart';
 
 /// Where a step button goes, named by the sutta it steps to.
@@ -156,7 +156,7 @@ class _LayoutMenuButton extends ConsumerWidget {
       visible: visible,
       menuChildren: [
         for (final layout in ReaderLayout.values)
-          _MenuRow(
+          MenuRow(
             icon: _LayoutGlyph(layout: layout, color: ink),
             label: layout.label(l10n),
             selected: layout == current,
@@ -210,20 +210,20 @@ class _MoreMenuButton extends ConsumerWidget {
       visible: visible,
       endAlignedWidth: _endMenuWidth,
       menuChildren: [
-        _MenuRow(
+        MenuRow(
           icon: Icon(Icons.content_copy, size: 20, color: ink),
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
         ),
         if (onSuttaCentral)
-          _MenuRow(
+          MenuRow(
             icon: Icon(Icons.open_in_new, size: 20, color: ink),
             label: l10n.openOnSuttaCentral,
             note: ref.watch(activeSuttaCentralTranslatorProvider),
             onSelected: () => openOnSuttaCentral(context, ref),
           ),
         if (kIsWeb)
-          _MenuRow(
+          MenuRow(
             icon: Icon(Icons.open_in_new, size: 20, color: ink),
             label: l10n.openAsHtmlPage,
             onSelected: () => openAsHtmlPage(context, ref),
@@ -235,76 +235,6 @@ class _MoreMenuButton extends ConsumerWidget {
         onTap: controller.toggle,
         menuOpen: controller.isOpen,
         focusNode: focusNode,
-      ),
-    );
-  }
-}
-
-/// A menu row: a glyph and a one-line label, with an optional [note] under it
-/// in small grey text. With [selected] set, the row is one choice of a set,
-/// checked when true.
-class _MenuRow extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final String? note;
-  final VoidCallback onSelected;
-  final bool? selected;
-
-  const _MenuRow({
-    required this.icon,
-    required this.label,
-    required this.onSelected,
-    this.note,
-    this.selected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final typography = context.typography;
-    final rowStyle = typography.listRowTitle;
-    final isSelected = selected ?? false;
-
-    return MenuItemButton(
-      onPressed: onSelected,
-      style: isSelected
-          ? MenuItemButton.styleFrom(
-              backgroundColor: AppMenuTheme.selectedRowColor(colorScheme),
-            )
-          : null,
-      // Lines up glyphs of different widths (icons, "P", "S").
-      leadingIcon: SizedBox(width: 24, child: Center(child: icon)),
-      trailingIcon: isSelected
-          ? Icon(Icons.check, size: 18, color: colorScheme.onPrimaryContainer)
-          : null,
-      // A choice is read out like a radio button.
-      child: Semantics(
-        checked: selected,
-        inMutuallyExclusiveGroup: selected == null ? null : true,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: isSelected
-                  ? rowStyle.copyWith(fontWeight: FontWeight.w600)
-                  : rowStyle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (note != null)
-              Text(
-                note!,
-                // The menu's grey hint style at the app's smallest size.
-                style: typography.menuSectionLabel.copyWith(
-                  fontSize: typography.countBadge.fontSize,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-          ],
-        ),
       ),
     );
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// The look every dropdown menu shares (`MenuAnchor` and its submenus): the
-/// search match options and the reader's toolbar menus.
+/// search match options, the reader's toolbar menus and the research mode
+/// menu.
 abstract final class AppMenuTheme {
   /// Height a divider between two groups of menu rows takes.
   static const double dividerHeight = 13;

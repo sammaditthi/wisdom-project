@@ -5,13 +5,18 @@ import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../domain/entities/research/research_mode.dart';
 import '../../providers/research_mode_provider.dart';
+import '../common/dismissible_menu_anchor.dart';
+import '../common/menu_row.dart';
 import 'research_mode_ui.dart';
 
-/// The Fast/Thinking mode switch shown in the Research header (the reference
-/// mockup's top-right chip). Tapping it opens a menu of the two modes, each
-/// with a one-line hint and a check on the active one. The choice applies to
-/// the current chat and is remembered per-chat ([researchModeProvider] seeds
-/// it; the chat's summary stores it) — a new chat always starts on Fast.
+/// Width of the mode menu, fixed so it lines up with the chip's right edge.
+const double _menuWidth = 240;
+
+/// The Fast/Thinking mode switch in the Research composer. Tapping it opens a
+/// menu of the two modes, each with a one-line hint and a check on the active
+/// one. The choice applies to the current chat and is remembered per-chat
+/// ([researchModeProvider] seeds it; the chat's summary stores it) — a new
+/// chat always starts on Fast.
 ///
 /// Presentation is deliberately friendly — "Fast" / "Thinking", never raw
 /// Gemini model IDs. The per-tier fallback ladder stays a backend detail.
@@ -24,93 +29,56 @@ class ResearchModeSelector extends ConsumerWidget {
     final colors = Theme.of(context).colorScheme;
     final mode = ref.watch(researchModeProvider);
 
-    return PopupMenuButton<ResearchMode>(
-      tooltip: l10n.researchModeTooltip,
-      position: PopupMenuPosition.under,
-      onSelected: (m) => ref.read(researchModeProvider.notifier).set(m),
-      itemBuilder: (context) => [
+    return DismissibleMenuAnchor(
+      overlayId: 'research-mode-menu',
+      endAlignedWidth: _menuWidth,
+      menuChildren: [
         for (final m in ResearchMode.values)
-          PopupMenuItem<ResearchMode>(
-            value: m,
-            child: _ModeMenuRow(
-              icon: m.icon,
-              title: m.label(l10n),
-              hint: m.hint(l10n),
-              selected: m == mode,
-            ),
+          MenuRow(
+            icon: Icon(m.icon, size: 20, color: colors.onPrimaryContainer),
+            label: m.label(l10n),
+            note: m.hint(l10n),
+            selected: m == mode,
+            onSelected: () => ref.read(researchModeProvider.notifier).set(m),
           ),
       ],
       // The resting chip: current mode + a dropdown caret. It reads as a raised
       // pill by being a step LIGHTER than the composer fill it sits inside
       // (surfaceContainerHigh). The search scope-filter chips use the same
       // fill on their darker row; unlike them, this one needs no border.
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: colors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(mode.icon, size: 18, color: colors.onSurfaceVariant),
-            const SizedBox(width: 6),
-            // The scope-filter chips' label style — the same token as the
-            // chips this one borrows its fill trick from, and it scales with
-            // the composer it sits in.
-            Text(mode.label(l10n), style: context.typography.chipLabel),
-            Icon(Icons.arrow_drop_down,
-                size: 20, color: colors.onSurfaceVariant),
-          ],
+      builder: (context, controller, focusNode) => Semantics(
+        button: true,
+        expanded: controller.isOpen,
+        child: Tooltip(
+          message: l10n.researchModeTooltip,
+          child: Material(
+            color: colors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(20),
+            child: InkWell(
+              focusNode: focusNode,
+              borderRadius: BorderRadius.circular(20),
+              onTap: controller.toggle,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(mode.icon, size: 18, color: colors.onSurfaceVariant),
+                    const SizedBox(width: 6),
+                    // The scope-filter chips' label style — the same token as
+                    // the chips this one borrows its fill trick from, and it
+                    // scales with the composer it sits in.
+                    Text(mode.label(l10n), style: context.typography.chipLabel),
+                    Icon(Icons.arrow_drop_down,
+                        size: 20, color: colors.onSurfaceVariant),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
-    );
-  }
-}
-
-/// One row in the mode menu: leading check (only for the active mode) + icon,
-/// then the title over a muted one-line hint.
-class _ModeMenuRow extends StatelessWidget {
-  const _ModeMenuRow({
-    required this.icon,
-    required this.title,
-    required this.hint,
-    required this.selected,
-  });
-
-  final IconData icon;
-  final String title;
-  final String hint;
-  final bool selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        // Fixed-width check slot so titles align whether or not a row is ticked.
-        SizedBox(
-          width: 24,
-          child: selected
-              ? Icon(Icons.check, size: 18, color: colors.onPrimaryContainer)
-              : null,
-        ),
-        Icon(icon, size: 18, color: colors.onPrimaryContainer),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title),
-            Text(
-              hint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
