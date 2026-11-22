@@ -187,9 +187,10 @@ class _LayoutMenuButton extends ConsumerWidget {
   }
 }
 
-/// ⋮ More options: Copy link, Open on SuttaCentral where the text has a
-/// counterpart there, and on the web Open as HTML page. A generic menu, since
-/// most of its rows open the text elsewhere rather than share it.
+/// More options (⋯ on Apple platforms, ⋮ elsewhere): Copy link, Open on
+/// SuttaCentral where the text has a counterpart there, and on the web Open as
+/// HTML page. A generic menu, since most of its rows open the text elsewhere
+/// rather than share it.
 class _MoreMenuButton extends ConsumerWidget {
   final bool visible;
 
@@ -226,7 +227,7 @@ class _MoreMenuButton extends ConsumerWidget {
           ),
       ],
       builder: (context, controller, focusNode) => _ToolbarButton.icon(
-        Icons.more_vert,
+        Icons.adaptive.more,
         tooltip: l10n.moreOptions,
         onTap: controller.toggle,
         menuOpen: controller.isOpen,
