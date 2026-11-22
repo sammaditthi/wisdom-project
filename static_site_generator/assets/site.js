@@ -1,8 +1,9 @@
 /* The site's only script file.
  *
- * Two jobs, one file, because more files would be more requests for ~4 KB:
+ * Three jobs, one file, because more files would be more requests for ~4 KB:
  *   1. "read in the app" following the page's `#`;
- *   2. the search dialog.
+ *   2. copying the breadcrumb with its `›` marks;
+ *   3. the search dialog.
  *
  * The reading layout is not here: `?layout=` and the remembered choice are
  * applied by `layoutScript` (`lib/render/reading_layouts.dart`), inline after
@@ -79,7 +80,53 @@
   }
 
   /* ===================================================================== *
-   * 2 · Search                                                            *
+   * 2 · Copy the trail                                                    *
+   * ===================================================================== */
+
+  /* Each segment is a flex box with its `›` drawn by CSS, so the browser's own
+   * copy gives one name per line, no marks, and drops names collapsed by
+   * width. This joins the selected names with the mark the stylesheet draws,
+   * read back from it so the mark lives in `stylesheet.dart` alone. Only a
+   * selection inside the trail that touches two names or more; anything else
+   * is the browser's.
+   */
+  var trail = document.querySelector('.breadcrumb');
+  if (trail) {
+    document.addEventListener('copy', function (event) {
+      var selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      var range = selection.getRangeAt(0);
+      if (!trail.contains(range.commonAncestorContainer)) return;
+      var segments = trail.querySelectorAll(':scope > :not(.home)');
+      if (!segments.length) return;
+      var mark = getComputedStyle(segments[0], '::before').content;
+      if (!/^".+"$/.test(mark)) return;
+      var names = [];
+      for (var i = 0; i < segments.length; i++) {
+        if (!range.intersectsNode(segments[i])) continue;
+        var part = document.createRange();
+        part.selectNodeContents(segments[i]);
+        /* Trimmed to the selection, so half a name copies as half a name.
+         * `toString` reads the text, not the paint, so a selected name
+         * collapsed by width still copies. */
+        if (range.compareBoundaryPoints(Range.START_TO_START, part) > 0) {
+          part.setStart(range.startContainer, range.startOffset);
+        }
+        if (range.compareBoundaryPoints(Range.END_TO_END, part) < 0) {
+          part.setEnd(range.endContainer, range.endOffset);
+        }
+        var name = part.toString();
+        if (name) names.push(name);
+      }
+      if (names.length < 2) return;
+      event.clipboardData.setData(
+          'text/plain', names.join(' ' + mark.slice(1, -1) + ' '));
+      event.preventDefault();
+    });
+  }
+
+  /* ===================================================================== *
+   * 3 · Search                                                            *
    * ===================================================================== */
 
   var trigger = document.getElementById('search-open');
