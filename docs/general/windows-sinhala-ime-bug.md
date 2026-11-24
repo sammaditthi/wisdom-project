@@ -1,7 +1,7 @@
 # Windows Sinhala IME Bug — Investigation & Findings
 
-**Date:** 2026-03-18 (updated 2026-10-06)
-**Status:** Fix merged to Flutter master 2026-10-02 (PR #189968) — not in stable or beta yet; Windows retest pending
+**Date:** 2026-03-18 (updated 2026-11-25)
+**Status:** Fix (PR #189968) is in stable since Flutter 3.50.0, which the app is on; Windows retest pending
 **Affects:** Windows desktop only, Sinhala phonetic keyboard (and other IME-based scripts)
 
 ---
@@ -138,15 +138,10 @@ This has been present since IME support was first added for Windows in engine PR
 - Regression test `SetEditingStatePreservesComposingRange`.
 - No issue linked ("trivial field-read typo"), so no Flutter issue mentions Sinhala.
 
-### Release status (checked 2026-10-06)
+### Release status (checked 2026-11-25)
 
-| Channel | Version | Has the fix |
-|---------|---------|-------------|
-| stable | 3.47.6 (2026-10-01) | ❌ |
-| beta | 3.49.0-0.2.pre (2026-10-01) | ❌ not on `flutter-3.49-candidate.0`, no cherry-pick PR |
-| master | — | ✅ |
-
-Ships with the next beta branch cut (likely 3.50), then the stable after that.
+In stable since 3.50.0; `git merge-base --is-ancestor e5077f5 3.50.1` holds. The
+app moved to 3.50.1 on 2026-11-25.
 
 ### Other IME fixes that landed (but do NOT fix character dropping)
 
@@ -166,9 +161,8 @@ Flutter's Windows embedder uses **IMM32** (Win95-era legacy API), not **TSF** (T
 
 - [x] Test on Flutter master channel — still broken as of 2026-06-05 (pre-fix PR)
 - [x] [flutter/flutter#189968](https://github.com/flutter/flutter/pull/189968) merged to master 2026-10-02
-- [ ] **Retest Helakuru phonetic input on Windows with `flutter channel master`** — confirms the typo is the whole cause
-- [ ] File Sinhala-specific bug on the Flutter repo, referencing #189968 as the fix
-- [ ] Consider adding a hint/tooltip for Windows users pointing them to Singlish input until fix ships in stable
+- [ ] **Retest Helakuru phonetic input on Windows on stable 3.50.1** — confirms the typo is the whole cause
+- [ ] If it still drops characters: file a Sinhala-specific bug on the Flutter repo, referencing #189968
 
 
 -------------

@@ -15,12 +15,12 @@ Upgrade `flutter_riverpod` from 2.6.1 to 3.4.3 as a plain version bump, and turn
 | 3 | Settings save themselves | S | Optional |
 | 4 | Theme and font size load like other settings | S | Optional |
 | 5 | Action providers become notifier methods | M | Optional |
-| 6 | `riverpod_lint`, maybe code generation | S | Blocked until the Flutter 3.47 upgrade |
+| 6 | `riverpod_lint`, maybe code generation | S | Optional; unblocked by the Flutter 3.50 upgrade |
 
 Rules:
 
 - Step 1 is one PR on its own branch, cut from `main` after `feat/search-pane-redesign` merges.
-- Do it after the [Flutter 3.47 upgrade](flutter-3-47-upgrade-plan.md) has merged, never alongside it. That plan's step 3 reformats most files, so a Riverpod branch open at the same time would conflict on nearly every file it touches. Flutter goes first because it has a deadline (the November stable release). 3.4.3 works on both SDKs: it needs Dart ≥ 3.12, and Flutter 3.47.6's `flutter_test` pins `test_api` 0.7.12, inside Riverpod's `^0.7.0`.
+- Do it after the [Flutter 3.50 upgrade](flutter-3-50-upgrade-plan.md) has merged, never alongside it. That upgrade reformats most files, so a Riverpod branch open at the same time would conflict on nearly every file it touches. On its lock, `flutter_riverpod` 3.5.0 (the latest, 2026-11-06) resolves (dry run, 2026-11-25).
 - Steps 2–5 are separate PRs after step 1. Each is optional.
 - Step 1 has to edit some existing tests (imports, retry, one double override). The upgrade forces these edits, but CLAUDE.md says tests aren't changed without the user's OK, so ask before starting. Write no new tests; a separate agent does that.
 - When a step is done, set its status and add a handover note at the end of this doc.
@@ -105,11 +105,9 @@ Benchmarked on both versions as a compiled release build, best of 5 runs (µs = 
 - **It unlocks step 6.**
 - **Not useful here:** offline persistence and mutations (experimental), and pausing (our layout doesn't trigger it).
 
-### Blocked for now
+### No longer blocked
 
-- `riverpod_lint` 3.1.9 needs Dart ≥ 3.13.
-- `riverpod_generator` 4.0.9 needs `freezed_annotation ^3`; the pub solver refuses it with our Freezed 2.
-- The [Flutter 3.47 upgrade](flutter-3-47-upgrade-plan.md) brings Dart 3.13.5 and Freezed 4 (`freezed_annotation` 3.1), which removes both blocks. Re-check the resolution then.
+`riverpod_lint` needed Dart ≥ 3.13 and `riverpod_generator` needed `freezed_annotation ^3`. The [Flutter 3.50 upgrade](flutter-3-50-upgrade-plan.md) brings Dart 3.14.0 and Freezed 4 (`freezed_annotation` 3.1.0). On its lock, `flutter_riverpod` 3.5.0, `riverpod_lint` 3.2.0 and `riverpod_generator` 4.0.10 resolve together (dry run, 2026-11-25).
 
 ## Step 1 — The upgrade
 
@@ -202,8 +200,8 @@ Converting the 16 simple `StateProvider`s to `Notifier` classes. That adds a cla
 
 ## Step 6 — Later
 
-- `riverpod_lint`, once the Flutter 3.47 upgrade (Dart 3.13.5) has landed.
-- Code generation (`riverpod_generator`): possible once that upgrade's Freezed 4 is in, but probably not worth it. It would turn every provider into an annotated function or class.
+- `riverpod_lint`.
+- Code generation (`riverpod_generator`): possible now that Freezed 4 is in, but probably not worth it. It would turn every provider into an annotated function or class.
 
 ## How the findings were checked
 
