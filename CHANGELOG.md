@@ -3,6 +3,7 @@
 ## Unreleased
 ### New
 - Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next text, change the font size and more
+- Copy path in the reader's More options menu copies where the text sits in the Tipiṭaka
 
 ## 1.2.0 - 2026-11-08
 ### New
