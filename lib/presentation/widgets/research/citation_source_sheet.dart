@@ -59,7 +59,8 @@ class CitationSourceSheet extends ConsumerStatefulWidget {
 
 class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
   /// Once true, the copy button reads "Link copied" until the sheet closes —
-  /// a SnackBar would be hidden underneath the modal sheet.
+  /// a SnackBar would be hidden underneath the modal sheet. Each opening
+  /// builds a new sheet, so it starts false again.
   bool _copied = false;
 
   Future<void> _openInReader(String nodeKey) async {
@@ -204,9 +205,13 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
               label: Text(l10n.researchOpenInReader),
             ),
             TextButton.icon(
-              onPressed: _copied ? null : () => _copyLink(nodeKey),
+              // Stays enabled: a disabled button greys out a confirmation and
+              // drops keyboard focus. A second tap copies the link again.
+              onPressed: () => _copyLink(nodeKey),
               icon: Icon(_copied ? Icons.check : Icons.link, size: 18),
               label: Text(_copied ? l10n.linkCopied : l10n.copyLink),
+              // Copied: the tick after the label, as in the reader's snackbar.
+              iconAlignment: _copied ? IconAlignment.end : IconAlignment.start,
             ),
           ] else
             Text(

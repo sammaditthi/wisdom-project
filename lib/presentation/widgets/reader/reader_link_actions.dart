@@ -21,11 +21,12 @@ Future<void> copyActiveTabPath(BuildContext context, WidgetRef ref) async {
   final segments = ref.read(breadcrumbPathProvider);
   if (segments.isEmpty) return;
   final messenger = ScaffoldMessenger.of(context);
-  final message = AppLocalizations.of(context).pathCopied;
+  final snackBar =
+      _copiedSnackBar(context, AppLocalizations.of(context).pathCopied);
   await Clipboard.setData(ClipboardData(
     text: segments.map((s) => s.displayName).join(breadcrumbSeparator),
   ));
-  messenger.showSnackBar(SnackBar(content: Text(message)));
+  messenger.showSnackBar(snackBar);
 }
 
 /// Copies the active tab's shareable link and confirms with a SnackBar.
@@ -33,9 +34,29 @@ Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
   final link = _activeTabLink(ref);
   if (link == null) return;
   final messenger = ScaffoldMessenger.of(context);
-  final message = AppLocalizations.of(context).linkCopied;
+  final snackBar =
+      _copiedSnackBar(context, AppLocalizations.of(context).linkCopied);
   await ref.read(copyTipitakaLinkProvider)(link);
-  messenger.showSnackBar(SnackBar(content: Text(message)));
+  messenger.showSnackBar(snackBar);
+}
+
+/// A copy's confirmation: the message with a tick after it, as a chosen
+/// row's tick sits after its label.
+SnackBar _copiedSnackBar(BuildContext context, String message) {
+  return SnackBar(
+    content: Row(
+      children: [
+        Flexible(child: Text(message)),
+        const SizedBox(width: 12),
+        // The text's colour, as Material gives a snackbar's own ✕.
+        Icon(
+          Icons.check,
+          size: 20,
+          color: Theme.of(context).colorScheme.onInverseSurface,
+        ),
+      ],
+    ),
+  );
 }
 
 /// Opens the active tab's text on the static site, in a new tab. Web only.

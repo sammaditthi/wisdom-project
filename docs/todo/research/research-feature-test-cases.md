@@ -219,7 +219,7 @@ Override `suttaCentralRefResolverProvider` (fixed uid→nodeKey map) and, where 
 | W-SHEET-1 | Unresolved uid | English snippet shown; "not linked yet" note; NO action buttons | — | P0 |
 | W-SHEET-2 | Resolved uid | "Open in reader" + "Copy link" buttons present | — | P0 |
 | W-SHEET-3 | Snippet `**match**` markers | Matched terms bold, markers not visible | — | P1 |
-| W-SHEET-4 | Copy link | Clipboard gets the built URL; button flips to "Link copied" and disables | — | P1 |
+| W-SHEET-4 | Copy link | Clipboard gets the built URL; button flips to "Link copied" with the tick after it, still enabled (a second tap copies again); reopening the sheet shows "Copy link" | — | P1 |
 | W-SHEET-5 | "Open in reader" | Recording fake receives the right `nodeKey`; sheet pops | — | P0 |
 | W-SHEET-6 | Active session changes while sheet is open (switch/delete under the desktop panel) | Sheet auto-closes | **#5** | P0 |
 | W-SHEET-7 | Sinhala preview (override document providers) | Sutta's Sinhala title + up to 4 entries; empty-slice edge (sutta starting at page's last entry) renders nothing, no crash | — | P2 |
