@@ -48,18 +48,19 @@ sealed class Failure with _$Failure {
   }) = ApiFailure;
 
   /// Returns a user-friendly error message
-  String get userMessage {
-    return when(
-      dataLoadFailure: (message, _) => 'Failed to load data: $message',
-      dataParseFailure: (message, _) => 'Failed to parse data: $message',
-      notFoundFailure: (message) => 'Not found: $message',
-      invalidOperationFailure: (message) => 'Invalid operation: $message',
-      unexpectedFailure: (message, _) => 'Unexpected error: $message',
-      apiFailure: (message, _, __) => message, // verbatim — already user-ready
-    );
-  }
+  String get userMessage => switch (this) {
+    DataLoadFailure(:final message) => 'Failed to load data: $message',
+    DataParseFailure(:final message) => 'Failed to parse data: $message',
+    NotFoundFailure(:final message) => 'Not found: $message',
+    InvalidOperationFailure(:final message) => 'Invalid operation: $message',
+    UnexpectedFailure(:final message) => 'Unexpected error: $message',
+    ApiFailure(:final message) => message, // verbatim — already user-ready
+  };
 
   /// The error type when this is an [ApiFailure], else null. Lets the UI switch
   /// on the failure category (which message + whether to offer Retry).
-  ApiErrorType? get apiType => whenOrNull(apiFailure: (_, type, __) => type);
+  ApiErrorType? get apiType => switch (this) {
+    ApiFailure(:final type) => type,
+    _ => null,
+  };
 }

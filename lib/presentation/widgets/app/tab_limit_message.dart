@@ -16,7 +16,7 @@ class TabLimitMessage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Hide first so repeated taps don't queue up.
-    ref.listen<int>(tabLimitReachedProvider, (_, __) {
+    ref.listen<int>(tabLimitReachedProvider, (_, _) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(

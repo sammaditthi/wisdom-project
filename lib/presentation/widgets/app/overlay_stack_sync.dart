@@ -105,10 +105,10 @@ class OverlayStackSync extends ConsumerWidget {
     // for another sutta opening in the same tab (prev/next): Flutter replaces
     // the selected text without reporting the selection gone, and focus
     // leaves the reader, so Cmd+C would reach this fallback.
-    ref.listen<int>(activeTabIndexProvider, (_, __) {
+    ref.listen<int>(activeTabIndexProvider, (_, _) {
       ref.read(lastSelectedTextProvider.notifier).state = null;
     });
-    ref.listen<String?>(activeNodeKeyProvider, (_, __) {
+    ref.listen<String?>(activeNodeKeyProvider, (_, _) {
       ref.read(lastSelectedTextProvider.notifier).state = null;
     });
 

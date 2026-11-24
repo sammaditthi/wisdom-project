@@ -178,7 +178,7 @@ final currentTextLayersProvider = Provider<List<TextLayer>>((ref) {
       return layers;
     },
     loading: () => [],
-    error: (_, __) => [],
+    error: (_, _) => [],
   );
 });
 

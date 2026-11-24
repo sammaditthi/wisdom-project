@@ -63,7 +63,7 @@ class ChatHistoryPanel extends ConsumerWidget {
           child: summaries.when(
             // A prefs read is effectively instant — no spinner needed.
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => _emptyHint(l10n),
+            error: (_, _) => _emptyHint(l10n),
             data: (chats) => chats.isEmpty
                 ? _emptyHint(l10n)
                 : ListView.builder(

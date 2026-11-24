@@ -288,7 +288,7 @@ class _SinhalaSourcePreview extends ConsumerWidget {
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
       data: (doc) {
         final page = doc.getPageByIndex(node.entryPageIndex);
         final entries = page?.sinhalaSection.entries ?? const [];
