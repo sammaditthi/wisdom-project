@@ -86,7 +86,10 @@ else
   fi
 fi
 
-PROFILE="$PWD/.dart_tool/web-test-chrome"
+# Outside the repo: chromedriver starts Chrome as its own app, so macOS gives it
+# only Chrome's own folder permissions, and a profile under ~/Desktop (or
+# Documents, Downloads) fails to open when Chrome lacks that one.
+PROFILE="$HOME/Library/Caches/sammaditthi-web-test-chrome"
 CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 [ -x "$CHROME" ] || { echo "Google Chrome not found at $CHROME"; exit 1; }
 
