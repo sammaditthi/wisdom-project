@@ -282,8 +282,7 @@ void main() {
       await open(tester);
 
       final general = tester.getTopLeft(sidebarItem('General')).dy;
-      final shortcuts =
-          tester.getTopLeft(sidebarItem('Keyboard shortcuts')).dy;
+      final shortcuts = tester.getTopLeft(sidebarItem('Keyboard shortcuts')).dy;
       final anumodana = tester.getTopLeft(sidebarItem('Anumodanā')).dy;
       expect(general, lessThan(shortcuts));
       expect(shortcuts, lessThan(anumodana));

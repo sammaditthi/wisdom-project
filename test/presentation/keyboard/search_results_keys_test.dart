@@ -348,14 +348,11 @@ void main() {
   }, variant: mac);
 
   test('↓ tries results first, then scrolling', () {
-    final down = shortcutMap(TargetPlatform.macOS)
-        .entries
-        .singleWhere((e) {
-          final activator = e.key as SingleActivator;
-          return activator.trigger == LogicalKeyboardKey.arrowDown &&
-              !activator.meta;
-        })
-        .value as PrioritizedIntents;
+    final down = shortcutMap(TargetPlatform.macOS).entries.singleWhere((e) {
+      final activator = e.key as SingleActivator;
+      return activator.trigger == LogicalKeyboardKey.arrowDown &&
+          !activator.meta;
+    }).value as PrioritizedIntents;
     expect(
       down.orderedIntents.map((i) => i.runtimeType),
       [MoveIntoSearchResultsIntent, NextSearchResultIntent, ScrollReaderIntent],
