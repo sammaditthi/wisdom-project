@@ -208,10 +208,10 @@ void main() {
       expect(find.text(l10n.anumodanaDpdLicence), findsOneWidget);
       expect(find.byTooltip(l10n.openLinkTo(dpd.name)), findsOneWidget);
 
-      // Seven links in all, as in the macOS app: the two sources, DPD, the
-      // three Transliteration rows and the moon images' credit. No other
-      // dictionary has one, so DPD's is the only one among them.
-      expect(find.byIcon(Icons.open_in_new), findsNWidgets(7));
+      // Eight links in all, as in the macOS app: the two sources, DPD, the
+      // three Transliteration rows, the moon images' credit and Buddhist Sun.
+      // No other dictionary has one, so DPD's is the only one among them.
+      expect(find.byIcon(Icons.open_in_new), findsNWidgets(8));
     }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
   });
 

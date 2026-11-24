@@ -116,7 +116,7 @@ in the macOS app and in any build made with `--dart-define=ENABLE_HOME=true`.
 `scripts/app/web/deploy.sh` passes `true` for dev and `false` for prod. Off:
 
 - Home is not in the rail or the bottom bar, and is not built at all.
-- Settings has no Time tab, and Anumodanā no Images section.
+- Settings has no Time tab, and Anumodanā no Images or Inspiration section.
 
 Web still loads the moon photos on an install (see *Moon photos*), so a
 database update made while the toggle is off still counts.
@@ -500,7 +500,7 @@ the card works out itself. No integration test.
   open card at once, and kept after a restart.
 - `test/presentation/widgets/home/today_card_test.dart`: the midday countdown
   rounds up (40 s reads "1 min") and says "1 h", not "1 h 0 min".
-- `anumodana_page_test.dart`, run as macOS, where Home is on: seven links,
+- `anumodana_page_test.dart`, run as macOS, where Home is on: eight links,
   and the Images section with its NASA link.
 
 Left out on purpose: the sky, the moon photo, sunset, the arc, the card's
@@ -511,7 +511,9 @@ the card.
 only the Anumodanā checks above, run as macOS, see Home. When Home ships,
 `app_shell_test.dart` (Home reads `keyValueStoreProvider`, the rail gains a
 destination) and `settings_dialog_test.dart` ("three tabs" becomes four) need
-work.
+work, and in `anumodana_page_test.dart` the NASA test and "DPD alone carries
+its citation and its link" drop their macOS-only `variant:` and the "macOS
+app" wording.
 
 ## Done when
 
