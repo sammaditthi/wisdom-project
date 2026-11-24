@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/search_match_finder.dart';
 import '../../../core/utils/text_utils.dart';
@@ -87,16 +88,22 @@ class HighlightedFtsSearchText extends ConsumerWidget {
     final String displaySnippet;
     final List<({int start, int end})> displayRanges;
     if (language == 'pali') {
-      (displaySnippet, displayRanges) =
-          applyConjunctsWithRangeMapping(snippet, rawRanges, options);
+      (displaySnippet, displayRanges) = applyConjunctsWithRangeMapping(
+        snippet,
+        rawRanges,
+        options,
+      );
     } else {
       displaySnippet = snippet;
       displayRanges = rawRanges;
     }
 
     // Build spans from ranges
-    final spans =
-        _buildSpansFromRanges(displaySnippet, displayRanges, highlightStyle);
+    final spans = _buildSpansFromRanges(
+      displaySnippet,
+      displayRanges,
+      highlightStyle,
+    );
 
     return RichText(
       text: TextSpan(style: baseStyle, children: spans),
@@ -185,10 +192,12 @@ class HighlightedFtsSearchText extends ConsumerWidget {
       if (range.start > pos) {
         spans.add(TextSpan(text: text.substring(pos, range.start)));
       }
-      spans.add(TextSpan(
-        text: text.substring(range.start, range.end),
-        style: highlightStyle,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(range.start, range.end),
+          style: highlightStyle,
+        ),
+      );
       pos = range.end;
     }
 

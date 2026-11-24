@@ -182,8 +182,10 @@ class SinglishTransliterator {
     // Step 3: Replace consonant + vowel (CRITICAL: uses simple string replace)
     for (final cons in _consonants) {
       for (final vowel in _vowels) {
-        text =
-            text.replaceAll('${cons[0]}${vowel[0]}', '${cons[1]}${vowel[2]}');
+        text = text.replaceAll(
+          '${cons[0]}${vowel[0]}',
+          '${cons[1]}${vowel[2]}',
+        );
       }
     }
 

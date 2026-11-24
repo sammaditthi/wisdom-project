@@ -38,5 +38,6 @@ class ReaderKeyboardBridge {
   }
 }
 
-final readerKeyboardBridgeProvider =
-    Provider<ReaderKeyboardBridge>((ref) => ReaderKeyboardBridge());
+final readerKeyboardBridgeProvider = Provider<ReaderKeyboardBridge>(
+  (ref) => ReaderKeyboardBridge(),
+);

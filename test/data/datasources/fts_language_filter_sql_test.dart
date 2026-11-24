@@ -33,12 +33,14 @@ void main() {
     // Same logical entry in two languages; both contain the search term, so
     // only the language filter distinguishes them. DB stores Sinhala as 'sinh'.
     await db.customStatement(
-        "INSERT INTO bjt_fts(rowid, text) VALUES (1, 'dhamma pali');");
+      "INSERT INTO bjt_fts(rowid, text) VALUES (1, 'dhamma pali');",
+    );
     await db.customStatement(
       "INSERT INTO bjt_meta VALUES (1, 'dn-1', '0-0', 'pali', 'p', 0, 'dn-1');",
     );
     await db.customStatement(
-        "INSERT INTO bjt_fts(rowid, text) VALUES (2, 'dhamma sinh');");
+      "INSERT INTO bjt_fts(rowid, text) VALUES (2, 'dhamma sinh');",
+    );
     await db.customStatement(
       "INSERT INTO bjt_meta VALUES (2, 'dn-1', '0-0', 'sinh', 'p', 0, 'dn-1');",
     );
@@ -49,8 +51,10 @@ void main() {
   // Mirrors searchFullText's JOIN + optional language clause.
   Future<List<String>> matchedLanguages(String? language) async {
     final sql = StringBuffer()
-      ..write('SELECT m.language FROM bjt_fts '
-          'JOIN bjt_meta m ON bjt_fts.rowid = m.id WHERE bjt_fts MATCH ?');
+      ..write(
+        'SELECT m.language FROM bjt_fts '
+        'JOIN bjt_meta m ON bjt_fts.rowid = m.id WHERE bjt_fts MATCH ?',
+      );
     final args = <Object>['dhamma'];
 
     final clause = ScopeFilterService.buildLanguageClause(language);
@@ -70,16 +74,19 @@ void main() {
     final needsMetaJoin = language != null;
 
     if (needsMetaJoin) {
-      buffer.write('SELECT COUNT(*) as count FROM bjt_fts t '
-          'JOIN bjt_meta m ON t.rowid = m.id WHERE bjt_fts MATCH ?');
+      buffer.write(
+        'SELECT COUNT(*) as count FROM bjt_fts t '
+        'JOIN bjt_meta m ON t.rowid = m.id WHERE bjt_fts MATCH ?',
+      );
       final clause = ScopeFilterService.buildLanguageClause(language);
       if (clause != null) {
         buffer.write(' AND $clause');
         args.addAll(ScopeFilterService.getLanguageParams(language));
       }
     } else {
-      buffer
-          .write('SELECT COUNT(*) as count FROM bjt_fts WHERE bjt_fts MATCH ?');
+      buffer.write(
+        'SELECT COUNT(*) as count FROM bjt_fts WHERE bjt_fts MATCH ?',
+      );
     }
     final rows = await db.rawQuery(buffer.toString(), args);
     return rows.first['count'] as int;
@@ -90,8 +97,10 @@ void main() {
   // clauses together. Re-runs the real shared builders for each clause.
   Future<int> countScopedLang(Set<String> scope, String? language) async {
     final buffer = StringBuffer()
-      ..write('SELECT COUNT(*) as count FROM bjt_fts t '
-          'JOIN bjt_meta m ON t.rowid = m.id WHERE bjt_fts MATCH ?');
+      ..write(
+        'SELECT COUNT(*) as count FROM bjt_fts t '
+        'JOIN bjt_meta m ON t.rowid = m.id WHERE bjt_fts MATCH ?',
+      );
     final args = <Object>['dhamma'];
 
     final scopeClause = ScopeFilterService.buildWhereClause(scope);
@@ -128,8 +137,7 @@ void main() {
       expect(await countMatches(null), 2);
     });
 
-    test(
-        "'pali' → joined count of just the Pali row "
+    test("'pali' → joined count of just the Pali row "
         '(guards the needsMetaJoin branch)', () async {
       expect(await countMatches('pali'), 1);
     });
@@ -148,17 +156,26 @@ void main() {
       // row 3: the 'atta-an-1' heading    row 4: a sutta under it
       // row 5: 'atta-an-10', the TENTH sibling — not a child of 'atta-an-1'
       await db.customStatement(
-          "INSERT INTO bjt_fts(rowid, text) VALUES (3, 'dhamma pali');");
-      await db.customStatement("INSERT INTO bjt_meta VALUES "
-          "(3, 'atta-an-1', '0-0', 'pali', 'p', 0, 'atta-an-1');");
+        "INSERT INTO bjt_fts(rowid, text) VALUES (3, 'dhamma pali');",
+      );
       await db.customStatement(
-          "INSERT INTO bjt_fts(rowid, text) VALUES (4, 'dhamma pali');");
-      await db.customStatement("INSERT INTO bjt_meta VALUES "
-          "(4, 'atta-an-1', '1-0', 'pali', 'p', 0, 'atta-an-1-2');");
+        "INSERT INTO bjt_meta VALUES "
+        "(3, 'atta-an-1', '0-0', 'pali', 'p', 0, 'atta-an-1');",
+      );
       await db.customStatement(
-          "INSERT INTO bjt_fts(rowid, text) VALUES (5, 'dhamma pali');");
-      await db.customStatement("INSERT INTO bjt_meta VALUES "
-          "(5, 'atta-an-10', '0-0', 'pali', 'p', 0, 'atta-an-10');");
+        "INSERT INTO bjt_fts(rowid, text) VALUES (4, 'dhamma pali');",
+      );
+      await db.customStatement(
+        "INSERT INTO bjt_meta VALUES "
+        "(4, 'atta-an-1', '1-0', 'pali', 'p', 0, 'atta-an-1-2');",
+      );
+      await db.customStatement(
+        "INSERT INTO bjt_fts(rowid, text) VALUES (5, 'dhamma pali');",
+      );
+      await db.customStatement(
+        "INSERT INTO bjt_meta VALUES "
+        "(5, 'atta-an-10', '0-0', 'pali', 'p', 0, 'atta-an-10');",
+      );
     });
 
     test("counts the node's own row and its descendants'", () async {
@@ -180,7 +197,8 @@ void main() {
       // Add a third 'dhamma' row: Pali, but in a DIFFERENT location (mn-1).
       //   row 1: pali / dn-1     row 2: sinh / dn-1     row 3: pali / mn-1
       await db.customStatement(
-          "INSERT INTO bjt_fts(rowid, text) VALUES (3, 'dhamma pali');");
+        "INSERT INTO bjt_fts(rowid, text) VALUES (3, 'dhamma pali');",
+      );
       await db.customStatement(
         "INSERT INTO bjt_meta VALUES (3, 'mn-1', '0-0', 'pali', 'p', 0, 'mn-1');",
       );

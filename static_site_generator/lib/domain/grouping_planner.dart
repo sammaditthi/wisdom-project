@@ -98,9 +98,7 @@ class GroupingPlanner {
     if (children.length == 1) return {children.first.nodeKey};
 
     final slicer = slicerFor(fileIds.first!);
-    final isShort = [
-      for (final child in children) _isShort(child, slicer),
-    ];
+    final isShort = [for (final child in children) _isShort(child, slicer)];
 
     // Every leaf short: the chapter covers the whole vagga and sits at the
     // container's own URL, so the first leaf folds too. This is the *only*

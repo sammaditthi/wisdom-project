@@ -11,10 +11,7 @@ void main() {
       expect(SuttaCentralRefResolver.parseRef('SN 15:3'), 'sn15.3');
       // A book name with one space.
       expect(SuttaCentralRefResolver.parseRef('Tha Ap 1'), 'tha-ap1');
-      expect(
-        SuttaCentralRefResolver.parseRef('Bu Pj 1'),
-        'pli-tv-bu-vb-pj1',
-      );
+      expect(SuttaCentralRefResolver.parseRef('Bu Pj 1'), 'pli-tv-bu-vb-pj1');
       // A range as SuttaCentral writes it.
       expect(SuttaCentralRefResolver.parseRef('Dhp 1-20'), 'dhp1-20');
     });

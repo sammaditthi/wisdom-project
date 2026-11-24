@@ -39,7 +39,8 @@ void main() {
         if (renderObject == null || !renderObject.attached) continue;
         final viewport = RenderAbstractViewport.maybeOf(renderObject);
         if (viewport == null) continue;
-        final diff = controller.offset -
+        final diff =
+            controller.offset -
             viewport.getOffsetToReveal(renderObject, 0.0).offset;
         final dist = diff >= 0 ? diff + 0.5 : -diff;
         if (dist < smallest) {
@@ -120,15 +121,17 @@ void main() {
             await pumpForSettle(tester, const Duration(seconds: 1));
             if (controller.offset == before) return;
           }
-          fail('The reveal never came to rest: the offset was still moving '
-              'after 12 settles, last at ${controller.offset}');
+          fail(
+            'The reveal never came to rest: the offset was still moving '
+            'after 12 settles, last at ${controller.offset}',
+          );
         }
 
         // Helper — drive the layout provider, wait for the reveal, then read
         // back the resulting state. Returns a record so each assertion can
         // quote the actual values in its `reason:` string for clean failures.
         Future<({double before, ReaderLayout layout, (int, int)? top})>
-            switchTo(ReaderLayout layout) async {
+        switchTo(ReaderLayout layout) async {
           container.read(updateActiveTabLayoutProvider)(layout);
           await settleUntilStill();
           return (
@@ -145,10 +148,14 @@ void main() {
         // settles at.
         final atTop = await switchTo(ReaderLayout.sideBySide);
         expect(atTop.layout, ReaderLayout.sideBySide);
-        expect(atTop.top, isNotNull,
-            reason: 'The reader must have keyed entries mounted for any of '
-                'this to be measurable — a null top entry means nothing was '
-                'found to compare, not that the switch behaved');
+        expect(
+          atTop.top,
+          isNotNull,
+          reason:
+              'The reader must have keyed entries mounted for any of '
+              'this to be measurable — a null top entry means nothing was '
+              'found to compare, not that the switch behaved',
+        );
 
         // ---- PHASE 2: a scrolled position is carried across ----
 
@@ -169,7 +176,8 @@ void main() {
         expect(
           controller.offset,
           greaterThan(0),
-          reason: 'jumpTo(1200) must produce a non-zero offset before a '
+          reason:
+              'jumpTo(1200) must produce a non-zero offset before a '
               'moved-off-the-top entry can be proved to survive — if the '
               'offset is 0 the laid-out list is shorter than 1200px and '
               'the test setup, not the layout listener, is the problem',
@@ -179,12 +187,19 @@ void main() {
         // *this* entry coming back, not about the viewport merely ending up
         // somewhere below the top.
         final scrolledTo = topVisibleEntry(tester, controller);
-        expect(scrolledTo, isNotNull,
-            reason: 'A scrolled viewport must still have a top entry');
-        expect(scrolledTo, isNot(atTop.top),
-            reason: 'jumpTo(1200) has to cross an entry boundary — if the top '
-                'entry is still the unit\'s first one there is no reading '
-                'position to lose and phases 2-3 prove nothing');
+        expect(
+          scrolledTo,
+          isNotNull,
+          reason: 'A scrolled viewport must still have a top entry',
+        );
+        expect(
+          scrolledTo,
+          isNot(atTop.top),
+          reason:
+              'jumpTo(1200) has to cross an entry boundary — if the top '
+              'entry is still the unit\'s first one there is no reading '
+              'position to lose and phases 2-3 prove nothing',
+        );
 
         // sideBySide → stacked. The listener captures sideBySide's top
         // entry and anchors stacked at it — never at the top, because
@@ -194,7 +209,8 @@ void main() {
         expect(
           posA.before,
           greaterThan(atTop.before),
-          reason: 'The entry at the top of sideBySide is pages into the '
+          reason:
+              'The entry at the top of sideBySide is pages into the '
               'unit, so stacked must open on it with the unit above it — '
               '${posA.before}px above vs reference ${atTop.before}. Falling '
               'back to the reference is the old behaviour: the switch reset '
@@ -203,7 +219,8 @@ void main() {
         expect(
           posA.top,
           scrolledTo,
-          reason: 'The entry at the top of sideBySide must be the entry at '
+          reason:
+              'The entry at the top of sideBySide must be the entry at '
               'the top of stacked. Revealing the WRONG entry also leaves the '
               'viewport below the reference, so the offset above cannot tell '
               'the two apart — expected $scrolledTo, got ${posA.top}',
@@ -219,14 +236,16 @@ void main() {
         expect(
           posASurvived.before,
           greaterThan(atTop.before),
-          reason: 'stacked → sinhalaOnly with no re-scroll must keep the '
+          reason:
+              'stacked → sinhalaOnly with no re-scroll must keep the '
               'reading position — ${posASurvived.before}px above vs '
               'reference ${atTop.before}',
         );
         expect(
           posASurvived.top,
           scrolledTo,
-          reason: 'Still the same entry two layouts on — expected '
+          reason:
+              'Still the same entry two layouts on — expected '
               '$scrolledTo, got ${posASurvived.top}',
         );
 
@@ -242,8 +261,11 @@ void main() {
           await tester.pump();
         }
         await pumpForSettle(tester, const Duration(seconds: 1));
-        expect(controller.position.extentBefore, 0,
-            reason: 'Phase 4 needs the viewport at the very top of the unit');
+        expect(
+          controller.position.extentBefore,
+          0,
+          reason: 'Phase 4 needs the viewport at the very top of the unit',
+        );
 
         // Deliberately back into sideBySide, the layout phase 1 measured,
         // so this compares like with like.
@@ -252,7 +274,8 @@ void main() {
         expect(
           posB.before,
           closeTo(atTop.before, 1.0),
-          reason: 'After scrolling back to the top, the switch must come back '
+          reason:
+              'After scrolling back to the top, the switch must come back '
               'up with it: the unit\'s first entry in sideBySide is where '
               'phase 1 landed, ${atTop.before}px above. ${posB.before}px '
               'means the listener reused an earlier capture (phase 2 left '
@@ -262,7 +285,8 @@ void main() {
         expect(
           posB.top,
           atTop.top,
-          reason: 'And it must be the unit\'s first entry that came back '
+          reason:
+              'And it must be the unit\'s first entry that came back '
               '(${atTop.top}), not the one phase 2 left at the top '
               '($scrolledTo)',
         );
@@ -346,7 +370,8 @@ void main() {
         expect(
           sinhalaState.currentMatchIndex,
           sinhalaCount > 0 ? 0 : -1,
-          reason: 'Recompute should reset currentMatchIndex to 0 '
+          reason:
+              'Recompute should reset currentMatchIndex to 0 '
               '(or -1 if the new layout has no matches)',
         );
 
@@ -360,7 +385,8 @@ void main() {
         expect(
           sideBySideState.matchCount,
           paliCount + sinhalaCount,
-          reason: 'sideBySide count must equal paliOnly + sinhalaOnly: '
+          reason:
+              'sideBySide count must equal paliOnly + sinhalaOnly: '
               '$paliCount + $sinhalaCount, got ${sideBySideState.matchCount}',
         );
 
@@ -374,14 +400,16 @@ void main() {
         expect(
           restoredState.matchCount,
           paliCount,
-          reason: 'Returning to paliOnly must restore the original '
+          reason:
+              'Returning to paliOnly must restore the original '
               'match count: expected $paliCount, got '
               '${restoredState.matchCount}',
         );
         expect(
           restoredState.currentMatchIndex,
           0,
-          reason: 'Recompute resets index to 0 — update this when the '
+          reason:
+              'Recompute resets index to 0 — update this when the '
               'currentMatchIndex preservation follow-up lands',
         );
         expect(
@@ -450,7 +478,8 @@ void main() {
         expect(
           matchCount,
           10,
-          reason: '"සීල" in dn-1-1 sideBySide should yield 10 matches '
+          reason:
+              '"සීල" in dn-1-1 sideBySide should yield 10 matches '
               '(see _findAllMatches: Pali + Sinhala sections scanned). '
               'Got $matchCount — repro depends on this exact count.',
         );
@@ -479,7 +508,8 @@ void main() {
         expect(
           readSearchState(container, 0).matches,
           isEmpty,
-          reason: 'Layout switch with search hidden must drop stale '
+          reason:
+              'Layout switch with search hidden must drop stale '
               'matches — openSearch will recompute on reopen',
         );
 
@@ -493,7 +523,8 @@ void main() {
         expect(
           readSearchState(container, 0).matchCount,
           10,
-          reason: 'Reopen must recompute against stacked (still both '
+          reason:
+              'Reopen must recompute against stacked (still both '
               'langs scanned) — count unchanged',
         );
         expect(
@@ -504,8 +535,10 @@ void main() {
 
         final first = readSearchState(container, 0).currentMatch!;
         expect(
-            isEntryOnScreen(tester, first.pageIndex, first.entryIndex), isTrue,
-            reason: 'Reopening search must bring match[0] on screen');
+          isEntryOnScreen(tester, first.pageIndex, first.entryIndex),
+          isTrue,
+          reason: 'Reopening search must bring match[0] on screen',
+        );
 
         // Step forward 5 times — reaches match[5] (page 6 entry 4 si,
         // "මජ්ඣිමසීලය"). This is several pages below match[0]'s position
@@ -525,7 +558,8 @@ void main() {
         expect(
           isEntryOnScreen(tester, fifth.pageIndex, fifth.entryIndex),
           isTrue,
-          reason: 'After 5 next-taps past cacheExtent, match[5]\'s row '
+          reason:
+              'After 5 next-taps past cacheExtent, match[5]\'s row '
               '(${fifth.pageIndex}, ${fifth.entryIndex}) must be on screen. '
               'Off screen means the reveal gave up before reaching the '
               'match — the scroll stopped while the index advanced.',
@@ -591,8 +625,9 @@ void main() {
         // 3. New tabs now seed from the saved layout, and the saved value
         //    wins over the orientation default in BOTH orientations
         //    (sinhalaOnly is neither orientation's default).
-        final idxLandscape =
-            container.read(openTabFromNodeKeyProvider)('dn-1-1');
+        final idxLandscape = container.read(openTabFromNodeKeyProvider)(
+          'dn-1-1',
+        );
         await pumpForSettle(tester);
         expect(
           container.read(tabsProvider)[idxLandscape].layout,
@@ -600,8 +635,10 @@ void main() {
           reason: 'New landscape tab seeds from saved layout, not sideBySide',
         );
 
-        final idxPortrait = container.read(openTabFromNodeKeyProvider)('dn-1-1',
-            isPortraitMode: true);
+        final idxPortrait = container.read(openTabFromNodeKeyProvider)(
+          'dn-1-1',
+          isPortraitMode: true,
+        );
         await pumpForSettle(tester);
         expect(
           container.read(tabsProvider)[idxPortrait].layout,
@@ -611,8 +648,10 @@ void main() {
 
         // 4. Existing tab keeps its own layout — switching never re-seeds.
         //    Simulate a tab saved earlier in a different layout (sideBySide).
-        final yesterdayTab = tabFromNode(container, 'dn-1-1')
-            .copyWith(layout: ReaderLayout.sideBySide);
+        final yesterdayTab = tabFromNode(
+          container,
+          'dn-1-1',
+        ).copyWith(layout: ReaderLayout.sideBySide);
         container.read(tabsProvider.notifier).addTab(yesterdayTab);
         final idxYesterday = container.read(tabsProvider).length - 1;
 
@@ -627,13 +666,15 @@ void main() {
         expect(
           container.read(activeReaderLayoutProvider),
           ReaderLayout.sideBySide,
-          reason: 'Reader shows the active tab\'s own layout, not the global '
+          reason:
+              'Reader shows the active tab\'s own layout, not the global '
               'last-used value',
         );
         expect(
           container.read(lastReaderLayoutProvider),
           ReaderLayout.sinhalaOnly,
-          reason: 'Merely switching tabs must not overwrite the last-used '
+          reason:
+              'Merely switching tabs must not overwrite the last-used '
               'layout',
         );
       },

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../domain/entities/navigation/tipitaka_tree_node.dart';
 import '../models/reader_tab.dart';
 import 'fts_highlight_provider.dart';
@@ -20,8 +21,9 @@ import 'tab_provider.dart';
 /// Extracted to a separate file (like [syncNavigatorToActiveTabProvider]) to
 /// avoid circular imports between tab_provider, fts_highlight_provider, and
 /// in_page_search_provider.
-final navigateToSuttaProvider =
-    Provider<void Function(TipitakaTreeNode)>((ref) {
+final navigateToSuttaProvider = Provider<void Function(TipitakaTreeNode)>((
+  ref,
+) {
   return (TipitakaTreeNode target) {
     final activeIndex = ref.read(activeTabIndexProvider);
     final tabs = ref.read(tabsProvider);

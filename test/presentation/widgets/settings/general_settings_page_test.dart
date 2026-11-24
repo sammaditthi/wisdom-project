@@ -53,12 +53,14 @@ void main() {
   }) async {
     tester.useWindow(window);
 
-    final container = createTestContainer(overrides: [
-      // Pinned: the default resolves from the host's locales, which would make
-      // the App Language selector's starting segment machine-dependent.
-      deviceLocalesProvider.overrideWithValue(const [Locale('en')]),
-      ...overrides,
-    ]);
+    final container = createTestContainer(
+      overrides: [
+        // Pinned: the default resolves from the host's locales, which would make
+        // the App Language selector's starting segment machine-dependent.
+        deviceLocalesProvider.overrideWithValue(const [Locale('en')]),
+        ...overrides,
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(
@@ -80,14 +82,13 @@ void main() {
   }
 
   /// A segment of [T]'s selector, by the label or icon inside it.
-  Finder segment<T>(Finder inner) => find.descendant(
-        of: find.byType(SegmentedButton<T>),
-        matching: inner,
-      );
+  Finder segment<T>(Finder inner) =>
+      find.descendant(of: find.byType(SegmentedButton<T>), matching: inner);
 
   group('GeneralSettingsPage structure', () {
-    testWidgets('five sections, each setting under its own heading',
-        (tester) async {
+    testWidgets('five sections, each setting under its own heading', (
+      tester,
+    ) async {
       await pumpPage(tester);
 
       expect(find.text('Appearance'), findsOneWidget);
@@ -118,8 +119,9 @@ void main() {
       expect(find.text('Hide navigation bar'), findsNothing);
     });
 
-    testWidgets('nothing overflows at a phone width or a narrow dialog',
-        (tester) async {
+    testWidgets('nothing overflows at a phone width or a narrow dialog', (
+      tester,
+    ) async {
       for (final width in const [390.0, 760.0]) {
         await pumpPage(tester, window: Size(width, 1600));
         expect(tester.takeException(), isNull, reason: '$width px');
@@ -128,8 +130,9 @@ void main() {
   });
 
   group('GeneralSettingsPage theme', () {
-    testWidgets('Light and Dark are icons with their names as tooltips',
-        (tester) async {
+    testWidgets('Light and Dark are icons with their names as tooltips', (
+      tester,
+    ) async {
       final container = await pumpPage(tester);
 
       final selector = tester.widget<SegmentedButton<AppThemeMode>>(
@@ -143,16 +146,21 @@ void main() {
       // announces for the segment. So neither word is on screen as text.
       expect(find.text('Light'), findsNothing);
       expect(find.text('Dark'), findsNothing);
-      expect(selector.segments.map((s) => s.tooltip).toList(),
-          equals(const ['Light', 'Dark']));
+      expect(
+        selector.segments.map((s) => s.tooltip).toList(),
+        equals(const ['Light', 'Dark']),
+      );
 
       expect(
-          selector.selected, equals({container.read(themeNotifierProvider)}));
+        selector.selected,
+        equals({container.read(themeNotifierProvider)}),
+      );
       expect(selector.selected, equals({AppThemeMode.light}));
     });
 
-    testWidgets('Dark is disabled and says so, and a tap cannot select it',
-        (tester) async {
+    testWidgets('Dark is disabled and says so, and a tap cannot select it', (
+      tester,
+    ) async {
       final container = await pumpPage(tester);
 
       final selector = tester.widget<SegmentedButton<AppThemeMode>>(
@@ -169,18 +177,23 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(container.read(themeNotifierProvider), AppThemeMode.light,
-          reason: 'enabled: false must hold, or the near-black theme ships');
+      expect(
+        container.read(themeNotifierProvider),
+        AppThemeMode.light,
+        reason: 'enabled: false must hold, or the near-black theme ships',
+      );
     });
   });
 
   group('GeneralSettingsPage language', () {
-    testWidgets('App language is self-labelled, and a tap writes it',
-        (tester) async {
+    testWidgets('App language is self-labelled, and a tap writes it', (
+      tester,
+    ) async {
       final store = InMemoryKeyValueStore();
-      final container = await pumpPage(tester, overrides: [
-        keyValueStoreProvider.overrideWithValue(store),
-      ]);
+      final container = await pumpPage(
+        tester,
+        overrides: [keyValueStoreProvider.overrideWithValue(store)],
+      );
 
       expect(segment<AppLanguage>(find.text('English')), findsOneWidget);
       expect(segment<AppLanguage>(find.text('සිංහල')), findsOneWidget);
@@ -193,8 +206,9 @@ void main() {
       expect(store.getString(StorageKeys.appLanguage), 'sinhala');
     });
 
-    testWidgets('Content language reads Pali | සිංහල, and a tap writes it',
-        (tester) async {
+    testWidgets('Content language reads Pali | සිංහල, and a tap writes it', (
+      tester,
+    ) async {
       final container = await pumpPage(tester);
 
       // Self-labelled like App language, from the two keys the search Refine
@@ -211,8 +225,9 @@ void main() {
       expect(container.read(contentLanguageProvider), ContentLanguage.sinhala);
     });
 
-    testWidgets('සිංහල labels two different selectors, so finders must scope',
-        (tester) async {
+    testWidgets('සිංහල labels two different selectors, so finders must scope', (
+      tester,
+    ) async {
       await pumpPage(tester);
 
       // App language's own-language label and Content language's Sinhala
@@ -221,8 +236,9 @@ void main() {
       expect(find.text('සිංහල'), findsNWidgets(2));
     });
 
-    testWidgets('the content selector shows the effective (clamped) value',
-        (tester) async {
+    testWidgets('the content selector shows the effective (clamped) value', (
+      tester,
+    ) async {
       // Saved raw = Pali, but this edition only offers Sinhala.
       const sinhalaOnlyEdition = Edition(
         editionId: 'stub-si',
@@ -231,12 +247,15 @@ void main() {
         type: EditionType.local,
         availableLanguages: ['si'],
       );
-      final container = await pumpPage(tester, overrides: [
-        keyValueStoreProvider.overrideWithValue(
-          InMemoryKeyValueStore({StorageKeys.contentLanguage: 'pali'}),
-        ),
-        currentEditionProvider.overrideWithValue(sinhalaOnlyEdition),
-      ]);
+      final container = await pumpPage(
+        tester,
+        overrides: [
+          keyValueStoreProvider.overrideWithValue(
+            InMemoryKeyValueStore({StorageKeys.contentLanguage: 'pali'}),
+          ),
+          currentEditionProvider.overrideWithValue(sinhalaOnlyEdition),
+        ],
+      );
 
       final selector = tester.widget<SegmentedButton<ContentLanguage>>(
         find.byType(SegmentedButton<ContentLanguage>),
@@ -254,8 +273,9 @@ void main() {
   });
 
   group('GeneralSettingsPage Pali letters', () {
-    testWidgets('the sample is transformed, never the raw line',
-        (tester) async {
+    testWidgets('the sample is transformed, never the raw line', (
+      tester,
+    ) async {
       await pumpPage(tester);
 
       // All eight switch combinations render this line differently, and the
@@ -268,8 +288,9 @@ void main() {
       );
     });
 
-    testWidgets('the sample follows a switch the instant it flips',
-        (tester) async {
+    testWidgets('the sample follows a switch the instant it flips', (
+      tester,
+    ) async {
       final container = await pumpPage(tester);
 
       final before = beautifyPaliText(_sample, _defaultOptions);
@@ -316,8 +337,9 @@ void main() {
   });
 
   group('GeneralSettingsPage about', () {
-    testWidgets('shows the running version, in each app language',
-        (tester) async {
+    testWidgets('shows the running version, in each app language', (
+      tester,
+    ) async {
       // The version comes from AppVersion.display, not a literal: a literal
       // turns every release into a red suite, and the deploy gate runs this.
       // The display rule itself is pinned in test/core/version. What is

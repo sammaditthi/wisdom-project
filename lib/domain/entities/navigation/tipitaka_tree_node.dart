@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../../core/constants/constants.dart';
 import '../content/content_language.dart';
 

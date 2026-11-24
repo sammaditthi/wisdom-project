@@ -19,8 +19,11 @@ void main() {
   // HH:mm alone reads an unrounded midday as one rounded down, so each time
   // must also be a whole minute.
   String sriLankaClock(DateTime instant) {
-    expect(instant.microsecondsSinceEpoch % Duration.microsecondsPerMinute, 0,
-        reason: '$instant is not a whole minute');
+    expect(
+      instant.microsecondsSinceEpoch % Duration.microsecondsPerMinute,
+      0,
+      reason: '$instant is not a whole minute',
+    );
     final local = instant.toUtc().add(City.utcOffset);
     String two(int n) => n.toString().padLeft(2, '0');
     return '${two(local.hour)}:${two(local.minute)}';

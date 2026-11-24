@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../entities/failure.dart';
 import '../entities/bjt/bjt_document.dart';
 

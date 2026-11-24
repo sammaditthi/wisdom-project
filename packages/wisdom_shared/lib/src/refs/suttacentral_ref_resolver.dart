@@ -22,10 +22,9 @@ class SuttaCentralRefResolver {
 
   const SuttaCentralRefResolver(
     this._scToNode, {
-    Map<String, String> nodeToSc = const {},
-    Map<String, String> translators = const {},
-  })  : _nodeToSc = nodeToSc,
-        _translators = translators;
+    this._nodeToSc = const {},
+    this._translators = const {},
+  });
 
   /// Reads the asset's shape: `map` (uid -> node), `reverse` (node -> uid where
   /// the first uid naming a node isn't the one to open) and `english`

@@ -30,14 +30,13 @@ void main() {
       // ASSERT
       expect(result.isRight(), true);
 
-      result.fold(
-        (failure) => fail('Expected success but got failure'),
-        (document) {
-          expect(document.fileId, equals('dn-1'));
-          expect(document.pageCount, equals(2));
-          expect(document.editionId, equals('bjt'));
-        },
-      );
+      result.fold((failure) => fail('Expected success but got failure'), (
+        document,
+      ) {
+        expect(document.fileId, equals('dn-1'));
+        expect(document.pageCount, equals(2));
+        expect(document.editionId, equals('bjt'));
+      });
 
       // Verify the repository was called with the correct fileId
       verify(mockRepository.loadDocument(testFileId)).called(1);
@@ -55,13 +54,10 @@ void main() {
       // ASSERT
       expect(result.isLeft(), true);
 
-      result.fold(
-        (failure) {
-          expect(failure, isA<NotFoundFailure>());
-          expect(failure.userMessage, contains('Not found'));
-        },
-        (document) => fail('Expected failure but got success'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<NotFoundFailure>());
+        expect(failure.userMessage, contains('Not found'));
+      }, (document) => fail('Expected failure but got success'));
     });
 
     test('should return failure when loading fails', () async {

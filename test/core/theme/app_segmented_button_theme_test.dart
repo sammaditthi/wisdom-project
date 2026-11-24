@@ -25,8 +25,11 @@ void main() {
     };
 
     for (final entry in themes.entries) {
-      expect(radiusOf(entry.value), 8,
-          reason: '${entry.key} does not carry the shared shape');
+      expect(
+        radiusOf(entry.value),
+        8,
+        reason: '${entry.key} does not carry the shared shape',
+      );
     }
   });
 
@@ -37,9 +40,8 @@ void main() {
     const own = RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(100)),
     );
-    final merged = const ButtonStyle(
-      shape: WidgetStatePropertyAll(own),
-    ).merge(AppTheme.light().segmentedButtonTheme.style);
+    final merged = const ButtonStyle(shape: WidgetStatePropertyAll(own))
+        .merge(AppTheme.light().segmentedButtonTheme.style);
 
     expect(merged.shape?.resolve({}), own);
   });

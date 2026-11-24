@@ -34,10 +34,7 @@ class DictionaryBottomSheet extends ConsumerWidget {
   /// Callback when the sheet should be closed
   final VoidCallback? onClose;
 
-  const DictionaryBottomSheet({
-    super.key,
-    this.onClose,
-  });
+  const DictionaryBottomSheet({super.key, this.onClose});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -157,8 +154,9 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
   /// threshold. The re-sync matters on orientation/resize: the threshold
   /// can shift even when the sheet size hasn't, leaving the chevron stale.
   void _syncSnaps() {
-    final snaps =
-        DictionarySheetConstants.adaptiveSnaps(widget.availableHeight);
+    final snaps = DictionarySheetConstants.adaptiveSnaps(
+      widget.availableHeight,
+    );
     _minFraction = snaps.min;
     _midFraction = snaps.mid;
     if (_sheetController.isAttached) {
@@ -295,8 +293,9 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                           width: 40,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.3,
+                            ),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -319,12 +318,14 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                                 controller: _wordController,
                                 focusNode: _wordFocusNode,
                                 onChanged: _onWordChanged,
-                                style: context.typography.dialogTitle
-                                    .copyWith(fontWeight: FontWeight.w700),
+                                style: context.typography.dialogTitle.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(vertical: 4),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
                                   border: UnderlineInputBorder(
                                     borderSide: BorderSide(
                                       color: theme.colorScheme.outline,
@@ -350,18 +351,20 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                                       if (_wordController.text.isEmpty) return;
                                       // Delete last character
                                       final text = _wordController.text;
-                                      _wordController.text =
-                                          text.substring(0, text.length - 1);
+                                      _wordController.text = text.substring(
+                                        0,
+                                        text.length - 1,
+                                      );
                                       // Move cursor to end and focus
                                       _wordController.selection =
                                           TextSelection.collapsed(
-                                        offset: _wordController.text.length,
-                                      );
+                                            offset: _wordController.text.length,
+                                          );
                                       _wordFocusNode.requestFocus();
                                       _onWordChanged(_wordController.text);
                                     },
-                                    tooltip:
-                                        AppLocalizations.of(context).backspace,
+                                    tooltip: AppLocalizations.of(context)
+                                        .backspace,
                                   ),
                                 ),
                               ),
@@ -374,16 +377,20 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
                                   .isExactMatchToggle,
                               onPressed: () {
                                 ref
-                                    .read(
-                                        bottomSheetExactMatchProvider.notifier)
-                                    .state = !isExactMatch;
+                                        .read(
+                                          bottomSheetExactMatchProvider
+                                              .notifier,
+                                        )
+                                        .state =
+                                    !isExactMatch;
                               },
                             ),
                             // Refine dictionaries button
                             CircularToggleButton(
                               isActive:
                                   !DictionaryFilterOperations.isAllSelected(
-                                      filterIds),
+                                    filterIds,
+                                  ),
                               icon: Icons.filter_list,
                               tooltip: AppLocalizations.of(context).refine,
                               onPressed: () => _openRefineDialog(context),
@@ -495,11 +502,7 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
       // "Viewing X out of Y results" footer when results are truncated
       if (hasMore)
         SliverToBoxAdapter(
-          child: _buildResultsFooter(
-            context,
-            entries.length,
-            totalCount,
-          ),
+          child: _buildResultsFooter(context, entries.length, totalCount),
         ),
     ];
   }
@@ -552,8 +555,10 @@ class _DictionaryEntryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final typography = context.typography;
     // Badge colour from the theme's shared dictionary badge palette.
-    final dictColor = context.dictionaryBadgeColors
-        .colorFor(entry.dictionaryId, theme.colorScheme.primary);
+    final dictColor = context.dictionaryBadgeColors.colorFor(
+      entry.dictionaryId,
+      theme.colorScheme.primary,
+    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -580,8 +585,9 @@ class _DictionaryEntryTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   entry.word,
-                  style: typography.resultTitle
-                      .copyWith(fontWeight: FontWeight.w600),
+                  style: typography.resultTitle.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -598,8 +604,10 @@ class _DictionaryEntryTile extends StatelessWidget {
           SelectionArea(
             child: Text.rich(
               TextSpan(
-                children:
-                    dictionaryMeaningSpans(entry.meaning, dropLinkText: isDpd),
+                children: dictionaryMeaningSpans(
+                  entry.meaning,
+                  dropLinkText: isDpd,
+                ),
               ),
               style: typography.definitionBody,
             ),

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../constants/constants.dart';
 import 'app_fonts.dart';
 
@@ -258,7 +259,8 @@ class TextEntryTheme extends ThemeExtension<TextEntryTheme> {
   /// each column 1240px.
   EdgeInsets readingPadding(double availableWidth, {int columns = 1}) {
     const base = PaneWidthConstants.readerContentPadding;
-    final maxColumn = PaneWidthConstants.readingColumnMeasureEm *
+    final maxColumn =
+        PaneWidthConstants.readingColumnMeasureEm *
         _paragraphFontSize *
         columns;
     if (availableWidth <= maxColumn + base * 2) {
@@ -307,8 +309,11 @@ class TextEntryTheme extends ThemeExtension<TextEntryTheme> {
       centeredStyles: centeredStyles,
       paragraphStyle: TextStyle.lerp(paragraphStyle, other.paragraphStyle, t)!,
       gathaStyle: TextStyle.lerp(gathaStyle, other.gathaStyle, t)!,
-      unindentedStyle:
-          TextStyle.lerp(unindentedStyle, other.unindentedStyle, t)!,
+      unindentedStyle: TextStyle.lerp(
+        unindentedStyle,
+        other.unindentedStyle,
+        t,
+      )!,
       paragraphFirstLineIndent: paragraphFirstLineIndent,
       gathaLeftPadding: gathaLeftPadding,
       gathaLevel2LeftPadding: gathaLevel2LeftPadding,

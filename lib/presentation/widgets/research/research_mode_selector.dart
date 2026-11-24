@@ -59,8 +59,10 @@ class ResearchModeSelector extends ConsumerWidget {
               borderRadius: BorderRadius.circular(20),
               onTap: controller.toggle,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -70,8 +72,11 @@ class ResearchModeSelector extends ConsumerWidget {
                     // the chips this one borrows its fill trick from, and it
                     // scales with the composer it sits in.
                     Text(mode.label(l10n), style: context.typography.chipLabel),
-                    Icon(Icons.arrow_drop_down,
-                        size: 20, color: colors.onSurfaceVariant),
+                    Icon(
+                      Icons.arrow_drop_down,
+                      size: 20,
+                      color: colors.onSurfaceVariant,
+                    ),
                   ],
                 ),
               ),

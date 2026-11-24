@@ -28,15 +28,13 @@ class CachingTextSearchRepository implements TextSearchRepository {
   final LRUCache<String, List<SearchResult>>? _fullResultsCache;
   final LRUCache<String, Map<SearchResultType, int>>? _countsCache;
 
-  CachingTextSearchRepository(
-    this._delegate, {
-    required CacheConfig config,
-  })  : _topResultsCache = config.enabled ? LRUCache(config.maxEntries) : null,
-        // No `* 2` multiplier on full-results capacity yet: pagination is
-        // not implemented (limit=50, offset=0 in current call sites).
-        // Bump when "load more" lands.
-        _fullResultsCache = config.enabled ? LRUCache(config.maxEntries) : null,
-        _countsCache = config.enabled ? LRUCache(config.maxEntries) : null;
+  CachingTextSearchRepository(this._delegate, {required CacheConfig config})
+    : _topResultsCache = config.enabled ? LRUCache(config.maxEntries) : null,
+      // No `* 2` multiplier on full-results capacity yet: pagination is
+      // not implemented (limit=50, offset=0 in current call sites).
+      // Bump when "load more" lands.
+      _fullResultsCache = config.enabled ? LRUCache(config.maxEntries) : null,
+      _countsCache = config.enabled ? LRUCache(config.maxEntries) : null;
 
   @override
   Future<Either<Failure, GroupedSearchResult>> searchTopResults(
@@ -60,10 +58,7 @@ class CachingTextSearchRepository implements TextSearchRepository {
     );
 
     // Cache successful results only — never poison the cache with failures.
-    result.fold(
-      (_) {},
-      (data) => cache.put(cacheKey, data),
-    );
+    result.fold((_) {}, (data) => cache.put(cacheKey, data));
     return result;
   }
 
@@ -83,10 +78,7 @@ class CachingTextSearchRepository implements TextSearchRepository {
 
     final result = await _delegate.searchByResultType(query, resultType);
 
-    result.fold(
-      (_) {},
-      (data) => cache.put(cacheKey, data),
-    );
+    result.fold((_) {}, (data) => cache.put(cacheKey, data));
     return result;
   }
 
@@ -105,10 +97,7 @@ class CachingTextSearchRepository implements TextSearchRepository {
 
     final result = await _delegate.countByResultType(query);
 
-    result.fold(
-      (_) {},
-      (data) => cache.put(cacheKey, data),
-    );
+    result.fold((_) {}, (data) => cache.put(cacheKey, data));
     return result;
   }
 
@@ -125,8 +114,9 @@ class CachingTextSearchRepository implements TextSearchRepository {
   }) {
     final sortedEditions = (query.editionIds.toList()..sort()).join(',');
     final sortedScope = (query.scope.toList()..sort()).join(',');
-    final sortedDicts =
-        (query.selectedDictionaryIds.toList()..sort()).join(',');
+    final sortedDicts = (query.selectedDictionaryIds.toList()..sort()).join(
+      ',',
+    );
 
     // '__all__' sentinel keeps "no edition filter" distinct from "explicitly
     // bjt only". Today the underlying repo collapses both to {'bjt'}, but
@@ -164,10 +154,10 @@ class CachingTextSearchRepository implements TextSearchRepository {
 
   /// Snapshot of all cache stats — useful for ad-hoc diagnostics.
   Map<String, CacheStats> snapshotStats() => {
-        if (_topResultsCache != null) 'topResults': _topResultsCache.stats,
-        if (_fullResultsCache != null) 'fullResults': _fullResultsCache.stats,
-        if (_countsCache != null) 'counts': _countsCache.stats,
-      };
+    if (_topResultsCache != null) 'topResults': _topResultsCache.stats,
+    if (_fullResultsCache != null) 'fullResults': _fullResultsCache.stats,
+    if (_countsCache != null) 'counts': _countsCache.stats,
+  };
 
   /// Logs statistics for all caches in debug mode only.
   void logAllStats() {

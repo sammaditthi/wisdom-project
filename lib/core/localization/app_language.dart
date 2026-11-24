@@ -12,9 +12,9 @@ enum AppLanguage {
   /// The Flutter [Locale] this maps to.
   /// Must stay in sync with `MaterialApp.supportedLocales`.
   Locale get locale => switch (this) {
-        AppLanguage.english => const Locale('en'),
-        AppLanguage.sinhala => const Locale('si'),
-      };
+    AppLanguage.english => const Locale('en'),
+    AppLanguage.sinhala => const Locale('si'),
+  };
 
   /// Resolves a device's *ordered* preferred locales to a supported
   /// [AppLanguage]. Mirrors how Flutter itself picks from

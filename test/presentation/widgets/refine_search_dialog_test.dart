@@ -60,11 +60,13 @@ void main() {
           searchStateProvider.overrideWith((ref) => notifier),
           availableContentLanguagesProvider.overrideWithValue(available),
           // The tree rows render in this language; value is irrelevant here.
-          effectiveContentLanguageProvider
-              .overrideWithValue(ContentLanguage.sinhala),
+          effectiveContentLanguageProvider.overrideWithValue(
+            ContentLanguage.sinhala,
+          ),
           // Empty tree → the scope section builds nothing of interest.
-          navigationTreeProvider
-              .overrideWith((ref) async => const <TipitakaTreeNode>[]),
+          navigationTreeProvider.overrideWith(
+            (ref) async => const <TipitakaTreeNode>[],
+          ),
         ],
         child: MaterialApp(
           // The real theme: the toggle's own style has to win against the
@@ -85,8 +87,9 @@ void main() {
         find.byType(SegmentedButton<ContentLanguage>),
       );
 
-  testWidgets('renders both language segments, both selected when both on',
-      (tester) async {
+  testWidgets('renders both language segments, both selected when both on', (
+    tester,
+  ) async {
     await pumpDialog(
       tester,
       searchInPali: true,
@@ -98,14 +101,15 @@ void main() {
     expect(find.text('LANGUAGE'), findsOneWidget);
     expect(find.text('Pali'), findsOneWidget);
     expect(find.text('සිංහල'), findsOneWidget);
-    expect(
-      readToggle(tester).selected,
-      {ContentLanguage.pali, ContentLanguage.sinhala},
-    );
+    expect(readToggle(tester).selected, {
+      ContentLanguage.pali,
+      ContentLanguage.sinhala,
+    });
   });
 
-  testWidgets('keeps its pill against the app-wide segmented shape',
-      (tester) async {
+  testWidgets('keeps its pill against the app-wide segmented shape', (
+    tester,
+  ) async {
     await pumpDialog(
       tester,
       searchInPali: true,
@@ -127,44 +131,48 @@ void main() {
   });
 
   testWidgets(
-      'tapping a selected segment (both on) narrows the filter to the other',
-      (tester) async {
-    final notifier = await pumpDialog(
-      tester,
-      searchInPali: true,
-      searchInSinhala: true,
-      available: const [ContentLanguage.pali, ContentLanguage.sinhala],
-    );
+    'tapping a selected segment (both on) narrows the filter to the other',
+    (tester) async {
+      final notifier = await pumpDialog(
+        tester,
+        searchInPali: true,
+        searchInSinhala: true,
+        available: const [ContentLanguage.pali, ContentLanguage.sinhala],
+      );
 
-    // Tapping the (selected) Pali segment deselects it → only Sinhala remains.
-    await tester.tap(find.text('Pali'));
-    await tester.pumpAndSettle();
+      // Tapping the (selected) Pali segment deselects it → only Sinhala remains.
+      await tester.tap(find.text('Pali'));
+      await tester.pumpAndSettle();
 
-    expect(notifier.languageCalls, isNotEmpty);
-    expect(notifier.languageCalls.last, (pali: false, sinhala: true));
-  });
+      expect(notifier.languageCalls, isNotEmpty);
+      expect(notifier.languageCalls.last, (pali: false, sinhala: true));
+    },
+  );
 
-  testWidgets('MANDATORY: tapping the only selected segment cannot turn it off',
-      (tester) async {
-    // Only Pali is on. Its segment is locked (disabled), so a tap is a no-op —
-    // the user can never reach "zero languages selected".
-    final notifier = await pumpDialog(
-      tester,
-      searchInPali: true,
-      searchInSinhala: false,
-      available: const [ContentLanguage.pali, ContentLanguage.sinhala],
-    );
+  testWidgets(
+    'MANDATORY: tapping the only selected segment cannot turn it off',
+    (tester) async {
+      // Only Pali is on. Its segment is locked (disabled), so a tap is a no-op —
+      // the user can never reach "zero languages selected".
+      final notifier = await pumpDialog(
+        tester,
+        searchInPali: true,
+        searchInSinhala: false,
+        available: const [ContentLanguage.pali, ContentLanguage.sinhala],
+      );
 
-    await tester.tap(find.text('Pali'), warnIfMissed: false);
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Pali'), warnIfMissed: false);
+      await tester.pumpAndSettle();
 
-    expect(notifier.languageCalls, isEmpty);
-    // Selection is unchanged: still exactly Pali.
-    expect(readToggle(tester).selected, {ContentLanguage.pali});
-  });
+      expect(notifier.languageCalls, isEmpty);
+      // Selection is unchanged: still exactly Pali.
+      expect(readToggle(tester).selected, {ContentLanguage.pali});
+    },
+  );
 
-  testWidgets('edition with fewer than two languages hides the whole toggle',
-      (tester) async {
+  testWidgets('edition with fewer than two languages hides the whole toggle', (
+    tester,
+  ) async {
     await pumpDialog(
       tester,
       searchInPali: true,

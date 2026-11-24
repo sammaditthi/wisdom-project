@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show HardwareKeyboard;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/text_entry_theme.dart';
@@ -63,8 +64,9 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
   @override
   Widget build(BuildContext context) {
     final isTabletOrDesktop = ResponsiveUtils.isTabletOrDesktop(context);
-    final dividerWidth =
-        isTabletOrDesktop ? PaneWidthConstants.dividerWidth : 24.0;
+    final dividerWidth = isTabletOrDesktop
+        ? PaneWidthConstants.dividerWidth
+        : 24.0;
 
     return Stack(
       children: [
@@ -75,8 +77,10 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
             builder: (context, constraints) {
               // Past the paired measure the leftover becomes equal margins
               // instead of more column.
-              final padding = context.textEntryTheme
-                  .readingPadding(constraints.maxWidth, columns: 2);
+              final padding = context.textEntryTheme.readingPadding(
+                constraints.maxWidth,
+                columns: 2,
+              );
               final availableWidth =
                   constraints.maxWidth - padding.horizontal - dividerWidth;
               final columns = _Columns(availableWidth, dividerWidth);
@@ -100,12 +104,16 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
                   // Each column labelled with its own printed page: 14 | 15.
                   buildPageNumber: (context, page) {
                     final pali = ReaderEntryBuilder.buildPageNumber(
-                        context, page.pageNumber);
+                      context,
+                      page.pageNumber,
+                    );
                     if (pali == null) return null;
                     return columns.row(
                       pali,
                       ReaderEntryBuilder.buildPageNumber(
-                              context, page.sinhalaPageNumber) ??
+                            context,
+                            page.sinhalaPageNumber,
+                          ) ??
                           const SizedBox.shrink(),
                     );
                   },
@@ -148,7 +156,8 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
     Widget entry(int entryIndex, String language) {
       final isPali = language == 'pi';
       final section = isPali ? page.paliSection : page.sinhalaSection;
-      final isCurrentMatch = currentMatch != null &&
+      final isCurrentMatch =
+          currentMatch != null &&
           currentMatch.pageIndex == absolutePageIndex &&
           currentMatch.entryIndex == entryIndex &&
           currentMatch.languageCode == language;
@@ -156,13 +165,18 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
         context,
         section.entries[entryIndex],
         enableDictionaryLookup: isPali,
-        inPageSearchQuery: hasQuery &&
+        inPageSearchQuery:
+            hasQuery &&
                 searchState.hasMatchInEntry(
-                    absolutePageIndex, entryIndex, language)
+                  absolutePageIndex,
+                  entryIndex,
+                  language,
+                )
             ? effectiveQuery
             : null,
-        currentMatchIndexInEntry:
-            isCurrentMatch ? currentMatch.matchIndexInEntry : null,
+        currentMatchIndexInEntry: isCurrentMatch
+            ? currentMatch.matchIndexInEntry
+            : null,
         onWordTap: widget.onWordTap,
       );
     }
@@ -199,19 +213,25 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
   }
 
   Widget _buildDividerOverlay(
-      BuildContext context, WidgetRef ref, double splitRatio) {
+    BuildContext context,
+    WidgetRef ref,
+    double splitRatio,
+  ) {
     return Positioned.fill(
       child: LayoutBuilder(
         builder: (context, constraints) {
           // The same padding the content is laid out with — this overlay floats
           // free of it, so once the margins start widening a literal 24 would
           // leave the handle sitting well left of the seam it drags.
-          final padding = context.textEntryTheme
-              .readingPadding(constraints.maxWidth, columns: 2);
+          final padding = context.textEntryTheme.readingPadding(
+            constraints.maxWidth,
+            columns: 2,
+          );
           // Must be the *same* width the rows divide: the divider is each
           // row's middle child, not part of either column, so the ratio is
           // against what is left after it.
-          final availableWidth = constraints.maxWidth -
+          final availableWidth =
+              constraints.maxWidth -
               padding.horizontal -
               PaneWidthConstants.dividerWidth;
           // The gap's own left edge, which is where the handle starts.
@@ -234,7 +254,8 @@ class _DualColumnPaneState extends ConsumerState<DualColumnPane> {
                   final ratioChange = delta / availableWidth;
                   final currentRatio = ref.read(activeSplitRatioProvider);
                   ref.read(updateActiveTabSplitRatioProvider)(
-                      currentRatio + ratioChange);
+                    currentRatio + ratioChange,
+                  );
                 },
               ),
             ),
@@ -256,18 +277,18 @@ class _Columns {
   /// ratio itself, so a divider drag re-lays only the built rows and never
   /// rebuilds the cells.
   Widget row(Widget left, Widget right) => Consumer(
-        builder: (context, ref, _) {
-          final ratio = ref.watch(activeSplitRatioProvider);
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(width: availableWidth * ratio, child: left),
-              SizedBox(width: dividerWidth),
-              SizedBox(width: availableWidth * (1 - ratio), child: right),
-            ],
-          );
-        },
+    builder: (context, ref, _) {
+      final ratio = ref.watch(activeSplitRatioProvider);
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: availableWidth * ratio, child: left),
+          SizedBox(width: dividerWidth),
+          SizedBox(width: availableWidth * (1 - ratio), child: right),
+        ],
       );
+    },
+  );
 }
 
 /// Which column the last press landed in: 0 Pali, 1 Sinhala, null none yet.
@@ -327,7 +348,9 @@ class _ColumnGate extends StaticSelectionContainerDelegate {
   _ActiveColumn active;
 
   Rect get _rect => MatrixUtils.transformRect(
-      getTransformTo(null), Offset.zero & containerSize);
+    getTransformTo(null),
+    Offset.zero & containerSize,
+  );
 
   @override
   SelectionResult dispatchSelectionEvent(SelectionEvent event) {
@@ -342,28 +365,29 @@ class _ColumnGate extends StaticSelectionContainerDelegate {
       final start = _rect.topLeft;
       super.dispatchSelectionEvent(const ClearSelectionEvent());
       super.dispatchSelectionEvent(
-          SelectionEdgeUpdateEvent.forStart(globalPosition: start));
+        SelectionEdgeUpdateEvent.forStart(globalPosition: start),
+      );
       super.dispatchSelectionEvent(
-          SelectionEdgeUpdateEvent.forEnd(globalPosition: start));
+        SelectionEdgeUpdateEvent.forEnd(globalPosition: start),
+      );
       return SelectionResult.none;
     }
     if (value.hasSelection) {
       super.dispatchSelectionEvent(const ClearSelectionEvent());
     }
     return switch (event) {
-      SelectionEdgeUpdateEvent(:final globalPosition) => hasSize
-          ? SelectionUtils.getResultBasedOnRect(_rect, globalPosition)
-          : SelectionResult.next,
+      SelectionEdgeUpdateEvent(:final globalPosition) =>
+        hasSize
+            ? SelectionUtils.getResultBasedOnRect(_rect, globalPosition)
+            : SelectionResult.next,
       GranularlyExtendSelectionEvent(:final forward) =>
         forward ? SelectionResult.next : SelectionResult.previous,
-      DirectionallyExtendSelectionEvent(:final direction) => switch (
-            direction) {
+      DirectionallyExtendSelectionEvent(:final direction) =>
+        switch (direction) {
           SelectionExtendDirection.forward ||
-          SelectionExtendDirection.nextLine =>
-            SelectionResult.next,
+          SelectionExtendDirection.nextLine => SelectionResult.next,
           SelectionExtendDirection.backward ||
-          SelectionExtendDirection.previousLine =>
-            SelectionResult.previous,
+          SelectionExtendDirection.previousLine => SelectionResult.previous,
         },
       _ => SelectionResult.none,
     };

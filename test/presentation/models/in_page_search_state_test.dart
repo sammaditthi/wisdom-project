@@ -56,36 +56,44 @@ void main() {
       expect(updated.revealCount, 3);
     });
 
-    test('hasActiveQuery requires both visible and non-empty effectiveQuery',
-        () {
-      expect(
-        InPageSearchState(isVisible: true, effectiveQuery: 'සුතං')
-            .hasActiveQuery,
-        true,
-      );
-      expect(
-        InPageSearchState(isVisible: false, effectiveQuery: 'සුතං')
-            .hasActiveQuery,
-        false,
-      );
-      expect(
-        InPageSearchState(isVisible: true, effectiveQuery: '').hasActiveQuery,
-        false,
-      );
-    });
+    test(
+      'hasActiveQuery requires both visible and non-empty effectiveQuery',
+      () {
+        expect(
+          InPageSearchState(
+            isVisible: true,
+            effectiveQuery: 'සුතං',
+          ).hasActiveQuery,
+          true,
+        );
+        expect(
+          InPageSearchState(
+            isVisible: false,
+            effectiveQuery: 'සුතං',
+          ).hasActiveQuery,
+          false,
+        );
+        expect(
+          InPageSearchState(isVisible: true, effectiveQuery: '').hasActiveQuery,
+          false,
+        );
+      },
+    );
 
     test('currentMatch returns null for invalid index, match for valid', () {
       const matches = [
         InPageMatch(
-            pageIndex: 0,
-            entryIndex: 0,
-            languageCode: 'pi',
-            matchIndexInEntry: 0),
+          pageIndex: 0,
+          entryIndex: 0,
+          languageCode: 'pi',
+          matchIndexInEntry: 0,
+        ),
         InPageMatch(
-            pageIndex: 1,
-            entryIndex: 2,
-            languageCode: 'si',
-            matchIndexInEntry: 0),
+          pageIndex: 1,
+          entryIndex: 2,
+          languageCode: 'si',
+          matchIndexInEntry: 0,
+        ),
       ];
 
       expect(
@@ -102,38 +110,43 @@ void main() {
       );
     });
 
-    test('matchedEntries deduplicates and hasMatchInEntry checks correctly',
-        () {
-      final state = InPageSearchState(
-        matches: const [
-          InPageMatch(
+    test(
+      'matchedEntries deduplicates and hasMatchInEntry checks correctly',
+      () {
+        final state = InPageSearchState(
+          matches: const [
+            InPageMatch(
               pageIndex: 0,
               entryIndex: 1,
               languageCode: 'pi',
-              matchIndexInEntry: 0),
-          InPageMatch(
+              matchIndexInEntry: 0,
+            ),
+            InPageMatch(
               pageIndex: 0,
               entryIndex: 1,
               languageCode: 'pi',
-              matchIndexInEntry: 1),
-          InPageMatch(
+              matchIndexInEntry: 1,
+            ),
+            InPageMatch(
               pageIndex: 2,
               entryIndex: 0,
               languageCode: 'si',
-              matchIndexInEntry: 0),
-        ],
-      );
+              matchIndexInEntry: 0,
+            ),
+          ],
+        );
 
-      // Two matches in same entry → only one tuple
-      expect(state.matchedEntries.length, 2);
-      expect(state.hasMatchInEntry(0, 1, 'pi'), true);
-      expect(state.hasMatchInEntry(2, 0, 'si'), true);
-      // Non-matching lookups
-      expect(state.hasMatchInEntry(0, 0, 'pi'), false);
-      expect(state.hasMatchInEntry(0, 1, 'si'), false);
+        // Two matches in same entry → only one tuple
+        expect(state.matchedEntries.length, 2);
+        expect(state.hasMatchInEntry(0, 1, 'pi'), true);
+        expect(state.hasMatchInEntry(2, 0, 'si'), true);
+        // Non-matching lookups
+        expect(state.hasMatchInEntry(0, 0, 'pi'), false);
+        expect(state.hasMatchInEntry(0, 1, 'si'), false);
 
-      // Empty state
-      expect(InPageSearchState().matchedEntries, isEmpty);
-    });
+        // Empty state
+        expect(InPageSearchState().matchedEntries, isEmpty);
+      },
+    );
   });
 }

@@ -21,17 +21,25 @@ void main() {
     });
 
     test('returns the key itself for the roots that need no expanding', () {
-      expect(ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.vinayaPitaka),
-          equals(['vp']));
-      expect(ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.abhidhammaPitaka),
-          equals(['ap']));
-      expect(ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.treatises),
-          equals(['anya']));
+      expect(
+        ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.vinayaPitaka),
+        equals(['vp']),
+      );
+      expect(
+        ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.abhidhammaPitaka),
+        equals(['ap']),
+      );
+      expect(
+        ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.treatises),
+        equals(['anya']),
+      );
     });
 
     test('returns the key itself for a node inside a branch', () {
-      expect(ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.dighaNikaya),
-          equals(['dn']));
+      expect(
+        ScopePatterns.getKeysForNodeKey(TipitakaNodeKeys.dighaNikaya),
+        equals(['dn']),
+      );
       expect(ScopePatterns.getKeysForNodeKey('dn-1'), equals(['dn-1']));
     });
   });
@@ -52,8 +60,10 @@ void main() {
 
     test('keeps keys that need no expanding as they are', () {
       expect(
-        ScopePatterns.getKeysForScope(
-            {TipitakaNodeKeys.dighaNikaya, TipitakaNodeKeys.majjhimaNikaya}),
+        ScopePatterns.getKeysForScope({
+          TipitakaNodeKeys.dighaNikaya,
+          TipitakaNodeKeys.majjhimaNikaya,
+        }),
         equals(['dn', 'mn']),
       );
       expect(ScopePatterns.getKeysForScope({'dn-1'}), equals(['dn-1']));

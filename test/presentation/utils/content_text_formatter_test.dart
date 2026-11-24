@@ -14,26 +14,34 @@ void main() {
     // cluster, so the conjunct transform actually changes it. ධම්ම → ධම්‍ම.
     const sampleWithConjunct = 'ධම්ම';
 
-    test('Pali branch routes through the conjunct transformer (and changes it)',
-        () {
+    test(
+      'Pali branch routes through the conjunct transformer (and changes it)',
+      () {
+        final result = formatContentLabel(
+          sampleWithConjunct,
+          ContentLanguage.pali,
+          PaliLetterOptions.defaults,
+        );
+
+        // Matches the production transformer exactly...
+        expect(
+          result,
+          equals(
+            beautifyPaliText(sampleWithConjunct, PaliLetterOptions.defaults),
+          ),
+        );
+        // ...and is genuinely different from the raw input (the branch is real,
+        // not an accidental no-op).
+        expect(result, isNot(equals(sampleWithConjunct)));
+      },
+    );
+
+    test('Sinhala branch returns the text unchanged (never applies conjuncts)', () {
       final result = formatContentLabel(
-          sampleWithConjunct, ContentLanguage.pali, PaliLetterOptions.defaults);
-
-      // Matches the production transformer exactly...
-      expect(
-        result,
-        equals(
-            beautifyPaliText(sampleWithConjunct, PaliLetterOptions.defaults)),
+        sampleWithConjunct,
+        ContentLanguage.sinhala,
+        PaliLetterOptions.defaults,
       );
-      // ...and is genuinely different from the raw input (the branch is real,
-      // not an accidental no-op).
-      expect(result, isNot(equals(sampleWithConjunct)));
-    });
-
-    test('Sinhala branch returns the text unchanged (never applies conjuncts)',
-        () {
-      final result = formatContentLabel(sampleWithConjunct,
-          ContentLanguage.sinhala, PaliLetterOptions.defaults);
 
       // Conjuncts must NEVER bind a Sinhala translation, so the same input that
       // changed under Pali is returned verbatim here.

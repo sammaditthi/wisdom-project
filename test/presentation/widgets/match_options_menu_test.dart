@@ -41,9 +41,9 @@ Future<void> _openMenu(WidgetTester tester) async {
 /// A menu option by its title. Scoped to the radio rows, as the button's
 /// own label can read the same ("Starts with").
 Finder _option(String title) => find.ancestor(
-      of: find.text(title),
-      matching: find.byWidgetPredicate((w) => w is RadioMenuButton),
-    );
+  of: find.text(title),
+  matching: find.byWidgetPredicate((w) => w is RadioMenuButton),
+);
 
 void main() {
   group('MatchOptionsButton label', () {
@@ -53,10 +53,8 @@ void main() {
       // A second word adds where the words sit.
       (_query(_twoWords), 'Starts with · Phrase'),
       (
-        _query(_twoWords).copyWith(
-          isPhraseSearch: false,
-          isAnywhereInText: true,
-        ),
+        _query(_twoWords)
+            .copyWith(isPhraseSearch: false, isAnywhereInText: true),
         'Starts with · Anywhere',
       ),
       (
@@ -84,8 +82,9 @@ void main() {
   });
 
   group('Match options menu', () {
-    testWidgets('one word: only the "how each word matches" options',
-        (tester) async {
+    testWidgets('one word: only the "how each word matches" options', (
+      tester,
+    ) async {
       await _pumpButton(tester, _query(_oneWord));
       await _openMenu(tester);
 
@@ -95,8 +94,9 @@ void main() {
       expect(find.text('Near each other'), findsNothing);
     });
 
-    testWidgets('a second word adds the "how words sit together" options',
-        (tester) async {
+    testWidgets('a second word adds the "how words sit together" options', (
+      tester,
+    ) async {
       await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);
 
@@ -106,8 +106,9 @@ void main() {
       expect(find.text('Within 10 words'), findsOneWidget);
     });
 
-    testWidgets('each option says what it finds in a tooltip, not a line',
-        (tester) async {
+    testWidgets('each option says what it finds in a tooltip, not a line', (
+      tester,
+    ) async {
       await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);
 
@@ -123,8 +124,9 @@ void main() {
       }
     });
 
-    testWidgets('picking an option applies it and keeps the menu open',
-        (tester) async {
+    testWidgets('picking an option applies it and keeps the menu open', (
+      tester,
+    ) async {
       final notifier = await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);
 
@@ -142,8 +144,9 @@ void main() {
       final container = ProviderScope.containerOf(
         tester.element(find.byType(MatchOptionsButton)),
       );
-      List<String> stack() =>
-          [for (final o in container.read(overlayStackProvider)) o.id];
+      List<String> stack() => [
+        for (final o in container.read(overlayStackProvider)) o.id,
+      ];
 
       await _openMenu(tester);
       expect(stack(), ['match-options-menu']);
@@ -166,15 +169,14 @@ void main() {
       expect(reset.onPressed, isNull);
     });
 
-    testWidgets('"Reset to default" is off when only hidden options differ',
-        (tester) async {
+    testWidgets('"Reset to default" is off when only hidden options differ', (
+      tester,
+    ) async {
       // "Anywhere" was picked, then the query went back to one word.
       await _pumpButton(
         tester,
-        _query(_oneWord).copyWith(
-          isPhraseSearch: false,
-          isAnywhereInText: true,
-        ),
+        _query(_oneWord)
+            .copyWith(isPhraseSearch: false, isAnywhereInText: true),
       );
       await _openMenu(tester);
 
@@ -206,8 +208,9 @@ void main() {
       expect(notifier.state.proximityDistance, defaults.proximityDistance);
     });
 
-    testWidgets('+ steps the distance and picks "Near each other"',
-        (tester) async {
+    testWidgets('+ steps the distance and picks "Near each other"', (
+      tester,
+    ) async {
       // Starts on "As a phrase".
       final notifier = await _pumpButton(tester, _query(_twoWords));
       await _openMenu(tester);

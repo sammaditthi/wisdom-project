@@ -46,8 +46,9 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
 
   /// Built once: activators have no `==`, so a new map each build would make
   /// `Shortcuts` index every key again.
-  final Map<ShortcutActivator, Intent> _shortcuts =
-      shortcutMap(defaultTargetPlatform);
+  final Map<ShortcutActivator, Intent> _shortcuts = shortcutMap(
+    defaultTargetPlatform,
+  );
 
   @override
   void dispose() {
@@ -73,8 +74,10 @@ class _AppShortcutsState extends ConsumerState<AppShortcuts> {
           ToggleNavigatorIntent: ToggleNavigatorAction(ref),
           StepSuttaIntent: StepSuttaAction(ref),
           ScrollReaderIntent: ScrollReaderAction(ref, _idleFocus),
-          MoveIntoSearchResultsIntent:
-              MoveIntoSearchResultsAction(ref, _idleFocus),
+          MoveIntoSearchResultsIntent: MoveIntoSearchResultsAction(
+            ref,
+            _idleFocus,
+          ),
           BackToSearchBoxIntent: BackToSearchBoxAction(ref),
           NextSearchResultIntent: NextSearchResultAction(ref),
           PreviousSearchResultIntent: PreviousSearchResultAction(ref),

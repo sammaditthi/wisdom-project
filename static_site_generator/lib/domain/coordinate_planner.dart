@@ -144,8 +144,10 @@ class CoordinatePlanner {
     // anything plans a preamble, so it has to be asked here too.
     PreamblePlanner.assertTypesPartitioned();
 
-    final verdicts =
-        SliceAlignment(tree: tree, slicerFor: slicerFor).misalignedSlices();
+    final verdicts = SliceAlignment(
+      tree: tree,
+      slicerFor: slicerFor,
+    ).misalignedSlices();
 
     // Containers convicted by at least one shifted child, kept apart by which
     // rule convicted them — the two read their numbers out of different
@@ -198,8 +200,13 @@ class CoordinatePlanner {
         // off `colophonRuns` cannot be answering for a container the other rule
         // also claims.
         if (!node.isLeaf && convicted.contains(node.nodeKey)) {
-          out.addAll(_correctShiftedRun(node, slicer,
-              numberInPreviousSlice: colophonRuns.contains(node.nodeKey)));
+          out.addAll(
+            _correctShiftedRun(
+              node,
+              slicer,
+              numberInPreviousSlice: colophonRuns.contains(node.nodeKey),
+            ),
+          );
           visited.add(node.nodeKey);
         } else if (node.isLeaf &&
             verdicts[node.nodeKey] == SliceMisalignment.strayDivider) {
@@ -263,7 +270,9 @@ class CoordinatePlanner {
   /// around it are correct and only this one row is misplaced, so correcting
   /// its neighbours would be the error rather than the fix.
   CoordinateCorrection _correctDivider(
-      TipitakaNode leaf, ContentSlicer slicer) {
+    TipitakaNode leaf,
+    ContentSlicer slicer,
+  ) {
     final slice = slicer.sliceFor(leaf.nodeKey);
     for (var i = 1; i < slice.rows.length; i++) {
       final row = slice.rows[i];
@@ -320,12 +329,15 @@ class CoordinatePlanner {
   /// coordinate onto itself is a line in the review diff with nothing in it to
   /// review.
   List<CoordinateCorrection> _correctShiftedRun(
-      TipitakaNode container, ContentSlicer slicer,
-      {required bool numberInPreviousSlice}) {
+    TipitakaNode container,
+    ContentSlicer slicer, {
+    required bool numberInPreviousSlice,
+  }) {
     final children = tree.childrenOf(container.nodeKey);
     if (children.any((child) => !child.isLeaf)) {
-      final readFrom =
-          numberInPreviousSlice ? 'its own preamble' : 'their own slices';
+      final readFrom = numberInPreviousSlice
+          ? 'its own preamble'
+          : 'their own slices';
       throw CoordinateDerivationFailure(
         '"${container.nodeKey}" holds a sub-container, so its leaves are not '
         'one printed run and the shift cannot be read off $readFrom.',
@@ -346,8 +358,9 @@ class CoordinatePlanner {
           'file, so the run is not one slice sequence.',
         );
       }
-      final window = slicer
-          .sliceFor(numberInPreviousSlice ? previous.nodeKey : leaf.nodeKey);
+      final window = slicer.sliceFor(
+        numberInPreviousSlice ? previous.nodeKey : leaf.nodeKey,
+      );
       final row = _soleLeadingNumber(window, leaf.nodeKey);
       // Advanced before the skip below, not after it: a leaf that emits nothing
       // is still the next leaf's window, and stepping over it would read the
@@ -357,12 +370,14 @@ class CoordinatePlanner {
           row.entryIndex == leaf.entryIndexInPage) {
         continue;
       }
-      out.add(CoordinateCorrection(
-        nodeKey: leaf.nodeKey,
-        from: (page: leaf.entryPageIndex, entry: leaf.entryIndexInPage),
-        to: (page: row.pageIndex, entry: row.entryIndex),
-        openingRow: row.pali?.text.trim() ?? '',
-      ));
+      out.add(
+        CoordinateCorrection(
+          nodeKey: leaf.nodeKey,
+          from: (page: leaf.entryPageIndex, entry: leaf.entryIndexInPage),
+          to: (page: row.pageIndex, entry: row.entryIndex),
+          openingRow: row.pali?.text.trim() ?? '',
+        ),
+      );
     }
     return out;
   }

@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/utils/search_query_utils.dart'
     show computeEffectiveQuery, singlishPreviewText;
 import '../../domain/entities/search/grouped_search_result.dart';
@@ -145,10 +147,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   /// Incremented on each new search to invalidate stale async results.
   int _searchRequestId = 0;
 
-  SearchStateNotifier(
-    this._searchRepository,
-    this._recentSearchesRepository,
-  ) : super(const SearchState());
+  SearchStateNotifier(this._searchRepository, this._recentSearchesRepository)
+    : super(const SearchState());
 
   /// Called when search bar receives focus
   /// Loads recent searches and reopens panel if there's a query
@@ -252,7 +252,9 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     if (query == null) {
       if (_searchRequestId == requestId) {
         state = state.copyWith(
-            isLoading: false, groupedResults: const AsyncValue.data(null));
+          isLoading: false,
+          groupedResults: const AsyncValue.data(null),
+        );
       }
       return;
     }
@@ -285,7 +287,9 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     if (query == null) {
       if (_searchRequestId == requestId) {
         state = state.copyWith(
-            isLoading: false, fullResults: const AsyncValue.data(null));
+          isLoading: false,
+          fullResults: const AsyncValue.data(null),
+        );
       }
       return;
     }
@@ -323,8 +327,9 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
     // saved as its Sinhala: "vedana" and "wedana" are one search, so one row.
     // Sinhala and references like "SN 15.3" stay as typed.
     final raw = state.rawQueryText;
-    await _recentSearchesRepository
-        .addRecentSearch(singlishPreviewText(raw) ?? raw);
+    await _recentSearchesRepository.addRecentSearch(
+      singlishPreviewText(raw) ?? raw,
+    );
 
     // Update recent searches list for next time
     final recentSearches = await _recentSearchesRepository.getRecentSearches();
@@ -541,7 +546,8 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
       isAnywhereInText: isAnywhereInText ?? state.isAnywhereInText,
       proximityDistance: proximityDistance ?? state.proximityDistance,
     );
-    final distanceOnly = next.isExactMatch == state.isExactMatch &&
+    final distanceOnly =
+        next.isExactMatch == state.isExactMatch &&
         next.isPhraseSearch == state.isPhraseSearch &&
         next.isAnywhereInText == state.isAnywhereInText;
     if (distanceOnly && next.proximityDistance == state.proximityDistance) {
@@ -559,13 +565,15 @@ class SearchStateNotifier extends StateNotifier<SearchState> {
   /// Used to show/hide secondary matches in grouped FTS results.
   void toggleFTSGroupExpansion(String nodeKey) {
     state = state.copyWith(
-        expandedFTSGroups: _toggled(state.expandedFTSGroups, nodeKey));
+      expandedFTSGroups: _toggled(state.expandedFTSGroups, nodeKey),
+    );
   }
 
   /// Show or hide a definition result's full meaning.
   void toggleDefinitionExpansion(String resultId) {
     state = state.copyWith(
-        expandedDefinitions: _toggled(state.expandedDefinitions, resultId));
+      expandedDefinitions: _toggled(state.expandedDefinitions, resultId),
+    );
   }
 
   static Set<String> _toggled(Set<String> set, String key) =>

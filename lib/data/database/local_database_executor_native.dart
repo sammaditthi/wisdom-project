@@ -30,7 +30,8 @@ Future<QueryExecutor> openLocalExecutor(String dbName) async {
   final stamp = File('${file.path}.sha256');
 
   // Both files are checked: the OS can delete one of the pair.
-  final isCurrent = await file.exists() &&
+  final isCurrent =
+      await file.exists() &&
       await stamp.exists() &&
       await stamp.readAsString() == sha256;
   if (!isCurrent) {

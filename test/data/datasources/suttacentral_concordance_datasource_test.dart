@@ -35,8 +35,9 @@ void main() {
   // for no jump.
   test('every book in canonBooks has a numbered uid in the map', () async {
     final json = jsonDecode(
-      await rootBundle
-          .loadString(SuttaCentralConcordanceDataSourceImpl.assetPath),
+      await rootBundle.loadString(
+        SuttaCentralConcordanceDataSourceImpl.assetPath,
+      ),
     ) as Map<String, dynamic>;
     final uids = (json['map'] as Map<String, dynamic>).keys;
 

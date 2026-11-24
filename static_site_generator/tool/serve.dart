@@ -55,8 +55,10 @@ Future<void> main(List<String> args) async {
   if (!root.existsSync()) {
     stderr.writeln('No such directory: ${root.path}');
     stderr.writeln('Build one first:');
-    stderr.writeln('  dart run static_site_generator/bin/generate.dart '
-        '--root an-1');
+    stderr.writeln(
+      '  dart run static_site_generator/bin/generate.dart '
+      '--root an-1',
+    );
     exitCode = 1;
     return;
   }
@@ -68,8 +70,10 @@ Future<void> main(List<String> args) async {
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, options.port);
   } on SocketException catch (error) {
     stderr.writeln('Cannot listen on port ${options.port}: ${error.message}');
-    stderr.writeln('Another server is probably already running. '
-        'Pass --port to pick a different one.');
+    stderr.writeln(
+      'Another server is probably already running. '
+      'Pass --port to pick a different one.',
+    );
     exitCode = 1;
     return;
   }
@@ -125,9 +129,10 @@ Future<void> _handle(HttpRequest request, String rootPath) async {
   if (path == '/$siteHeadersOutputPath') {
     response.statusCode = HttpStatus.notFound;
     _writeHtml(
-        request,
-        '<h1>404</h1><p><code>$path</code> is read by '
-        'Cloudflare Pages at deploy time and is never served as a page.</p>');
+      request,
+      '<h1>404</h1><p><code>$path</code> is read by '
+      'Cloudflare Pages at deploy time and is never served as a page.</p>',
+    );
     await response.close();
     _log(request, response.statusCode);
     return;
@@ -159,8 +164,10 @@ Future<void> _handle(HttpRequest request, String rootPath) async {
     // nodeKey, and telling someone to rebuild with `--root all` is then simply
     // wrong.
     if (path.startsWith(tipitakaUrl(''))) {
-      stdout.writeln('     ↳ no file. If this key is in the tree it was '
-          "outside this build's --root; rebuild with --root all.");
+      stdout.writeln(
+        '     ↳ no file. If this key is in the tree it was '
+        "outside this build's --root; rebuild with --root all.",
+      );
     }
     return;
   }

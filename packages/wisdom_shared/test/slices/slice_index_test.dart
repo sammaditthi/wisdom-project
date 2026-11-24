@@ -17,13 +17,15 @@ import 'package:wisdom_shared/wisdom_shared.dart';
 /// whether the real tree still has those shapes.
 void main() {
   group('rangeFor — the direction the build already covers', () {
-    test('a node runs to the next coordinate, whatever kind of node that is',
-        () {
-      expect(_span(_index, 'bk'), '(0,0)..(0,2)'); // preamble, then its child
-      expect(_span(_index, 'bk-1'), '(0,2)..(1,0)'); // across a page break
-      expect(_span(_index, 'bk-2'), '(1,0)..(1,4)'); // stops at a *container*
-      expect(_span(_index, 'bk-v'), '(1,4)..(1,5)'); // vagga's own preamble
-    });
+    test(
+      'a node runs to the next coordinate, whatever kind of node that is',
+      () {
+        expect(_span(_index, 'bk'), '(0,0)..(0,2)'); // preamble, then its child
+        expect(_span(_index, 'bk-1'), '(0,2)..(1,0)'); // across a page break
+        expect(_span(_index, 'bk-2'), '(1,0)..(1,4)'); // stops at a *container*
+        expect(_span(_index, 'bk-v'), '(1,4)..(1,5)'); // vagga's own preamble
+      },
+    );
 
     test('only the last coordinate has no end', () {
       expect(_index.rangeFor('bk-v-1').end, isNull);
@@ -77,10 +79,16 @@ void main() {
         for (var entry = 0; entry < 10; entry++) {
           final at = SliceCoordinate(page, entry);
           final range = _index.rangeFor(_index.keyAt(page, entry));
-          expect(range.start.compareTo(at), lessThanOrEqualTo(0),
-              reason: '$at starts before its owner ${range.nodeKey}');
-          expect(range.end == null || range.end!.compareTo(at) > 0, isTrue,
-              reason: '$at is past the end of its owner ${range.nodeKey}');
+          expect(
+            range.start.compareTo(at),
+            lessThanOrEqualTo(0),
+            reason: '$at starts before its owner ${range.nodeKey}',
+          );
+          expect(
+            range.end == null || range.end!.compareTo(at) > 0,
+            isTrue,
+            reason: '$at is past the end of its owner ${range.nodeKey}',
+          );
         }
       }
     });
@@ -94,10 +102,10 @@ void main() {
     // has no preamble the inner one does not also carry — but a row can only
     // have one owner, so keyAt has to pick.
     List<TipitakaNode> pair() => [
-          _node('sp', at: (0, 0), parent: null, children: ['dn']),
-          _node('dn', at: (0, 0), parent: 'sp', children: ['dn-1-1']),
-          _node('dn-1-1', at: (0, 4), parent: 'dn'),
-        ];
+      _node('sp', at: (0, 0), parent: null, children: ['dn']),
+      _node('dn', at: (0, 0), parent: 'sp', children: ['dn-1-1']),
+      _node('dn-1-1', at: (0, 4), parent: 'dn'),
+    ];
 
     test('they share a range', () {
       final index = SliceIndex.forFile('dn-1', pair());
@@ -159,8 +167,7 @@ void main() {
 
     test('a node with no content file is absent — it has no text to slice', () {
       expect(
-        SliceIndex.nodesByFile(tree)
-            .values
+        SliceIndex.nodesByFile(tree).values
             .expand((n) => n)
             .map((n) => n.nodeKey),
         isNot(contains('bk-4')),
@@ -196,23 +203,26 @@ String _span(SliceIndex index, String key) {
   return '${range.start}..${range.end}';
 }
 
-TipitakaNode _node(String key,
-        {required (int, int) at,
-        required String? parent,
-        List<String> children = const []}) =>
-    TipitakaNode(
-      nodeKey: key,
-      paliName: key,
-      sinhalaName: key,
-      hierarchyLevel: 1,
-      entryPageIndex: at.$1,
-      entryIndexInPage: at.$2,
-      parentNodeKey: parent,
-      contentFileId: 'bk-1',
-      childKeys: children,
-    );
+TipitakaNode _node(
+  String key, {
+  required (int, int) at,
+  required String? parent,
+  List<String> children = const [],
+}) => TipitakaNode(
+  nodeKey: key,
+  paliName: key,
+  sinhalaName: key,
+  hierarchyLevel: 1,
+  entryPageIndex: at.$1,
+  entryIndexInPage: at.$2,
+  parentNodeKey: parent,
+  contentFileId: 'bk-1',
+  childKeys: children,
+);
 
 /// One `tree.json` row: `[pali, sinh, level, [page, entry], parent, fileId]`.
-List<dynamic> _row(String? parent,
-        {required List<int> at, required String? file}) =>
-    [parent ?? 'x', parent ?? 'x', 1, at, parent ?? 'root', file];
+List<dynamic> _row(
+  String? parent, {
+  required List<int> at,
+  required String? file,
+}) => [parent ?? 'x', parent ?? 'x', 1, at, parent ?? 'root', file];

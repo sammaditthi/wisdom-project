@@ -26,8 +26,10 @@ void main(List<String> args) {
 
   final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
-    stderr.writeln('no build directory at $rootPath. Generate one first, or '
-        'pass --build <dir>.');
+    stderr.writeln(
+      'no build directory at $rootPath. Generate one first, or '
+      'pass --build <dir>.',
+    );
     exitCode = 1;
     return;
   }
@@ -42,8 +44,10 @@ void main(List<String> args) {
   if (originFlag != null) {
     origin = _normalizeOrigin(originFlag);
     if (origin == null) {
-      stderr.writeln('--origin needs a scheme and a host, as in '
-          'https://sammaditthi.net. Got: $originFlag');
+      stderr.writeln(
+        '--origin needs a scheme and a host, as in '
+        'https://sammaditthi.net. Got: $originFlag',
+      );
       exitCode = 1;
       return;
     }
@@ -51,9 +55,11 @@ void main(List<String> args) {
     origin = _detectOrigin(rootPath);
   }
   if (origin == null) {
-    stderr.writeln('no origin: $rootPath/index.html carries no canonical, so '
-        'the site\'s own absolute URLs cannot be told from anyone else\'s. '
-        'Pass --origin https://<host> to say it outright.');
+    stderr.writeln(
+      'no origin: $rootPath/index.html carries no canonical, so '
+      'the site\'s own absolute URLs cannot be told from anyone else\'s. '
+      'Pass --origin https://<host> to say it outright.',
+    );
     exitCode = 1;
     return;
   }
@@ -86,8 +92,9 @@ void main(List<String> args) {
       }
 
       // A bare `#frag` asks its own file; everything else names a path.
-      final target =
-          link.path == null ? from : _resolve(link.path!, tree, from: from);
+      final target = link.path == null
+          ? from
+          : _resolve(link.path!, tree, from: from);
       if (target == null) {
         report.brokenTargets.putIfAbsent(raw, () => from);
         continue;
@@ -230,8 +237,9 @@ final RegExp _htmlRef = RegExp(r'(?:href|src)="([^"]*)"');
 /// `og:image` carries an asset URL that appears nowhere else on the page, and
 /// P5 named it the one asset whose absence is invisible on the site itself —
 /// only a link scraper ever asks for it. `og:url` rides along for free.
-final RegExp _metaRef =
-    RegExp(r'<meta[^>]+property="og:(?:image|url)"[^>]+content="([^"]*)"');
+final RegExp _metaRef = RegExp(
+  r'<meta[^>]+property="og:(?:image|url)"[^>]+content="([^"]*)"',
+);
 
 /// The one channel by which a URL reaches JavaScript. `site.js` holds no URLs
 /// by rule, so the search index arrives as `data-index="/assets/…?v=<hash>"` —
@@ -400,8 +408,10 @@ class _Report {
       duplicateIds.isEmpty;
 
   void print() {
-    stdout.writeln('\nlinks   $links references, '
-        '$fragments fragments resolved against their target');
+    stdout.writeln(
+      '\nlinks   $links references, '
+      '$fragments fragments resolved against their target',
+    );
 
     if (externalHosts.isNotEmpty) {
       final hosts = externalHosts.toList()..sort();
@@ -409,9 +419,11 @@ class _Report {
     }
 
     if (!lookedAtAnything) {
-      stdout.writeln('\nfound no ${links == 0 ? 'links' : 'fragments'} at all. '
-          'The patterns match nothing this build writes, so every check below '
-          'passed without looking. Treated as a failure.');
+      stdout.writeln(
+        '\nfound no ${links == 0 ? 'links' : 'fragments'} at all. '
+        'The patterns match nothing this build writes, so every check below '
+        'passed without looking. Treated as a failure.',
+      );
     }
 
     _section('broken targets', brokenTargets);
@@ -419,12 +431,14 @@ class _Report {
     _section('duplicate ids', duplicateIds);
 
     stdout.writeln('');
-    stdout.writeln(passed
-        ? 'PASS — every internal link resolves, every fragment names an id on '
-            'the page it points at, and no page declares an id twice.'
-        : 'FAIL — ${brokenTargets.length} broken, '
-            '${missingFragments.length} fragments naming nothing, '
-            '${duplicateIds.length} ids declared twice.');
+    stdout.writeln(
+      passed
+          ? 'PASS — every internal link resolves, every fragment names an id on '
+                'the page it points at, and no page declares an id twice.'
+          : 'FAIL — ${brokenTargets.length} broken, '
+                '${missingFragments.length} fragments naming nothing, '
+                '${duplicateIds.length} ids declared twice.',
+    );
   }
 
   void _section(String title, Map<String, String> offenders) {

@@ -12,10 +12,7 @@ class CacheConfig {
   /// underlying repository (no allocation, no key generation).
   final bool enabled;
 
-  const CacheConfig({
-    required this.maxEntries,
-    required this.enabled,
-  });
+  const CacheConfig({required this.maxEntries, required this.enabled});
 
   /// Builds a configuration sized for the running platform.
   ///

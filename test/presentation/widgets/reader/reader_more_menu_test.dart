@@ -103,8 +103,9 @@ void main() {
       expect(find.textContaining('thanissaro'), findsNothing);
     });
 
-    testWidgets('a screen reader hears the translator with the label',
-        (tester) async {
+    testWidgets('a screen reader hears the translator with the label', (
+      tester,
+    ) async {
       // Disposed inline: the framework checks for a live handle before
       // tear-downs run.
       final handle = tester.ensureSemantics();
@@ -133,8 +134,12 @@ void main() {
           return null;
         },
       );
-      addTearDown(() => tester.binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, null));
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
 
       await openMoreMenu(
         tester,

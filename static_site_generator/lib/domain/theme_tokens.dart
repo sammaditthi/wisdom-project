@@ -22,10 +22,10 @@ class ThemeTokens {
 
   /// Light-theme colour roles: `onSurface`, `heading`, `background` …
   Map<String, String> get lightColors => {
-        for (final entry
-            in (_json['colors']['light'] as Map<String, dynamic>).entries)
-          entry.key: entry.value as String,
-      };
+    for (final entry
+        in (_json['colors']['light'] as Map<String, dynamic>).entries)
+      entry.key: entry.value as String,
+  };
 
   /// Reader (serif) family, e.g. `NotoSerifSinhala`.
   String get readerFont => _fonts['reader'] as String;
@@ -55,14 +55,13 @@ class ThemeTokens {
       (_fonts['baseFontSize'] as num).toDouble();
 
   /// Style for a plain entry type (`paragraph`, `gatha`, `unindented`).
-  EntryStyle entryStyle(String type) => EntryStyle._(
-        (_json['entryStyles'][type] as Map<String, dynamic>),
-      );
+  EntryStyle entryStyle(String type) =>
+      EntryStyle._((_json['entryStyles'][type] as Map<String, dynamic>));
 
   /// Style for a levelled entry type (`heading`, `centered`), levels 1–5.
   EntryStyle levelledEntryStyle(String type, int level) => EntryStyle._(
-        (_json['entryStyles'][type]['$level'] as Map<String, dynamic>),
-      );
+    (_json['entryStyles'][type]['$level'] as Map<String, dynamic>),
+  );
 
   /// A weight a *pane* applies over an entry style rather than one the entry
   /// style carries — `paliStacked`, `body`. See `_paneWeights` in the dump

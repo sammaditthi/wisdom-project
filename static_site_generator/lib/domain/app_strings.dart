@@ -37,8 +37,10 @@ class AppStrings {
         throw StateError('app_si.arb has no string "$key".');
       }
       if (value.contains('{')) {
-        throw StateError('app_si.arb "$key" has a placeholder the site cannot '
-            'fill: "$value".');
+        throw StateError(
+          'app_si.arb "$key" has a placeholder the site cannot '
+          'fill: "$value".',
+        );
       }
     }
   }

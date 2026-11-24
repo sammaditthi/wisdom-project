@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
+
 import 'package:dartz/dartz.dart';
+
 import '../../domain/entities/failure.dart';
 import '../../domain/entities/search/grouped_search_result.dart';
 import '../../domain/entities/search/search_result_type.dart';
@@ -30,10 +32,9 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
   TextSearchRepositoryImpl(
     this._ftsDataSource,
     this._treeRepository, {
-    DictionaryRepository? dictionaryRepository,
-    required BJTContentDataSource contentDataSource,
-  })  : _dictionaryRepository = dictionaryRepository,
-        _contentDataSource = contentDataSource;
+    this._dictionaryRepository,
+    required this._contentDataSource,
+  });
 
   /// Overfetch multiplier for grouped results.
   /// We fetch more records than needed to ensure enough unique groups (nodeKeys).
@@ -64,79 +65,81 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     try {
       // Defensive guard - StateNotifier should validate before calling
       if (query.queryText.trim().isEmpty) {
-        return const Right(GroupedSearchResult(resultsByType: {
-          SearchResultType.title: [],
-          SearchResultType.fullText: [],
-          SearchResultType.definition: [],
-        }));
+        return const Right(
+          GroupedSearchResult(
+            resultsByType: {
+              SearchResultType.title: [],
+              SearchResultType.fullText: [],
+              SearchResultType.definition: [],
+            },
+          ),
+        );
       }
 
-      final editionsToSearch =
-          query.editionIds.isEmpty ? {'bjt'} : query.editionIds;
+      final editionsToSearch = query.editionIds.isEmpty
+          ? {'bjt'}
+          : query.editionIds;
 
       final treeResult = await _treeRepository.loadNavigationTree();
 
-      return await treeResult.fold(
-        (failure) async => Left(failure),
-        (tree) async {
-          final nodeMap = _buildNodeMap(tree);
-          final resultsByType = <SearchResultType, List<SearchResult>>{};
+      return await treeResult.fold((failure) async => Left(failure), (
+        tree,
+      ) async {
+        final nodeMap = _buildNodeMap(tree);
+        final resultsByType = <SearchResultType, List<SearchResult>>{};
 
-          // Derive the language scope ONCE; it drives both the title gating and
-          // the FTS filter below — one source of truth for the two toggles.
-          final languageScope = SearchLanguageScope.fromFlags(
-            searchInPali: query.searchInPali,
-            searchInSinhala: query.searchInSinhala,
-          );
+        // Derive the language scope ONCE; it drives both the title gating and
+        // the FTS filter below — one source of truth for the two toggles.
+        final languageScope = SearchLanguageScope.fromFlags(
+          searchInPali: query.searchInPali,
+          searchInSinhala: query.searchInSinhala,
+        );
 
-          // 1. Title matches (from navigation tree - in memory, fast)
-          resultsByType[SearchResultType.title] = _searchTitles(
-            nodeMap: nodeMap,
-            queryText: query.queryText,
-            editionId: 'bjt', // TODO: Support multiple editions
-            scope: query.scope,
-            isExactMatch: query.isExactMatch,
-            languageScope: languageScope,
-            limit: maxPerCategory,
-          );
+        // 1. Title matches (from navigation tree - in memory, fast)
+        resultsByType[SearchResultType.title] = _searchTitles(
+          nodeMap: nodeMap,
+          queryText: query.queryText,
+          editionId: 'bjt', // TODO: Support multiple editions
+          scope: query.scope,
+          isExactMatch: query.isExactMatch,
+          languageScope: languageScope,
+          limit: maxPerCategory,
+        );
 
-          // 2. Content matches (from FTS)
-          // Overfetch to ensure enough unique groups (suttas) after grouping
-          final overfetchLimit =
-              maxPerCategory * _groupedSearchOverfetchMultiplier;
-          final ftsResults = await _searchFullText(
-            nodeMap: nodeMap,
-            queryText: query.queryText,
-            editionIds: editionsToSearch,
-            scope: query.scope,
-            isExactMatch: query.isExactMatch,
-            isPhraseSearch: query.isPhraseSearch,
-            isAnywhereInText: query.isAnywhereInText,
-            proximityDistance: query.proximityDistance,
-            language: _ftsLanguageFilter(languageScope),
-            limit: overfetchLimit,
-            offset: 0,
-          );
+        // 2. Content matches (from FTS)
+        // Overfetch to ensure enough unique groups (suttas) after grouping
+        final overfetchLimit =
+            maxPerCategory * _groupedSearchOverfetchMultiplier;
+        final ftsResults = await _searchFullText(
+          nodeMap: nodeMap,
+          queryText: query.queryText,
+          editionIds: editionsToSearch,
+          scope: query.scope,
+          isExactMatch: query.isExactMatch,
+          isPhraseSearch: query.isPhraseSearch,
+          isAnywhereInText: query.isAnywhereInText,
+          proximityDistance: query.proximityDistance,
+          language: _ftsLanguageFilter(languageScope),
+          limit: overfetchLimit,
+          offset: 0,
+        );
 
-          // Group by nodeKey and limit to maxPerCategory groups
-          resultsByType[SearchResultType.fullText] = _limitToGroups(
-            ftsResults,
-            maxGroups: maxPerCategory,
-          );
+        // Group by nodeKey and limit to maxPerCategory groups
+        resultsByType[SearchResultType.fullText] = _limitToGroups(
+          ftsResults,
+          maxGroups: maxPerCategory,
+        );
 
-          // 3. Definition matches (from dictionary)
-          resultsByType[SearchResultType.definition] = await _searchDefinitions(
-            query.queryText,
-            isExactMatch: query.isExactMatch,
-            dictionaryIds: query.selectedDictionaryIds,
-            limit: maxPerCategory,
-          );
+        // 3. Definition matches (from dictionary)
+        resultsByType[SearchResultType.definition] = await _searchDefinitions(
+          query.queryText,
+          isExactMatch: query.isExactMatch,
+          dictionaryIds: query.selectedDictionaryIds,
+          limit: maxPerCategory,
+        );
 
-          return Right(GroupedSearchResult(
-            resultsByType: resultsByType,
-          ));
-        },
-      );
+        return Right(GroupedSearchResult(resultsByType: resultsByType));
+      });
     } catch (e) {
       return Left(
         Failure.dataLoadFailure(
@@ -158,36 +161,38 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
         return const Right([]);
       }
 
-      final editionsToSearch =
-          query.editionIds.isEmpty ? {'bjt'} : query.editionIds;
+      final editionsToSearch = query.editionIds.isEmpty
+          ? {'bjt'}
+          : query.editionIds;
 
       final treeResult = await _treeRepository.loadNavigationTree();
 
-      return await treeResult.fold(
-        (failure) async => Left(failure),
-        (tree) async {
-          final nodeMap = _buildNodeMap(tree);
-          final languageScope = SearchLanguageScope.fromFlags(
-            searchInPali: query.searchInPali,
-            searchInSinhala: query.searchInSinhala,
-          );
+      return await treeResult.fold((failure) async => Left(failure), (
+        tree,
+      ) async {
+        final nodeMap = _buildNodeMap(tree);
+        final languageScope = SearchLanguageScope.fromFlags(
+          searchInPali: query.searchInPali,
+          searchInSinhala: query.searchInSinhala,
+        );
 
-          switch (resultType) {
-            case SearchResultType.topResults:
-              // "All" category should use searchCategorizedPreview instead
-              // This case should not be reached via normal flow
-              throw StateError(
-                'Use searchTopResults for SearchResultType.topResults',
-              );
-            case SearchResultType.reference:
-              // Reference jumps are resolved in-memory by
-              // referenceSearchResultProvider, never via FTS (resolver plan,
-              // Part C). Excluded from the tab bar, so this is unreachable.
-              throw StateError(
-                'SearchResultType.reference is not an FTS category',
-              );
-            case SearchResultType.title:
-              return Right(_searchTitles(
+        switch (resultType) {
+          case SearchResultType.topResults:
+            // "All" category should use searchCategorizedPreview instead
+            // This case should not be reached via normal flow
+            throw StateError(
+              'Use searchTopResults for SearchResultType.topResults',
+            );
+          case SearchResultType.reference:
+            // Reference jumps are resolved in-memory by
+            // referenceSearchResultProvider, never via FTS (resolver plan,
+            // Part C). Excluded from the tab bar, so this is unreachable.
+            throw StateError(
+              'SearchResultType.reference is not an FTS category',
+            );
+          case SearchResultType.title:
+            return Right(
+              _searchTitles(
                 nodeMap: nodeMap,
                 queryText: query.queryText,
                 editionId: 'bjt',
@@ -195,43 +200,40 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
                 isExactMatch: query.isExactMatch,
                 languageScope: languageScope,
                 limit: query.limit,
-              ));
+              ),
+            );
 
-            case SearchResultType.fullText:
-              final results = await _searchFullText(
-                nodeMap: nodeMap,
-                queryText: query.queryText,
-                editionIds: editionsToSearch,
-                scope: query.scope,
-                isExactMatch: query.isExactMatch,
-                isPhraseSearch: query.isPhraseSearch,
-                isAnywhereInText: query.isAnywhereInText,
-                proximityDistance: query.proximityDistance,
-                language: _ftsLanguageFilter(languageScope),
-                limit: query.limit,
-                offset: query.offset,
-              );
-              return Right(results);
+          case SearchResultType.fullText:
+            final results = await _searchFullText(
+              nodeMap: nodeMap,
+              queryText: query.queryText,
+              editionIds: editionsToSearch,
+              scope: query.scope,
+              isExactMatch: query.isExactMatch,
+              isPhraseSearch: query.isPhraseSearch,
+              isAnywhereInText: query.isAnywhereInText,
+              proximityDistance: query.proximityDistance,
+              language: _ftsLanguageFilter(languageScope),
+              limit: query.limit,
+              offset: query.offset,
+            );
+            return Right(results);
 
-            case SearchResultType.definition:
-              // Dictionary search
-              final results = await _searchDefinitions(
-                query.queryText,
-                isExactMatch: query.isExactMatch,
-                dictionaryIds: query.selectedDictionaryIds,
-                limit: query.limit,
-                offset: query.offset,
-              );
-              return Right(results);
-          }
-        },
-      );
+          case SearchResultType.definition:
+            // Dictionary search
+            final results = await _searchDefinitions(
+              query.queryText,
+              isExactMatch: query.isExactMatch,
+              dictionaryIds: query.selectedDictionaryIds,
+              limit: query.limit,
+              offset: query.offset,
+            );
+            return Right(results);
+        }
+      });
     } catch (e) {
       return Left(
-        Failure.dataLoadFailure(
-          message: 'Failed to search by type',
-          error: e,
-        ),
+        Failure.dataLoadFailure(message: 'Failed to search by type', error: e),
       );
     }
   }
@@ -250,55 +252,55 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
         });
       }
 
-      final editionsToSearch =
-          query.editionIds.isEmpty ? {'bjt'} : query.editionIds;
+      final editionsToSearch = query.editionIds.isEmpty
+          ? {'bjt'}
+          : query.editionIds;
 
       final treeResult = await _treeRepository.loadNavigationTree();
 
-      return await treeResult.fold(
-        (failure) async => Left(failure),
-        (tree) async {
-          final nodeMap = _buildNodeMap(tree);
-          final count = <SearchResultType, int>{};
-          final languageScope = SearchLanguageScope.fromFlags(
-            searchInPali: query.searchInPali,
-            searchInSinhala: query.searchInSinhala,
-          );
+      return await treeResult.fold((failure) async => Left(failure), (
+        tree,
+      ) async {
+        final nodeMap = _buildNodeMap(tree);
+        final count = <SearchResultType, int>{};
+        final languageScope = SearchLanguageScope.fromFlags(
+          searchInPali: query.searchInPali,
+          searchInSinhala: query.searchInSinhala,
+        );
 
-          // Title count (from navigation tree - in memory, fast)
-          count[SearchResultType.title] = _searchTitles(
-            nodeMap: nodeMap,
-            queryText: query.queryText,
-            editionId: 'bjt',
-            scope: query.scope,
-            isExactMatch: query.isExactMatch,
-            languageScope: languageScope,
-          ).length;
+        // Title count (from navigation tree - in memory, fast)
+        count[SearchResultType.title] = _searchTitles(
+          nodeMap: nodeMap,
+          queryText: query.queryText,
+          editionId: 'bjt',
+          scope: query.scope,
+          isExactMatch: query.isExactMatch,
+          languageScope: languageScope,
+        ).length;
 
-          // Content count (efficient SQL COUNT) — same language filter as the
-          // FTS search above, so the tab badge matches the rows shown.
-          count[SearchResultType.fullText] =
-              await _ftsDataSource.countFullTextMatches(
-            query.queryText,
-            editionId: editionsToSearch.first,
-            scope: query.scope,
-            isExactMatch: query.isExactMatch,
-            isPhraseSearch: query.isPhraseSearch,
-            isAnywhereInText: query.isAnywhereInText,
-            proximityDistance: query.proximityDistance,
-            language: _ftsLanguageFilter(languageScope),
-          );
+        // Content count (efficient SQL COUNT) — same language filter as the
+        // FTS search above, so the tab badge matches the rows shown.
+        count[SearchResultType.fullText] = await _ftsDataSource
+            .countFullTextMatches(
+              query.queryText,
+              editionId: editionsToSearch.first,
+              scope: query.scope,
+              isExactMatch: query.isExactMatch,
+              isPhraseSearch: query.isPhraseSearch,
+              isAnywhereInText: query.isAnywhereInText,
+              proximityDistance: query.proximityDistance,
+              language: _ftsLanguageFilter(languageScope),
+            );
 
-          // Definition count (from dictionary)
-          count[SearchResultType.definition] = await _countDefinitions(
-            query.queryText,
-            isExactMatch: query.isExactMatch,
-            dictionaryIds: query.selectedDictionaryIds,
-          );
+        // Definition count (from dictionary)
+        count[SearchResultType.definition] = await _countDefinitions(
+          query.queryText,
+          isExactMatch: query.isExactMatch,
+          dictionaryIds: query.selectedDictionaryIds,
+        );
 
-          return Right(count);
-        },
-      );
+        return Right(count);
+      });
     } catch (e) {
       return Left(
         Failure.dataLoadFailure(
@@ -429,10 +431,10 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
 
     // Canon first, then commentary, then treatises (anya).
     int collectionRank(TipitakaTreeNode? node) => switch (node) {
-          TipitakaTreeNode(isCommentary: true) => 1,
-          TipitakaTreeNode(isTreatise: true) => 2,
-          _ => 0,
-        };
+      TipitakaTreeNode(isCommentary: true) => 1,
+      TipitakaTreeNode(isTreatise: true) => 2,
+      _ => 0,
+    };
 
     // One sort key per result, worked out once. Lower sorts first, rule by
     // rule, and the first rule that differs decides:
@@ -563,7 +565,8 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
         // The entry in one of the two rows fetched for its page, or '' when
         // it is unavailable — a missing or corrupt row degrades only its own
         // hit and never fails the search.
-        final matchedText = _entryTextFrom(
+        final matchedText =
+            _entryTextFrom(
               pageSides,
               match.filename,
               pageIndex,
@@ -578,8 +581,9 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
             : (node.paliName.isNotEmpty ? node.paliName : node.sinhalaName);
 
         // Normalize language: FTS uses 'sinh' but app uses 'sinhala'
-        final normalizedLanguage =
-            match.language == 'sinh' ? 'sinhala' : match.language;
+        final normalizedLanguage = match.language == 'sinh'
+            ? 'sinhala'
+            : match.language;
 
         results.add(
           SearchResult(
@@ -615,10 +619,10 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
   /// - [SearchLanguageScope.pali]    → 'pali'
   /// - [SearchLanguageScope.sinhala] → 'sinh'  (DB stores Sinhala as 'sinh')
   String? _ftsLanguageFilter(SearchLanguageScope scope) => switch (scope) {
-        SearchLanguageScope.both => null,
-        SearchLanguageScope.pali => 'pali',
-        SearchLanguageScope.sinhala => 'sinh',
-      };
+    SearchLanguageScope.both => null,
+    SearchLanguageScope.pali => 'pali',
+    SearchLanguageScope.sinhala => 'sinh',
+  };
 
   /// Limits results to maxGroups unique nodeKeys (suttas).
   /// Returns all results belonging to the first maxGroups groups.
@@ -680,8 +684,10 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     while (current != null && current.parentNodeKey != null) {
       final parent = nodeMap[current.parentNodeKey];
       if (parent != null) {
-        parts.insert(0,
-            parent.paliName.isNotEmpty ? parent.paliName : parent.sinhalaName);
+        parts.insert(
+          0,
+          parent.paliName.isNotEmpty ? parent.paliName : parent.sinhalaName,
+        );
         current = parent;
       } else {
         break;
@@ -710,8 +716,9 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
     int entryIndex,
     String language,
   ) {
-    final order =
-        language == 'pali' ? _snippetLanguages : _snippetLanguages.reversed;
+    final order = language == 'pali'
+        ? _snippetLanguages
+        : _snippetLanguages.reversed;
     for (final lang in order) {
       final side =
           sides[(fileId: fileId, pageIndex: pageIndex, language: lang)];
@@ -750,16 +757,13 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       offset: offset,
     );
 
-    return result.fold(
-      (failure) {
-        developer.log(
-          'Dictionary search failed: ${failure.userMessage}',
-          name: 'TextSearchRepository',
-        );
-        return <SearchResult>[];
-      },
-      (entries) => entries.map(_mapDictionaryEntryToSearchResult).toList(),
-    );
+    return result.fold((failure) {
+      developer.log(
+        'Dictionary search failed: ${failure.userMessage}',
+        name: 'TextSearchRepository',
+      );
+      return <SearchResult>[];
+    }, (entries) => entries.map(_mapDictionaryEntryToSearchResult).toList());
   }
 
   /// Count definition matches from dictionary
@@ -778,16 +782,13 @@ class TextSearchRepositoryImpl implements TextSearchRepository {
       dictionaryIds: dictionaryIds,
     );
 
-    return result.fold(
-      (failure) {
-        developer.log(
-          'Dictionary count failed: ${failure.userMessage}',
-          name: 'TextSearchRepository',
-        );
-        return 0;
-      },
-      (count) => count,
-    );
+    return result.fold((failure) {
+      developer.log(
+        'Dictionary count failed: ${failure.userMessage}',
+        name: 'TextSearchRepository',
+      );
+      return 0;
+    }, (count) => count);
   }
 
   /// Maps a DictionaryEntry to SearchResult for UI integration

@@ -62,10 +62,7 @@ class DictionaryFilterOperations {
   /// - If all [keysToToggle] are already in [current]: removes them
   /// - Otherwise: adds them all
   /// - Auto-normalizes (all selected → empty = "All")
-  static Set<String> toggleKeys(
-    Set<String> current,
-    Set<String> keysToToggle,
-  ) {
+  static Set<String> toggleKeys(Set<String> current, Set<String> keysToToggle) {
     final Set<String> result;
     if (keysToToggle.every(current.contains)) {
       // All keys present → remove them

@@ -11,12 +11,14 @@ class FixedAccentColors {
   // haze. The red is kept well clear of the error reds.
   static const primaryFixedDim = Color(0xFFFFA700); // Sun orange: the sun
   static const onPrimaryFixed = Color(0xFFFF4D00); // Sunset red: the low sun
-  static const onPrimaryFixedVariant =
-      Color(0xFFA65200); // Dark orange: midday near, 5.5:1 on white
+  static const onPrimaryFixedVariant = Color(
+    0xFFA65200,
+  ); // Dark orange: midday near, 5.5:1 on white
   static const secondaryFixed = Color(0xFFA9CBEA); // Sky blue: kāla
   static const secondaryFixedDim = Color(0xFF75839B); // Slate grey: afternoon
-  static const onSecondaryFixed =
-      Color(0xFFFF6D00); // Deep orange: midday near, 5.9:1 on dark
+  static const onSecondaryFixed = Color(
+    0xFFFF6D00,
+  ); // Deep orange: midday near, 5.9:1 on dark
   static const tertiaryFixed = Color(0xFFCFE2F3); // Pale blue: drawn moon
   static const tertiaryFixedDim = Color(0xFF1B2A4E); // Midnight blue: night
 }
@@ -45,13 +47,15 @@ class LightThemeColors {
   static const surface = Color(0xFFFFFFFF); // Pure white for non content panels
   static const onSurface = Color(0xFF422701); // Deep brown (body text)
   static const onSurfaceVariant = Color(0xFF705E46); // Warm taupe (muted text)
-  static const surfaceContainerLowest =
-      Color(0xFFFDF8F3); // Subtle lift from bg
+  static const surfaceContainerLowest = Color(
+    0xFFFDF8F3,
+  ); // Subtle lift from bg
   static const surfaceContainerLow = Color(0xFFF5EEE5); // Subtle lift
   static const surfaceContainer = Color(0xFFEDE6DD); // Standard cards
   static const surfaceContainerHigh = Color(0xFFE8DFD0); // Gatha bg, highlights
-  static const surfaceContainerHighest =
-      Color(0xFFE0D7C8); // Dialogs, active tabs
+  static const surfaceContainerHighest = Color(
+    0xFFE0D7C8,
+  ); // Dialogs, active tabs
   static const surfaceDim = Color(0xFFDED8CE); // Dimmer canvas
   static const surfaceBright = background; // Bright canvas
   static const surfaceTint = primary; // Elevation tint
@@ -69,8 +73,9 @@ class LightThemeColors {
   // ============================================
   static const secondary = onSurfaceVariant; // Warm taupe
   static const onSecondary = Color(0xFFFFFFFF); // White
-  static const secondaryContainer =
-      Color(0xFFD0CABE); // Warm greige (selected pill bg)
+  static const secondaryContainer = Color(
+    0xFFD0CABE,
+  ); // Warm greige (selected pill bg)
   static const onSecondaryContainer = heading; // Dark brown
 
   // ============================================
@@ -84,8 +89,9 @@ class LightThemeColors {
   // ============================================
   // Error group
   // ============================================
-  static const error =
-      Color(0xFFB3261E); // M3 cherry red (distinct from primary)
+  static const error = Color(
+    0xFFB3261E,
+  ); // M3 cherry red (distinct from primary)
   static const onError = Color(0xFFFFFFFF); // White
   static const errorContainer = Color(0xFFFFDAD0); // Soft peach-red
   static const onErrorContainer = Color(0xFF410001); // Dark maroon
@@ -113,8 +119,9 @@ class LightThemeColors {
   // Custom (not M3 roles — app-specific)
   // ============================================
   static const heading = Color(0xFF2A2318); // Dark brown (reader headings only)
-  static const highlight =
-      Color(0xFFFFE680); // Soft amber (text highlight on parchment)
+  static const highlight = Color(
+    0xFFFFE680,
+  ); // Soft amber (text highlight on parchment)
 }
 
 /// Color palette for Dark theme
@@ -122,13 +129,15 @@ class LightThemeColors {
 class DarkThemeColors {
   // Background & Surface Container Hierarchy (Material 3)
   static const background = Color(0xFF121212); // Near black
-  static const surfaceContainerLowest =
-      Color(0xFF121212); // Same as bg (inactive)
+  static const surfaceContainerLowest = Color(
+    0xFF121212,
+  ); // Same as bg (inactive)
   static const surfaceContainerLow = Color(0xFF1A1A1A); // Subtle lift
   static const surface = Color(0xFF1E1E1E); // Standard cards
   static const surfaceContainerHigh = Color(0xFF2A2A2A); // Gatha bg, highlights
-  static const surfaceContainerHighest =
-      Color(0xFF333333); // Dialogs, active tabs
+  static const surfaceContainerHighest = Color(
+    0xFF333333,
+  ); // Dialogs, active tabs
 
   // Text
   static const primary = Color(0xFFFFFFFF); // Pure white (headings)
@@ -138,8 +147,9 @@ class DarkThemeColors {
 
   // Interactive
   static const accent = Color(0xFFFF8C00); // Bright orange (links, buttons)
-  static const secondaryAccent =
-      Color(0xFFFFD36A); // Golden amber (current match highlight)
+  static const secondaryAccent = Color(
+    0xFFFFD36A,
+  ); // Golden amber (current match highlight)
 
   // Utility
   static const divider = Color(0xFF424242); // Dark gray divider
@@ -156,13 +166,15 @@ class DarkThemeColors {
 class WarmThemeColors {
   // Background & Surface Container Hierarchy (Material 3)
   static const background = Color(0xFF2A2318); // Dark warm brown
-  static const surfaceContainerLowest =
-      Color(0xFF2A2318); // Same as bg (inactive)
+  static const surfaceContainerLowest = Color(
+    0xFF2A2318,
+  ); // Same as bg (inactive)
   static const surfaceContainerLow = Color(0xFF332B1F); // Subtle lift
   static const surface = Color(0xFF3D3428); // Standard cards
   static const surfaceContainerHigh = Color(0xFF4A3E2E); // Gatha bg, highlights
-  static const surfaceContainerHighest =
-      Color(0xFF554838); // Dialogs, active tabs
+  static const surfaceContainerHighest = Color(
+    0xFF554838,
+  ); // Dialogs, active tabs
 
   // Text
   static const primary = Color(0xFFD47E30); // Cinnamon orange (headings)
@@ -172,8 +184,9 @@ class WarmThemeColors {
 
   // Interactive
   static const accent = Color(0xFFD6B588); // Gold (links, buttons)
-  static const secondaryAccent =
-      Color(0xFFFFD36A); // Golden amber (current match highlight)
+  static const secondaryAccent = Color(
+    0xFFFFD36A,
+  ); // Golden amber (current match highlight)
 
   // Utility
   static const divider = Color(0xFF524535); // Dark brown divider

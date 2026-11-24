@@ -21,11 +21,15 @@ Future<void> copyActiveTabPath(BuildContext context, WidgetRef ref) async {
   final segments = ref.read(breadcrumbPathProvider);
   if (segments.isEmpty) return;
   final messenger = ScaffoldMessenger.of(context);
-  final snackBar =
-      _copiedSnackBar(context, AppLocalizations.of(context).pathCopied);
-  await Clipboard.setData(ClipboardData(
-    text: segments.map((s) => s.displayName).join(breadcrumbSeparator),
-  ));
+  final snackBar = _copiedSnackBar(
+    context,
+    AppLocalizations.of(context).pathCopied,
+  );
+  await Clipboard.setData(
+    ClipboardData(
+      text: segments.map((s) => s.displayName).join(breadcrumbSeparator),
+    ),
+  );
   messenger.showSnackBar(snackBar);
 }
 
@@ -34,8 +38,10 @@ Future<void> copyActiveTabLink(BuildContext context, WidgetRef ref) async {
   final link = _activeTabLink(ref);
   if (link == null) return;
   final messenger = ScaffoldMessenger.of(context);
-  final snackBar =
-      _copiedSnackBar(context, AppLocalizations.of(context).linkCopied);
+  final snackBar = _copiedSnackBar(
+    context,
+    AppLocalizations.of(context).linkCopied,
+  );
   await ref.read(copyTipitakaLinkProvider)(link);
   messenger.showSnackBar(snackBar);
 }

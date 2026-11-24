@@ -136,115 +136,134 @@ void main() {
         // Default language is Sinhala, so we expect Sinhala display names
         final text = getBreadcrumbText(tester);
         final node = container.read(nodeByKeyProvider('dn-1-1'));
-        expect(text, contains(node!.sinhalaName),
-            reason: 'Breadcrumb should contain the leaf sutta name');
-        expect(text, contains('›'),
-            reason: 'Breadcrumb should contain separator');
+        expect(
+          text,
+          contains(node!.sinhalaName),
+          reason: 'Breadcrumb should contain the leaf sutta name',
+        );
+        expect(
+          text,
+          contains('›'),
+          reason: 'Breadcrumb should contain separator',
+        );
 
         // Verify the path has at least the leaf + its parent
         final parentNode = container.read(nodeByKeyProvider('dn-1'));
-        expect(text, contains(parentNode!.sinhalaName),
-            reason: 'Breadcrumb should contain parent name');
+        expect(
+          text,
+          contains(parentNode!.sinhalaName),
+          reason: 'Breadcrumb should contain parent name',
+        );
       },
     );
 
     // =================================================================
     // Test 2: Breadcrumb is empty when no tab is open
     // =================================================================
-    testWidgets(
-      '2. Breadcrumb shows nothing when no tab is active',
-      (tester) async {
-        await pumpBreadcrumbApp(tester);
+    testWidgets('2. Breadcrumb shows nothing when no tab is active', (
+      tester,
+    ) async {
+      await pumpBreadcrumbApp(tester);
 
-        // ASSERT: No RichText in the breadcrumb area
-        final breadcrumbRichText = find.descendant(
-          of: find.byType(BreadcrumbWidget),
-          matching: find.byType(RichText),
-        );
-        expect(breadcrumbRichText, findsNothing,
-            reason: 'No tabs → breadcrumb should render SizedBox.shrink');
-      },
-    );
+      // ASSERT: No RichText in the breadcrumb area
+      final breadcrumbRichText = find.descendant(
+        of: find.byType(BreadcrumbWidget),
+        matching: find.byType(RichText),
+      );
+      expect(
+        breadcrumbRichText,
+        findsNothing,
+        reason: 'No tabs → breadcrumb should render SizedBox.shrink',
+      );
+    });
 
     // =================================================================
     // Test 3: Leaf segment is non-tappable
     // =================================================================
-    testWidgets(
-      '3. Leaf segment (last) has no tap recognizer',
-      (tester) async {
-        final container = await pumpBreadcrumbApp(tester);
+    testWidgets('3. Leaf segment (last) has no tap recognizer', (tester) async {
+      final container = await pumpBreadcrumbApp(tester);
 
-        final tab = tabFromNode(container, 'dn-1-1');
-        await openTab(tester, container, tab);
+      final tab = tabFromNode(container, 'dn-1-1');
+      await openTab(tester, container, tab);
 
-        // ASSERT: Last span has no TapGestureRecognizer
-        final spans = getBreadcrumbSpans(tester);
-        expect(spans, isNotEmpty, reason: 'Breadcrumb should have spans');
+      // ASSERT: Last span has no TapGestureRecognizer
+      final spans = getBreadcrumbSpans(tester);
+      expect(spans, isNotEmpty, reason: 'Breadcrumb should have spans');
 
-        final lastSpan = spans.last;
-        expect(lastSpan.recognizer, isNull,
-            reason: 'Leaf segment should NOT have a tap recognizer');
-      },
-    );
+      final lastSpan = spans.last;
+      expect(
+        lastSpan.recognizer,
+        isNull,
+        reason: 'Leaf segment should NOT have a tap recognizer',
+      );
+    });
 
     // =================================================================
     // Test 4: Parent segments ARE tappable
     // =================================================================
-    testWidgets(
-      '4. Parent segments have tap recognizers',
-      (tester) async {
-        final container = await pumpBreadcrumbApp(tester);
+    testWidgets('4. Parent segments have tap recognizers', (tester) async {
+      final container = await pumpBreadcrumbApp(tester);
 
-        final tab = tabFromNode(container, 'dn-1-1');
-        await openTab(tester, container, tab);
+      final tab = tabFromNode(container, 'dn-1-1');
+      await openTab(tester, container, tab);
 
-        // ASSERT: First span (root parent) has a TapGestureRecognizer
-        final spans = getBreadcrumbSpans(tester);
-        final firstSpan = spans.first;
-        expect(firstSpan.recognizer, isA<TapGestureRecognizer>(),
-            reason: 'Parent segment should have a tap recognizer');
-      },
-    );
+      // ASSERT: First span (root parent) has a TapGestureRecognizer
+      final spans = getBreadcrumbSpans(tester);
+      final firstSpan = spans.first;
+      expect(
+        firstSpan.recognizer,
+        isA<TapGestureRecognizer>(),
+        reason: 'Parent segment should have a tap recognizer',
+      );
+    });
 
     // =================================================================
     // Test 5: Tapping parent segment opens a new tab
     // =================================================================
-    testWidgets(
-      '5. Tapping parent segment opens new tab for that node',
-      (tester) async {
-        final container = await pumpBreadcrumbApp(tester);
+    testWidgets('5. Tapping parent segment opens new tab for that node', (
+      tester,
+    ) async {
+      final container = await pumpBreadcrumbApp(tester);
 
-        // Open leaf sutta
-        final tab = tabFromNode(container, 'dn-1-1');
-        await openTab(tester, container, tab);
+      // Open leaf sutta
+      final tab = tabFromNode(container, 'dn-1-1');
+      await openTab(tester, container, tab);
 
-        final tabCountBefore = container.read(tabsProvider).length;
+      final tabCountBefore = container.read(tabsProvider).length;
 
-        // ACT: Tap the first parent segment (root of the path)
-        final spans = getBreadcrumbSpans(tester);
-        final parentRecognizer = spans.first.recognizer as TapGestureRecognizer;
-        parentRecognizer.onTap!();
-        await pumpForSettle(tester);
+      // ACT: Tap the first parent segment (root of the path)
+      final spans = getBreadcrumbSpans(tester);
+      final parentRecognizer = spans.first.recognizer as TapGestureRecognizer;
+      parentRecognizer.onTap!();
+      await pumpForSettle(tester);
 
-        // ASSERT: New tab was created
-        final tabs = container.read(tabsProvider);
-        expect(tabs.length, equals(tabCountBefore + 1),
-            reason: 'Tapping parent should add a new tab');
+      // ASSERT: New tab was created
+      final tabs = container.read(tabsProvider);
+      expect(
+        tabs.length,
+        equals(tabCountBefore + 1),
+        reason: 'Tapping parent should add a new tab',
+      );
 
-        // The new tab is now active
-        final activeIndex = container.read(activeTabIndexProvider);
-        expect(activeIndex, equals(tabs.length - 1),
-            reason: 'New tab should become active');
+      // The new tab is now active
+      final activeIndex = container.read(activeTabIndexProvider);
+      expect(
+        activeIndex,
+        equals(tabs.length - 1),
+        reason: 'New tab should become active',
+      );
 
-        // The new tab's nodeKey matches the breadcrumb parent we tapped
-        // (which is the root ancestor of dn-1-1)
-        final newTab = tabs[activeIndex];
-        // Verify the new tab is for the root of the breadcrumb path
-        final ancestorKeys = container.read(ancestorKeysProvider('dn-1-1'));
-        expect(newTab.nodeKey, equals(ancestorKeys.first),
-            reason: 'New tab nodeKey should match the tapped parent');
-      },
-    );
+      // The new tab's nodeKey matches the breadcrumb parent we tapped
+      // (which is the root ancestor of dn-1-1)
+      final newTab = tabs[activeIndex];
+      // Verify the new tab is for the root of the breadcrumb path
+      final ancestorKeys = container.read(ancestorKeysProvider('dn-1-1'));
+      expect(
+        newTab.nodeKey,
+        equals(ancestorKeys.first),
+        reason: 'New tab nodeKey should match the tapped parent',
+      );
+    });
 
     // =================================================================
     // Test 6: Breadcrumb updates after navigating to parent
@@ -260,8 +279,11 @@ void main() {
 
         final textBefore = getBreadcrumbText(tester);
         final leafNode = container.read(nodeByKeyProvider('dn-1-1'));
-        expect(textBefore, contains(leafNode!.sinhalaName),
-            reason: 'Should show leaf name initially');
+        expect(
+          textBefore,
+          contains(leafNode!.sinhalaName),
+          reason: 'Should show leaf name initially',
+        );
 
         // ACT: Tap first parent to navigate to root
         final spans = getBreadcrumbSpans(tester);
@@ -270,9 +292,11 @@ void main() {
 
         // ASSERT: Breadcrumb now shows shorter path (just root)
         final textAfter = getBreadcrumbText(tester);
-        expect(textAfter, isNot(contains(leafNode.sinhalaName)),
-            reason:
-                'Leaf name should no longer appear after navigating to root');
+        expect(
+          textAfter,
+          isNot(contains(leafNode.sinhalaName)),
+          reason: 'Leaf name should no longer appear after navigating to root',
+        );
       },
     );
 
@@ -294,8 +318,11 @@ void main() {
 
         // Verify Sinhala names shown initially
         final textBefore = getBreadcrumbText(tester);
-        expect(textBefore, contains(sinhalaName),
-            reason: 'Default language is Sinhala');
+        expect(
+          textBefore,
+          contains(sinhalaName),
+          reason: 'Default language is Sinhala',
+        );
 
         // ACT: Switch Content Language to Pali. The breadcrumb and tree both
         // watch effectiveContentLanguageProvider, which derives from this.
@@ -306,22 +333,32 @@ void main() {
 
         // ASSERT: Now shows Pali names (with conjunct transformation applied)
         final textAfter = getBreadcrumbText(tester);
-        expect(textAfter,
-            contains(beautifyPaliText(paliName, PaliLetterOptions.defaults)),
-            reason:
-                'After switching to Pali, breadcrumb should show Pali names');
-        expect(textAfter, isNot(contains(sinhalaName)),
-            reason: 'Sinhala names should no longer appear');
+        expect(
+          textAfter,
+          contains(beautifyPaliText(paliName, PaliLetterOptions.defaults)),
+          reason: 'After switching to Pali, breadcrumb should show Pali names',
+        );
+        expect(
+          textAfter,
+          isNot(contains(sinhalaName)),
+          reason: 'Sinhala names should no longer appear',
+        );
 
         // ASSERT: Tree navigator also shows Pali names with conjuncts.
         // The parent node 'dn' (දීඝනිකාය) should now display its Pali name
         // with conjunct transformation in the tree.
         final dnNode = container.read(nodeByKeyProvider('dn'));
-        final dnPaliTransformed =
-            beautifyPaliText(dnNode!.paliName, PaliLetterOptions.defaults);
-        expect(find.text(dnPaliTransformed), findsOneWidget,
-            reason: 'Tree navigator should show Pali names with conjuncts '
-                'after language switch');
+        final dnPaliTransformed = beautifyPaliText(
+          dnNode!.paliName,
+          PaliLetterOptions.defaults,
+        );
+        expect(
+          find.text(dnPaliTransformed),
+          findsOneWidget,
+          reason:
+              'Tree navigator should show Pali names with conjuncts '
+              'after language switch',
+        );
       },
     );
 
@@ -353,9 +390,13 @@ void main() {
         // happened, so a tree that stopped rendering dn would skip the lot and
         // leave the test passing on nothing.
         final dnText = find.text(dnNode!.sinhalaName);
-        expect(dnText, findsWidgets,
-            reason: 'The tree navigator must be showing dn — there is nothing '
-                'to tap otherwise, and nothing below would be checked');
+        expect(
+          dnText,
+          findsWidgets,
+          reason:
+              'The tree navigator must be showing dn — there is nothing '
+              'to tap otherwise, and nothing below would be checked',
+        );
 
         await tester.tap(dnText.first);
         await pumpForSettle(tester);
@@ -365,40 +406,56 @@ void main() {
         expect(tabs, isNotEmpty, reason: 'Tapping node should create a tab');
 
         final createdTab = tabs.last;
-        expect(createdTab.nodeKey, equals('dn'),
-            reason: 'Tab nodeKey should match the tapped node');
-        expect(createdTab.anchorPageIndex, isNull,
-            reason: 'A tree tap names no row to land on — the unit is '
-                'rendered from its own first row');
+        expect(
+          createdTab.nodeKey,
+          equals('dn'),
+          reason: 'Tab nodeKey should match the tapped node',
+        );
+        expect(
+          createdTab.anchorPageIndex,
+          isNull,
+          reason:
+              'A tree tap names no row to land on — the unit is '
+              'rendered from its own first row',
+        );
 
         // The content file is not on the tab any more: the tab is the node,
         // and the file it reads is resolved from that key. So the question
         // this test asks is now asked of the *derived* provider. dn carries a
         // file of its own, so this is asserted positively on purpose: a `null`
         // here would equally be a resolver that never loaded.
-        expect(container.read(activeContentFileIdProvider),
-            equals(dnNode.contentFileId),
-            reason: 'The unit should read the tapped node own file');
+        expect(
+          container.read(activeContentFileIdProvider),
+          equals(dnNode.contentFileId),
+          reason: 'The unit should read the tapped node own file',
+        );
 
         // The file id alone cannot say WHICH unit opened: dn, dn-1, dn-1-1 and
         // dn-1-2 all read dn-1. The unit's start coordinate can, and it is
         // what replaced the start-coordinate fields this test used to read off
         // the tab.
         final unit = container.read(activeReaderUnitProvider).valueOrNull;
-        expect(unit, isNotNull,
-            reason: 'The tapped node must resolve to a unit');
+        expect(
+          unit,
+          isNotNull,
+          reason: 'The tapped node must resolve to a unit',
+        );
         expect(
           unit!.range.start,
           SliceCoordinate(dnNode.entryPageIndex, dnNode.entryIndexInPage),
-          reason: 'dn own row is where its unit starts — a unit resolved for '
+          reason:
+              'dn own row is where its unit starts — a unit resolved for '
               'dn-1, dn-1-1 or dn-1-2 reads the same file from further in, '
               'and the assertion above would not notice',
         );
 
         // Breadcrumb should update to show path for dn
         final text = getBreadcrumbText(tester);
-        expect(text, isNotEmpty,
-            reason: 'Breadcrumb should render for the new tab');
+        expect(
+          text,
+          isNotEmpty,
+          reason: 'Breadcrumb should render for the new tab',
+        );
       },
     );
   });

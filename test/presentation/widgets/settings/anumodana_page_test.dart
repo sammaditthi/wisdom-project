@@ -59,16 +59,23 @@ void main() {
       expect(find.text(l10n.anumodanaLineage), findsNothing);
 
       double y(String label) => tester.getTopLeft(find.text(label)).dy;
-      expect(y(l10n.anumodanaTextSources),
-          lessThan(y(l10n.anumodanaDictionaries)));
-      expect(y(l10n.anumodanaDictionaries),
-          lessThan(y(l10n.anumodanaContributors)));
       expect(
-          y(l10n.anumodanaContributors), lessThan(y(l10n.anumodanaLicences)));
+        y(l10n.anumodanaTextSources),
+        lessThan(y(l10n.anumodanaDictionaries)),
+      );
+      expect(
+        y(l10n.anumodanaDictionaries),
+        lessThan(y(l10n.anumodanaContributors)),
+      );
+      expect(
+        y(l10n.anumodanaContributors),
+        lessThan(y(l10n.anumodanaLicences)),
+      );
     });
 
-    testWidgets('each text source names itself, its use and its way out',
-        (tester) async {
+    testWidgets('each text source names itself, its use and its way out', (
+      tester,
+    ) async {
       final l10n = await pumpPage(tester);
 
       // Proper names are never translated, so these two are literals.
@@ -82,8 +89,9 @@ void main() {
     });
 
     // Home, and with it the moon images, is only in the macOS app.
-    testWidgets('the moon images are credited to NASA in the macOS app',
-        (tester) async {
+    testWidgets('the moon images are credited to NASA in the macOS app', (
+      tester,
+    ) async {
       final l10n = await pumpPage(tester);
 
       // The credit line NASA asks for, word for word, so a literal.
@@ -96,8 +104,9 @@ void main() {
       expect(find.byTooltip(l10n.openLinkTo(nasa)), findsOneWidget);
     }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
-    testWidgets('the sources carry their own logos, drawn as decoration',
-        (tester) async {
+    testWidgets('the sources carry their own logos, drawn as decoration', (
+      tester,
+    ) async {
       await pumpPage(tester);
 
       final images = tester.widgetList<Image>(find.byType(Image)).toList();
@@ -115,21 +124,26 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Those who contributed is a statement, not a labelled setting',
-        (tester) async {
-      final l10n = await pumpPage(tester);
-      expect(find.text(l10n.anumodanaContributorsBody), findsOneWidget);
-    });
+    testWidgets(
+      'Those who contributed is a statement, not a labelled setting',
+      (tester) async {
+        final l10n = await pumpPage(tester);
+        expect(find.text(l10n.anumodanaContributorsBody), findsOneWidget);
+      },
+    );
 
-    testWidgets('the bundled faces and the open-source list are reachable',
-        (tester) async {
+    testWidgets('the bundled faces and the open-source list are reachable', (
+      tester,
+    ) async {
       final l10n = await pumpPage(tester);
 
       // Named, not localized: these are the four faces pubspec declares, and
       // assets/fonts/OFL.txt is registered for them in main.dart.
       expect(
-        find.text('Noto Sans, Noto Serif, Noto Sans Sinhala, '
-            'Noto Serif Sinhala'),
+        find.text(
+          'Noto Sans, Noto Serif, Noto Sans Sinhala, '
+          'Noto Serif Sinhala',
+        ),
         findsOneWidget,
       );
       expect(find.text('SIL Open Font License 1.1'), findsOneWidget);
@@ -152,9 +166,9 @@ void main() {
   group('AnumodanaPage dictionaries', () {
     /// One of the page's two groups, in the order it shows them.
     List<DictionaryInfo> group(String targetLanguage) => [
-          for (final d in DictionaryInfo.all.values)
-            if (d.targetLanguage == targetLanguage) d,
-        ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      for (final d in DictionaryInfo.all.values)
+        if (d.targetLanguage == targetLanguage) d,
+    ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     testWidgets('every DictionaryInfo.all entry is credited', (tester) async {
       final l10n = await pumpPage(tester);
@@ -172,13 +186,17 @@ void main() {
 
       for (final d in DictionaryInfo.all.values) {
         expect(find.text(d.name), findsOneWidget, reason: '${d.id} name');
-        expect(find.text(d.abbreviation), findsOneWidget,
-            reason: '${d.id} tile');
+        expect(
+          find.text(d.abbreviation),
+          findsOneWidget,
+          reason: '${d.id} tile',
+        );
       }
     });
 
-    testWidgets('each group is alphabetical, as its hint promises',
-        (tester) async {
+    testWidgets('each group is alphabetical, as its hint promises', (
+      tester,
+    ) async {
       final l10n = await pumpPage(tester);
       expect(find.text(l10n.anumodanaDictionariesHint), findsOneWidget);
 
@@ -187,8 +205,11 @@ void main() {
           for (final d in group(targetLanguage))
             tester.getTopLeft(find.text(d.name)).dy,
         ];
-        expect(tops, orderedEquals([...tops]..sort()),
-            reason: '$targetLanguage is out of alphabetical order on screen');
+        expect(
+          tops,
+          orderedEquals([...tops]..sort()),
+          reason: '$targetLanguage is out of alphabetical order on screen',
+        );
       }
     });
 

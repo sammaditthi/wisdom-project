@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../content/entry.dart';
 
 part 'bjt_section.freezed.dart';

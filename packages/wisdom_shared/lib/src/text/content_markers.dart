@@ -88,7 +88,7 @@ class ContentSegment {
   String toString() => isFootnote
       ? 'ContentSegment.footnote($footnoteLabel)'
       : 'ContentSegment("$text"${bold ? ' bold' : ''}'
-          '${underline ? ' underline' : ''})';
+            '${underline ? ' underline' : ''})';
 }
 
 /// Splits raw entry text into ordered, styled segments. No Flutter.
@@ -103,11 +103,9 @@ List<ContentSegment> parseContentMarkers(String raw) {
 
   void flush() {
     if (buffer.isEmpty) return;
-    segments.add(ContentSegment(
-      text: buffer.toString(),
-      bold: bold,
-      underline: underline,
-    ));
+    segments.add(
+      ContentSegment(text: buffer.toString(), bold: bold, underline: underline),
+    );
     buffer.clear();
   }
 
@@ -130,12 +128,14 @@ List<ContentSegment> parseContentMarkers(String raw) {
       // entry (the Vibhaṅgavagga uddāna in mn-3-4.json) whose entire span is
       // one footnote, and which would otherwise reach a renderer with no
       // styling information at all.
-      segments.add(ContentSegment(
-        text: '',
-        bold: bold,
-        underline: underline,
-        footnoteLabel: label,
-      ));
+      segments.add(
+        ContentSegment(
+          text: '',
+          bold: bold,
+          underline: underline,
+          footnoteLabel: label,
+        ),
+      );
     },
   );
   flush();

@@ -24,36 +24,44 @@ Future<void> main(List<String> args) async {
 
   final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
-    stderr.writeln('no build directory at $rootPath. Generate one first, or '
-        'pass --build <dir>.');
+    stderr.writeln(
+      'no build directory at $rootPath. Generate one first, or '
+      'pass --build <dir>.',
+    );
     exitCode = 1;
     return;
   }
   stdout.writeln('build   $rootPath');
 
-  final pages = Directory(rootPath)
-      .listSync(recursive: true)
-      .whereType<File>()
-      .map((f) => f.path.substring(rootPath.length + 1))
-      .where((p) => p.endsWith('.html'))
-      .toList()
-    ..sort();
+  final pages =
+      Directory(rootPath)
+          .listSync(recursive: true)
+          .whereType<File>()
+          .map((f) => f.path.substring(rootPath.length + 1))
+          .where((p) => p.endsWith('.html'))
+          .toList()
+        ..sort();
   if (pages.isEmpty) {
-    stdout.writeln('\nFAIL — found no .html files at all, so nothing was '
-        'checked. Treated as a failure.');
+    stdout.writeln(
+      '\nFAIL — found no .html files at all, so nothing was '
+      'checked. Treated as a failure.',
+    );
     exitCode = 1;
     return;
   }
 
   // Round-robin, so each worker gets a share of the corpus's few huge pages.
-  final workers =
-      Platform.numberOfProcessors.clamp(1, pages.length.clamp(1, 64));
+  final workers = Platform.numberOfProcessors.clamp(
+    1,
+    pages.length.clamp(1, 64),
+  );
   final shares = [
     for (var w = 0; w < workers; w++)
       [for (var i = w; i < pages.length; i += workers) pages[i]],
   ];
   final found = await Future.wait(
-      shares.map((share) => Isolate.run(() => _parse(rootPath, share))));
+    shares.map((share) => Isolate.run(() => _parse(rootPath, share))),
+  );
 
   // Message → every page it occurs on, first location kept per page.
   final byMessage = <String, Map<String, String>>{};
@@ -80,15 +88,19 @@ Future<void> main(List<String> args) async {
     final onPages = byMessage[message]!;
     final first = (onPages.keys.toList()..sort()).first;
     stdout.writeln('\n$message');
-    stdout.writeln('  on ${_count(onPages.length, 'page')}, '
-        'first $first:${onPages[first]}');
+    stdout.writeln(
+      '  on ${_count(onPages.length, 'page')}, '
+      'first $first:${onPages[first]}',
+    );
   }
   final rest = messages.length - _maxMessagesShown;
   if (rest > 0) stdout.writeln('\n… and ${_count(rest, 'more kind')}');
 
   final pagesHit = byMessage.values.expand((p) => p.keys).toSet().length;
-  stdout.writeln('\nFAIL — ${_count(messages.length, 'kind')} of parse error, '
-      'on $pagesHit of ${pages.length} pages.');
+  stdout.writeln(
+    '\nFAIL — ${_count(messages.length, 'kind')} of parse error, '
+    'on $pagesHit of ${pages.length} pages.',
+  );
   exitCode = 1;
 }
 
@@ -106,8 +118,10 @@ class _ParseError {
 List<_ParseError> _parse(String rootPath, List<String> pages) {
   final errors = <_ParseError>[];
   for (final page in pages) {
-    final parser = HtmlParser(File('$rootPath/$page').readAsStringSync(),
-        generateSpans: true);
+    final parser = HtmlParser(
+      File('$rootPath/$page').readAsStringSync(),
+      generateSpans: true,
+    );
     parser.parse();
     for (final error in parser.errors) {
       final start = error.span?.start;

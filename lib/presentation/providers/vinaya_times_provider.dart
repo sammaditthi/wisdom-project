@@ -24,8 +24,8 @@ final sunTimesRepositoryProvider = Provider<SunTimesRepository>((ref) {
 /// something is watching.
 final minuteClockProvider =
     StateNotifierProvider.autoDispose<MinuteClockNotifier, DateTime>((ref) {
-  return MinuteClockNotifier();
-});
+      return MinuteClockNotifier();
+    });
 
 class MinuteClockNotifier extends StateNotifier<DateTime> {
   MinuteClockNotifier() : super(_thisMinute()) {
@@ -59,24 +59,24 @@ class MinuteClockNotifier extends StateNotifier<DateTime> {
 /// The city the times are worked out for.
 final vinayaTimesCityProvider =
     StateNotifierProvider<SavedChoiceNotifier<City>, City>((ref) {
-  return SavedChoiceNotifier(
-    ref.watch(keyValueStoreProvider),
-    key: StorageKeys.vinayaTimesCity,
-    values: City.values,
-    fallback: City.fallback,
-  );
-});
+      return SavedChoiceNotifier(
+        ref.watch(keyValueStoreProvider),
+        key: StorageKeys.vinayaTimesCity,
+        values: City.values,
+        fallback: City.fallback,
+      );
+    });
 
 /// How aruṇa is reckoned.
 final dawnMethodProvider =
     StateNotifierProvider<SavedChoiceNotifier<DawnMethod>, DawnMethod>((ref) {
-  return SavedChoiceNotifier(
-    ref.watch(keyValueStoreProvider),
-    key: StorageKeys.vinayaTimesDawnMethod,
-    values: DawnMethod.values,
-    fallback: DawnMethod.fallback,
-  );
-});
+      return SavedChoiceNotifier(
+        ref.watch(keyValueStoreProvider),
+        key: StorageKeys.vinayaTimesDawnMethod,
+        values: DawnMethod.values,
+        fallback: DawnMethod.fallback,
+      );
+    });
 
 /// One enum choice saved under [key] by its name; [fallback] until the user
 /// picks, or when the saved name is no longer a value.
@@ -86,8 +86,8 @@ class SavedChoiceNotifier<T extends Enum> extends StateNotifier<T> {
     required String key,
     required List<T> values,
     required T fallback,
-  })  : _key = key,
-        super(values.asNameMap()[_store.getString(key)] ?? fallback);
+  }) : _key = key,
+       super(values.asNameMap()[_store.getString(key)] ?? fallback);
 
   final KeyValueStore _store;
   final String _key;
@@ -117,8 +117,9 @@ final vinayaTimesProvider = Provider.autoDispose<VinayaTimesState>((ref) {
   final beforeDawn = now.isBefore(sun.dawn);
 
   // The day runs aruṇa to aruṇa: before today's aruṇa it is still yesterday.
-  final buddhistDay =
-      beforeDawn ? today.subtract(const Duration(days: 1)) : today;
+  final buddhistDay = beforeDawn
+      ? today.subtract(const Duration(days: 1))
+      : today;
 
   return VinayaTimesState(
     now: now,
@@ -132,8 +133,8 @@ final vinayaTimesProvider = Provider.autoDispose<VinayaTimesState>((ref) {
     vikalaEnds: beforeDawn
         ? sun.dawn
         : sunTimes
-            .sunDay(today.add(const Duration(days: 1)), city, method)
-            .dawn,
+              .sunDay(today.add(const Duration(days: 1)), city, method)
+              .dawn,
     nightStart: beforeDawn
         ? sunTimes.sunDay(buddhistDay, city, method).sunset
         : sun.sunset,

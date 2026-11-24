@@ -154,7 +154,8 @@ String buildSiteHeaders() {
   out.writeln('# so a changed file is a changed URL — see site_assets.dart.');
   out.writeln('# HTML has no cache rule: it keeps Pages\' default');
   out.writeln(
-      '# `max-age=0, must-revalidate`, because a page\'s URL is stable');
+    '# `max-age=0, must-revalidate`, because a page\'s URL is stable',
+  );
   out.writeln('# while its content is not.');
   for (final rule in rules.entries) {
     out.writeln();

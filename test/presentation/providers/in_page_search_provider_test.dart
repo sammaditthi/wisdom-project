@@ -17,7 +17,9 @@ void main() {
   ProviderContainer createContainerWithTabs(int tabCount) {
     final c = createTestContainer();
     for (var i = 0; i < tabCount; i++) {
-      c.read(tabsProvider.notifier).addTab(
+      c
+          .read(tabsProvider.notifier)
+          .addTab(
             ReaderTab.fromNode(
               nodeKey: 'node-$i',
               paliName: 'Tab $i',
@@ -63,29 +65,35 @@ void main() {
     });
 
     group('updateQuery', () {
-      test('empty query clears immediately, non-empty updates before debounce',
-          () {
-        fakeAsync((async) {
-          final notifier = container.read(inPageSearchStatesProvider.notifier);
-          notifier.openSearch();
+      test(
+        'empty query clears immediately, non-empty updates before debounce',
+        () {
+          fakeAsync((async) {
+            final notifier = container.read(
+              inPageSearchStatesProvider.notifier,
+            );
+            notifier.openSearch();
 
-          // Non-empty: rawQuery updates immediately
-          notifier.updateQuery('සුතං');
-          expect(
-              container.read(activeInPageSearchStateProvider).rawQuery, 'සුතං');
-          expect(
-            container.read(activeInPageSearchStateProvider).effectiveQuery,
-            isNotEmpty,
-          );
+            // Non-empty: rawQuery updates immediately
+            notifier.updateQuery('සුතං');
+            expect(
+              container.read(activeInPageSearchStateProvider).rawQuery,
+              'සුතං',
+            );
+            expect(
+              container.read(activeInPageSearchStateProvider).effectiveQuery,
+              isNotEmpty,
+            );
 
-          // Empty: clears immediately without debounce
-          notifier.updateQuery('');
-          final state = container.read(activeInPageSearchStateProvider);
-          expect(state.rawQuery, '');
-          expect(state.effectiveQuery, '');
-          expect(state.matches, isEmpty);
-        });
-      });
+            // Empty: clears immediately without debounce
+            notifier.updateQuery('');
+            final state = container.read(activeInPageSearchStateProvider);
+            expect(state.rawQuery, '');
+            expect(state.effectiveQuery, '');
+            expect(state.matches, isEmpty);
+          });
+        },
+      );
 
       test('rapid typing only keeps the last query (debounce)', () {
         fakeAsync((async) {
@@ -157,8 +165,11 @@ void main() {
 
         final state = container.read(activeInPageSearchStateProvider);
         expect(state.currentMatchIndex, 0);
-        expect(state.revealCount, 2,
-            reason: 'The reader scrolls back to the match on each press');
+        expect(
+          state.revealCount,
+          2,
+          reason: 'The reader scrolls back to the match on each press',
+        );
       });
 
       test('both do nothing when matches is empty', () {
@@ -244,15 +255,9 @@ void main() {
 
       // Verify isolation
       container.read(activeTabIndexProvider.notifier).state = 0;
-      expect(
-        container.read(activeInPageSearchStateProvider).rawQuery,
-        'භගවා',
-      );
+      expect(container.read(activeInPageSearchStateProvider).rawQuery, 'භගවා');
       container.read(activeTabIndexProvider.notifier).state = 1;
-      expect(
-        container.read(activeInPageSearchStateProvider).rawQuery,
-        'සුතං',
-      );
+      expect(container.read(activeInPageSearchStateProvider).rawQuery, 'සුතං');
     });
   });
 }
@@ -308,10 +313,7 @@ ProviderContainer _createContainerWithMatches(
 
 /// Subclass that allows injecting initial state for testing.
 class _TestableSearchNotifier extends InPageSearchNotifier {
-  _TestableSearchNotifier(
-    super.ref,
-    Map<int, InPageSearchState> initialState,
-  ) {
+  _TestableSearchNotifier(super.ref, Map<int, InPageSearchState> initialState) {
     state = initialState;
   }
 }

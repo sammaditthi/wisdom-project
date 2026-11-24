@@ -94,7 +94,9 @@ class TodayCard extends ConsumerWidget {
             state,
             width: math.min(_arcMaxWidth, sunWidth),
           );
-          final sunSky = Center(child: _SkyArc(state: state, arc: arc));
+          final sunSky = Center(
+            child: _SkyArc(state: state, arc: arc),
+          );
 
           // The header and the row above the horizon, with the sky behind
           // them both: the sky reaches the card's top.
@@ -128,7 +130,8 @@ class TodayCard extends ConsumerWidget {
                 corner: _radius - _border,
                 // The arc is centred in the sun's column, its centre on the
                 // horizon.
-                marker: Offset((sunWidth - arc.width) / 2, -arc.centre.dy) +
+                marker:
+                    Offset((sunWidth - arc.width) / 2, -arc.centre.dy) +
                     arc.marker,
                 moon: wide
                     ? Offset(
@@ -230,8 +233,10 @@ class _DateAndCity extends StatelessWidget {
 
     // The device's date, like the clock times on the card. The weekday is
     // bold wherever the language puts it, so it is found in the full date.
-    final date =
-        DateFormat(l10n.vinayaTimesFullDatePattern, locale).format(now);
+    final date = DateFormat(
+      l10n.vinayaTimesFullDatePattern,
+      locale,
+    ).format(now);
     final weekday = DateFormat('EEEE', locale).format(now);
     final at = date.indexOf(weekday);
     final rest = typography.menuSectionLabel.copyWith(color: colors.onSurface);
@@ -239,10 +244,8 @@ class _DateAndCity extends StatelessWidget {
     return Tooltip(
       message: l10n.vinayaTimesChangeLocation(city.label(l10n)),
       child: TextButton(
-        onPressed: () => SettingsDialog.show(
-          context,
-          initial: SettingsTab.vinayaTimes,
-        ),
+        onPressed: () =>
+            SettingsDialog.show(context, initial: SettingsTab.vinayaTimes),
         // As small as its two lines allow. The theme still gives it a 48px
         // tap area on touch screens.
         style: TextButton.styleFrom(
@@ -350,9 +353,10 @@ class _ArcHeadline extends StatelessWidget {
           <= _middayVerySoon => colors.error,
           // Dark orange reads on a light card only; a dark one takes a
           // brighter orange, its own and not the sun's.
-          <= _middaySoon => colors.brightness == Brightness.light
-              ? colors.onPrimaryFixedVariant
-              : colors.onSecondaryFixed,
+          <= _middaySoon =>
+            colors.brightness == Brightness.light
+                ? colors.onPrimaryFixedVariant
+                : colors.onSecondaryFixed,
           _ => colors.onSurface,
         },
       );
@@ -533,8 +537,9 @@ class _SkyArc extends StatelessWidget {
     final now = _nowLabel(context, state.now);
     final dark = now.style;
     // Bold until midday, regular once it has passed.
-    final middayStyle =
-        state.isVikala ? dark : dark.copyWith(fontWeight: FontWeight.w600);
+    final middayStyle = state.isVikala
+        ? dark
+        : dark.copyWith(fontWeight: FontWeight.w600);
 
     final lineHeight = arc.lineHeight;
     final day = arc.day;
@@ -551,7 +556,8 @@ class _SkyArc extends StatelessWidget {
     final nowRect = arc.nowRect;
     // A very small arc at a large text size would push it above the card's
     // header gap; then it goes too.
-    final showNow = arc.nowFits &&
+    final showNow =
+        arc.nowFits &&
         nowRect.top >= 0 &&
         !(day && nowRect.overlaps(middayRect));
 
@@ -586,16 +592,20 @@ class _SkyArc extends StatelessWidget {
                     markerRadius: _markerRadius,
                     // Keeps the arc clear of the sky behind it.
                     casingColor: colors.surface,
-                    stretchColor:
-                        day ? colors.secondaryFixed : colors.tertiaryFixedDim,
+                    stretchColor: day
+                        ? colors.secondaryFixed
+                        : colors.tertiaryFixedDim,
                     // The afternoon; the night's stretch covers it all.
                     restColor: colors.secondaryFixedDim,
                     markerColor: colors.onSurface,
                     // Both are discs: the sun orange, red while low; the
                     // moon amber.
                     markerFill: day
-                        ? Color.lerp(colors.primaryFixedDim,
-                            colors.onPrimaryFixed, _sunRedness(state))!
+                        ? Color.lerp(
+                            colors.primaryFixedDim,
+                            colors.onPrimaryFixed,
+                            _sunRedness(state),
+                          )!
                         : colors.primaryFixed,
                     markerRing: _markerRing,
                   ),

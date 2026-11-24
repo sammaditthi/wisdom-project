@@ -110,8 +110,10 @@ void main() {
         notifier.updateQuery('');
 
         // ASSERT
-        expect(notifier.state.groupedResults,
-            const AsyncValue<GroupedSearchResult?>.data(null));
+        expect(
+          notifier.state.groupedResults,
+          const AsyncValue<GroupedSearchResult?>.data(null),
+        );
         expect(notifier.state.isLoading, isFalse);
       });
 
@@ -165,8 +167,10 @@ void main() {
         await notifier.selectResultType(SearchResultType.fullText);
 
         // ASSERT
-        expect(notifier.state.selectedResultType,
-            equals(SearchResultType.fullText));
+        expect(
+          notifier.state.selectedResultType,
+          equals(SearchResultType.fullText),
+        );
       });
 
       test('should load categorized results for "all" category', () async {
@@ -207,9 +211,12 @@ void main() {
         await notifier.selectResultType(SearchResultType.fullText);
 
         // ASSERT
-        verify(mockSearchRepository.searchByResultType(
-                any, SearchResultType.fullText))
-            .called(1);
+        verify(
+          mockSearchRepository.searchByResultType(
+            any,
+            SearchResultType.fullText,
+          ),
+        ).called(1);
       });
 
       test('should not reload if same category selected', () async {
@@ -284,10 +291,11 @@ void main() {
     group('clearRecentSearches', () {
       test('should clear all recent searches', () async {
         // ARRANGE
-        when(mockRecentSearchesRepository.getRecentSearches())
-            .thenAnswer((_) async => [
-                  RecentSearch(queryText: 'dhamma', timestamp: DateTime.now()),
-                ]);
+        when(mockRecentSearchesRepository.getRecentSearches()).thenAnswer(
+          (_) async => [
+            RecentSearch(queryText: 'dhamma', timestamp: DateTime.now()),
+          ],
+        );
         await notifier.onFocus();
         expect(notifier.state.recentSearches, isNotEmpty);
 
@@ -341,24 +349,26 @@ void main() {
         });
       });
 
-      test('searches at once, with the new options, when a placement changes',
-          () {
-        fakeAsync((async) {
-          searchSettled(async);
+      test(
+        'searches at once, with the new options, when a placement changes',
+        () {
+          fakeAsync((async) {
+            searchSettled(async);
 
-          notifier.setMatchOptions(
-            isPhraseSearch: false,
-            isAnywhereInText: true,
-          );
+            notifier.setMatchOptions(
+              isPhraseSearch: false,
+              isAnywhereInText: true,
+            );
 
-          // No time has passed: the search did not wait.
-          final query = verify(
-            mockSearchRepository.searchTopResults(captureAny),
-          ).captured.single;
-          expect(query.isPhraseSearch, isFalse);
-          expect(query.isAnywhereInText, isTrue);
-        });
-      });
+            // No time has passed: the search did not wait.
+            final query = verify(
+              mockSearchRepository.searchTopResults(captureAny),
+            ).captured.single;
+            expect(query.isPhraseSearch, isFalse);
+            expect(query.isAnywhereInText, isTrue);
+          });
+        },
+      );
 
       test('a distance-only change waits for the typing pause', () {
         fakeAsync((async) {
@@ -435,31 +445,41 @@ void main() {
 
       test('setScope should set scope filter', () {
         // ACT
-        notifier.setScope(
-            {TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka});
+        notifier.setScope({
+          TipitakaNodeKeys.suttaPitaka,
+          TipitakaNodeKeys.vinayaPitaka,
+        });
 
         // ASSERT
         expect(
           notifier.state.scope,
-          containsAll(
-              [TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka]),
+          containsAll([
+            TipitakaNodeKeys.suttaPitaka,
+            TipitakaNodeKeys.vinayaPitaka,
+          ]),
         );
       });
 
       test('setScope should replace existing scope', () {
         // ARRANGE
-        notifier.setScope(
-            {TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka});
+        notifier.setScope({
+          TipitakaNodeKeys.suttaPitaka,
+          TipitakaNodeKeys.vinayaPitaka,
+        });
 
         // ACT
         notifier.setScope({TipitakaNodeKeys.dighaNikaya});
 
         // ASSERT
         expect(notifier.state.scope, contains(TipitakaNodeKeys.dighaNikaya));
-        expect(notifier.state.scope,
-            isNot(contains(TipitakaNodeKeys.suttaPitaka)));
-        expect(notifier.state.scope,
-            isNot(contains(TipitakaNodeKeys.vinayaPitaka)));
+        expect(
+          notifier.state.scope,
+          isNot(contains(TipitakaNodeKeys.suttaPitaka)),
+        );
+        expect(
+          notifier.state.scope,
+          isNot(contains(TipitakaNodeKeys.vinayaPitaka)),
+        );
       });
 
       test('clearFilters should reset all filters', () {
@@ -530,8 +550,10 @@ void main() {
       // Test 4: setScope replaces existing scope
       test('should replace existing scope with new scope', () {
         // ARRANGE
-        notifier.setScope(
-            {TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka});
+        notifier.setScope({
+          TipitakaNodeKeys.suttaPitaka,
+          TipitakaNodeKeys.vinayaPitaka,
+        });
         expect(notifier.state.scope.length, equals(2));
 
         // ACT
@@ -539,16 +561,20 @@ void main() {
 
         // ASSERT
         expect(notifier.state.scope, contains(TipitakaNodeKeys.dighaNikaya));
-        expect(notifier.state.scope,
-            isNot(contains(TipitakaNodeKeys.suttaPitaka)));
+        expect(
+          notifier.state.scope,
+          isNot(contains(TipitakaNodeKeys.suttaPitaka)),
+        );
         expect(notifier.state.scope.length, equals(1));
       });
 
       // Test 5: selectAll clears scope
       test('should clear scope when selectAll is called', () {
         // ARRANGE
-        notifier.setScope(
-            {TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka});
+        notifier.setScope({
+          TipitakaNodeKeys.suttaPitaka,
+          TipitakaNodeKeys.vinayaPitaka,
+        });
         expect(notifier.state.scope, isNotEmpty);
 
         // ACT
@@ -573,8 +599,10 @@ void main() {
           when(mockSearchRepository.searchTopResults(any))
               .thenAnswer((_) async => const Right(categorizedResult));
 
-          notifier.setScope(
-              {TipitakaNodeKeys.suttaPitaka, TipitakaNodeKeys.vinayaPitaka});
+          notifier.setScope({
+            TipitakaNodeKeys.suttaPitaka,
+            TipitakaNodeKeys.vinayaPitaka,
+          });
           notifier.updateQuery('ධම්ම'); // Use Sinhala to avoid transliteration
           async.elapse(const Duration(milliseconds: 350));
 
@@ -586,11 +614,12 @@ void main() {
           expect(captured.length, greaterThan(0));
           final query = captured.last;
           expect(
-              query.scope,
-              containsAll([
-                TipitakaNodeKeys.suttaPitaka,
-                TipitakaNodeKeys.vinayaPitaka
-              ]));
+            query.scope,
+            containsAll([
+              TipitakaNodeKeys.suttaPitaka,
+              TipitakaNodeKeys.vinayaPitaka,
+            ]),
+          );
         });
       });
     });
@@ -633,11 +662,11 @@ void main() {
         // ARRANGE
         when(mockRecentSearchesRepository.addRecentSearch(any))
             .thenAnswer((_) async {});
-        when(mockRecentSearchesRepository.getRecentSearches())
-            .thenAnswer((_) async => [
-                  RecentSearch(
-                      queryText: 'test query', timestamp: DateTime.now()),
-                ]);
+        when(mockRecentSearchesRepository.getRecentSearches()).thenAnswer(
+          (_) async => [
+            RecentSearch(queryText: 'test query', timestamp: DateTime.now()),
+          ],
+        );
 
         notifier.updateQuery('aanandha');
         expect(notifier.state.isResultsPanelVisible, isTrue);
@@ -650,7 +679,9 @@ void main() {
         expect(notifier.state.isPanelDismissed, isTrue);
         expect(notifier.state.isResultsPanelVisible, isFalse);
         expect(
-            notifier.state.rawQueryText, equals('aanandha')); // Text preserved
+          notifier.state.rawQueryText,
+          equals('aanandha'),
+        ); // Text preserved
       });
 
       test('should save Sinhala and references as typed', () async {
@@ -697,7 +728,9 @@ void main() {
         // ASSERT
         expect(notifier.state.recentSearches.length, equals(2));
         expect(
-            notifier.state.recentSearches[0].queryText, equals('test query'));
+          notifier.state.recentSearches[0].queryText,
+          equals('test query'),
+        );
       });
     });
 
@@ -745,8 +778,10 @@ void main() {
           // ASSERT - an error, not "didn't search", so the tab says it failed
           expect(notifier.state.isLoading, isFalse);
           expect(notifier.state.groupedResults.error, failure);
-          expect(notifier.state.rawQueryText,
-              equals('test')); // Query text preserved
+          expect(
+            notifier.state.rawQueryText,
+            equals('test'),
+          ); // Query text preserved
         });
       });
 
@@ -754,17 +789,22 @@ void main() {
         fakeAsync((async) {
           // ARRANGE - a first search whose counts load
           when(mockSearchRepository.searchTopResults(any)).thenAnswer(
-              (_) async => const Right(GroupedSearchResult(resultsByType: {})));
-          when(mockSearchRepository.countByResultType(any)).thenAnswer(
-              (_) async => const Right({SearchResultType.title: 3}));
+            (_) async => const Right(GroupedSearchResult(resultsByType: {})),
+          );
+          when(
+            mockSearchRepository.countByResultType(any),
+          ).thenAnswer((_) async => const Right({SearchResultType.title: 3}));
           notifier.updateQuery('test');
           async.elapse(const Duration(milliseconds: 350));
-          expect(notifier.state.countByResultType,
-              equals({SearchResultType.title: 3}));
+          expect(
+            notifier.state.countByResultType,
+            equals({SearchResultType.title: 3}),
+          );
 
           // ACT - the next query's count fails
           when(mockSearchRepository.countByResultType(any)).thenAnswer(
-              (_) async => const Left(Failure.dataLoadFailure(message: 'x')));
+            (_) async => const Left(Failure.dataLoadFailure(message: 'x')),
+          );
           notifier.updateQuery('dhamma');
           async.elapse(const Duration(milliseconds: 350));
 
@@ -842,15 +882,17 @@ void main() {
           var callCount = 0;
           when(mockSearchRepository.searchTopResults(any))
               .thenAnswer((_) async {
-            callCount++;
-            return const Right(GroupedSearchResult(
-              resultsByType: {
-                SearchResultType.title: [],
-                SearchResultType.fullText: [],
-                SearchResultType.definition: [],
-              },
-            ));
-          });
+                callCount++;
+                return const Right(
+                  GroupedSearchResult(
+                    resultsByType: {
+                      SearchResultType.title: [],
+                      SearchResultType.fullText: [],
+                      SearchResultType.definition: [],
+                    },
+                  ),
+                );
+              });
 
           // ACT - Rapidly change query three times
           notifier.updateQuery('a');
@@ -861,7 +903,8 @@ void main() {
 
           notifier.updateQuery('abc');
           async.elapse(
-              const Duration(milliseconds: 350)); // Wait for final debounce
+            const Duration(milliseconds: 350),
+          ); // Wait for final debounce
 
           // ASSERT - Should only search once (for 'abc'), not three times
           expect(callCount, equals(1));
@@ -869,42 +912,47 @@ void main() {
         });
       });
 
-      test('should handle concurrent filter changes without race conditions',
-          () {
-        fakeAsync((async) {
-          // ARRANGE
-          const categorizedResult = GroupedSearchResult(
-            resultsByType: {
-              SearchResultType.title: [],
-              SearchResultType.fullText: [],
-              SearchResultType.definition: [],
-            },
-          );
-          when(mockSearchRepository.searchTopResults(any))
-              .thenAnswer((_) async => const Right(categorizedResult));
+      test(
+        'should handle concurrent filter changes without race conditions',
+        () {
+          fakeAsync((async) {
+            // ARRANGE
+            const categorizedResult = GroupedSearchResult(
+              resultsByType: {
+                SearchResultType.title: [],
+                SearchResultType.fullText: [],
+                SearchResultType.definition: [],
+              },
+            );
+            when(mockSearchRepository.searchTopResults(any))
+                .thenAnswer((_) async => const Right(categorizedResult));
 
-          notifier.updateQuery('dhamma');
-          async.elapse(const Duration(milliseconds: 350));
-          clearInteractions(mockSearchRepository);
+            notifier.updateQuery('dhamma');
+            async.elapse(const Duration(milliseconds: 350));
+            clearInteractions(mockSearchRepository);
 
-          // ACT - Rapidly toggle filters
-          notifier.setMatchOptions(isExactMatch: true);
-          notifier.setLanguageFilter(pali: false);
-          notifier.setScope({TipitakaNodeKeys.suttaPitaka});
+            // ACT - Rapidly toggle filters
+            notifier.setMatchOptions(isExactMatch: true);
+            notifier.setLanguageFilter(pali: false);
+            notifier.setScope({TipitakaNodeKeys.suttaPitaka});
 
-          // Wait for all searches to complete
-          async.elapse(const Duration(milliseconds: 50));
+            // Wait for all searches to complete
+            async.elapse(const Duration(milliseconds: 50));
 
-          // ASSERT - All filter changes should be reflected in final state
-          expect(notifier.state.isExactMatch, isTrue);
-          expect(notifier.state.searchInPali, isFalse);
-          expect(notifier.state.scope, contains(TipitakaNodeKeys.suttaPitaka));
+            // ASSERT - All filter changes should be reflected in final state
+            expect(notifier.state.isExactMatch, isTrue);
+            expect(notifier.state.searchInPali, isFalse);
+            expect(
+              notifier.state.scope,
+              contains(TipitakaNodeKeys.suttaPitaka),
+            );
 
-          // Should have triggered searches (one per filter change)
-          verify(mockSearchRepository.searchTopResults(any))
-              .called(greaterThan(0));
-        });
-      });
+            // Should have triggered searches (one per filter change)
+            verify(mockSearchRepository.searchTopResults(any))
+                .called(greaterThan(0));
+          });
+        },
+      );
     });
 
     group('toggleScopeKeys', () {

@@ -123,20 +123,25 @@ String breadcrumb({
   List<TipitakaNode> trail = const <TipitakaNode>[],
   TipitakaNode? current,
 }) {
-  final buffer =
-      StringBuffer('<nav class="breadcrumb" aria-label="$breadcrumbLabel">');
+  final buffer = StringBuffer(
+    '<nav class="breadcrumb" aria-label="$breadcrumbLabel">',
+  );
   buffer.write(homeLink(build));
   for (final ancestor in trail) {
     // `nodeLabelHtml` escapes `"`, which is what lets one string be both the
     // text and the attribute.
     final label = nodeLabelHtml(ancestor);
-    buffer.write('<a href="${tipitakaUrl(ancestor.nodeKey)}" '
-        'title="$label">$label</a>');
+    buffer.write(
+      '<a href="${tipitakaUrl(ancestor.nodeKey)}" '
+      'title="$label">$label</a>',
+    );
   }
   if (current != null) {
     final label = nodeLabelHtml(current);
-    buffer.write('<span class="leaf" aria-current="page" '
-        'title="$label">$label</span>');
+    buffer.write(
+      '<span class="leaf" aria-current="page" '
+      'title="$label">$label</span>',
+    );
   }
   buffer.write('</nav>');
   return buffer.toString();
@@ -198,8 +203,10 @@ String upLink(TipitakaNode parent) {
 String tocList(Iterable<TipitakaNode> nodes, {required UrlResolver urlFor}) {
   final buffer = StringBuffer('<ul class="toc">');
   for (final node in nodes) {
-    buffer.write('<li><a href="${urlFor(node.nodeKey)}">'
-        '${nodeLabelHtml(node)}</a></li>');
+    buffer.write(
+      '<li><a href="${urlFor(node.nodeKey)}">'
+      '${nodeLabelHtml(node)}</a></li>',
+    );
   }
   buffer.write('</ul>');
   return buffer.toString();
@@ -264,10 +271,12 @@ String toolbar({
     final more = build.strings.html('moreOptions');
     buffer.write('<span class="app-sep" aria-hidden="true"></span>');
     buffer.write(_appLink(appUrl, build, pill: true));
-    buffer.write('<details class="more"><summary class="more-trigger" '
-        'aria-label="$more" title="$more">${moreIcon.markup}</summary>'
-        '<div class="more-menu">${withLayouts ? _layoutGroup(build) : ''}'
-        '${_appLink(appUrl, build)}</div></details>');
+    buffer.write(
+      '<details class="more"><summary class="more-trigger" '
+      'aria-label="$more" title="$more">${moreIcon.markup}</summary>'
+      '<div class="more-menu">${withLayouts ? _layoutGroup(build) : ''}'
+      '${_appLink(appUrl, build)}</div></details>',
+    );
   }
   buffer.write('</div>');
   return buffer.toString();
@@ -283,8 +292,10 @@ String _layoutGroup(SiteBuild build) {
     // accessible name comes from its own `aria-label`, and a `<label>` is not
     // focusable, so this string never reaches the a11y tree twice.
     final label = build.strings.html(layout.labelKey);
-    buffer.write('<label for="${layout.id}" title="$label">'
-        '${layout.glyph}</label>');
+    buffer.write(
+      '<label for="${layout.id}" title="$label">'
+      '${layout.glyph}</label>',
+    );
   }
   buffer.write('</div>');
   return buffer.toString();

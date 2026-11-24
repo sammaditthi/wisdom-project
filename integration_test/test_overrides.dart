@@ -106,9 +106,8 @@ class InMemoryKeyValueStore implements KeyValueStore {
 /// Returns a fresh [keyValueStoreProvider] override backed by an in-memory
 /// store. Add this to the `overrides` list of any [ProviderScope] that builds
 /// widgets transitively touching tabs / navigator visibility.
-Override keyValueStoreOverride() => keyValueStoreProvider.overrideWithValue(
-      InMemoryKeyValueStore(),
-    );
+Override keyValueStoreOverride() =>
+    keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore());
 
 /// How long [pumpForSettle] waits before giving up. Comfortably longer than the
 /// ~10-second database-lock window we observe in the combined suite — so a
@@ -204,7 +203,7 @@ Future<ProviderContainer> pumpReaderApp(
         supportedLocales: AppLocalizations.supportedLocales,
         builder: withShortcuts
             ? (context, child) =>
-                AppShortcuts(child: OverlayStackSync(child: child!))
+                  AppShortcuts(child: OverlayStackSync(child: child!))
             : null,
         home: const Scaffold(
           body: Column(
@@ -265,8 +264,11 @@ final readerScrollView = find.byWidgetPredicate(
 /// showing text — reading a controller off an empty finder throws an opaque
 /// StateError instead.
 ScrollController readerScrollController(WidgetTester tester) {
-  expect(readerScrollView, findsOneWidget,
-      reason: 'The reader must be showing text to have a scroll view');
+  expect(
+    readerScrollView,
+    findsOneWidget,
+    reason: 'The reader must be showing text to have a scroll view',
+  );
   return tester.widget<CustomScrollView>(readerScrollView).controller!;
 }
 
@@ -274,9 +276,9 @@ ScrollController readerScrollController(WidgetTester tester) {
 /// `entry_<page>_<entry>`. Matches a built row even off screen, in the list's
 /// cache area; nothing while it isn't built.
 Finder readerRow(int page, int entry) => find.byWidgetPredicate(
-      (w) => w is KeyedSubtree && '${w.key}'.endsWith(' entry_${page}_$entry]'),
-      skipOffstage: false,
-    );
+  (w) => w is KeyedSubtree && '${w.key}'.endsWith(' entry_${page}_$entry]'),
+  skipOffstage: false,
+);
 
 /// Whether the reader row `(page, entry)` is built with its top edge inside
 /// the reader's viewport.

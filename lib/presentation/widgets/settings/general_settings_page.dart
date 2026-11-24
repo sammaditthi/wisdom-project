@@ -25,12 +25,7 @@ class GeneralSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        settingsGutter,
-        0,
-        settingsGutter,
-        24,
-      ),
+      padding: const EdgeInsets.fromLTRB(settingsGutter, 0, settingsGutter, 24),
       children: [
         SettingsSection(
           title: l10n.settingsAppearance,
@@ -201,7 +196,9 @@ class _ContentLanguageSelector extends ConsumerWidget {
 
   /// Maps a [ContentLanguage] to its localized label.
   String _contentLanguageLabel(
-      ContentLanguage language, AppLocalizations l10n) {
+    ContentLanguage language,
+    AppLocalizations l10n,
+  ) {
     switch (language) {
       case ContentLanguage.pali:
         return l10n.paliLanguageLabel;

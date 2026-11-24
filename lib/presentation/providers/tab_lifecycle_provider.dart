@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/constants/constants.dart';
 import 'fts_highlight_provider.dart';
 import 'in_page_search_provider.dart';
@@ -39,8 +40,9 @@ final closeTabProvider = Provider<void Function(int)>((ref) {
     // Update active tab index
     if (isClosingActiveTab) {
       // If we closed the active tab, switch to the previous tab or -1 if no tabs left
-      final newActiveIndex =
-          tabIndex > 0 ? tabIndex - 1 : (tabs.length > 1 ? 0 : -1);
+      final newActiveIndex = tabIndex > 0
+          ? tabIndex - 1
+          : (tabs.length > 1 ? 0 : -1);
 
       // Set to -1 first to force the activeTabIndexProvider listener to fire
       // This ensures the widget properly resets scroll position when the new
@@ -58,7 +60,7 @@ final closeTabProvider = Provider<void Function(int)>((ref) {
         ref.read(ftsHighlightProvider.notifier).clearAll();
         ref.read(selectedNodeProvider.notifier).state = null;
         ref.read(expandedNodesProvider.notifier).state = {
-          TipitakaNodeKeys.suttaPitaka
+          TipitakaNodeKeys.suttaPitaka,
         };
       } else {
         // Sync navigator to the new active tab

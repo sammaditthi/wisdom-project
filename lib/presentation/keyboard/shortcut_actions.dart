@@ -399,7 +399,7 @@ List<FocusNode> _arrowStops(WidgetRef ref) {
   final rows = searchResultStops(ref.read(recentSearchRowsFocusNodeProvider));
   return [
     for (final row in rows)
-      if (!row.ancestors.any(rows.contains)) row
+      if (!row.ancestors.any(rows.contains)) row,
   ];
 }
 

@@ -7,12 +7,13 @@ part of 'chat_summary.dart';
 // **************************************************************************
 
 _ChatSummary _$ChatSummaryFromJson(Map<String, dynamic> json) => _ChatSummary(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      mode: $enumDecodeNullable(_$ResearchModeEnumMap, json['mode']) ??
-          ResearchMode.fast,
-    );
+  id: json['id'] as String,
+  title: json['title'] as String,
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  mode:
+      $enumDecodeNullable(_$ResearchModeEnumMap, json['mode']) ??
+      ResearchMode.fast,
+);
 
 Map<String, dynamic> _$ChatSummaryToJson(_ChatSummary instance) =>
     <String, dynamic>{

@@ -67,8 +67,10 @@ class ChatHistoryPanel extends ConsumerWidget {
             data: (chats) => chats.isEmpty
                 ? _emptyHint(l10n)
                 : ListView.builder(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     itemCount: chats.length,
                     itemBuilder: (context, index) => _ChatTile(
                       chat: chats[index],
@@ -120,14 +122,15 @@ class _ChatTile extends ConsumerWidget {
       title: Text(chat.title, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text(
         _relativeTime(context, chat.updatedAt),
-        style: Theme.of(context)
-            .textTheme
-            .bodySmall
+        style: Theme.of(context).textTheme.bodySmall
             ?.copyWith(color: colors.onSurfaceVariant),
       ),
       trailing: IconButton(
-        icon: Icon(Icons.delete_outline,
-            size: 18, color: colors.onSurfaceVariant),
+        icon: Icon(
+          Icons.delete_outline,
+          size: 18,
+          color: colors.onSurfaceVariant,
+        ),
         tooltip: l10n.researchDeleteChat,
         onPressed: () {
           final wasActive = selected;

@@ -37,9 +37,7 @@ class SettingsSection extends StatelessWidget {
             // A section header and a row label are the same size; only the
             // weight separates them. Not `sectionHeader`, which is the
             // uppercase letter-spaced style the search panel uses.
-            style: typography.resultTitle.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: typography.resultTitle.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         if (hint != null)
@@ -97,19 +95,13 @@ class SettingsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          if (leading != null) ...[
-            leading!,
-            const SizedBox(width: 16),
-          ],
+          if (leading != null) ...[leading!, const SizedBox(width: 16)],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  label,
-                  style: typography.resultTitle,
-                ),
+                Text(label, style: typography.resultTitle),
                 if (hint != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 2),
@@ -118,22 +110,14 @@ class SettingsRow extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) ...[
-            const SizedBox(width: 16),
-            trailing!,
-          ],
+          if (trailing != null) ...[const SizedBox(width: 16), trailing!],
         ],
       ),
     );
 
     final row = ConstrainedBox(
       constraints: const BoxConstraints(minHeight: 48),
-      child: onTap == null
-          ? content
-          : InkWell(
-              onTap: onTap,
-              child: content,
-            ),
+      child: onTap == null ? content : InkWell(onTap: onTap, child: content),
     );
 
     return Column(
@@ -169,10 +153,10 @@ class SettingsProse extends StatelessWidget {
 /// icon or a dictionary's abbreviation, or a source's own logo on its own.
 class SettingsTile extends StatelessWidget {
   const SettingsTile({super.key, this.icon, this.text, this.imageAsset})
-      : assert(
-          icon != null || text != null || imageAsset != null,
-          'a tile needs an icon, text or an image',
-        );
+    : assert(
+        icon != null || text != null || imageAsset != null,
+        'a tile needs an icon, text or an image',
+      );
 
   final IconData? icon;
   final String? text;

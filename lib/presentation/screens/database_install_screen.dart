@@ -57,13 +57,14 @@ class DatabaseInstallScreen extends StatelessWidget {
       body: SafeArea(
         child: _EmblemLayout(
           below: switch (status.phase) {
-            DatabaseInstallPhase.failed =>
-              _Failure(failure: status.failure, onRetry: onRetry),
+            DatabaseInstallPhase.failed => _Failure(
+              failure: status.failure,
+              onRetry: onRetry,
+            ),
             DatabaseInstallPhase.installing => _Progress(status: status),
             // `ready` never reaches here — the gate shows the app instead.
             DatabaseInstallPhase.checking ||
-            DatabaseInstallPhase.ready =>
-              const _Preparing(),
+            DatabaseInstallPhase.ready => const _Preparing(),
           },
         ),
       ),
@@ -235,26 +236,28 @@ class _Failure extends StatelessWidget {
 
     final (String title, String description) = switch (kind) {
       DatabaseInstallFailureKind.unsupportedBrowser => (
-          l10n.databaseInstallUnsupportedTitle,
-          l10n.databaseInstallUnsupportedDescription,
-        ),
+        l10n.databaseInstallUnsupportedTitle,
+        l10n.databaseInstallUnsupportedDescription,
+      ),
       DatabaseInstallFailureKind.outOfSpace => (
-          l10n.databaseInstallOutOfSpaceTitle,
-          l10n.databaseInstallOutOfSpaceDescription,
-        ),
+        l10n.databaseInstallOutOfSpaceTitle,
+        l10n.databaseInstallOutOfSpaceDescription,
+      ),
       DatabaseInstallFailureKind.download ||
-      DatabaseInstallFailureKind.other =>
-        (
-          l10n.databaseInstallFailedTitle,
-          l10n.databaseInstallFailedDescription
-        ),
+      DatabaseInstallFailureKind.other => (
+        l10n.databaseInstallFailedTitle,
+        l10n.databaseInstallFailedDescription,
+      ),
     };
 
     final typography = context.typography;
     return _Panel(
       children: [
-        Text(title,
-            style: typography.errorMessage, textAlign: TextAlign.center),
+        Text(
+          title,
+          style: typography.errorMessage,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 4),
         Text(
           description,

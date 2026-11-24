@@ -32,13 +32,10 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (document) {
-          expect(document.fileId, equals('dn-1'));
-          expect(document.pageCount, equals(2));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (document) {
+        expect(document.fileId, equals('dn-1'));
+        expect(document.pageCount, equals(2));
+      });
 
       verify(mockDataSource.loadDocument(testFileId)).called(1);
     });
@@ -92,13 +89,10 @@ void main() {
 
       // ASSERT
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<DataLoadFailure>());
-          expect(failure.userMessage, contains('Failed to load'));
-        },
-        (document) => fail('Expected failure'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<DataLoadFailure>());
+        expect(failure.userMessage, contains('Failed to load'));
+      }, (document) => fail('Expected failure'));
     });
   });
 

@@ -55,8 +55,11 @@ class GroupedFTSTile extends ConsumerWidget {
     final theme = Theme.of(context);
     // Only this group's flag. The panel still rebuilds every tile: see item 5
     // in docs/todo/performance/perf-top10-killers.md.
-    final isExpanded = ref.watch(searchStateProvider
-        .select((s) => s.expandedFTSGroups.contains(group.nodeKey)));
+    final isExpanded = ref.watch(
+      searchStateProvider.select(
+        (s) => s.expandedFTSGroups.contains(group.nodeKey),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +95,8 @@ class GroupedFTSTile extends ConsumerWidget {
     return Padding(
       // Lines the button's label up with the tile text.
       padding: EdgeInsets.only(
-        left: ResultBadge.textStart(context, showEditionBadge) -
+        left:
+            ResultBadge.textStart(context, showEditionBadge) -
             SearchLinkButton.padding,
         bottom: 4,
       ),
@@ -121,10 +125,7 @@ class GroupedFTSTile extends ConsumerWidget {
         color: theme.colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(8),
         border: Border(
-          left: BorderSide(
-            color: theme.colorScheme.outlineVariant,
-            width: 3,
-          ),
+          left: BorderSide(color: theme.colorScheme.outlineVariant, width: 3),
         ),
       ),
       child: Column(

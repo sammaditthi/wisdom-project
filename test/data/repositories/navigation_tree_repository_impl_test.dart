@@ -32,34 +32,33 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (tree) {
-          expect(tree.length, equals(2));
-          expect(tree[0].nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (tree) {
+        expect(tree.length, equals(2));
+        expect(tree[0].nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
+      });
 
       verify(mockDataSource.loadNavigationTree()).called(1);
     });
 
-    test('should return CACHED tree on second call (no datasource hit)',
-        () async {
-      // ARRANGE
-      when(mockDataSource.loadNavigationTree())
-          .thenAnswer((_) async => TestData.sampleTree);
+    test(
+      'should return CACHED tree on second call (no datasource hit)',
+      () async {
+        // ARRANGE
+        when(mockDataSource.loadNavigationTree())
+            .thenAnswer((_) async => TestData.sampleTree);
 
-      // ACT - Call twice
-      await repository.loadNavigationTree();
-      final result = await repository.loadNavigationTree();
+        // ACT - Call twice
+        await repository.loadNavigationTree();
+        final result = await repository.loadNavigationTree();
 
-      // ASSERT
-      expect(result.isRight(), true);
+        // ASSERT
+        expect(result.isRight(), true);
 
-      // KEY ASSERTION: DataSource should only be called ONCE
-      // Second call should use cache
-      verify(mockDataSource.loadNavigationTree()).called(1);
-    });
+        // KEY ASSERTION: DataSource should only be called ONCE
+        // Second call should use cache
+        verify(mockDataSource.loadNavigationTree()).called(1);
+      },
+    );
 
     test('should return DataLoadFailure when datasource throws', () async {
       // ARRANGE
@@ -71,13 +70,10 @@ void main() {
 
       // ASSERT
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<DataLoadFailure>());
-          expect(failure.userMessage, contains('Failed to load'));
-        },
-        (tree) => fail('Expected failure'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<DataLoadFailure>());
+        expect(failure.userMessage, contains('Failed to load'));
+      }, (tree) => fail('Expected failure'));
     });
   });
 
@@ -91,18 +87,16 @@ void main() {
           .thenAnswer((_) async => TestData.sampleTree);
 
       // ACT
-      final result =
-          await repository.getNodeByKey(TipitakaNodeKeys.suttaPitaka);
+      final result = await repository.getNodeByKey(
+        TipitakaNodeKeys.suttaPitaka,
+      );
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (node) {
-          expect(node.nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
-          expect(node.paliName, equals('Sutta Pitaka'));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (node) {
+        expect(node.nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
+        expect(node.paliName, equals('Sutta Pitaka'));
+      });
     });
 
     test('should return nested node when found', () async {
@@ -115,13 +109,10 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (node) {
-          expect(node.nodeKey, equals('sp-1-1'));
-          expect(node.paliName, equals('Silakkhandha Vagga'));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (node) {
+        expect(node.nodeKey, equals('sp-1-1'));
+        expect(node.paliName, equals('Silakkhandha Vagga'));
+      });
     });
 
     test('should return NotFoundFailure when node does not exist', () async {
@@ -134,13 +125,10 @@ void main() {
 
       // ASSERT
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<NotFoundFailure>());
-          expect(failure.userMessage, contains('non-existent-key'));
-        },
-        (node) => fail('Expected failure'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<NotFoundFailure>());
+        expect(failure.userMessage, contains('non-existent-key'));
+      }, (node) => fail('Expected failure'));
     });
 
     test('should load tree first if not cached', () async {
@@ -170,14 +158,11 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (roots) {
-          expect(roots.length, equals(2));
-          expect(roots[0].nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
-          expect(roots[1].nodeKey, equals(TipitakaNodeKeys.vinayaPitaka));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (roots) {
+        expect(roots.length, equals(2));
+        expect(roots[0].nodeKey, equals(TipitakaNodeKeys.suttaPitaka));
+        expect(roots[1].nodeKey, equals(TipitakaNodeKeys.vinayaPitaka));
+      });
     });
 
     test('should return empty list when tree is empty', () async {
@@ -215,16 +200,10 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (nodes) {
-          expect(nodes.isNotEmpty, true);
-          expect(
-            nodes.any((n) => n.paliName.contains('Sutta')),
-            true,
-          );
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (nodes) {
+        expect(nodes.isNotEmpty, true);
+        expect(nodes.any((n) => n.paliName.contains('Sutta')), true);
+      });
     });
 
     test('should find nodes matching Sinhala name', () async {
@@ -241,12 +220,9 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (nodes) {
-          expect(nodes.isNotEmpty, true);
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (nodes) {
+        expect(nodes.isNotEmpty, true);
+      });
     });
 
     test('should be case-insensitive', () async {
@@ -263,12 +239,9 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (nodes) {
-          expect(nodes.isNotEmpty, true);
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (nodes) {
+        expect(nodes.isNotEmpty, true);
+      });
     });
 
     test('should return empty list when no matches found', () async {
@@ -301,13 +274,10 @@ void main() {
 
       // ASSERT
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected success'),
-        (nodes) {
-          // Should find both Sutta Pitaka and Vinaya Pitaka
-          expect(nodes.length, greaterThanOrEqualTo(2));
-        },
-      );
+      result.fold((failure) => fail('Expected success'), (nodes) {
+        // Should find both Sutta Pitaka and Vinaya Pitaka
+        expect(nodes.length, greaterThanOrEqualTo(2));
+      });
     });
   });
 }

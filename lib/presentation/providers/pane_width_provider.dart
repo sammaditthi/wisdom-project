@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/constants/constants.dart';
 
 /// Provider for Navigator pane width (left sidebar)

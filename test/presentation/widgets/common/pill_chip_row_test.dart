@@ -35,9 +35,11 @@ void main() {
 
     final row = find.byType(Scrollable);
     double offset() => tester.state<ScrollableState>(row).position.pixels;
-    expect(tester.state<ScrollableState>(row).position.maxScrollExtent,
-        greaterThan(0),
-        reason: 'the chips must not fit, or there is nothing to drag');
+    expect(
+      tester.state<ScrollableState>(row).position.maxScrollExtent,
+      greaterThan(0),
+      reason: 'the chips must not fit, or there is nothing to drag',
+    );
 
     await tester.dragFrom(
       tester.getCenter(row),

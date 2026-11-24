@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
@@ -61,9 +62,11 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
   static double _closeIconEnd(BuildContext context) {
     final button =
         Theme.of(context).materialTapTargetSize == MaterialTapTargetSize.padded
-            ? math.max(_closeButtonSize,
-                kMinInteractiveDimension + _closeDensity.baseSizeAdjustment.dx)
-            : _closeButtonSize;
+        ? math.max(
+            _closeButtonSize,
+            kMinInteractiveDimension + _closeDensity.baseSizeAdjustment.dx,
+          )
+        : _closeButtonSize;
     return _rowEndPadding + (button - _closeIconSize) / 2 + _closeGlyphInset;
   }
 
@@ -91,8 +94,9 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
   @override
   Widget build(BuildContext context) {
     // Only the list, so unrelated search-state changes don't rebuild the rows.
-    final recentSearches =
-        ref.watch(searchStateProvider.select((s) => s.recentSearches));
+    final recentSearches = ref.watch(
+      searchStateProvider.select((s) => s.recentSearches),
+    );
     final theme = Theme.of(context);
 
     if (recentSearches.isEmpty) {
@@ -136,8 +140,9 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
   ) {
     final l10n = AppLocalizations.of(context);
     final canExpand = recentSearches.length > _collapsedCount;
-    final visible =
-        _expanded ? recentSearches : recentSearches.take(_collapsedCount);
+    final visible = _expanded
+        ? recentSearches
+        : recentSearches.take(_collapsedCount);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +206,9 @@ class _RecentSearchOverlayState extends ConsumerState<RecentSearchOverlay> {
       key: ValueKey(queryText),
       dense: true,
       contentPadding: const EdgeInsetsDirectional.only(
-          start: _rowStartPadding, end: _rowEndPadding),
+        start: _rowStartPadding,
+        end: _rowEndPadding,
+      ),
       leading: Icon(
         Icons.history,
         size: 20,

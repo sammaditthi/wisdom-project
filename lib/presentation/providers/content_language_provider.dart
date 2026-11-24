@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/storage/key_value_store.dart';
 import '../../core/storage/key_value_store_provider.dart';
 import '../../core/storage/storage_keys.dart';
@@ -13,8 +14,9 @@ final currentEditionProvider = Provider<Edition>((ref) => bjtEdition);
 
 /// Content Language options offered by the active edition, in declared order.
 /// BJT → [pali, sinhala]. Future editions (e.g. SuttaCentral) → [pali, english].
-final availableContentLanguagesProvider =
-    Provider<List<ContentLanguage>>((ref) {
+final availableContentLanguagesProvider = Provider<List<ContentLanguage>>((
+  ref,
+) {
   final edition = ref.watch(currentEditionProvider);
   return edition.availableLanguages
       .map(ContentLanguage.fromIso)
@@ -27,8 +29,8 @@ final availableContentLanguagesProvider =
 /// anything user-facing.
 final contentLanguageProvider =
     StateNotifierProvider<ContentLanguageNotifier, ContentLanguage>((ref) {
-  return ContentLanguageNotifier(ref.watch(keyValueStoreProvider));
-});
+      return ContentLanguageNotifier(ref.watch(keyValueStoreProvider));
+    });
 
 /// The Content Language widgets should actually use: the saved choice clamped
 /// to what the active edition supports, else the edition default (first

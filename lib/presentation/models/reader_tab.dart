@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import '../../core/constants/constants.dart';
 import '../../core/utils/text_utils.dart' show truncateGraphemes;
 import 'reader_layout.dart';

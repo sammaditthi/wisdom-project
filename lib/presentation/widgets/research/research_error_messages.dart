@@ -13,19 +13,19 @@ String researchErrorMessage(
   AppLocalizations l10n,
   ApiErrorType type, {
   ResearchMode mode = ResearchMode.fast,
-}) =>
-    switch (type) {
-      ApiErrorType.offline => l10n.researchErrorOffline,
-      ApiErrorType.timeout => l10n.researchErrorTimeout,
-      ApiErrorType.rateLimited => mode == ResearchMode.thinking
-          ? l10n.researchErrorRateLimitedThinking
-          : l10n.researchErrorRateLimited,
-      ApiErrorType.serviceBusy => l10n.researchErrorServiceBusy,
-      ApiErrorType.notAuthorised => l10n.researchErrorNotAuthorised,
-      ApiErrorType.cannotAnswer => l10n.researchErrorCannotAnswer,
-      ApiErrorType.serverError => l10n.researchErrorServerError,
-      ApiErrorType.resourceLimit => l10n.researchErrorResourceLimit,
-    };
+}) => switch (type) {
+  ApiErrorType.offline => l10n.researchErrorOffline,
+  ApiErrorType.timeout => l10n.researchErrorTimeout,
+  ApiErrorType.rateLimited =>
+    mode == ResearchMode.thinking
+        ? l10n.researchErrorRateLimitedThinking
+        : l10n.researchErrorRateLimited,
+  ApiErrorType.serviceBusy => l10n.researchErrorServiceBusy,
+  ApiErrorType.notAuthorised => l10n.researchErrorNotAuthorised,
+  ApiErrorType.cannotAnswer => l10n.researchErrorCannotAnswer,
+  ApiErrorType.serverError => l10n.researchErrorServerError,
+  ApiErrorType.resourceLimit => l10n.researchErrorResourceLimit,
+};
 
 /// Whether the chat view should offer a one-tap Retry for this type.
 ///
@@ -33,12 +33,11 @@ String researchErrorMessage(
 /// needs the user to *rephrase*, not re-send the identical text (the chat view
 /// restores their question to the input instead). Everything else is retriable.
 bool canRetryType(ApiErrorType type) => switch (type) {
-      ApiErrorType.notAuthorised || ApiErrorType.cannotAnswer => false,
-      ApiErrorType.offline ||
-      ApiErrorType.timeout ||
-      ApiErrorType.rateLimited ||
-      ApiErrorType.serviceBusy ||
-      ApiErrorType.serverError ||
-      ApiErrorType.resourceLimit =>
-        true,
-    };
+  ApiErrorType.notAuthorised || ApiErrorType.cannotAnswer => false,
+  ApiErrorType.offline ||
+  ApiErrorType.timeout ||
+  ApiErrorType.rateLimited ||
+  ApiErrorType.serviceBusy ||
+  ApiErrorType.serverError ||
+  ApiErrorType.resourceLimit => true,
+};

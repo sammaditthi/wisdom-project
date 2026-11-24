@@ -20,9 +20,7 @@ import 'package:the_wisdom_project/presentation/widgets/common/status_message_vi
 Future<void> _pump(WidgetTester tester, Widget child) async {
   await tester.pumpWidget(
     MaterialApp(
-      home: Scaffold(
-        body: SizedBox(width: 800, height: 600, child: child),
-      ),
+      home: Scaffold(body: SizedBox(width: 800, height: 600, child: child)),
     ),
   );
 }
@@ -33,8 +31,9 @@ void main() {
   // ===========================================================================
 
   group('StatusMessageView — variant rendering', () {
-    testWidgets('loading: renders 32px CircularProgressIndicator, no icon',
-        (tester) async {
+    testWidgets('loading: renders 32px CircularProgressIndicator, no icon', (
+      tester,
+    ) async {
       await _pump(
         tester,
         const StatusMessageView(variant: StatusVariant.loading),
@@ -58,8 +57,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('info: info_outline icon + title + optional description',
-        (tester) async {
+    testWidgets('info: info_outline icon + title + optional description', (
+      tester,
+    ) async {
       await _pump(
         tester,
         const StatusMessageView(
@@ -95,14 +95,12 @@ void main() {
       expect(find.byIcon(Icons.search_off), findsOneWidget);
     });
 
-    testWidgets('error: error_outline icon, coloured with colorScheme.error',
-        (tester) async {
+    testWidgets('error: error_outline icon, coloured with colorScheme.error', (
+      tester,
+    ) async {
       await _pump(
         tester,
-        const StatusMessageView(
-          variant: StatusVariant.error,
-          title: 'Boom',
-        ),
+        const StatusMessageView(variant: StatusVariant.error, title: 'Boom'),
       );
       expect(find.byIcon(Icons.error_outline), findsOneWidget);
       final iconWidget = tester.widget<Icon>(find.byIcon(Icons.error_outline));
@@ -111,8 +109,9 @@ void main() {
       expect(iconWidget.size, 40);
     });
 
-    testWidgets('offline: cloud_off icon, coloured with colorScheme.error',
-        (tester) async {
+    testWidgets('offline: cloud_off icon, coloured with colorScheme.error', (
+      tester,
+    ) async {
       await _pump(
         tester,
         const StatusMessageView(
@@ -140,8 +139,9 @@ void main() {
       expect(find.byIcon(Icons.info_outline), findsNothing);
     });
 
-    testWidgets('action widget is rendered after the description',
-        (tester) async {
+    testWidgets('action widget is rendered after the description', (
+      tester,
+    ) async {
       var tapped = false;
       await _pump(
         tester,
@@ -160,8 +160,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('asserts that non-loading variants have a title',
-        (tester) async {
+    testWidgets('asserts that non-loading variants have a title', (
+      tester,
+    ) async {
       // Constructing without a title for a non-loading variant must trip
       // the constructor's `assert`. We catch the failure to verify it.
       expect(
@@ -186,7 +187,8 @@ void main() {
     test('TimeoutException → offline', () {
       expect(
         statusVariantForError(
-            TimeoutException('slow', const Duration(seconds: 1))),
+          TimeoutException('slow', const Duration(seconds: 1)),
+        ),
         StatusVariant.offline,
       );
     });

@@ -55,7 +55,8 @@ class FtsSameTextSql {
       // column from the row the min came from. Selecting them here rather than
       // rejoining `hits` is what keeps that CTE from being computed twice —
       // which would run every word's MATCH a second time.
-      sql: '''
+      sql:
+          '''
 ${hits.sql},
         anchors AS (
           SELECT MIN(h.id) AS id, h.filename AS filename, h.eind AS eind,
@@ -126,7 +127,8 @@ ${hits.sql},
     }
 
     return (
-      sql: '''
+      sql:
+          '''
         WITH hits AS (
 ${branches.join('\n            UNION ALL\n')}
         ),

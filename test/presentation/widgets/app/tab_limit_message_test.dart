@@ -48,15 +48,17 @@ void main() {
     expect(find.text(message), findsOneWidget);
   });
 
-  testWidgets('shows while "Getting ready" still covers the app',
-      (tester) async {
+  testWidgets('shows while "Getting ready" still covers the app', (
+    tester,
+  ) async {
     // A web start link opens as soon as the tree loads, which can be before
     // the gate lets AppShell build.
     final container = await pumpWith(
       tester,
       DatabaseInstallScreen(
-        status:
-            const DatabaseInstallStatus(phase: DatabaseInstallPhase.checking),
+        status: const DatabaseInstallStatus(
+          phase: DatabaseInstallPhase.checking,
+        ),
         onRetry: () {},
       ),
     );

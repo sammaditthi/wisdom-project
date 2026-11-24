@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/localization/l10n/app_localizations.dart';
 import '../../core/utils/responsive_utils.dart';
 import '../widgets/navigation/tree_navigator_widget.dart';
@@ -44,8 +45,10 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     // Awaited for its index rather than re-reading that provider: the opener
     // resolves the hit's unit first, so a synchronous read here would still
     // name the tab the user came from.
-    final tabIndex = await ref.read(openTabFromSearchResultProvider)(result,
-        isPortraitMode: isPortraitMode);
+    final tabIndex = await ref.read(openTabFromSearchResultProvider)(
+      result,
+      isPortraitMode: isPortraitMode,
+    );
     // -1 is a refusal at the tab limit: the results stay up, so the reader can
     // close a tab and tap the same hit again.
     if (!mounted || tabIndex < 0) return;
@@ -55,7 +58,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     // so they won't show highlights — no explicit clearing needed.
     if (result.resultType == SearchResultType.fullText) {
       final searchState = ref.read(searchStateProvider);
-      ref.read(ftsHighlightProvider.notifier).setForTab(
+      ref
+          .read(ftsHighlightProvider.notifier)
+          .setForTab(
             tabIndex,
             FtsHighlightState(
               queryText: searchState.effectiveQueryText,
@@ -113,12 +118,15 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
     final searchPanelWidth = ref.watch(searchPanelWidthProvider);
 
     // Calculate effective navigator width (0 if hidden or on mobile)
-    final effectiveNavWidth =
-        (isTabletOrDesktop && navigatorVisible) ? navigatorWidth : 0.0;
+    final effectiveNavWidth = (isTabletOrDesktop && navigatorVisible)
+        ? navigatorWidth
+        : 0.0;
 
     // Calculate dynamic max for search panel (ensure 400px reader content)
     final searchPanelMaxWidth = (screenWidth - effectiveNavWidth - 400.0).clamp(
-        PaneWidthConstants.searchMin, PaneWidthConstants.searchMaxAbsolute);
+      PaneWidthConstants.searchMin,
+      PaneWidthConstants.searchMaxAbsolute,
+    );
 
     // Clamp search panel width to dynamic max
     final effectiveSearchWidth = searchPanelWidth.clamp(
@@ -140,7 +148,8 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
       // System back closes what Esc would (a menu, the dictionary, find in
       // page), then search: search mode on phones, or the panel under the box
       // on tablets. Not while another section shows: back is that section's.
-      canPop: !isReaderShowing ||
+      canPop:
+          !isReaderShowing ||
           !(isOverlayOpen || isSearchMode || isSearchPanelVisible),
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
@@ -296,8 +305,9 @@ class _ReaderScreenState extends ConsumerState<ReaderScreen> {
                         onDragUpdate: (delta) {
                           // Negative delta (drag left) = wider panel
                           final newWidth = searchPanelWidth - delta;
-                          ref.read(searchPanelWidthProvider.notifier).state =
-                              newWidth.clamp(
+                          ref
+                              .read(searchPanelWidthProvider.notifier)
+                              .state = newWidth.clamp(
                             PaneWidthConstants.searchMin,
                             searchPanelMaxWidth,
                           );

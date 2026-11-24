@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+
 import 'package:flutter/services.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import '../../domain/entities/navigation/tipitaka_tree_node.dart';
 
 /// Local data source for loading the navigation tree from assets
@@ -31,8 +33,12 @@ class TreeLocalDataSourceImpl implements TreeLocalDataSource {
   // Mirrors the pattern in DictionaryDataSourceImpl. dart:developer.log is a
   // no-op in release builds, so this costs nothing in production.
   void _log(String message, {Object? error, StackTrace? stack}) {
-    developer.log(message,
-        name: 'TreeDataSource', error: error, stackTrace: stack);
+    developer.log(
+      message,
+      name: 'TreeDataSource',
+      error: error,
+      stackTrace: stack,
+    );
   }
 
   /// Decodes `tree.json` through [TipitakaTree.fromJson] and maps the result

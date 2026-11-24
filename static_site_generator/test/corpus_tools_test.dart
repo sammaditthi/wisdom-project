@@ -17,8 +17,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 void main() {
-  test('the frozen snapshot still describes this tree, and the rule still runs',
-      () {
+  test('the frozen snapshot still describes this tree, and the rule still runs', () {
     // The default report rather than `--check`, which is not a second test's
     // worth of coverage: `_integrity` and `SitePlan.build` both run *before*
     // the mode branch, so this already asks the four questions `--check` asks.
@@ -60,8 +59,10 @@ ProcessResult _run(String toolPath) {
   // Checked before running so a wrong working directory fails saying so,
   // instead of surfacing as a non-zero exit that reads like real drift.
   if (!File(toolPath).existsSync()) {
-    fail('$toolPath not found. Run `dart test` from the static_site_generator/ '
-        'package root — the path is relative to it.');
+    fail(
+      '$toolPath not found. Run `dart test` from the static_site_generator/ '
+      'package root — the path is relative to it.',
+    );
   }
   return Process.runSync(
     // The Dart running this test, not whatever `dart` is on PATH: with Flutter

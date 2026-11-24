@@ -25,14 +25,11 @@ class ApiClient {
   /// varies widely per request should pass `timeout:` per call instead of picking
   /// one compromise value here — see [postJson].
   ApiClient({
-    required String baseUrl,
-    String? appToken,
-    Duration timeout = const Duration(seconds: 120),
+    required this._baseUrl,
+    this._appToken,
+    this._timeout = const Duration(seconds: 120),
     http.Client? client,
-  })  : _baseUrl = baseUrl,
-        _appToken = appToken,
-        _timeout = timeout,
-        _client = client ?? http.Client();
+  }) : _client = client ?? http.Client();
 
   /// POSTs [body] as JSON to [path]; decodes a JSON object on 200.
   ///
@@ -49,21 +46,20 @@ class ApiClient {
     String path,
     Map<String, dynamic> body, {
     Duration? timeout,
-  }) =>
-      _send(
-        () => _client.post(
-          Uri.parse('$_baseUrl$path'),
-          headers: _headers,
-          body: jsonEncode(body),
-        ),
-        timeout ?? _timeout,
-      );
+  }) => _send(
+    () => _client.post(
+      Uri.parse('$_baseUrl$path'),
+      headers: _headers,
+      body: jsonEncode(body),
+    ),
+    timeout ?? _timeout,
+  );
 
   Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        // review Finding #2: one home for the X-App-Token gate.
-        if (_appToken != null) 'X-App-Token': _appToken,
-      };
+    'Content-Type': 'application/json',
+    // review Finding #2: one home for the X-App-Token gate.
+    if (_appToken != null) 'X-App-Token': _appToken,
+  };
 
   Future<Map<String, dynamic>> _send(
     Future<http.Response> Function() call,

@@ -31,8 +31,11 @@ void main() {
           'kuu': 'කූ',
         };
         for (final entry in cases.entries) {
-          expect(transliterator.convert(entry.key), entry.value,
-              reason: '${entry.key} should convert to ${entry.value}');
+          expect(
+            transliterator.convert(entry.key),
+            entry.value,
+            reason: '${entry.key} should convert to ${entry.value}',
+          );
         }
       });
 
@@ -48,8 +51,11 @@ void main() {
           'Dha': 'ධ', // uppercase Dh = dental aspirated
         };
         for (final entry in cases.entries) {
-          expect(transliterator.convert(entry.key), entry.value,
-              reason: '${entry.key} should convert to ${entry.value}');
+          expect(
+            transliterator.convert(entry.key),
+            entry.value,
+            reason: '${entry.key} should convert to ${entry.value}',
+          );
         }
       });
 
@@ -82,16 +88,13 @@ void main() {
       });
 
       test('standalone vowels', () {
-        final cases = {
-          'a': 'අ',
-          'i': 'ඉ',
-          'u': 'උ',
-          'e': 'එ',
-          'o': 'ඔ',
-        };
+        final cases = {'a': 'අ', 'i': 'ඉ', 'u': 'උ', 'e': 'එ', 'o': 'ඔ'};
         for (final entry in cases.entries) {
-          expect(transliterator.convert(entry.key), entry.value,
-              reason: '${entry.key} should convert to ${entry.value}');
+          expect(
+            transliterator.convert(entry.key),
+            entry.value,
+            reason: '${entry.key} should convert to ${entry.value}',
+          );
         }
       });
 
@@ -100,15 +103,13 @@ void main() {
       });
 
       test('other consonants (sh, Sh, ch, Ch)', () {
-        final cases = {
-          'sha': 'ශ',
-          'Sha': 'ෂ',
-          'cha': 'ච',
-          'Cha': 'ඡ',
-        };
+        final cases = {'sha': 'ශ', 'Sha': 'ෂ', 'cha': 'ච', 'Cha': 'ඡ'};
         for (final entry in cases.entries) {
-          expect(transliterator.convert(entry.key), entry.value,
-              reason: '${entry.key} should convert to ${entry.value}');
+          expect(
+            transliterator.convert(entry.key),
+            entry.value,
+            reason: '${entry.key} should convert to ${entry.value}',
+          );
         }
       });
 
@@ -116,15 +117,13 @@ void main() {
         // Romanized Pali spells ච as `c` (cakka, citta, pañca). The UCSC
         // scheme this came from has only ch/Ch, so a bare `c` used to survive
         // every pass as a Latin letter.
-        final cases = {
-          'ca': 'ච',
-          'cakka': 'චක්ක',
-          'cha': 'ච',
-          'Cha': 'ඡ',
-        };
+        final cases = {'ca': 'ච', 'cakka': 'චක්ක', 'cha': 'ච', 'Cha': 'ඡ'};
         for (final entry in cases.entries) {
-          expect(transliterator.convert(entry.key), entry.value,
-              reason: '${entry.key} should convert to ${entry.value}');
+          expect(
+            transliterator.convert(entry.key),
+            entry.value,
+            reason: '${entry.key} should convert to ${entry.value}',
+          );
         }
       });
 

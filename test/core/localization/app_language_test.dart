@@ -11,16 +11,20 @@ void main() {
     test('honours the ordered device list, skipping unsupported locales', () {
       // Tamil is first but unsupported; Sinhala is the user's 2nd choice and is
       // supported — so we pick Sinhala, NOT English off the primary locale.
-      final result = AppLanguage.fromLocales(
-        const [Locale('ta'), Locale('si'), Locale('en')],
-      );
+      final result = AppLanguage.fromLocales(const [
+        Locale('ta'),
+        Locale('si'),
+        Locale('en'),
+      ]);
 
       expect(result, equals(AppLanguage.sinhala));
     });
 
     test('respects ranking: English ahead of Sinhala resolves to English', () {
-      final result =
-          AppLanguage.fromLocales(const [Locale('en'), Locale('si')]);
+      final result = AppLanguage.fromLocales(const [
+        Locale('en'),
+        Locale('si'),
+      ]);
 
       expect(result, equals(AppLanguage.english));
     });
@@ -33,10 +37,7 @@ void main() {
     });
 
     test('empty list falls back to English', () {
-      expect(
-        AppLanguage.fromLocales(const []),
-        equals(AppLanguage.english),
-      );
+      expect(AppLanguage.fromLocales(const []), equals(AppLanguage.english));
     });
   });
 
@@ -46,10 +47,12 @@ void main() {
       expect(AppLanguage.fromStorage('english'), equals(AppLanguage.english));
     });
 
-    test('returns null for null or unrecognised values (caller uses device)',
-        () {
-      expect(AppLanguage.fromStorage(null), isNull);
-      expect(AppLanguage.fromStorage('klingon'), isNull);
-    });
+    test(
+      'returns null for null or unrecognised values (caller uses device)',
+      () {
+        expect(AppLanguage.fromStorage(null), isNull);
+        expect(AppLanguage.fromStorage('klingon'), isNull);
+      },
+    );
   });
 }

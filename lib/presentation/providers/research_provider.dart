@@ -74,19 +74,19 @@ final chatSummariesProvider = FutureProvider<List<ChatSummary>>((ref) {
 /// Chat state + the send action for the Research section.
 final researchChatProvider =
     StateNotifierProvider<ResearchChatNotifier, ResearchChatState>((ref) {
-  return ResearchChatNotifier(
-    ref,
-    ref.watch(researchRepositoryProvider),
-    ref.watch(chatHistoryRepositoryProvider),
-  );
-});
+      return ResearchChatNotifier(
+        ref,
+        ref.watch(researchRepositoryProvider),
+        ref.watch(chatHistoryRepositoryProvider),
+      );
+    });
 
 /// Owns the active chat transcript, drives the one network call per question,
 /// and keeps the saved-chats store in sync (create on first send, persist
 /// after every turn, open/delete from the Recent panel).
 class ResearchChatNotifier extends StateNotifier<ResearchChatState> {
   ResearchChatNotifier(this._ref, this._repository, this._historyRepo)
-      : super(const ResearchChatState());
+    : super(const ResearchChatState());
 
   final Ref _ref;
   final ResearchRepository _repository;
@@ -178,8 +178,11 @@ class ResearchChatNotifier extends StateNotifier<ResearchChatState> {
     required ResearchMode mode,
   }) async {
     if (sessionId != null) _pendingSessions[sessionId] = mode;
-    final result =
-        await _repository.research(text, history: history, mode: mode);
+    final result = await _repository.research(
+      text,
+      history: history,
+      mode: mode,
+    );
     if (sessionId != null) _pendingSessions.remove(sessionId);
 
     // The user may have opened another chat (or started a new one) while the
@@ -195,18 +198,15 @@ class ResearchChatNotifier extends StateNotifier<ResearchChatState> {
         // chat always has at least that turn). Filing the answer would
         // resurrect the deleted chat — with the answer prose as its title.
         if (stored.isEmpty) return;
-        await _saveTranscript(
-            sessionId,
-            [
-              ...stored,
-              ChatMessage(
-                role: ChatRole.assistant,
-                content: answer.answer,
-                citations: answer.citations,
-                model: answer.model,
-              ),
-            ],
-            mode);
+        await _saveTranscript(sessionId, [
+          ...stored,
+          ChatMessage(
+            role: ChatRole.assistant,
+            content: answer.answer,
+            citations: answer.citations,
+            model: answer.model,
+          ),
+        ], mode);
       }
       return;
     }
@@ -285,9 +285,14 @@ class ResearchChatNotifier extends StateNotifier<ResearchChatState> {
   /// [mode], and refresh the Recent panel. [mode] is passed in, not read from
   /// `state`: [_run]'s background path saves a chat that isn't the live one.
   Future<void> _saveTranscript(
-      String id, List<ChatMessage> messages, ResearchMode mode) async {
-    final firstUserTurn =
-        messages.firstWhere((m) => m.isUser, orElse: () => messages.first);
+    String id,
+    List<ChatMessage> messages,
+    ResearchMode mode,
+  ) async {
+    final firstUserTurn = messages.firstWhere(
+      (m) => m.isUser,
+      orElse: () => messages.first,
+    );
     await _historyRepo.saveChat(
       ChatSummary(
         id: id,

@@ -10,8 +10,8 @@ import 'tab_provider.dart' show activeNodeKeyProvider;
 /// Datasource that loads the committed SuttaCentral↔BJT concordance asset.
 final suttaCentralConcordanceDataSourceProvider =
     Provider<SuttaCentralConcordanceDataSource>(
-  (ref) => SuttaCentralConcordanceDataSourceImpl(),
-);
+      (ref) => SuttaCentralConcordanceDataSourceImpl(),
+    );
 
 /// The pure [SuttaCentralRefResolver], built once from the loaded concordance.
 ///

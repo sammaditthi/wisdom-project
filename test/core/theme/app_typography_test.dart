@@ -60,16 +60,31 @@ void main() {
     // fails five tests at once, each reporting bare arithmetic. This group
     // fails BY NAME, so those become consequences rather than the diagnosis.
     test('are still the production values', () {
-      expect(AppFonts.treeFontSize, defaultDefinition,
-          reason: 'the definition size moved');
-      expect(AppFonts.baseFontSize * 1.1, closeTo(defaultParagraph, 0.01),
-          reason: 'the reader paragraph moved');
-      expect(PaneWidthConstants.proseColumnMeasureEm, 44.0,
-          reason: 'the prose measure moved');
-      expect(PaneWidthConstants.proseColumnGutter, 16.0,
-          reason: 'the gutter moved');
-      expect(PaneWidthConstants.readingColumnMeasureEm, 54.5,
-          reason: 'the reader measure moved');
+      expect(
+        AppFonts.treeFontSize,
+        defaultDefinition,
+        reason: 'the definition size moved',
+      );
+      expect(
+        AppFonts.baseFontSize * 1.1,
+        closeTo(defaultParagraph, 0.01),
+        reason: 'the reader paragraph moved',
+      );
+      expect(
+        PaneWidthConstants.proseColumnMeasureEm,
+        44.0,
+        reason: 'the prose measure moved',
+      );
+      expect(
+        PaneWidthConstants.proseColumnGutter,
+        16.0,
+        reason: 'the gutter moved',
+      );
+      expect(
+        PaneWidthConstants.readingColumnMeasureEm,
+        54.5,
+        reason: 'the reader measure moved',
+      );
     });
 
     test('0.7x and 1.5x are still the ends of the slider', () {
@@ -103,8 +118,11 @@ void main() {
       // gutters and what is left is 44 definition-sizes of text.
       for (final scale in [0.7, 1.0, 1.25, 1.5]) {
         final text = typographyAt(scale).proseColumnMaxWidth - 16 * 2;
-        expect(text / (defaultDefinition * scale), closeTo(44.0, 0.01),
-            reason: 'measure drifted at ${scale}x');
+        expect(
+          text / (defaultDefinition * scale),
+          closeTo(44.0, 0.01),
+          reason: 'measure drifted at ${scale}x',
+        );
       }
     });
 
@@ -121,9 +139,11 @@ void main() {
       // treeNodeLabel and watching only that group go red.
       for (final scale in [0.7, 1.0, 1.5]) {
         final typography = typographyAt(scale);
-        expect(typography.proseColumnMaxWidth,
-            closeTo(44 * typography.definitionBody.fontSize! + 32, 0.01),
-            reason: 'cap detached from definitionBody at ${scale}x');
+        expect(
+          typography.proseColumnMaxWidth,
+          closeTo(44 * typography.definitionBody.fontSize! + 32, 0.01),
+          reason: 'cap detached from definitionBody at ${scale}x',
+        );
       }
     });
   });
@@ -135,10 +155,14 @@ void main() {
     // reader got the same 800px, which is 38em of text instead of 57em. An em
     // cap cannot be flat.
     test('strictly monotonic across 0.7x -> 1.0x -> 1.5x', () {
-      expect(typographyAt(0.7).proseColumnMaxWidth,
-          lessThan(typographyAt(1.0).proseColumnMaxWidth));
-      expect(typographyAt(1.0).proseColumnMaxWidth,
-          lessThan(typographyAt(1.5).proseColumnMaxWidth));
+      expect(
+        typographyAt(0.7).proseColumnMaxWidth,
+        lessThan(typographyAt(1.0).proseColumnMaxWidth),
+      );
+      expect(
+        typographyAt(1.0).proseColumnMaxWidth,
+        lessThan(typographyAt(1.5).proseColumnMaxWidth),
+      );
     });
 
     test('a 1.5x reader gets a visibly wider column than a 0.7x one', () {
@@ -158,8 +182,10 @@ void main() {
     // em would buy the UI a longer line. These two tests are here so a future
     // tidy-up cannot quietly fold one constant into the other.
     test('the two ems are different numbers', () {
-      expect(PaneWidthConstants.proseColumnMeasureEm,
-          isNot(PaneWidthConstants.readingColumnMeasureEm));
+      expect(
+        PaneWidthConstants.proseColumnMeasureEm,
+        isNot(PaneWidthConstants.readingColumnMeasureEm),
+      );
     });
 
     test('the prose cap is not the reader cap at the same scale', () {
@@ -171,12 +197,18 @@ void main() {
         // number copied across files.
         final readerCap =
             4000 - readerThemeAt(scale).readingPadding(4000).horizontal;
-        expect(readerCap, closeTo(54.5 * defaultParagraph * scale, 0.01),
-            reason: 'reader cap moved at ${scale}x');
+        expect(
+          readerCap,
+          closeTo(54.5 * defaultParagraph * scale, 0.01),
+          reason: 'reader cap moved at ${scale}x',
+        );
 
         final proseCap = typographyAt(scale).proseColumnMaxWidth;
-        expect(proseCap, isNot(closeTo(readerCap, 1)),
-            reason: 'prose cap collapsed onto the reader cap at ${scale}x');
+        expect(
+          proseCap,
+          isNot(closeTo(readerCap, 1)),
+          reason: 'prose cap collapsed onto the reader cap at ${scale}x',
+        );
         // And specifically NARROWER: 44em of a 14px face is less than 54.5em of
         // a 17.6px one even after the gutters are added back.
         expect(proseCap, lessThan(readerCap));
@@ -252,8 +284,9 @@ void main() {
     });
 
     test('an untouched copyWith leaves the cap alone', () {
-      final copy = typographyAt().copyWith(badgeLabel: const TextStyle())
-          as AppTypography;
+      final copy = typographyAt().copyWith(
+        badgeLabel: const TextStyle(),
+      ) as AppTypography;
       expect(copy.proseColumnMaxWidth, closeTo(648.0, 0.01));
     });
   });

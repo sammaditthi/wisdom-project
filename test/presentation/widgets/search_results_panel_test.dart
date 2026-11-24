@@ -80,8 +80,9 @@ void main() {
   group('SearchResultsPanel — edge cases (mocked state)', () {
     // ── Loading states ──────────────────────────────────────────────────
 
-    testWidgets('shows loading indicator when isLoading is true (All tab)',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true (All tab)', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: const SearchState(
@@ -96,25 +97,27 @@ void main() {
     });
 
     testWidgets(
-        'shows loading indicator when fullResults is loading (specific tab)',
-        (tester) async {
-      await _pumpPanel(
-        tester,
-        state: const SearchState(
-          rawQueryText: 'test',
-          effectiveQueryText: 'test',
-          selectedResultType: SearchResultType.title,
-          fullResults: AsyncValue.loading(),
-        ),
-      );
+      'shows loading indicator when fullResults is loading (specific tab)',
+      (tester) async {
+        await _pumpPanel(
+          tester,
+          state: const SearchState(
+            rawQueryText: 'test',
+            effectiveQueryText: 'test',
+            selectedResultType: SearchResultType.title,
+            fullResults: AsyncValue.loading(),
+          ),
+        );
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
+        expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      },
+    );
 
     // ── Error state ─────────────────────────────────────────────────────
 
-    testWidgets('generic error → errorLoadingSearch, no raw leak, no Retry',
-        (tester) async {
+    testWidgets('generic error → errorLoadingSearch, no raw leak, no Retry', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: SearchState(
@@ -139,8 +142,9 @@ void main() {
       expect(find.textContaining('LEAKED-RAW-MESSAGE'), findsNothing);
     });
 
-    testWidgets('Failure wrapping a SocketException → offline copy, no Retry',
-        (tester) async {
+    testWidgets('Failure wrapping a SocketException → offline copy, no Retry', (
+      tester,
+    ) async {
       // SocketException's runtime type name is matched by the classifier,
       // and `Failure.error` is unwrapped one level — so this routes the
       // panel to the offline preset.
@@ -160,17 +164,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Cannot reach the server'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again.'),
-        findsOneWidget,
-      );
+      expect(find.text('Check your connection and try again.'), findsOneWidget);
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
       // Retry was removed; on web the user can refresh the page instead.
       expect(find.text('Retry'), findsNothing);
     });
 
-    testWidgets('a failed Top results search shows the error, not "invalid"',
-        (tester) async {
+    testWidgets('a failed Top results search shows the error, not "invalid"', (
+      tester,
+    ) async {
       // "?something" used to fail the FTS query, and this tab showed
       // "Enter a valid search query" while Full text showed the error.
       await _pumpPanel(
@@ -207,8 +209,9 @@ void main() {
 
     // ── Badge boundary values ───────────────────────────────────────────
 
-    testWidgets('zero count badges show "0" on all 3 category tabs',
-        (tester) async {
+    testWidgets('zero count badges show "0" on all 3 category tabs', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: const SearchState(
@@ -233,9 +236,7 @@ void main() {
         state: const SearchState(
           rawQueryText: 'test',
           effectiveQueryText: 'test',
-          countByResultType: {
-            SearchResultType.title: 100,
-          },
+          countByResultType: {SearchResultType.title: 100},
         ),
       );
 
@@ -251,25 +252,27 @@ void main() {
         SearchState(
           rawQueryText: 'metta',
           effectiveQueryText: 'metta',
-          groupedResults: const AsyncValue.data(GroupedSearchResult(
-            resultsByType: {
-              SearchResultType.title: [
-                SearchResult(
-                  id: 'title_sn-1',
-                  editionId: 'bjt',
-                  resultType: SearchResultType.title,
-                  title: 'මෙත්තසුත්තං',
-                  subtitle: 'සුත්තනිපාතො',
-                  matchedText: '',
-                  contentFileId: 'sn-1',
-                  pageIndex: 0,
-                  entryIndex: 0,
-                  nodeKey: 'sn-1',
-                  language: 'pali',
-                ),
-              ],
-            },
-          )),
+          groupedResults: const AsyncValue.data(
+            GroupedSearchResult(
+              resultsByType: {
+                SearchResultType.title: [
+                  SearchResult(
+                    id: 'title_sn-1',
+                    editionId: 'bjt',
+                    resultType: SearchResultType.title,
+                    title: 'මෙත්තසුත්තං',
+                    subtitle: 'සුත්තනිපාතො',
+                    matchedText: '',
+                    contentFileId: 'sn-1',
+                    pageIndex: 0,
+                    entryIndex: 0,
+                    nodeKey: 'sn-1',
+                    language: 'pali',
+                  ),
+                ],
+              },
+            ),
+          ),
           countByResultType: counts,
         );
 
@@ -281,8 +284,9 @@ void main() {
       expect(find.text('See all'), findsNothing);
     });
 
-    testWidgets('no "See all" when the section shows every result',
-        (tester) async {
+    testWidgets('no "See all" when the section shows every result', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: topResultsWith({SearchResultType.title: 1}),
@@ -293,8 +297,9 @@ void main() {
       expect(find.text('See all'), findsNothing);
     });
 
-    testWidgets('"See all" opens the Titles tab when there are more results',
-        (tester) async {
+    testWidgets('"See all" opens the Titles tab when there are more results', (
+      tester,
+    ) async {
       final notifier = await _pumpPanel(
         tester,
         state: topResultsWith({SearchResultType.title: 5}),
@@ -309,8 +314,9 @@ void main() {
       expect(tester.widget<TabBar>(find.byType(TabBar)).controller!.index, 1);
     });
 
-    testWidgets('the results are where the ↓ key looks for them',
-        (tester) async {
+    testWidgets('the results are where the ↓ key looks for them', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: topResultsWith({SearchResultType.title: 5}),
@@ -324,8 +330,9 @@ void main() {
       expect(searchResultStops(results), contains(seeAll));
     });
 
-    testWidgets('the panel focus node wraps everything focusable',
-        (tester) async {
+    testWidgets('the panel focus node wraps everything focusable', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: topResultsWith({SearchResultType.title: 5}),
@@ -346,22 +353,23 @@ void main() {
 
     // ── "Show N more" in a full-text group ──────────────────────────────
 
-    testWidgets('"Show 2 more" shows the hidden matches and "Show less"',
-        (tester) async {
+    testWidgets('"Show 2 more" shows the hidden matches and "Show less"', (
+      tester,
+    ) async {
       // Three matches in one sutta: one primary row and two hidden ones.
       SearchResult match(int entryIndex) => SearchResult(
-            id: 'fts_dn-1_$entryIndex',
-            editionId: 'bjt',
-            resultType: SearchResultType.fullText,
-            title: 'බ්‍රහ්මජාලසුත්තං',
-            subtitle: 'දීඝනිකායො',
-            matchedText: 'එවං මෙ සුතං',
-            contentFileId: 'dn-1',
-            pageIndex: 0,
-            entryIndex: entryIndex,
-            nodeKey: 'dn-1',
-            language: 'pali',
-          );
+        id: 'fts_dn-1_$entryIndex',
+        editionId: 'bjt',
+        resultType: SearchResultType.fullText,
+        title: 'බ්‍රහ්මජාලසුත්තං',
+        subtitle: 'දීඝනිකායො',
+        matchedText: 'එවං මෙ සුතං',
+        contentFileId: 'dn-1',
+        pageIndex: 0,
+        entryIndex: entryIndex,
+        nodeKey: 'dn-1',
+        language: 'pali',
+      );
 
       await _pumpPanel(
         tester,
@@ -391,18 +399,18 @@ void main() {
       // so only the tiles' choice of accessor keeps the markers off screen.
       // docs/todo/search/word-joining-characters-in-the-fts-index.md
       SearchResult match(int entryIndex) => SearchResult(
-            id: 'fts_dn-1_$entryIndex',
-            editionId: 'bjt',
-            resultType: SearchResultType.fullText,
-            title: 'බ්‍රහ්මජාලසුත්තං',
-            subtitle: 'දීඝනිකායො',
-            matchedText: '**ඡන්දරාගවෙමත්තතා**ති එවං{1} මෙ සුතං',
-            contentFileId: 'dn-1',
-            pageIndex: 0,
-            entryIndex: entryIndex,
-            nodeKey: 'dn-1',
-            language: 'pali',
-          );
+        id: 'fts_dn-1_$entryIndex',
+        editionId: 'bjt',
+        resultType: SearchResultType.fullText,
+        title: 'බ්‍රහ්මජාලසුත්තං',
+        subtitle: 'දීඝනිකායො',
+        matchedText: '**ඡන්දරාගවෙමත්තතා**ති එවං{1} මෙ සුතං',
+        contentFileId: 'dn-1',
+        pageIndex: 0,
+        entryIndex: entryIndex,
+        nodeKey: 'dn-1',
+        language: 'pali',
+      );
 
       await _pumpPanel(
         tester,
@@ -420,10 +428,12 @@ void main() {
       await tester.pumpAndSettle();
 
       final snippets = tester
-          .widgetList<RichText>(find.descendant(
-            of: find.byType(HighlightedFtsSearchText),
-            matching: find.byType(RichText),
-          ))
+          .widgetList<RichText>(
+            find.descendant(
+              of: find.byType(HighlightedFtsSearchText),
+              matching: find.byType(RichText),
+            ),
+          )
           // The pali branch welds conjuncts, which inserts ZWJs — undo that
           // so the expectation is about markers, not letter shapes.
           .map((w) => removeConjunctFormatting(w.text.toPlainText()))
@@ -441,8 +451,9 @@ void main() {
     // The panel has no close button: the search field's back arrow closes
     // it (integration_test/search_mode_test.dart).
 
-    testWidgets('onResultTap callback fires when result is tapped',
-        (tester) async {
+    testWidgets('onResultTap callback fires when result is tapped', (
+      tester,
+    ) async {
       SearchResult? tappedResult;
       const result = SearchResult(
         id: 'test_id',
@@ -495,18 +506,24 @@ void main() {
     );
 
     for (final kind in [PointerDeviceKind.mouse, PointerDeviceKind.touch]) {
-      testWidgets('a ${kind.name} drag brings the last tab on screen',
-          (tester) async {
+      testWidgets('a ${kind.name} drag brings the last tab on screen', (
+        tester,
+      ) async {
         await _pumpPanel(tester, state: state, width: 300);
         await tester.pumpAndSettle();
 
         final panel = tester.getRect(find.byType(SearchResultsPanel));
-        Rect lastTab() => tester.getRect(find.ancestor(
-              of: find.text('Definitions'),
-              matching: find.byType(Tab),
-            ));
-        expect(lastTab().right, greaterThan(panel.right),
-            reason: 'the tabs must not fit, or there is nothing to drag');
+        Rect lastTab() => tester.getRect(
+          find.ancestor(
+            of: find.text('Definitions'),
+            matching: find.byType(Tab),
+          ),
+        );
+        expect(
+          lastTab().right,
+          greaterThan(panel.right),
+          reason: 'the tabs must not fit, or there is nothing to drag',
+        );
 
         await tester.dragFrom(
           tester.getCenter(find.byType(TabBar)),
@@ -572,12 +589,13 @@ void main() {
         );
 
     List<Override> treeOverrides(ContentLanguage reading) => [
-          navigationTreeProvider.overrideWith((ref) async => tree),
-          effectiveContentLanguageProvider.overrideWithValue(reading),
-        ];
+      navigationTreeProvider.overrideWith((ref) async => tree),
+      effectiveContentLanguageProvider.overrideWithValue(reading),
+    ];
 
-    testWidgets('both on + reading Sinhala → tile shows the Sinhala name',
-        (tester) async {
+    testWidgets('both on + reading Sinhala → tile shows the Sinhala name', (
+      tester,
+    ) async {
       await _pumpPanel(
         tester,
         state: stateWith(pali: true, sinhala: true),
@@ -590,40 +608,42 @@ void main() {
     });
 
     testWidgets(
-        'Pali-only overrides a Sinhala reading pref → tile shows the Pali name',
-        (tester) async {
-      // Narrowing the search to Pali must reach the pixels, even though the
-      // user reads in Sinhala.
-      await _pumpPanel(
-        tester,
-        state: stateWith(pali: true, sinhala: false),
-        overrides: treeOverrides(ContentLanguage.sinhala),
-      );
-      await tester.pumpAndSettle();
+      'Pali-only overrides a Sinhala reading pref → tile shows the Pali name',
+      (tester) async {
+        // Narrowing the search to Pali must reach the pixels, even though the
+        // user reads in Sinhala.
+        await _pumpPanel(
+          tester,
+          state: stateWith(pali: true, sinhala: false),
+          overrides: treeOverrides(ContentLanguage.sinhala),
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Brahmajālasutta'), findsOneWidget);
-      expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsNothing);
-    });
+        expect(find.text('Brahmajālasutta'), findsOneWidget);
+        expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsNothing);
+      },
+    );
 
     testWidgets(
-        'flipping the toggle re-renders the tile into the other language',
-        (tester) async {
-      final notifier = await _pumpPanel(
-        tester,
-        state: stateWith(pali: true, sinhala: true),
-        overrides: treeOverrides(ContentLanguage.sinhala),
-      );
-      await tester.pumpAndSettle();
+      'flipping the toggle re-renders the tile into the other language',
+      (tester) async {
+        final notifier = await _pumpPanel(
+          tester,
+          state: stateWith(pali: true, sinhala: true),
+          overrides: treeOverrides(ContentLanguage.sinhala),
+        );
+        await tester.pumpAndSettle();
 
-      // Starts in Sinhala (both on + Sinhala reading pref).
-      expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsOneWidget);
+        // Starts in Sinhala (both on + Sinhala reading pref).
+        expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsOneWidget);
 
-      // Narrow to Pali-only → the same tile must switch to the Pali name live.
-      notifier.setLanguageFilter(pali: true, sinhala: false);
-      await tester.pumpAndSettle();
+        // Narrow to Pali-only → the same tile must switch to the Pali name live.
+        notifier.setLanguageFilter(pali: true, sinhala: false);
+        await tester.pumpAndSettle();
 
-      expect(find.text('Brahmajālasutta'), findsOneWidget);
-      expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsNothing);
-    });
+        expect(find.text('Brahmajālasutta'), findsOneWidget);
+        expect(find.text('බ්‍රහ්මජාලසූත්‍රය'), findsNothing);
+      },
+    );
   });
 }

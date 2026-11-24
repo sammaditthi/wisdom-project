@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
+
 import '../../../core/theme/text_entry_theme.dart';
 import '../../../domain/entities/bjt/bjt_page.dart';
 import '../../../domain/entities/bjt/bjt_section.dart';
@@ -73,21 +74,21 @@ class SingleColumnPane extends StatelessWidget {
           rowCount: (page) => _section(page).entries.length,
           buildPageNumber: (context, page) =>
               ReaderEntryBuilder.buildPageNumber(
-            context,
-            languageCode == 'pi' ? page.pageNumber : page.sinhalaPageNumber,
-          ),
+                context,
+                languageCode == 'pi' ? page.pageNumber : page.sinhalaPageNumber,
+              ),
           buildRows: (context, index, start, end) =>
               ReaderEntryBuilder.buildEntries(
-            context,
-            _section(slice.pages[index]).entries.sublist(start, end),
-            enableDictionaryLookup: enableDictionaryLookup,
-            searchState: searchState,
-            absolutePageIndex: slice.absolutePageStart + index,
-            entryStartOffset: start,
-            languageCode: languageCode,
-            onWordTap: onWordTap,
-            entryKeyRegistry: entryKeyRegistry,
-          ),
+                context,
+                _section(slice.pages[index]).entries.sublist(start, end),
+                enableDictionaryLookup: enableDictionaryLookup,
+                searchState: searchState,
+                absolutePageIndex: slice.absolutePageStart + index,
+                entryStartOffset: start,
+                languageCode: languageCode,
+                onWordTap: onWordTap,
+                entryKeyRegistry: entryKeyRegistry,
+              ),
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/pali_letter_options.dart';
@@ -41,15 +42,19 @@ class RefineSearchDialog extends ConsumerStatefulWidget {
   /// try/finally guarantees the stack entry is removed no matter how the
   /// dialog actually closed (ESC, barrier tap, system back, programmatic).
   static Future<void> show(BuildContext context) async {
-    final overlayStack = ProviderScope.containerOf(context, listen: false)
-        .read(overlayStackProvider.notifier);
+    final overlayStack = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(overlayStackProvider.notifier);
     final navigator = Navigator.of(context, rootNavigator: true);
-    overlayStack.push(DismissibleOverlay(
-      id: 'refine-search-dialog',
-      dismiss: () {
-        if (navigator.canPop()) navigator.pop();
-      },
-    ));
+    overlayStack.push(
+      DismissibleOverlay(
+        id: 'refine-search-dialog',
+        dismiss: () {
+          if (navigator.canPop()) navigator.pop();
+        },
+      ),
+    );
     try {
       await showDialog<void>(
         context: context,
@@ -104,10 +109,7 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
 
     return Dialog(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 400,
-          maxHeight: 600,
-        ),
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -127,13 +129,16 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
               Expanded(
                 child: treeAsync.when(
                   data: (tree) => _buildScopeSection(
-                      theme, tree, scope, language, options, l10n),
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
+                    theme,
+                    tree,
+                    scope,
+                    language,
+                    options,
+                    l10n,
                   ),
-                  error: (_, __) => Center(
-                    child: Text(l10n.errorLoadingTree),
-                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (_, __) => Center(child: Text(l10n.errorLoadingTree)),
                 ),
               ),
 
@@ -151,15 +156,9 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
   Widget _buildHeader(ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
-        Icon(
-          Icons.filter_list,
-          color: theme.colorScheme.onPrimaryContainer,
-        ),
+        Icon(Icons.filter_list, color: theme.colorScheme.onPrimaryContainer),
         const SizedBox(width: 8),
-        Text(
-          l10n.refineSearch,
-          style: theme.textTheme.titleLarge,
-        ),
+        Text(l10n.refineSearch, style: theme.textTheme.titleLarge),
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.close),
@@ -182,10 +181,12 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
     // Nothing to toggle if the edition exposes fewer than two languages.
     if (available.length < 2) return const SizedBox.shrink();
 
-    final searchInPali =
-        ref.watch(searchStateProvider.select((s) => s.searchInPali));
-    final searchInSinhala =
-        ref.watch(searchStateProvider.select((s) => s.searchInSinhala));
+    final searchInPali = ref.watch(
+      searchStateProvider.select((s) => s.searchInPali),
+    );
+    final searchInSinhala = ref.watch(
+      searchStateProvider.select((s) => s.searchInSinhala),
+    );
 
     // Current selection as a Set, clamped to available languages. The fallback
     // to "all available" guards SegmentedButton's non-empty assert (the toggle
@@ -253,14 +254,10 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
             // reads as an identical surfaceContainerLow chip. Trade-off: when
             // both languages are selected the divider over the brown `secondary`
             // fill is faint, because outline ≈ secondary in luminance.
-            side: WidgetStateProperty.all(
-              BorderSide(color: cs.outline),
-            ),
+            side: WidgetStateProperty.all(BorderSide(color: cs.outline)),
             // Echo the quick-filter pill roundness while staying one connected bar.
             shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100),
-              ),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
             ),
           ),
           segments: available.map((lang) {
@@ -277,7 +274,9 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
           onSelectionChanged: (newSelection) {
             // Single source of truth: searchStateProvider.
             // setLanguageFilter triggers a re-search + recount.
-            ref.read(searchStateProvider.notifier).setLanguageFilter(
+            ref
+                .read(searchStateProvider.notifier)
+                .setLanguageFilter(
                   pali: newSelection.contains(ContentLanguage.pali),
                   sinhala: newSelection.contains(ContentLanguage.sinhala),
                 );
@@ -325,8 +324,9 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
                 },
                 child: Text(
                   l10n.clear,
-                  style: context.typography.actionLabel
-                      .copyWith(color: theme.colorScheme.primary),
+                  style: context.typography.actionLabel.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
           ],
@@ -335,9 +335,7 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
-              ),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(
@@ -345,8 +343,17 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
               child: SingleChildScrollView(
                 child: Column(
                   children: tree
-                      .map((node) => _buildTreeNode(
-                          theme, node, 0, scope, tree, language, options))
+                      .map(
+                        (node) => _buildTreeNode(
+                          theme,
+                          node,
+                          0,
+                          scope,
+                          tree,
+                          language,
+                          options,
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -381,18 +388,15 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
         InkWell(
           onTap: hasChildren
               ? () => setState(() {
-                    if (isExpanded) {
-                      _expandedNodes.remove(node.nodeKey);
-                    } else {
-                      _expandedNodes.add(node.nodeKey);
-                    }
-                  })
+                  if (isExpanded) {
+                    _expandedNodes.remove(node.nodeKey);
+                  } else {
+                    _expandedNodes.add(node.nodeKey);
+                  }
+                })
               : null,
           child: Padding(
-            padding: EdgeInsets.only(
-              left: 8.0 + (depth * 16.0),
-              right: 8.0,
-            ),
+            padding: EdgeInsets.only(left: 8.0 + (depth * 16.0), right: 8.0),
             child: Row(
               children: [
                 // Expand/collapse icon
@@ -430,8 +434,9 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
                       options,
                     ),
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight:
-                          isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -443,8 +448,17 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
 
         // Children
         if (hasChildren && isExpanded)
-          ...node.childNodes.map((child) => _buildTreeNode(
-              theme, child, depth + 1, scope, tree, language, options)),
+          ...node.childNodes.map(
+            (child) => _buildTreeNode(
+              theme,
+              child,
+              depth + 1,
+              scope,
+              tree,
+              language,
+              options,
+            ),
+          ),
       ],
     );
   }
@@ -453,10 +467,7 @@ class _RefineSearchDialogState extends ConsumerState<RefineSearchDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        TextButton(
-          onPressed: _resetToDefaults,
-          child: Text(l10n.reset),
-        ),
+        TextButton(onPressed: _resetToDefaults, child: Text(l10n.reset)),
         const SizedBox(width: 8),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),

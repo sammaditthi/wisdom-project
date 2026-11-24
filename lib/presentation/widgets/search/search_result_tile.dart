@@ -55,13 +55,18 @@ class SearchResultTile extends ConsumerWidget {
     final labels = searchResultLabels(ref, searchResult);
 
     return ListTile(
-      contentPadding: EdgeInsets.fromLTRB(ResultBadge.rowPadding, 8,
-          ResultBadge.rowPadding, hasLinkBelow ? 0 : 8),
+      contentPadding: EdgeInsets.fromLTRB(
+        ResultBadge.rowPadding,
+        8,
+        ResultBadge.rowPadding,
+        hasLinkBelow ? 0 : 8,
+      ),
       leading: showEditionBadge
           ? ResultBadge(
               label: searchResult.editionId.toUpperCase(),
-              backgroundColor:
-                  theme.colorScheme.tertiary.withValues(alpha: 0.3),
+              backgroundColor: theme.colorScheme.tertiary.withValues(
+                alpha: 0.3,
+              ),
             )
           : null,
       // Title is never highlighted - just plain text

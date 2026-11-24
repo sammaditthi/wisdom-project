@@ -7,14 +7,15 @@ part of 'chat_message.dart';
 // **************************************************************************
 
 _ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => _ChatMessage(
-      role: json['role'] as String,
-      content: json['content'] as String,
-      citations: (json['citations'] as List<dynamic>?)
-              ?.map((e) => Citation.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      model: json['model'] as String?,
-    );
+  role: json['role'] as String,
+  content: json['content'] as String,
+  citations:
+      (json['citations'] as List<dynamic>?)
+          ?.map((e) => Citation.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  model: json['model'] as String?,
+);
 
 Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
     <String, dynamic>{

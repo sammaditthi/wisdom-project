@@ -24,7 +24,8 @@ class DismissibleMenuAnchor extends ConsumerStatefulWidget {
     BuildContext context,
     MenuController controller,
     FocusNode focusNode,
-  ) builder;
+  )
+  builder;
   final bool visible;
   final double? endAlignedWidth;
 

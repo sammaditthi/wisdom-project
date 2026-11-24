@@ -45,10 +45,13 @@ class Cdp {
   }) {
     final waiter = _Waiter(methods, Completer());
     _waiters.add(waiter);
-    return waiter.completer.future.timeout(timeout, onTimeout: () {
-      _waiters.remove(waiter);
-      throw TimeoutException('none of $methods arrived');
-    });
+    return waiter.completer.future.timeout(
+      timeout,
+      onTimeout: () {
+        _waiters.remove(waiter);
+        throw TimeoutException('none of $methods arrived');
+      },
+    );
   }
 
   Future<void> close() async {

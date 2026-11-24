@@ -22,14 +22,12 @@ sealed class Failure with _$Failure {
   }) = DataParseFailure;
 
   /// Failure when requested resource is not found
-  const factory Failure.notFoundFailure({
-    required String message,
-  }) = NotFoundFailure;
+  const factory Failure.notFoundFailure({required String message}) =
+      NotFoundFailure;
 
   /// Failure when an invalid operation is attempted
-  const factory Failure.invalidOperationFailure({
-    required String message,
-  }) = InvalidOperationFailure;
+  const factory Failure.invalidOperationFailure({required String message}) =
+      InvalidOperationFailure;
 
   /// Generic unexpected failure
   const factory Failure.unexpectedFailure({
@@ -63,7 +61,5 @@ sealed class Failure with _$Failure {
 
   /// The error type when this is an [ApiFailure], else null. Lets the UI switch
   /// on the failure category (which message + whether to offer Retry).
-  ApiErrorType? get apiType => whenOrNull(
-        apiFailure: (_, type, __) => type,
-      );
+  ApiErrorType? get apiType => whenOrNull(apiFailure: (_, type, __) => type);
 }

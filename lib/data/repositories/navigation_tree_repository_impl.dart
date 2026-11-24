@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import '../../domain/entities/failure.dart';
 import '../../domain/entities/navigation/tipitaka_tree_node.dart';
 import '../../domain/repositories/navigation_tree_repository.dart';
@@ -39,10 +40,12 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
 
       return Right(tree);
     } catch (e) {
-      return Left(Failure.dataLoadFailure(
-        message: 'Failed to load navigation tree',
-        error: e,
-      ));
+      return Left(
+        Failure.dataLoadFailure(
+          message: 'Failed to load navigation tree',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -54,23 +57,28 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
         final result = await loadNavigationTree();
         if (result.isLeft()) {
           return Left(
-              result.fold((failure) => failure, (_) => throw Exception()));
+            result.fold((failure) => failure, (_) => throw Exception()),
+          );
         }
       }
 
       final node = _nodeIndex![nodeKey];
       if (node == null) {
-        return Left(Failure.notFoundFailure(
-          message: 'Node with key "$nodeKey" not found',
-        ));
+        return Left(
+          Failure.notFoundFailure(
+            message: 'Node with key "$nodeKey" not found',
+          ),
+        );
       }
 
       return Right(node);
     } catch (e) {
-      return Left(Failure.unexpectedFailure(
-        message: 'Failed to get node by key',
-        error: e,
-      ));
+      return Left(
+        Failure.unexpectedFailure(
+          message: 'Failed to get node by key',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -82,16 +90,19 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
         final result = await loadNavigationTree();
         if (result.isLeft()) {
           return Left(
-              result.fold((failure) => failure, (_) => throw Exception()));
+            result.fold((failure) => failure, (_) => throw Exception()),
+          );
         }
       }
 
       return Right(_cachedTree ?? []);
     } catch (e) {
-      return Left(Failure.unexpectedFailure(
-        message: 'Failed to get root nodes',
-        error: e,
-      ));
+      return Left(
+        Failure.unexpectedFailure(
+          message: 'Failed to get root nodes',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -107,7 +118,8 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
         final result = await loadNavigationTree();
         if (result.isLeft()) {
           return Left(
-              result.fold((failure) => failure, (_) => throw Exception()));
+            result.fold((failure) => failure, (_) => throw Exception()),
+          );
         }
       }
 
@@ -134,10 +146,9 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
 
       return Right(matchingNodes);
     } catch (e) {
-      return Left(Failure.unexpectedFailure(
-        message: 'Failed to search nodes',
-        error: e,
-      ));
+      return Left(
+        Failure.unexpectedFailure(message: 'Failed to search nodes', error: e),
+      );
     }
   }
 
@@ -150,10 +161,12 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
       // A failed build must not stay cached, or every later caller replays the
       // same error and a retry can never succeed.
       _planBuild = null;
-      return Left(Failure.dataLoadFailure(
-        message: 'Failed to load the page plan',
-        error: e,
-      ));
+      return Left(
+        Failure.dataLoadFailure(
+          message: 'Failed to load the page plan',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -162,10 +175,12 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
     try {
       return Right(await _localDataSource.loadSharedTree());
     } catch (e) {
-      return Left(Failure.dataLoadFailure(
-        message: 'Failed to load the navigation tree',
-        error: e,
-      ));
+      return Left(
+        Failure.dataLoadFailure(
+          message: 'Failed to load the navigation tree',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -180,7 +195,8 @@ class NavigationTreeRepositoryImpl implements NavigationTreeRepository {
 
   /// Build a flat index of all nodes for quick lookup
   Map<String, TipitakaTreeNode> _buildNodeIndex(
-      List<TipitakaTreeNode> rootNodes) {
+    List<TipitakaTreeNode> rootNodes,
+  ) {
     final index = <String, TipitakaTreeNode>{};
 
     void indexNode(TipitakaTreeNode node) {

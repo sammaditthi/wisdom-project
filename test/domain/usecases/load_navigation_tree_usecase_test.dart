@@ -42,10 +42,14 @@ void main() {
             fail('Expected success but got failure: ${failure.userMessage}'),
         (tree) {
           expect(tree.length, equals(2)); // sampleTree has 2 root nodes
-          expect(tree[0].nodeKey,
-              equals(TipitakaNodeKeys.suttaPitaka)); // Sutta Pitaka
-          expect(tree[1].nodeKey,
-              equals(TipitakaNodeKeys.vinayaPitaka)); // Vinaya Pitaka
+          expect(
+            tree[0].nodeKey,
+            equals(TipitakaNodeKeys.suttaPitaka),
+          ); // Sutta Pitaka
+          expect(
+            tree[1].nodeKey,
+            equals(TipitakaNodeKeys.vinayaPitaka),
+          ); // Vinaya Pitaka
         },
       );
 
@@ -64,13 +68,10 @@ void main() {
       // ASSERT
       expect(result.isLeft(), true);
 
-      result.fold(
-        (failure) {
-          expect(failure, isA<DataLoadFailure>());
-          expect(failure.userMessage, contains('Failed to load'));
-        },
-        (tree) => fail('Expected failure but got success'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<DataLoadFailure>());
+        expect(failure.userMessage, contains('Failed to load'));
+      }, (tree) => fail('Expected failure but got success'));
 
       verify(mockRepository.loadNavigationTree()).called(1);
     });

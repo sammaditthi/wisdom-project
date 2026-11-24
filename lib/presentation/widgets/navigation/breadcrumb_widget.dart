@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../providers/breadcrumb_provider.dart';
@@ -83,17 +84,16 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
           };
         _recognizers.add(recognizer);
 
-        spans.add(TextSpan(
-          text: segments[i].displayName,
-          style: parentStyle,
-          recognizer: recognizer,
-        ));
+        spans.add(
+          TextSpan(
+            text: segments[i].displayName,
+            style: parentStyle,
+            recognizer: recognizer,
+          ),
+        );
       } else {
         // Leaf segment — non-tappable
-        spans.add(TextSpan(
-          text: segments[i].displayName,
-          style: leafStyle,
-        ));
+        spans.add(TextSpan(text: segments[i].displayName, style: leafStyle));
       }
     }
 

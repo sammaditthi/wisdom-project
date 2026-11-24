@@ -36,10 +36,7 @@ class OverlayStackNotifier extends StateNotifier<List<DismissibleOverlay>> {
   /// entry is removed and the new one goes on top — keeps the API safe to
   /// call from a `ref.listen` that may fire on every rebuild.
   void push(DismissibleOverlay overlay) {
-    state = [
-      ...state.where((o) => o.id != overlay.id),
-      overlay,
-    ];
+    state = [...state.where((o) => o.id != overlay.id), overlay];
   }
 
   /// Removes the overlay with the given [id], wherever it is in the stack.
@@ -66,5 +63,5 @@ class OverlayStackNotifier extends StateNotifier<List<DismissibleOverlay>> {
 /// underlying visibility providers by `OverlayStackSync`.
 final overlayStackProvider =
     StateNotifierProvider<OverlayStackNotifier, List<DismissibleOverlay>>(
-  (ref) => OverlayStackNotifier(),
-);
+      (ref) => OverlayStackNotifier(),
+    );

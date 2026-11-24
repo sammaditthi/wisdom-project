@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../../domain/entities/failure.dart';
 import '../../domain/entities/bjt/bjt_document.dart';
 import '../../domain/repositories/bjt_document_repository.dart';
@@ -38,10 +39,12 @@ class BJTDocumentRepositoryImpl implements BJTDocumentRepository {
 
       return Right(document);
     } catch (e) {
-      return Left(Failure.dataLoadFailure(
-        message: 'Failed to load BJT document for $fileId',
-        error: e,
-      ));
+      return Left(
+        Failure.dataLoadFailure(
+          message: 'Failed to load BJT document for $fileId',
+          error: e,
+        ),
+      );
     }
   }
 
@@ -75,10 +78,12 @@ class BJTDocumentRepositoryImpl implements BJTDocumentRepository {
 
       return Right(successCount);
     } catch (e) {
-      return Left(Failure.unexpectedFailure(
-        message: 'Failed to preload BJT documents',
-        error: e,
-      ));
+      return Left(
+        Failure.unexpectedFailure(
+          message: 'Failed to preload BJT documents',
+          error: e,
+        ),
+      );
     }
   }
 }

@@ -15,8 +15,9 @@ import 'navigation_tree_provider.dart';
 /// `tab_provider.dart`) for the reason `navigator_sync_provider` was — those
 /// two already import each other's neighbourhood, and a resolver they both
 /// reach would close the loop.
-final readerUnitResolverProvider =
-    FutureProvider<ReaderUnitResolver>((ref) async {
+final readerUnitResolverProvider = FutureProvider<ReaderUnitResolver>((
+  ref,
+) async {
   final tree = await ref.watch(sharedTreeProvider.future);
   return ReaderUnitResolver(tree);
 });
@@ -32,15 +33,15 @@ enum ReaderStep { previous, next }
 /// of it.
 final neighbourLeafProvider = Provider.autoDispose
     .family<TipitakaTreeNode?, (String, ReaderStep)>((ref, arg) {
-  final (nodeKey, step) = arg;
-  final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
-  if (resolver == null) return null;
+      final (nodeKey, step) = arg;
+      final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
+      if (resolver == null) return null;
 
-  final leaf = switch (step) {
-    ReaderStep.previous => resolver.leafBefore(nodeKey),
-    ReaderStep.next => resolver.leafAfter(nodeKey),
-  };
-  // The nested `TipitakaTreeNode` is what the reader's callers pass around;
-  // the shared tree's node is a different type carrying no children.
-  return leaf == null ? null : ref.watch(nodeByKeyProvider(leaf.nodeKey));
-});
+      final leaf = switch (step) {
+        ReaderStep.previous => resolver.leafBefore(nodeKey),
+        ReaderStep.next => resolver.leafAfter(nodeKey),
+      };
+      // The nested `TipitakaTreeNode` is what the reader's callers pass around;
+      // the shared tree's node is a different type carrying no children.
+      return leaf == null ? null : ref.watch(nodeByKeyProvider(leaf.nodeKey));
+    });

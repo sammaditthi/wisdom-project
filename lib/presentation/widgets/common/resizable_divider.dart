@@ -69,8 +69,9 @@ class _ResizableDividerState extends State<ResizableDivider> {
     final colorScheme = Theme.of(context).colorScheme;
 
     // Background only changes on drag (not hover) to avoid double color flash
-    final backgroundColor =
-        _isDragging ? colorScheme.primaryContainer : Colors.transparent;
+    final backgroundColor = _isDragging
+        ? colorScheme.primaryContainer
+        : Colors.transparent;
 
     final pillColor = _isDragging ? colorScheme.primary : colorScheme.onSurface;
 

@@ -24,8 +24,12 @@ void main() {
     await pressKeys(tester, LogicalKeyboardKey.equal, primary: true);
     expect(c.read(fontScaleProvider), 1.0);
 
-    await pressKeys(tester, LogicalKeyboardKey.equal,
-        primary: true, shift: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.equal,
+      primary: true,
+      shift: true,
+    );
     expect(c.read(fontScaleProvider), 1.1);
   }, variant: mac);
 
@@ -34,8 +38,13 @@ void main() {
     final c = await pumpShortcutHost(tester, home: const Scaffold());
     await c.read(fontScaleProvider.notifier).setScale(0.9);
 
-    await pressKeys(tester, LogicalKeyboardKey.add,
-        primary: true, shift: true, physicalKey: PhysicalKeyboardKey.equal);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.add,
+      primary: true,
+      shift: true,
+      physicalKey: PhysicalKeyboardKey.equal,
+    );
     expect(c.read(fontScaleProvider), 1.0);
   }, variant: mac);
 
@@ -71,8 +80,9 @@ void main() {
     expect(c.read(navigatorVisibleProvider), isTrue);
   }, variant: mac);
 
-  testWidgets('⌘B does nothing outside the Reader or behind a dialog',
-      (tester) async {
+  testWidgets('⌘B does nothing outside the Reader or behind a dialog', (
+    tester,
+  ) async {
     final c = await pumpShortcutHost(tester, home: const Scaffold());
 
     c.read(selectedAppSectionProvider.notifier).state = AppSection.research;
@@ -80,9 +90,9 @@ void main() {
     expect(c.read(navigatorVisibleProvider), isTrue);
 
     c.read(selectedAppSectionProvider.notifier).state = AppSection.reader;
-    c.read(overlayStackProvider.notifier).push(
-          DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}),
-        );
+    c
+        .read(overlayStackProvider.notifier)
+        .push(DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}));
     await pressKeys(tester, LogicalKeyboardKey.keyB, primary: true);
     expect(c.read(navigatorVisibleProvider), isTrue);
   }, variant: mac);

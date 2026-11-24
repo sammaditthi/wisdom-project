@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../../../core/constants/constants.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../domain/entities/bjt/bjt_page.dart';
@@ -51,8 +52,9 @@ class AnchoredPageList extends StatelessWidget {
 
   static const _centerKey = ValueKey('anchored-page-list-center');
 
-  static const _spacer =
-      SizedBox(height: PaneWidthConstants.readerToolbarHeight);
+  static const _spacer = SizedBox(
+    height: PaneWidthConstants.readerToolbarHeight,
+  );
 
   @override
   Widget build(BuildContext context) {

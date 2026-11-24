@@ -98,10 +98,8 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
     // Update rawQuery + effectiveQuery immediately (for UI responsiveness)
     _setTabState(
       tabIndex,
-      _getTabState(tabIndex).copyWith(
-        rawQuery: rawQuery,
-        effectiveQuery: effectiveQuery,
-      ),
+      _getTabState(tabIndex)
+          .copyWith(rawQuery: rawQuery, effectiveQuery: effectiveQuery),
     );
 
     // Capture the tab's node key and layout at call time, so the debounce
@@ -183,7 +181,8 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
     final tabState = _getTabState(tabIndex);
     if (tabState.matches.isEmpty) return;
 
-    final prevIndex = (tabState.currentMatchIndex - 1 + tabState.matchCount) %
+    final prevIndex =
+        (tabState.currentMatchIndex - 1 + tabState.matchCount) %
         tabState.matchCount;
     _setTabState(
       tabIndex,
@@ -345,12 +344,14 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
         if (hidden != null && hidden(entryIndex)) continue;
         final ranges = finder.findMatchRanges(entries[entryIndex].plainText);
         for (var matchIdx = 0; matchIdx < ranges.length; matchIdx++) {
-          matches.add(InPageMatch(
-            pageIndex: slice.absolutePageStart + localPage,
-            entryIndex: entryIndex,
-            languageCode: languageCode,
-            matchIndexInEntry: matchIdx,
-          ));
+          matches.add(
+            InPageMatch(
+              pageIndex: slice.absolutePageStart + localPage,
+              entryIndex: entryIndex,
+              languageCode: languageCode,
+              matchIndexInEntry: matchIdx,
+            ),
+          );
         }
       }
     }
@@ -379,8 +380,8 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
 /// Provider for the in-page search state map (tab index -> search state).
 final inPageSearchStatesProvider =
     StateNotifierProvider<InPageSearchNotifier, Map<int, InPageSearchState>>(
-  (ref) => InPageSearchNotifier(ref),
-);
+      (ref) => InPageSearchNotifier(ref),
+    );
 
 /// Derived provider: the search state for the currently active tab.
 ///

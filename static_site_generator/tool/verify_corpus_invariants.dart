@@ -107,14 +107,18 @@ void main(List<String> args) {
       scopeOk &&
       suttaCentralOk &&
       contentOk != false) {
-    stdout.writeln('PASS — extraction identical to the app original (1, 2), '
-        'every URL reads back as its own page (3), reading order never '
-        'steps backwards inside a content file (4), search scope matches '
-        'the hierarchy node for node (6), and every node the SuttaCentral '
-        'map names is in the tree (7).');
-    stdout.writeln(contentOk == null
-        ? '       Section 5 did not run — see its SKIPPED line above.'
-        : '       The content table matches the JSON, entry for entry (5).');
+    stdout.writeln(
+      'PASS — extraction identical to the app original (1, 2), '
+      'every URL reads back as its own page (3), reading order never '
+      'steps backwards inside a content file (4), search scope matches '
+      'the hierarchy node for node (6), and every node the SuttaCentral '
+      'map names is in the tree (7).',
+    );
+    stdout.writeln(
+      contentOk == null
+          ? '       Section 5 did not run — see its SKIPPED line above.'
+          : '       The content table matches the JSON, entry for entry (5).',
+    );
   } else {
     stdout.writeln('FAIL — see divergences above.');
     exitCode = 1;
@@ -155,7 +159,9 @@ bool _verifyMarkers(CorpusReader reader) {
         }
 
         if (!_sameRanges(
-            ContentMarkers.boldRanges(raw), _oldMarkedRanges(raw))) {
+          ContentMarkers.boldRanges(raw),
+          _oldMarkedRanges(raw),
+        )) {
           rangeDiffs++;
           _sample(samples, 'ranges     $id  ${_clip(raw)}');
         }
@@ -197,14 +203,22 @@ bool _verifyMarkers(CorpusReader reader) {
   stdout.writeln('  plainText divergences $plainDiffs');
   stdout.writeln('  boldRanges divergences $rangeDiffs');
   stdout.writeln('  segment rebuild fails $rebuildDiffs');
-  stdout.writeln('  footnote refs         $footnotes '
-      '(${labels.length} distinct labels, $nonNumeric non-numeric)');
-  stdout.writeln('  footnotes inside a span $styledFootnotes '
-      '(carry bold/underline)');
-  stdout.writeln('  underline spans       $underlineSpans '
-      '(source `__` pairs)');
-  stdout.writeln('  underline segments    $underlineSegmentRuns '
-      '(what a renderer receives)');
+  stdout.writeln(
+    '  footnote refs         $footnotes '
+    '(${labels.length} distinct labels, $nonNumeric non-numeric)',
+  );
+  stdout.writeln(
+    '  footnotes inside a span $styledFootnotes '
+    '(carry bold/underline)',
+  );
+  stdout.writeln(
+    '  underline spans       $underlineSpans '
+    '(source `__` pairs)',
+  );
+  stdout.writeln(
+    '  underline segments    $underlineSegmentRuns '
+    '(what a renderer receives)',
+  );
 
   // These two counts disagreed by one before footnote segments carried their
   // ambient style: `__{4}__` in mn-3-4.json wraps nothing but a reference,
@@ -215,8 +229,10 @@ bool _verifyMarkers(CorpusReader reader) {
   // not necessarily regress.
   final underlineConsistent = underlineSpans == underlineSegmentRuns;
   if (!underlineConsistent) {
-    stdout.writeln('  ⚠ ${underlineSpans - underlineSegmentRuns} span(s) reach '
-        'no styled segment — check for footnote-only or adjacent spans');
+    stdout.writeln(
+      '  ⚠ ${underlineSpans - underlineSegmentRuns} span(s) reach '
+      'no styled segment — check for footnote-only or adjacent spans',
+    );
   }
   _printSamples(samples);
 
@@ -238,8 +254,9 @@ bool _verifyTree(CorpusReader reader) {
   final oldChildren = <String, List<String>>{};
   decoded.forEach((nodeKey, value) {
     final parent = (value as List<dynamic>)[4];
-    final parentKey =
-        (parent == 'root' || parent == null) ? 'root' : parent as String;
+    final parentKey = (parent == 'root' || parent == null)
+        ? 'root'
+        : parent as String;
     (oldChildren[parentKey] ??= <String>[]).add(nodeKey);
   });
   for (final children in oldChildren.values) {
@@ -261,8 +278,10 @@ bool _verifyTree(CorpusReader reader) {
   void compare(String parentKey, List<String> oldOrder, List<String> newOrder) {
     parentsCompared++;
     if (oldOrder.length == newOrder.length &&
-        List.generate(oldOrder.length, (i) => oldOrder[i] == newOrder[i])
-            .every((same) => same)) {
+        List.generate(
+          oldOrder.length,
+          (i) => oldOrder[i] == newOrder[i],
+        ).every((same) => same)) {
       return;
     }
     mismatches++;
@@ -277,14 +296,19 @@ bool _verifyTree(CorpusReader reader) {
   for (final node in tree.allNodes) {
     if (node.childKeys.isEmpty) continue;
     compare(
-        node.nodeKey, oldChildren[node.nodeKey] ?? const [], node.childKeys);
+      node.nodeKey,
+      oldChildren[node.nodeKey] ?? const [],
+      node.childKeys,
+    );
   }
 
   // §11.8: unstable ordering would re-hash every page on an unchanged corpus.
   String signature(TipitakaTree t) =>
       t.allNodes.map((n) => '${n.nodeKey}:${n.childKeys.join(",")}').join('|');
-  final deterministic = signature(
-          TipitakaTree.fromJson(json.decode(raw) as Map<String, dynamic>)) ==
+  final deterministic =
+      signature(
+        TipitakaTree.fromJson(json.decode(raw) as Map<String, dynamic>),
+      ) ==
       signature(tree);
 
   // The hazard the explicit tiebreak exists for: parents holding at least one
@@ -304,16 +328,22 @@ bool _verifyTree(CorpusReader reader) {
 
   stdout.writeln('TREE');
   stdout.writeln('  nodes                 ${tree.length}');
-  stdout.writeln('  roots                 ${tree.rootKeys.length} '
-      '(${tree.rootKeys.join(', ')})');
+  stdout.writeln(
+    '  roots                 ${tree.rootKeys.length} '
+    '(${tree.rootKeys.join(', ')})',
+  );
   stdout.writeln('  parents compared      $parentsCompared');
   stdout.writeln('  ordering mismatches   $mismatches');
   stdout.writeln('  deterministic decode  $deterministic');
-  stdout.writeln('  index-less keys       ${indexless.length} '
-      'under ${hazardParents.length} parents');
+  stdout.writeln(
+    '  index-less keys       ${indexless.length} '
+    'under ${hazardParents.length} parents',
+  );
   if (widest != null) {
-    stdout.writeln('  widest such parent    ${widest.key} '
-        '(${widest.value} children; List.sort is unstable at 32+)');
+    stdout.writeln(
+      '  widest such parent    ${widest.key} '
+      '(${widest.value} children; List.sort is unstable at 32+)',
+    );
   }
   _printSamples(samples);
 
@@ -454,8 +484,10 @@ bool _verifyLinks(CorpusReader reader) {
   stdout.writeln('LINKS');
   stdout.writeln('  pages planned         ${plan.pages.length}');
   stdout.writeln('  keys served           ${servedKeys.length}');
-  stdout.writeln('  merged vannana        $merged '
-      '(commentaries answering for more than one sutta)');
+  stdout.writeln(
+    '  merged vannana        $merged '
+    '(commentaries answering for more than one sutta)',
+  );
   stdout.writeln('  origin markers        $doors');
   stdout.writeln('  urls read back        $urls');
   stdout.writeln('  parse failures        $parseFails');
@@ -541,8 +573,10 @@ bool _verifyReadingOrder(CorpusReader reader) {
   stdout.writeln('READING ORDER');
   stdout.writeln('  content files         ${lastIn.length}');
   stdout.writeln('  nodes with text       $nodes');
-  stdout.writeln('  shared coordinates    $ties '
-      '(legal — a root printed on its first child\'s heading block)');
+  stdout.writeln(
+    '  shared coordinates    $ties '
+    '(legal — a root printed on its first child\'s heading block)',
+  );
   stdout.writeln('  steps backwards       $backwards');
   _printSamples(samples);
 
@@ -609,10 +643,14 @@ bool? _verifyContent(
   // exists to prevent. Refuse rather than read it.
   final wal = File('$dbPath-wal');
   if (wal.existsSync() && wal.lengthSync() > 0) {
-    stdout.writeln('  ! $dbPath has ${wal.lengthSync()} bytes of '
-        'un-checkpointed WAL, which a read-only open must ignore.');
-    stdout.writeln("    Checkpoint first: sqlite3 '$dbPath' "
-        "'PRAGMA wal_checkpoint(TRUNCATE);'");
+    stdout.writeln(
+      '  ! $dbPath has ${wal.lengthSync()} bytes of '
+      'un-checkpointed WAL, which a read-only open must ignore.',
+    );
+    stdout.writeln(
+      "    Checkpoint first: sqlite3 '$dbPath' "
+      "'PRAGMA wal_checkpoint(TRUNCATE);'",
+    );
     return false;
   }
 
@@ -689,8 +727,10 @@ bool? _verifyContent(
       // named failure belongs. Wrong type is a finding, not a crash.
       final stored = <String, ({Object? blob, Object? pageNum})>{};
       for (final row in byFile.select([id])) {
-        stored['${row['pageIndex']}/${row['language']}'] =
-            (blob: row['blob'], pageNum: row['pageNum']);
+        stored['${row['pageIndex']}/${row['language']}'] = (
+          blob: row['blob'],
+          pageNum: row['pageNum'],
+        );
       }
 
       for (var pageIndex = 0; pageIndex < pages.length; pageIndex++) {
@@ -715,16 +755,19 @@ bool? _verifyContent(
           if (storedRow.pageNum != page['pageNum']) {
             pageNumDiffs++;
             _sample(
-                pageNumSamples,
-                '$where: pageNum ${page['pageNum']} in source, '
-                '${storedRow.pageNum ?? 'absent'} in table');
+              pageNumSamples,
+              '$where: pageNum ${page['pageNum']} in source, '
+              '${storedRow.pageNum ?? 'absent'} in table',
+            );
           }
 
           final raw = storedRow.blob;
           if (raw is! Uint8List) {
             typeFails++;
-            _sample(typeSamples,
-                '$where: the column holds ${_shapeOf(raw)}, not a BLOB');
+            _sample(
+              typeSamples,
+              '$where: the column holds ${_shapeOf(raw)}, not a BLOB',
+            );
             continue;
           }
           final blob = raw;
@@ -739,8 +782,10 @@ bool? _verifyContent(
           formats.add(format);
           if (format != 'zlib') {
             frameFails++;
-            _sample(frameSamples,
-                '$where: $format frame — the contract is plain zlib');
+            _sample(
+              frameSamples,
+              '$where: $format frame — the contract is plain zlib',
+            );
           }
 
           final List<int> plain;
@@ -755,8 +800,10 @@ bool? _verifyContent(
             };
           } catch (error) {
             inflateFails++;
-            _sample(inflateSamples,
-                '$id page $pageIndex $language ($format): $error');
+            _sample(
+              inflateSamples,
+              '$id page $pageIndex $language ($format): $error',
+            );
             continue;
           }
           inflatedBytes += plain.length;
@@ -767,10 +814,13 @@ bool? _verifyContent(
           if (format == 'zlib') {
             String? disagreement;
             try {
-              final web =
-                  const ZLibDecoderWeb().decodeBytes(blob, verify: true);
+              final web = const ZLibDecoderWeb().decodeBytes(
+                blob,
+                verify: true,
+              );
               if (!_sameBytes(plain, web)) {
-                disagreement = 'dart:io inflated ${plain.length} B, '
+                disagreement =
+                    'dart:io inflated ${plain.length} B, '
                     'the pure-Dart decoder ${web.length} B that differ';
               }
             } catch (error) {
@@ -787,8 +837,10 @@ bool? _verifyContent(
             actual = json.decode(utf8.decode(plain));
           } catch (error) {
             inflateFails++;
-            _sample(inflateSamples,
-                '$id page $pageIndex $language: not JSON — $error');
+            _sample(
+              inflateSamples,
+              '$id page $pageIndex $language: not JSON — $error',
+            );
             continue;
           }
 
@@ -810,17 +862,19 @@ bool? _verifyContent(
           if (!_deepEquals(expectedEntries, actualEntries)) {
             textDiffs++;
             _sample(
-                entrySamples,
-                '$where: '
-                '${_firstEntryDivergence(expectedEntries, actualEntries)}');
+              entrySamples,
+              '$where: '
+              '${_firstEntryDivergence(expectedEntries, actualEntries)}',
+            );
           }
           if (!_deepEquals(expectedMap['footnotes'], actualMap['footnotes'])) {
             footnoteDiffs++;
             _sample(
-                footnoteSamples,
-                '$where: '
-                '${_footnoteShape(expectedMap)} in source, '
-                '${_footnoteShape(actualMap)} in table');
+              footnoteSamples,
+              '$where: '
+              '${_footnoteShape(expectedMap)} in source, '
+              '${_footnoteShape(actualMap)} in table',
+            );
           }
 
           // Anything else the page carried. Not decoration: whatever is here
@@ -843,27 +897,39 @@ bool? _verifyContent(
 
     stdout.writeln('  database              $dbPath');
     stdout.writeln('  rows in table         $rowsInTable');
-    stdout.writeln('  rows expected         $rowsExpected '
-        '(one per page per language)');
+    stdout.writeln(
+      '  rows expected         $rowsExpected '
+      '(one per page per language)',
+    );
     stdout.writeln('  rows missing          $rowsMissing');
     stdout.writeln('  rows not in corpus    $rowsExtra');
-    stdout.writeln('  wrong column type     $typeFails '
-        '(not a BLOB)');
-    stdout.writeln('  frames seen           '
-        '${(formats.toList()..sort()).join(', ')}');
-    stdout.writeln('  frame violations      $frameFails '
-        '(contract is plain zlib)');
+    stdout.writeln(
+      '  wrong column type     $typeFails '
+      '(not a BLOB)',
+    );
+    stdout.writeln(
+      '  frames seen           '
+      '${(formats.toList()..sort()).join(', ')}',
+    );
+    stdout.writeln(
+      '  frame violations      $frameFails '
+      '(contract is plain zlib)',
+    );
     stdout.writeln('  inflate/decode fails  $inflateFails');
-    stdout.writeln('  decoder disagreements $decoderDiffs '
-        '(dart:io vs the web build\'s pure-Dart zlib)');
+    stdout.writeln(
+      '  decoder disagreements $decoderDiffs '
+      '(dart:io vs the web build\'s pure-Dart zlib)',
+    );
     stdout.writeln('  pageNum divergences   $pageNumDiffs');
     stdout.writeln('  entries compared      $entriesCompared');
     stdout.writeln('  entry divergences     $textDiffs');
     stdout.writeln('  footnote divergences  $footnoteDiffs');
     stdout.writeln('  other key divergences $shapeDiffs');
-    stdout.writeln('  stored / inflated     ${_mb(storedBytes)} / '
-        '${_mb(inflatedBytes)} MB '
-        '(${(ratio * 100).toStringAsFixed(1)}% of plain JSON)');
+    stdout.writeln(
+      '  stored / inflated     ${_mb(storedBytes)} / '
+      '${_mb(inflatedBytes)} MB '
+      '(${(ratio * 100).toStringAsFixed(1)}% of plain JSON)',
+    );
     _printSamples(missingSamples, 'missing rows');
     _printSamples(typeSamples, 'column type');
     _printSamples(frameSamples, 'frame');
@@ -945,12 +1011,12 @@ String _firstEntryDivergence(List<dynamic> expected, List<dynamic> actual) {
 
 /// A short, safe name for whatever turned up where something else belonged.
 String _shapeOf(Object? value) => switch (value) {
-      null => 'absent',
-      Map() => 'an object',
-      List() => 'a list',
-      String() => 'a string',
-      _ => _withArticle('${value.runtimeType}'),
-    };
+  null => 'absent',
+  Map() => 'an object',
+  List() => 'a list',
+  String() => 'a string',
+  _ => _withArticle('${value.runtimeType}'),
+};
 
 String _withArticle(String noun) =>
     'aeiou'.contains(noun[0].toLowerCase()) ? 'an $noun' : 'a $noun';
@@ -1038,9 +1104,11 @@ bool _verifyScope(CorpusReader reader) {
 
     // Real ancestry, straight off the parent links.
     final ancestors = <String>{};
-    for (var cur = node.parentNodeKey;
-        cur != null;
-        cur = tree[cur]?.parentNodeKey) {
+    for (
+      var cur = node.parentNodeKey;
+      cur != null;
+      cur = tree[cur]?.parentNodeKey
+    ) {
       ancestors.add(cur);
     }
 
@@ -1052,9 +1120,10 @@ bool _verifyScope(CorpusReader reader) {
       if (!ScopePatterns.isNodeCoveredBy(key, ancestor)) {
         uncovered++;
         _sample(
-            samples,
-            'uncovered  $key is not covered by $ancestor, '
-            'which is its ancestor — that branch cannot be searched');
+          samples,
+          'uncovered  $key is not covered by $ancestor, '
+          'which is its ancestor — that branch cannot be searched',
+        );
       }
     }
 
@@ -1071,23 +1140,28 @@ bool _verifyScope(CorpusReader reader) {
       if (ScopePatterns.isNodeCoveredBy(key, candidate)) {
         overReaching++;
         _sample(
-            samples,
-            'over-reaching  $candidate covers $key, '
-            'which does not sit under it');
+          samples,
+          'over-reaching  $candidate covers $key, '
+          'which does not sit under it',
+        );
       }
     }
   }
 
-  final expanded = ScopePatterns.expandedKeys.values
-      .fold(0, (sum, keys) => sum + keys.length);
+  final expanded = ScopePatterns.expandedKeys.values.fold(
+    0,
+    (sum, keys) => sum + keys.length,
+  );
 
   stdout.writeln('SCOPE');
   stdout.writeln('  nodes checked          $nodes');
   stdout.writeln('  ancestor pairs         $ancestorPairs');
   stdout.writeln('  ancestors not covering $uncovered');
   stdout.writeln('  non-ancestors covering $overReaching');
-  stdout.writeln('  keys needing expansion $keysNeedingExpansion '
-      '(expandedKeys lists $expanded)');
+  stdout.writeln(
+    '  keys needing expansion $keysNeedingExpansion '
+    '(expandedKeys lists $expanded)',
+  );
   _printSamples(samples);
 
   return uncovered == 0 && overReaching == 0;
@@ -1102,8 +1176,8 @@ bool _verifySuttaCentral(CorpusReader reader) {
   final file = File('${reader.assetsPath}/data/sc-to-bjt.json');
   final asset = json.decode(file.readAsStringSync()) as Map<String, dynamic>;
   final map = (asset['map'] as Map<String, dynamic>).cast<String, String>();
-  final reverse =
-      (asset['reverse'] as Map<String, dynamic>).cast<String, String>();
+  final reverse = (asset['reverse'] as Map<String, dynamic>)
+      .cast<String, String>();
 
   final samples = <String>[];
   var missing = 0;

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/localization/app_language.dart';
 import '../../core/storage/key_value_store.dart';
 import '../../core/storage/key_value_store_provider.dart';
@@ -21,24 +22,24 @@ final deviceLocalesProvider = Provider<List<Locale>>(
 /// `MaterialApp.locale`.
 final appLanguageProvider =
     StateNotifierProvider<AppLanguageNotifier, AppLanguage>((ref) {
-  return AppLanguageNotifier(
-    store: ref.watch(keyValueStoreProvider),
-    deviceLocales: ref.watch(deviceLocalesProvider),
-  );
-});
+      return AppLanguageNotifier(
+        store: ref.watch(keyValueStoreProvider),
+        deviceLocales: ref.watch(deviceLocalesProvider),
+      );
+    });
 
 /// Manages the App Language preference with persistence.
 class AppLanguageNotifier extends StateNotifier<AppLanguage> {
   AppLanguageNotifier({
     required KeyValueStore store,
     required List<Locale> deviceLocales,
-  })  : _store = store,
-        super(
-          // A previously saved choice always wins; otherwise resolve the
-          // device's ordered locale list the way Flutter would.
-          AppLanguage.fromStorage(store.getString(StorageKeys.appLanguage)) ??
-              AppLanguage.fromLocales(deviceLocales),
-        );
+  }) : _store = store,
+       super(
+         // A previously saved choice always wins; otherwise resolve the
+         // device's ordered locale list the way Flutter would.
+         AppLanguage.fromStorage(store.getString(StorageKeys.appLanguage)) ??
+             AppLanguage.fromLocales(deviceLocales),
+       );
 
   final KeyValueStore _store;
 

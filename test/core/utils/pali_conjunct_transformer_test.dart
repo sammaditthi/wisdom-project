@@ -41,9 +41,7 @@ void main() {
   group('Behaviour grid -', () {
     const sentence = 'ධර්ම බුද්ධ ධම්ම චන්ද';
 
-    test(
-        'Default (S3 on, S2 off, S1 on) — repaya+common ligated; special stays touching',
-        () {
+    test('Default (S3 on, S2 off, S1 on) — repaya+common ligated; special stays touching', () {
       // repaya ligated; special cluster touched (S2 off); general-only touched;
       // common cluster ligated.
       const expected = 'ධර්\u200Dම බුද\u200D්ධ ධම\u200D්ම චන්\u200Dද';
@@ -54,9 +52,7 @@ void main() {
       );
     });
 
-    test(
-        'All on (S3 on, S2 on, S1 on) — only delta vs Default is the special cluster',
-        () {
+    test('All on (S3 on, S2 on, S1 on) — only delta vs Default is the special cluster', () {
       // With Switch 2 on the special cluster ligates (hal then ZWJ), which also
       // shields it from the touching pass. Everything else matches Default.
       const allOn = PaliLetterOptions(
@@ -70,9 +66,7 @@ void main() {
       expect(beautifyPaliText(sentence, allOn), equals(expected));
     });
 
-    test(
-        'Touching only (S3 off, S2 off, S1 on) — every cluster touched, none ligated',
-        () {
+    test('Touching only (S3 off, S2 off, S1 on) — every cluster touched, none ligated', () {
       // No ligation tiers run, so every hal gets a ZWJ inserted before it.
       const touchingOnly = PaliLetterOptions(
         standardLigatures: false,
@@ -85,8 +79,7 @@ void main() {
       expect(beautifyPaliText(sentence, touchingOnly), equals(expected));
     });
 
-    test('All off (PaliLetterOptions.baseline) — bare text, no ZWJ inserted',
-        () {
+    test('All off (PaliLetterOptions.baseline) — bare text, no ZWJ inserted', () {
       // All three switches off: the input has no zero-width chars to strip, so
       // the output must equal the raw input exactly.
       expect(
@@ -182,9 +175,7 @@ void main() {
   // applyConjunctsWithRangeMapping must remap a raw range onto the display text
   // so a highlight still covers the same letters.
   group('Position map round-trip -', () {
-    test(
-        'common conjunct inserts ZWJ and remapped range slices the new display span',
-        () {
+    test('common conjunct inserts ZWJ and remapped range slices the new display span', () {
       // raw "චන්ද" (ච න ් ද, length 4). Defaults ligate the common cluster,
       // giving display "චන්\u200Dද" (ච න ් ZWJ ද, length 5).
       //
@@ -194,7 +185,10 @@ void main() {
       const ranges = [(start: 1, end: 4)];
 
       final (displayText, remappedRanges) = applyConjunctsWithRangeMapping(
-          raw, ranges, PaliLetterOptions.defaults);
+        raw,
+        ranges,
+        PaliLetterOptions.defaults,
+      );
 
       const expectedDisplay = 'චන්\u200Dද';
       expect(displayText, equals(expectedDisplay));
@@ -207,7 +201,9 @@ void main() {
       const expectedSlice = 'න්\u200Dද';
       expect(
         displayText.substring(
-            remappedRanges.first.start, remappedRanges.first.end),
+          remappedRanges.first.start,
+          remappedRanges.first.end,
+        ),
         equals(expectedSlice),
       );
     });

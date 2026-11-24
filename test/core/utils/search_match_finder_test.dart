@@ -57,17 +57,18 @@ void main() {
       });
 
       test(
-          'falls back to phrase search for multi-word query with hyphenated text',
-          () {
-        final finder = SearchMatchFinder(
-          queryText: 'සීල සමාධි',
-          isPhraseSearch: true,
-          isExactMatch: true,
-        );
+        'falls back to phrase search for multi-word query with hyphenated text',
+        () {
+          final finder = SearchMatchFinder(
+            queryText: 'සීල සමාධි',
+            isPhraseSearch: true,
+            isExactMatch: true,
+          );
 
-        final ranges = finder.findMatchRanges('සීල-සමාධි පඤ්ඤා');
-        expect(ranges.length, 1);
-      });
+          final ranges = finder.findMatchRanges('සීල-සමාධි පඤ්ඤා');
+          expect(ranges.length, 1);
+        },
+      );
     });
 
     group('phrase mode (isPhraseSearch: true, isExactMatch: false)', () {

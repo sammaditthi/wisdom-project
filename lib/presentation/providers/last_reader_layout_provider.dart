@@ -53,8 +53,8 @@ class LastReaderLayoutNotifier extends StateNotifier<ReaderLayout?> {
 /// already reflects what's on disk; no main.dart wiring is required.
 final lastReaderLayoutProvider =
     StateNotifierProvider<LastReaderLayoutNotifier, ReaderLayout?>((ref) {
-  return LastReaderLayoutNotifier(ref.read(keyValueStoreProvider));
-});
+      return LastReaderLayoutNotifier(ref.read(keyValueStoreProvider));
+    });
 
 /// Resolves the layout a newly opened tab should start in.
 ///

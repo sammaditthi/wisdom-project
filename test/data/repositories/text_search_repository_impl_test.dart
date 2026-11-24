@@ -76,14 +76,16 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
@@ -91,30 +93,30 @@ void main() {
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            expect(
-                categorized.resultsByType.containsKey(SearchResultType.title),
-                true);
-            expect(
-                categorized.resultsByType
-                    .containsKey(SearchResultType.fullText),
-                true);
-            expect(
-                categorized.resultsByType
-                    .containsKey(SearchResultType.definition),
-                true);
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          expect(
+            categorized.resultsByType.containsKey(SearchResultType.title),
+            true,
+          );
+          expect(
+            categorized.resultsByType.containsKey(SearchResultType.fullText),
+            true,
+          );
+          expect(
+            categorized.resultsByType.containsKey(SearchResultType.definition),
+            true,
+          );
 
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            // 'brahma' matches Pali name 'Brahmajālasutta' directly
-            expect(titleResults[0].title, equals('Brahmajālasutta'));
-            expect(titleResults[0].resultType, equals(SearchResultType.title));
-            expect(titleResults[0].language, equals('pali'));
-          },
-        );
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          // 'brahma' matches Pali name 'Brahmajālasutta' directly
+          expect(titleResults[0].title, equals('Brahmajālasutta'));
+          expect(titleResults[0].resultType, equals(SearchResultType.title));
+          expect(titleResults[0].language, equals('pali'));
+        });
       });
 
       test('should limit results per category by maxPerCategory', () async {
@@ -179,31 +181,34 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(largeTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 2);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 2,
+        );
 
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            // Should be limited to 2 even though 4 suttas match "sutta"
-            expect(titleResults.length, lessThanOrEqualTo(2));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          // Should be limited to 2 even though 4 suttas match "sutta"
+          expect(titleResults.length, lessThanOrEqualTo(2));
+        });
       });
 
       test('should include content results from FTS', () async {
@@ -226,14 +231,16 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => ftsMatches);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => ftsMatches);
 
         // ACT
         final result = await repository.searchTopResults(query);
@@ -241,80 +248,88 @@ void main() {
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final contentResults =
-                categorized.resultsByType[SearchResultType.fullText]!;
-            expect(contentResults.length, equals(1));
-            expect(contentResults[0].resultType,
-                equals(SearchResultType.fullText));
-            expect(contentResults[0].contentFileId, equals('dn-1'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final contentResults =
+              categorized.resultsByType[SearchResultType.fullText]!;
+          expect(contentResults.length, equals(1));
+          expect(
+            contentResults[0].resultType,
+            equals(SearchResultType.fullText),
+          );
+          expect(contentResults[0].contentFileId, equals('dn-1'));
+        });
       });
 
-      test(
-          'should pass isExactMatch=true to FTS when query has isExactMatch enabled',
-          () async {
+      test('should pass isExactMatch=true to FTS when query has isExactMatch enabled', () async {
         // ARRANGE
         const query = SearchQuery(queryText: 'dhamma', isExactMatch: true);
 
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         await repository.searchTopResults(query);
 
         // ASSERT - Verify isExactMatch was passed to FTS datasource
-        verify(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: true, // Should pass isExactMatch from query
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
+        verify(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: true, // Should pass isExactMatch from query
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).called(1);
       });
 
       test('should pass isExactMatch=false to FTS by default', () async {
         // ARRANGE
-        const query =
-            SearchQuery(queryText: 'dhamma'); // isExactMatch defaults to false
+        const query = SearchQuery(
+          queryText: 'dhamma',
+        ); // isExactMatch defaults to false
 
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         await repository.searchTopResults(query);
 
         // ASSERT - Verify isExactMatch defaults to false
-        verify(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: false, // Default value
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
+        verify(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: false, // Default value
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).called(1);
       });
 
       test('should return failure when tree loading fails', () async {
@@ -333,12 +348,9 @@ void main() {
         // ASSERT
         expect(result.isLeft(), true);
 
-        result.fold(
-          (failure) {
-            expect(failure, isA<DataLoadFailure>());
-          },
-          (results) => fail('Expected failure but got success'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DataLoadFailure>());
+        }, (results) => fail('Expected failure but got success'));
       });
 
       test('should return failure when FTS throws', () async {
@@ -348,14 +360,16 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenThrow(Exception('Database error'));
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenThrow(Exception('Database error'));
 
         // ACT
         final result = await repository.searchTopResults(query);
@@ -363,14 +377,13 @@ void main() {
         // ASSERT
         expect(result.isLeft(), true);
 
-        result.fold(
-          (failure) {
-            expect(failure, isA<DataLoadFailure>());
-            expect(failure.userMessage,
-                contains('Failed to perform categorized search'));
-          },
-          (results) => fail('Expected failure but got success'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DataLoadFailure>());
+          expect(
+            failure.userMessage,
+            contains('Failed to perform categorized search'),
+          );
+        }, (results) => fail('Expected failure but got success'));
       });
 
       test('should return empty definition category (placeholder)', () async {
@@ -380,14 +393,16 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
@@ -395,112 +410,118 @@ void main() {
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final definitionResults =
-                categorized.resultsByType[SearchResultType.definition]!;
-            expect(definitionResults, isEmpty);
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final definitionResults =
+              categorized.resultsByType[SearchResultType.definition]!;
+          expect(definitionResults, isEmpty);
+        });
       });
 
-      test('should normalize query by removing zero-width characters',
-          () async {
-        // ARRANGE - Query with Zero-Width Joiner (common in Sinhala input)
-        const queryWithZWJ =
-            SearchQuery(queryText: 'සති\u200Dය'); // Contains ZWJ
+      test(
+        'should normalize query by removing zero-width characters',
+        () async {
+          // ARRANGE - Query with Zero-Width Joiner (common in Sinhala input)
+          const queryWithZWJ = SearchQuery(
+            queryText: 'සති\u200Dය',
+          ); // Contains ZWJ
 
-        final treeWithSatiMatch = [
-          const TipitakaTreeNode(
-            nodeKey: 'sati-1',
-            paliName: 'Satipaṭṭhānasutta',
-            sinhalaName: 'සතිය', // No ZWJ - should still match
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'sati-1',
-          ),
-        ];
+          final treeWithSatiMatch = [
+            const TipitakaTreeNode(
+              nodeKey: 'sati-1',
+              paliName: 'Satipaṭṭhānasutta',
+              sinhalaName: 'සතිය', // No ZWJ - should still match
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'sati-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithSatiMatch));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithSatiMatch));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(queryWithZWJ);
+          // ACT
+          final result = await repository.searchTopResults(queryWithZWJ);
 
-        // ASSERT
-        expect(result.isRight(), true);
+          // ASSERT
+          expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(titleResults.length, equals(1));
             expect(titleResults[0].title, equals('සතිය'));
-          },
-        );
-      });
+          });
+        },
+      );
 
-      test('should return sinhala name when only sinhala matches query',
-          () async {
-        // ARRANGE
-        const query = SearchQuery(queryText: 'සතිපට්ඨාන');
+      test(
+        'should return sinhala name when only sinhala matches query',
+        () async {
+          // ARRANGE
+          const query = SearchQuery(queryText: 'සතිපට්ඨාන');
 
-        final treeWithSinhalaMatch = [
-          const TipitakaTreeNode(
-            nodeKey: 'sati-1',
-            paliName: 'Satipaṭṭhānasutta', // Pali - does NOT contain query
-            sinhalaName: 'සතිපට්ඨානසූත්‍රය', // Sinhala - DOES contain query
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'sati-1',
-          ),
-        ];
+          final treeWithSinhalaMatch = [
+            const TipitakaTreeNode(
+              nodeKey: 'sati-1',
+              paliName: 'Satipaṭṭhānasutta', // Pali - does NOT contain query
+              sinhalaName: 'සතිපට්ඨානසූත්‍රය', // Sinhala - DOES contain query
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'sati-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithSinhalaMatch));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithSinhalaMatch));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT
-        expect(result.isRight(), true);
+          // ASSERT
+          expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(titleResults.length, equals(1));
             // Should show Sinhala name since that matched
             expect(titleResults[0].title, equals('සතිපට්ඨානසූත්‍රය'));
             expect(titleResults[0].language, equals('sinhala'));
-          },
-        );
-      });
+          });
+        },
+      );
 
       test('should return pali name when only pali matches query', () async {
         // ARRANGE - Use a Sinhala query that matches only the Pali name
@@ -523,14 +544,16 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithPaliMatch));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
@@ -538,132 +561,135 @@ void main() {
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            // Should show Pali name since only Pali matched
-            expect(titleResults[0].title, equals('විනයපිටක'));
-            expect(titleResults[0].language, equals('pali'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          // Should show Pali name since only Pali matched
+          expect(titleResults[0].title, equals('විනයපිටක'));
+          expect(titleResults[0].language, equals('pali'));
+        });
       });
 
-      test('finds a numbered heading written either with or without spaces',
-          () async {
-        // The sanitizer turns both "3.1.4.1" and "3. 1. 4. 1" into this.
-        const query = SearchQuery(queryText: '3 1 4 1');
+      test(
+        'finds a numbered heading written either with or without spaces',
+        () async {
+          // The sanitizer turns both "3.1.4.1" and "3. 1. 4. 1" into this.
+          const query = SearchQuery(queryText: '3 1 4 1');
 
-        final treeWithNumberedHeadings = [
-          const TipitakaTreeNode(
-            nodeKey: 'an-3-1-4-1',
-            paliName: '3. 1. 4. 1', // how the Tipitaka tree writes it
-            sinhalaName: '3. 1. 4. 1',
-            hierarchyLevel: 1,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'an-3-1-4-1',
-          ),
-          const TipitakaTreeNode(
-            nodeKey: 'atta-an-3-1-4-1',
-            paliName: '3.1.4.1', // how the commentary tree writes it
-            sinhalaName: '3.1.4.1',
-            hierarchyLevel: 1,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'atta-an-3-1-4-1',
-          ),
-        ];
+          final treeWithNumberedHeadings = [
+            const TipitakaTreeNode(
+              nodeKey: 'an-3-1-4-1',
+              paliName: '3. 1. 4. 1', // how the Tipitaka tree writes it
+              sinhalaName: '3. 1. 4. 1',
+              hierarchyLevel: 1,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'an-3-1-4-1',
+            ),
+            const TipitakaTreeNode(
+              nodeKey: 'atta-an-3-1-4-1',
+              paliName: '3.1.4.1', // how the commentary tree writes it
+              sinhalaName: '3.1.4.1',
+              hierarchyLevel: 1,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'atta-an-3-1-4-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithNumberedHeadings));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithNumberedHeadings));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT - one normalizer on both sides, so neither spelling is lost
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT - one normalizer on both sides, so neither spelling is lost
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(
               titleResults.map((r) => r.nodeKey),
               containsAll(<String>['an-3-1-4-1', 'atta-an-3-1-4-1']),
             );
-          },
-        );
-      });
+          });
+        },
+      );
 
-      test('should prefer sinhala name when both pali and sinhala match',
-          () async {
-        // ARRANGE - Use Sinhala query that matches both names directly
-        const query = SearchQuery(queryText: 'සූත්‍ර');
+      test(
+        'should prefer sinhala name when both pali and sinhala match',
+        () async {
+          // ARRANGE - Use Sinhala query that matches both names directly
+          const query = SearchQuery(queryText: 'සූත්‍ර');
 
-        final treeWithBothMatch = [
-          const TipitakaTreeNode(
-            nodeKey: 'both-1',
-            paliName: 'Suttaසූත්‍ර', // Contains the query
-            sinhalaName: 'සූත්‍රය', // Also contains the query
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'both-1',
-          ),
-        ];
+          final treeWithBothMatch = [
+            const TipitakaTreeNode(
+              nodeKey: 'both-1',
+              paliName: 'Suttaසූත්‍ර', // Contains the query
+              sinhalaName: 'සූත්‍රය', // Also contains the query
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'both-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithBothMatch));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithBothMatch));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT
-        expect(result.isRight(), true);
+          // ASSERT
+          expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(titleResults.length, equals(1));
             // Should prefer Sinhala when both match
             expect(titleResults[0].title, equals('සූත්‍රය'));
             expect(titleResults[0].language, equals('sinhala'));
-          },
-        );
-      });
+          });
+        },
+      );
 
       // ========================================================================
       // CONTAINS MATCHING TESTS (isExactMatch=false)
       // ========================================================================
 
-      test(
-          'should match query in middle of title with contains matching (isExactMatch=false)',
-          () async {
+      test('should match query in middle of title with contains matching (isExactMatch=false)', () async {
         // ARRANGE - Query "jāla" should match "Brahmajālasutta" (middle position)
         const query = SearchQuery(queryText: 'jāla', isExactMatch: false);
 
@@ -683,29 +709,30 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithMiddleMatch));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].title, equals('Brahmajālasutta'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].title, equals('Brahmajālasutta'));
+        });
       });
 
       test('should match with case insensitivity in contains mode', () async {
@@ -728,29 +755,30 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithCaseVariation));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].title, equals('Brahmajālasutta'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].title, equals('Brahmajālasutta'));
+        });
       });
 
       test('should match Sinhala substring with contains matching', () async {
@@ -773,39 +801,38 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithSinhalaSubstring));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].title, equals('බ්‍රහ්මජාලසූත්‍රය'));
-            expect(titleResults[0].language, equals('sinhala'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].title, equals('බ්‍රහ්මජාලසූත්‍රය'));
+          expect(titleResults[0].language, equals('sinhala'));
+        });
       });
 
       // ========================================================================
       // WORD BOUNDARY MATCHING TESTS (isExactMatch=true)
       // ========================================================================
 
-      test(
-          'should match complete word only with word boundary (isExactMatch=true)',
-          () async {
+      test('should match complete word only with word boundary (isExactMatch=true)', () async {
         // ARRANGE - Test all 4 boundary conditions
         const query = SearchQuery(queryText: 'Dhamma', isExactMatch: true);
 
@@ -870,193 +897,196 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithWordBoundaries));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            // Should match up to 3 (default maxPerCategory) word boundary matches
-            // but NOT the compound word "Dhammasutta"
-            expect(titleResults.length, equals(3));
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          // Should match up to 3 (default maxPerCategory) word boundary matches
+          // but NOT the compound word "Dhammasutta"
+          expect(titleResults.length, equals(3));
 
-            final titles = titleResults.map((r) => r.title).toList();
-            // Verify compound word is NOT matched (key assertion)
-            expect(titles, isNot(contains('Dhammasutta')));
-            // Verify matches are from valid word boundary results
-            for (final title in titles) {
-              expect(
-                [
-                  'Dhamma',
-                  'Dhamma Sutta',
-                  'The Dhamma',
-                  'Teaching Dhamma Today'
-                ],
-                contains(title),
-              );
-            }
-          },
-        );
+          final titles = titleResults.map((r) => r.title).toList();
+          // Verify compound word is NOT matched (key assertion)
+          expect(titles, isNot(contains('Dhammasutta')));
+          // Verify matches are from valid word boundary results
+          for (final title in titles) {
+            expect([
+              'Dhamma',
+              'Dhamma Sutta',
+              'The Dhamma',
+              'Teaching Dhamma Today',
+            ], contains(title));
+          }
+        });
       });
 
       test(
-          'should respect word boundaries at all positions (isExactMatch=true)',
-          () async {
-        // ARRANGE - Test specific boundary scenarios
-        const query = SearchQuery(queryText: 'sutta', isExactMatch: true);
+        'should respect word boundaries at all positions (isExactMatch=true)',
+        () async {
+          // ARRANGE - Test specific boundary scenarios
+          const query = SearchQuery(queryText: 'sutta', isExactMatch: true);
 
-        final treeWithBoundaryTests = [
-          // Match: Exact word "sutta"
-          const TipitakaTreeNode(
-            nodeKey: 'b1',
-            paliName: 'sutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'b1',
-          ),
-          // Match: "sutta " at beginning
-          const TipitakaTreeNode(
-            nodeKey: 'b2',
-            paliName: 'sutta pitaka',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'b2',
-          ),
-          // Match: " sutta" at end
-          const TipitakaTreeNode(
-            nodeKey: 'b3',
-            paliName: 'brahmajāla sutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'b3',
-          ),
-          // Match: " sutta " in middle
-          const TipitakaTreeNode(
-            nodeKey: 'b4',
-            paliName: 'first sutta text',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'b4',
-          ),
-        ];
+          final treeWithBoundaryTests = [
+            // Match: Exact word "sutta"
+            const TipitakaTreeNode(
+              nodeKey: 'b1',
+              paliName: 'sutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'b1',
+            ),
+            // Match: "sutta " at beginning
+            const TipitakaTreeNode(
+              nodeKey: 'b2',
+              paliName: 'sutta pitaka',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'b2',
+            ),
+            // Match: " sutta" at end
+            const TipitakaTreeNode(
+              nodeKey: 'b3',
+              paliName: 'brahmajāla sutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'b3',
+            ),
+            // Match: " sutta " in middle
+            const TipitakaTreeNode(
+              nodeKey: 'b4',
+              paliName: 'first sutta text',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'b4',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithBoundaryTests));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithBoundaryTests));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT
-        expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT
+          expect(result.isRight(), true);
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             // All 4 nodes match word boundary, limited to 3 by default maxPerCategory
             expect(titleResults.length, equals(3));
-          },
-        );
-      });
+          });
+        },
+      );
 
-      test('a period is a word boundary, a hyphen is not (isExactMatch=true)',
-          () async {
-        // ARRANGE - '.' is a separator in the FTS index and, now, on the
-        // title side too. '-' separates in the index as well, but the query
-        // sanitizer deletes it while titles keep it, so the title side still
-        // won't break on a hyphen — a known gap, not the tokenizer's rule.
-        const query = SearchQuery(queryText: 'sutta', isExactMatch: true);
+      test(
+        'a period is a word boundary, a hyphen is not (isExactMatch=true)',
+        () async {
+          // ARRANGE - '.' is a separator in the FTS index and, now, on the
+          // title side too. '-' separates in the index as well, but the query
+          // sanitizer deletes it while titles keep it, so the title side still
+          // won't break on a hyphen — a known gap, not the tokenizer's rule.
+          const query = SearchQuery(queryText: 'sutta', isExactMatch: true);
 
-        final treeWithPunctuation = [
-          // Should NOT match: hyphen is not a word boundary (no space)
-          const TipitakaTreeNode(
-            nodeKey: 'hyphen-1',
-            paliName: 'Brahma-sutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'hyphen-1',
-          ),
-          // Should match: space before 'sutta' is a word boundary
-          const TipitakaTreeNode(
-            nodeKey: 'space-1',
-            paliName: 'Brahma sutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'space-1',
-          ),
-          // Should match: a period separates words, as it does in the index
-          const TipitakaTreeNode(
-            nodeKey: 'period-1',
-            paliName: 'First.sutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'period-1',
-          ),
-        ];
+          final treeWithPunctuation = [
+            // Should NOT match: hyphen is not a word boundary (no space)
+            const TipitakaTreeNode(
+              nodeKey: 'hyphen-1',
+              paliName: 'Brahma-sutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'hyphen-1',
+            ),
+            // Should match: space before 'sutta' is a word boundary
+            const TipitakaTreeNode(
+              nodeKey: 'space-1',
+              paliName: 'Brahma sutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'space-1',
+            ),
+            // Should match: a period separates words, as it does in the index
+            const TipitakaTreeNode(
+              nodeKey: 'period-1',
+              paliName: 'First.sutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'period-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithPunctuation));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithPunctuation));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT
-        expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT
+          expect(result.isRight(), true);
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             // The space and the period both end a word; the hyphen does not.
@@ -1064,127 +1094,140 @@ void main() {
               titleResults.map((r) => r.nodeKey),
               unorderedEquals(<String>['space-1', 'period-1']),
             );
-          },
-        );
-      });
+          });
+        },
+      );
 
       // ========================================================================
       // TITLE SORTING TESTS
       // ========================================================================
 
-      test('should sort startsWith before contains, leaf before parent',
-          () async {
-        // ARRANGE - Create 4 node types to test both sort criteria
-        const query = SearchQuery(queryText: 'sutta', isExactMatch: false);
+      test(
+        'should sort startsWith before contains, leaf before parent',
+        () async {
+          // ARRANGE - Create 4 node types to test both sort criteria
+          const query = SearchQuery(queryText: 'sutta', isExactMatch: false);
 
-        final treeWithSortingTest = [
-          // Priority 4 (lowest): contains + parent
-          const TipitakaTreeNode(
-            nodeKey: 'parent-contains',
-            paliName: 'Brahmajālasutta Collection',
-            sinhalaName: '',
-            hierarchyLevel: 1,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'parent-contains',
-            childNodes: [
-              TipitakaTreeNode(
-                nodeKey: 'child-dummy',
-                paliName: 'Child',
-                sinhalaName: '',
-                hierarchyLevel: 2,
-                entryPageIndex: 0,
-                entryIndexInPage: 0,
-                parentNodeKey: 'parent-contains',
-                contentFileId: 'child-dummy',
-              ),
-            ],
-          ),
-          // Priority 3: contains + leaf
-          const TipitakaTreeNode(
-            nodeKey: 'leaf-contains',
-            paliName: 'Brahmajālasutta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'leaf-contains',
-          ),
-          // Priority 2: startsWith + parent
-          const TipitakaTreeNode(
-            nodeKey: 'parent-starts',
-            paliName: 'Sutta Pitaka',
-            sinhalaName: '',
-            hierarchyLevel: 1,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'parent-starts',
-            childNodes: [
-              TipitakaTreeNode(
-                nodeKey: 'child-dummy2',
-                paliName: 'Child',
-                sinhalaName: '',
-                hierarchyLevel: 2,
-                entryPageIndex: 0,
-                entryIndexInPage: 0,
-                parentNodeKey: 'parent-starts',
-                contentFileId: 'child-dummy2',
-              ),
-            ],
-          ),
-          // Priority 1 (highest): startsWith + leaf
-          const TipitakaTreeNode(
-            nodeKey: 'leaf-starts',
-            paliName: 'Suttanipāta',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'leaf-starts',
-          ),
-        ];
+          final treeWithSortingTest = [
+            // Priority 4 (lowest): contains + parent
+            const TipitakaTreeNode(
+              nodeKey: 'parent-contains',
+              paliName: 'Brahmajālasutta Collection',
+              sinhalaName: '',
+              hierarchyLevel: 1,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'parent-contains',
+              childNodes: [
+                TipitakaTreeNode(
+                  nodeKey: 'child-dummy',
+                  paliName: 'Child',
+                  sinhalaName: '',
+                  hierarchyLevel: 2,
+                  entryPageIndex: 0,
+                  entryIndexInPage: 0,
+                  parentNodeKey: 'parent-contains',
+                  contentFileId: 'child-dummy',
+                ),
+              ],
+            ),
+            // Priority 3: contains + leaf
+            const TipitakaTreeNode(
+              nodeKey: 'leaf-contains',
+              paliName: 'Brahmajālasutta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'leaf-contains',
+            ),
+            // Priority 2: startsWith + parent
+            const TipitakaTreeNode(
+              nodeKey: 'parent-starts',
+              paliName: 'Sutta Pitaka',
+              sinhalaName: '',
+              hierarchyLevel: 1,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'parent-starts',
+              childNodes: [
+                TipitakaTreeNode(
+                  nodeKey: 'child-dummy2',
+                  paliName: 'Child',
+                  sinhalaName: '',
+                  hierarchyLevel: 2,
+                  entryPageIndex: 0,
+                  entryIndexInPage: 0,
+                  parentNodeKey: 'parent-starts',
+                  contentFileId: 'child-dummy2',
+                ),
+              ],
+            ),
+            // Priority 1 (highest): startsWith + leaf
+            const TipitakaTreeNode(
+              nodeKey: 'leaf-starts',
+              paliName: 'Suttanipāta',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'leaf-starts',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeWithSortingTest));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeWithSortingTest));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          // ACT
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        // ASSERT
-        expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT
+          expect(result.isRight(), true);
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(titleResults.length, equals(4));
 
             // Verify correct sort order
-            expect(titleResults[0].nodeKey,
-                equals('leaf-starts')); // 1st: startsWith + leaf
-            expect(titleResults[1].nodeKey,
-                equals('parent-starts')); // 2nd: startsWith + parent
-            expect(titleResults[2].nodeKey,
-                equals('leaf-contains')); // 3rd: contains + leaf
-            expect(titleResults[3].nodeKey,
-                equals('parent-contains')); // 4th: contains + parent
-          },
-        );
-      });
+            expect(
+              titleResults[0].nodeKey,
+              equals('leaf-starts'),
+            ); // 1st: startsWith + leaf
+            expect(
+              titleResults[1].nodeKey,
+              equals('parent-starts'),
+            ); // 2nd: startsWith + parent
+            expect(
+              titleResults[2].nodeKey,
+              equals('leaf-contains'),
+            ); // 3rd: contains + leaf
+            expect(
+              titleResults[3].nodeKey,
+              equals('parent-contains'),
+            ); // 4th: contains + parent
+          });
+        },
+      );
 
       test('should apply limit after sorting (not before)', () async {
         // ARRANGE - Ensure limit gets top priority results, not just first N found
@@ -1229,40 +1272,44 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithLimitTest));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT - Limit to 2 results
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 2);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 2,
+        );
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
 
-            // Should return TOP 2 by priority (both startsWith), not first 2 found
-            expect(titleResults.length, equals(2));
-            expect(titleResults[0].nodeKey, equals('starts-1'));
-            expect(titleResults[1].nodeKey, equals('starts-2'));
-            // The contains match should be excluded by limit
-            expect(titleResults.map((r) => r.nodeKey),
-                isNot(contains('contains-1')));
-          },
-        );
+          // Should return TOP 2 by priority (both startsWith), not first 2 found
+          expect(titleResults.length, equals(2));
+          expect(titleResults[0].nodeKey, equals('starts-1'));
+          expect(titleResults[1].nodeKey, equals('starts-2'));
+          // The contains match should be excluded by limit
+          expect(
+            titleResults.map((r) => r.nodeKey),
+            isNot(contains('contains-1')),
+          );
+        });
       });
 
-      test(
-          'should sort canon before commentary before treatises, '
+      test('should sort canon before commentary before treatises, '
           'after match quality but before the leaf rule', () async {
         // ARRANGE - Tree order is the reverse of the expected order, so only
         // the canon rule can put them right.
@@ -1328,31 +1375,34 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithCollections));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         // ASSERT
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(
-              titleResults.map((r) => r.nodeKey),
-              equals(['dn-1', 'atta-dn-1', 'anya-1', 'dn-2']),
-            );
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(
+            titleResults.map((r) => r.nodeKey),
+            equals(['dn-1', 'atta-dn-1', 'anya-1', 'dn-2']),
+          );
+        });
       });
 
       test('should keep tree order for tied titles', () async {
@@ -1379,114 +1429,122 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(tiedTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 40);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 40,
+        );
 
         // ASSERT
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.map((r) => r.nodeKey), equals(nodeKeys));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.map((r) => r.nodeKey), equals(nodeKeys));
+        });
       });
 
-      test('should keep reading order for tied titles in nested branches',
-          () async {
-        // ARRANGE - All canon, all starting with the query. Reading order is
-        // depth-first, parent before child: the deep leaf comes before the
-        // shallow one, and sp before its child kn-snp. A breadth-first or
-        // children-first walk of the tree breaks one or the other.
-        const query = SearchQuery(queryText: 'සුත්ත');
+      test(
+        'should keep reading order for tied titles in nested branches',
+        () async {
+          // ARRANGE - All canon, all starting with the query. Reading order is
+          // depth-first, parent before child: the deep leaf comes before the
+          // shallow one, and sp before its child kn-snp. A breadth-first or
+          // children-first walk of the tree breaks one or the other.
+          const query = SearchQuery(queryText: 'සුත්ත');
 
-        final nestedTree = [
-          const TipitakaTreeNode(
-            nodeKey: 'sp',
-            paliName: 'සුත්තපිටක',
-            sinhalaName: '',
-            hierarchyLevel: 0,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'sp',
-            childNodes: [
-              TipitakaTreeNode(
-                nodeKey: 'kn-snp',
-                paliName: 'සුත්තනිපාතො',
-                sinhalaName: '',
-                hierarchyLevel: 1,
-                entryPageIndex: 0,
-                entryIndexInPage: 0,
-                parentNodeKey: 'sp',
-                contentFileId: 'kn-snp',
-                childNodes: [
-                  TipitakaTreeNode(
-                    nodeKey: 'kn-snp-1-1',
-                    paliName: 'සුත්තසුත්තං',
-                    sinhalaName: '',
-                    hierarchyLevel: 2,
-                    entryPageIndex: 0,
-                    entryIndexInPage: 0,
-                    parentNodeKey: 'kn-snp',
-                    contentFileId: 'kn-snp',
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const TipitakaTreeNode(
-            nodeKey: 'ap-vbh-1-1',
-            paliName: 'සුත්තන්තභාජනියං',
-            sinhalaName: '',
-            hierarchyLevel: 0,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'ap-vbh-1-1',
-          ),
-        ];
+          final nestedTree = [
+            const TipitakaTreeNode(
+              nodeKey: 'sp',
+              paliName: 'සුත්තපිටක',
+              sinhalaName: '',
+              hierarchyLevel: 0,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'sp',
+              childNodes: [
+                TipitakaTreeNode(
+                  nodeKey: 'kn-snp',
+                  paliName: 'සුත්තනිපාතො',
+                  sinhalaName: '',
+                  hierarchyLevel: 1,
+                  entryPageIndex: 0,
+                  entryIndexInPage: 0,
+                  parentNodeKey: 'sp',
+                  contentFileId: 'kn-snp',
+                  childNodes: [
+                    TipitakaTreeNode(
+                      nodeKey: 'kn-snp-1-1',
+                      paliName: 'සුත්තසුත්තං',
+                      sinhalaName: '',
+                      hierarchyLevel: 2,
+                      entryPageIndex: 0,
+                      entryIndexInPage: 0,
+                      parentNodeKey: 'kn-snp',
+                      contentFileId: 'kn-snp',
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const TipitakaTreeNode(
+              nodeKey: 'ap-vbh-1-1',
+              paliName: 'සුත්තන්තභාජනියං',
+              sinhalaName: '',
+              hierarchyLevel: 0,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'ap-vbh-1-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(nestedTree));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(nestedTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          // ACT
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        // ASSERT - Leaves first, then containers, each in reading order
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT - Leaves first, then containers, each in reading order
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(
               titleResults.map((r) => r.nodeKey),
               equals(['kn-snp-1-1', 'ap-vbh-1-1', 'sp', 'kn-snp']),
             );
-          },
-        );
-      });
+          });
+        },
+      );
 
       test('should rank a Sinhala-only match by its Sinhala name', () async {
         // ARRANGE - The query is Sinhala spelling, so only the Sinhala names
@@ -1520,39 +1578,41 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sinhalaOnlyTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         // ASSERT
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(
-              titleResults.map((r) => r.nodeKey),
-              equals(['kn-snp', 'dn-1-1']),
-            );
-            expect(
-              titleResults.map((r) => r.language),
-              everyElement(equals('sinhala')),
-            );
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(
+            titleResults.map((r) => r.nodeKey),
+            equals(['kn-snp', 'dn-1-1']),
+          );
+          expect(
+            titleResults.map((r) => r.language),
+            everyElement(equals('sinhala')),
+          );
+        });
       });
 
-      test('should rank by the Pali name when it starts with the query',
-          () async {
+      test('should rank by the Pali name when it starts with the query', () async {
         // ARRANGE - kn-ud-2 matches on both names. Its Sinhala name only
         // contains උදාන, but its Pali name starts with it, and a Pali reader
         // sees the Pali name on the tile. It must outrank the contains-only
@@ -1585,32 +1645,35 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(bothNamesTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         // ASSERT - Ranked by its Pali name, still labelled with its Sinhala one
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(
-              titleResults.map((r) => r.nodeKey),
-              equals(['kn-ud-2', 'kn-ud-1']),
-            );
-            expect(titleResults.first.language, equals('sinhala'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(
+            titleResults.map((r) => r.nodeKey),
+            equals(['kn-ud-2', 'kn-ud-1']),
+          );
+          expect(titleResults.first.language, equals('sinhala'));
+        });
       });
 
       test('should not rank by a name that did not match', () async {
@@ -1673,20 +1736,24 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(bothNamesTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          language: anyNamed('language'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            language: anyNamed('language'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         for (final (:search, :query, :expected) in cases) {
           // ACT
-          final result =
-              await repository.searchTopResults(query, maxPerCategory: 10);
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
           // ASSERT
           result.fold(
@@ -1766,98 +1833,106 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(numberedTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         // ASSERT
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(
-              titleResults.map((r) => r.nodeKey),
-              equals([
-                'kn-khp-5',
-                'kn-snp-2-4',
-                'kn-bv-5',
-                'atta-kn-khp-5-4',
-                'kn-jat-1',
-              ]),
-            );
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(
+            titleResults.map((r) => r.nodeKey),
+            equals([
+              'kn-khp-5',
+              'kn-snp-2-4',
+              'kn-bv-5',
+              'atta-kn-khp-5-4',
+              'kn-jat-1',
+            ]),
+          );
+        });
       });
 
-      test('should still rank by the number when the query starts with one',
-          () async {
-        // ARRANGE - "15. මඞ්ගල…" contains "5. මඞ්ගල" but does not start with
-        // it. Looking past numbering must not cost a numbered query its
-        // match on the whole name.
-        const query = SearchQuery(queryText: '5. මඞ්ගල');
+      test(
+        'should still rank by the number when the query starts with one',
+        () async {
+          // ARRANGE - "15. මඞ්ගල…" contains "5. මඞ්ගල" but does not start with
+          // it. Looking past numbering must not cost a numbered query its
+          // match on the whole name.
+          const query = SearchQuery(queryText: '5. මඞ්ගල');
 
-        final numberedTree = [
-          const TipitakaTreeNode(
-            nodeKey: 'kn-khp-15',
-            paliName: '15. මඞ්ගලසුත්තං',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'kn-khp-15',
-          ),
-          const TipitakaTreeNode(
-            nodeKey: 'kn-khp-5',
-            paliName: '5. මඞ්ගලසුත්තං',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'kn-khp-5',
-          ),
-        ];
+          final numberedTree = [
+            const TipitakaTreeNode(
+              nodeKey: 'kn-khp-15',
+              paliName: '15. මඞ්ගලසුත්තං',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'kn-khp-15',
+            ),
+            const TipitakaTreeNode(
+              nodeKey: 'kn-khp-5',
+              paliName: '5. මඞ්ගලසුත්තං',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'kn-khp-5',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(numberedTree));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(numberedTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          // ACT
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        // ASSERT
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(
               titleResults.map((r) => r.nodeKey),
               equals(['kn-khp-5', 'kn-khp-15']),
             );
-          },
-        );
-      });
+          });
+        },
+      );
 
       // ========================================================================
       // SCOPE FILTERING INTEGRATION TESTS
@@ -1899,147 +1974,157 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithMultipleScopes));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            // Should only return Sutta scope results
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].contentFileId, startsWith('dn-'));
-            expect(titleResults[0].nodeKey, equals('dn-1-1'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          // Should only return Sutta scope results
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].contentFileId, startsWith('dn-'));
+          expect(titleResults[0].nodeKey, equals('dn-1-1'));
+        });
       });
 
-      test('scopes a title by its node key, not the file holding its text',
-          () async {
-        // ARRANGE - a commentary branch whose children keep their text in the
-        // ANCESTOR's file, which is most of the corpus. Scoping on
-        // contentFileId dropped them all: 'atta-kn-khp' never starts with
-        // 'atta-kn-khp-'.
-        const query = SearchQuery(
-          queryText: 'වණ්ණනා',
-          scope: {'atta-kn-khp'}, // one ticked row in the Refine dialog
-        );
+      test(
+        'scopes a title by its node key, not the file holding its text',
+        () async {
+          // ARRANGE - a commentary branch whose children keep their text in the
+          // ANCESTOR's file, which is most of the corpus. Scoping on
+          // contentFileId dropped them all: 'atta-kn-khp' never starts with
+          // 'atta-kn-khp-'.
+          const query = SearchQuery(
+            queryText: 'වණ්ණනා',
+            scope: {'atta-kn-khp'}, // one ticked row in the Refine dialog
+          );
 
-        final treeSharingOneFile = [
-          // Inside the ticked node; its text lives in the ticked node's file.
-          const TipitakaTreeNode(
-            nodeKey: 'atta-kn-khp-1',
-            paliName: 'කින්තිපඤ්හවණ්ණනා',
-            sinhalaName: '',
-            hierarchyLevel: 3,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'atta-kn-khp',
-          ),
-          // Same shape in a branch that is NOT ticked - must stay out.
-          const TipitakaTreeNode(
-            nodeKey: 'atta-kn-dhp-1',
-            paliName: 'යමකවග්ගවණ්ණනා',
-            sinhalaName: '',
-            hierarchyLevel: 3,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'atta-kn-dhp',
-          ),
-        ];
+          final treeSharingOneFile = [
+            // Inside the ticked node; its text lives in the ticked node's file.
+            const TipitakaTreeNode(
+              nodeKey: 'atta-kn-khp-1',
+              paliName: 'කින්තිපඤ්හවණ්ණනා',
+              sinhalaName: '',
+              hierarchyLevel: 3,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'atta-kn-khp',
+            ),
+            // Same shape in a branch that is NOT ticked - must stay out.
+            const TipitakaTreeNode(
+              nodeKey: 'atta-kn-dhp-1',
+              paliName: 'යමකවග්ගවණ්ණනා',
+              sinhalaName: '',
+              hierarchyLevel: 3,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'atta-kn-dhp',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeSharingOneFile));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeSharingOneFile));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        final result = await repository.searchTopResults(query);
+          // ACT
+          final result = await repository.searchTopResults(query);
 
-        // ASSERT
-        expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          // ASSERT
+          expect(result.isRight(), true);
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titleResults =
                 categorized.resultsByType[SearchResultType.title]!;
             expect(titleResults.map((r) => r.nodeKey), ['atta-kn-khp-1']);
-          },
-        );
-      });
+          });
+        },
+      );
 
-      test('should pass scope filter to FTS datasource for full text search',
-          () async {
-        // ARRANGE
-        const query = SearchQuery(
-          queryText: 'dhamma',
-          scope: {TipitakaNodeKeys.vinayaPitaka}, // Only search Vinaya Pitaka
-        );
+      test(
+        'should pass scope filter to FTS datasource for full text search',
+        () async {
+          // ARRANGE
+          const query = SearchQuery(
+            queryText: 'dhamma',
+            scope: {TipitakaNodeKeys.vinayaPitaka}, // Only search Vinaya Pitaka
+          );
 
-        final sampleTree = [
-          const TipitakaTreeNode(
-            nodeKey: 'test-1',
-            paliName: 'Test',
-            sinhalaName: '',
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'test-1',
-          ),
-        ];
+          final sampleTree = [
+            const TipitakaTreeNode(
+              nodeKey: 'test-1',
+              paliName: 'Test',
+              sinhalaName: '',
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'test-1',
+            ),
+          ];
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(sampleTree));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
 
-        // ACT
-        await repository.searchTopResults(query);
+          // ACT
+          await repository.searchTopResults(query);
 
-        // ASSERT - Verify scope was passed to FTS datasource
-        verify(mockFTSDataSource.searchFullText(
-          'dhamma',
-          editionIds: anyNamed('editionIds'),
-          scope: {
-            TipitakaNodeKeys.vinayaPitaka
-          }, // Scope should be passed through
-          isExactMatch: false,
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
-      });
+          // ASSERT - Verify scope was passed to FTS datasource
+          verify(
+            mockFTSDataSource.searchFullText(
+              'dhamma',
+              editionIds: anyNamed('editionIds'),
+              scope: {
+                TipitakaNodeKeys.vinayaPitaka,
+              }, // Scope should be passed through
+              isExactMatch: false,
+              isPhraseSearch: anyNamed('isPhraseSearch'),
+              isAnywhereInText: anyNamed('isAnywhereInText'),
+              proximityDistance: anyNamed('proximityDistance'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).called(1);
+        },
+      );
 
       // ========================================================================
       // EDGE CASE TESTS
@@ -2078,31 +2163,32 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithNullContentFileId));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            // Should only include the child with contentFileId
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].nodeKey, equals('child-1'));
-            expect(titleResults[0].contentFileId, isNotNull);
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          // Should only include the child with contentFileId
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].nodeKey, equals('child-1'));
+          expect(titleResults[0].contentFileId, isNotNull);
+        });
       });
 
       test('should handle empty query string gracefully', () async {
@@ -2125,30 +2211,31 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT - Should not throw, return empty or all results depending on business logic
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            // Empty query behavior: currently matches all (contains logic)
-            // This test documents current behavior
-            expect(titleResults, isA<List>());
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          // Empty query behavior: currently matches all (contains logic)
+          // This test documents current behavior
+          expect(titleResults, isA<List>());
+        });
       });
 
       test('should handle nodes with empty names gracefully', () async {
@@ -2171,29 +2258,30 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(treeWithEmptyPaliName));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
 
         // ACT
         final result = await repository.searchTopResults(query);
 
         // ASSERT - Should match Sinhala name even when Pali is empty
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
-            final titleResults =
-                categorized.resultsByType[SearchResultType.title]!;
-            expect(titleResults.length, equals(1));
-            expect(titleResults[0].title, equals('සූත්‍රය'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          categorized,
+        ) {
+          final titleResults =
+              categorized.resultsByType[SearchResultType.title]!;
+          expect(titleResults.length, equals(1));
+          expect(titleResults[0].title, equals('සූත්‍රය'));
+        });
       });
     });
 
@@ -2230,21 +2318,22 @@ void main() {
             .thenAnswer((_) async => Right(sampleTree));
 
         // ACT
-        final result =
-            await repository.searchByResultType(query, SearchResultType.title);
+        final result = await repository.searchByResultType(
+          query,
+          SearchResultType.title,
+        );
 
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (results) {
-            expect(results.length, equals(1));
-            // Now matches Sinhala name since query is in Sinhala
-            expect(results[0].title, equals('බ්‍රහ්මජාලසූත්‍රය'));
-            expect(results[0].resultType, equals(SearchResultType.title));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          results,
+        ) {
+          expect(results.length, equals(1));
+          // Now matches Sinhala name since query is in Sinhala
+          expect(results[0].title, equals('බ්‍රහ්මජාලසූත්‍රය'));
+          expect(results[0].resultType, equals(SearchResultType.title));
+        });
       });
 
       test('should search by content category using FTS', () async {
@@ -2267,39 +2356,44 @@ void main() {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => ftsMatches);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => ftsMatches);
 
         // ACT
         final result = await repository.searchByResultType(
-            query, SearchResultType.fullText);
+          query,
+          SearchResultType.fullText,
+        );
 
         // ASSERT
         expect(result.isRight(), true);
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (results) {
-            expect(results.length, equals(1));
-            expect(results[0].resultType, equals(SearchResultType.fullText));
-            expect(results[0].contentFileId, equals('dn-1'));
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          results,
+        ) {
+          expect(results.length, equals(1));
+          expect(results[0].resultType, equals(SearchResultType.fullText));
+          expect(results[0].contentFileId, equals('dn-1'));
+        });
         // Verify FTS was called with the Sinhala query (no transliteration)
-        verify(mockFTSDataSource.searchFullText(
-          'ධම්ම',
-          editionIds: {'bjt'},
-          scope: {},
-          isExactMatch: false,
-          limit: 50,
-          offset: 0,
-        )).called(1);
+        verify(
+          mockFTSDataSource.searchFullText(
+            'ධම්ම',
+            editionIds: {'bjt'},
+            scope: {},
+            isExactMatch: false,
+            limit: 50,
+            offset: 0,
+          ),
+        ).called(1);
       });
 
       test('should support pagination with offset parameter', () async {
@@ -2338,28 +2432,34 @@ void main() {
             .thenAnswer((_) async => Right(sampleTree));
 
         // Mock first page (offset: 0)
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: 50,
-          offset: 0,
-        )).thenAnswer((_) async => firstPageMatches);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: 50,
+            offset: 0,
+          ),
+        ).thenAnswer((_) async => firstPageMatches);
 
         // Mock second page (offset: 50)
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: 50,
-          offset: 50,
-        )).thenAnswer((_) async => secondPageMatches);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: 50,
+            offset: 50,
+          ),
+        ).thenAnswer((_) async => secondPageMatches);
 
         // ACT - Get first page
         final firstPageResult = await repository.searchByResultType(
-            query, SearchResultType.fullText);
+          query,
+          SearchResultType.fullText,
+        );
 
         // ASSERT - First page
         expect(firstPageResult.isRight(), true);
@@ -2372,54 +2472,60 @@ void main() {
         );
 
         // Verify first page call
-        verify(mockFTSDataSource.searchFullText(
-          'ධම්ම',
-          editionIds: {'bjt'},
-          scope: {},
-          isExactMatch: false,
-          limit: 50,
-          offset: 0,
-        )).called(1);
-      });
-
-      test('should pass custom limit and offset from query to FTS datasource',
-          () async {
-        // ARRANGE - Query with custom limit and offset for pagination
-        const query = SearchQuery(
-          queryText: 'ධම්ම',
-          limit: 20, // Smaller page size
-          offset: 40, // Third page (if page size is 20)
-        );
-
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(sampleTree));
-
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
-
-        // ACT
-        await repository.searchByResultType(query, SearchResultType.fullText);
-
-        // ASSERT - Verify custom limit and offset from query were passed through
-        verify(mockFTSDataSource.searchFullText(
-          'ධම්ම',
-          editionIds: {'bjt'},
-          scope: {},
-          isExactMatch: false,
-          limit: 20, // Custom limit from query
-          offset: 40, // Custom offset from query
-        )).called(1);
+        verify(
+          mockFTSDataSource.searchFullText(
+            'ධම්ම',
+            editionIds: {'bjt'},
+            scope: {},
+            isExactMatch: false,
+            limit: 50,
+            offset: 0,
+          ),
+        ).called(1);
       });
 
       test(
-          'should return empty results when definition search without dictionary repository',
-          () async {
+        'should pass custom limit and offset from query to FTS datasource',
+        () async {
+          // ARRANGE - Query with custom limit and offset for pagination
+          const query = SearchQuery(
+            queryText: 'ධම්ම',
+            limit: 20, // Smaller page size
+            offset: 40, // Third page (if page size is 20)
+          );
+
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(sampleTree));
+
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenAnswer((_) async => []);
+
+          // ACT
+          await repository.searchByResultType(query, SearchResultType.fullText);
+
+          // ASSERT - Verify custom limit and offset from query were passed through
+          verify(
+            mockFTSDataSource.searchFullText(
+              'ධම්ම',
+              editionIds: {'bjt'},
+              scope: {},
+              isExactMatch: false,
+              limit: 20, // Custom limit from query
+              offset: 40, // Custom offset from query
+            ),
+          ).called(1);
+        },
+      );
+
+      test('should return empty results when definition search without dictionary repository', () async {
         // ARRANGE
         const query = SearchQuery(queryText: 'dhamma');
 
@@ -2428,21 +2534,20 @@ void main() {
 
         // ACT
         final result = await repository.searchByResultType(
-            query, SearchResultType.definition);
+          query,
+          SearchResultType.definition,
+        );
 
         // ASSERT - Returns success with empty results when no dictionary repository
         expect(result.isRight(), true);
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (results) {
-            expect(results, isEmpty);
-          },
-        );
+        result.fold((failure) => fail('Expected success but got failure'), (
+          results,
+        ) {
+          expect(results, isEmpty);
+        });
       });
 
-      test(
-          'should return failure when topResults type is used with searchByResultType',
-          () async {
+      test('should return failure when topResults type is used with searchByResultType', () async {
         // ARRANGE
         const query = SearchQuery(queryText: 'dhamma');
 
@@ -2451,17 +2556,16 @@ void main() {
 
         // ACT
         final result = await repository.searchByResultType(
-            query, SearchResultType.topResults);
+          query,
+          SearchResultType.topResults,
+        );
 
         // ASSERT - StateError is caught and wrapped in Failure
         expect(result.isLeft(), true);
-        result.fold(
-          (failure) {
-            expect(failure, isA<DataLoadFailure>());
-            expect(failure.userMessage, contains('Failed to search by type'));
-          },
-          (_) => fail('Expected failure but got success'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DataLoadFailure>());
+          expect(failure.userMessage, contains('Failed to search by type'));
+        }, (_) => fail('Expected failure but got success'));
       });
 
       test('should return failure when tree loading fails', () async {
@@ -2475,52 +2579,54 @@ void main() {
         );
 
         // ACT
-        final result =
-            await repository.searchByResultType(query, SearchResultType.title);
+        final result = await repository.searchByResultType(
+          query,
+          SearchResultType.title,
+        );
 
         // ASSERT
         expect(result.isLeft(), true);
 
-        result.fold(
-          (failure) {
-            expect(failure, isA<DataLoadFailure>());
-          },
-          (results) => fail('Expected failure but got success'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DataLoadFailure>());
+        }, (results) => fail('Expected failure but got success'));
       });
 
-      test('should return failure when FTS throws for content category',
-          () async {
-        // ARRANGE - Use Sinhala query to avoid transliteration
-        const query = SearchQuery(queryText: 'ධම්ම');
+      test(
+        'should return failure when FTS throws for content category',
+        () async {
+          // ARRANGE - Use Sinhala query to avoid transliteration
+          const query = SearchQuery(queryText: 'ධම්ම');
 
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(sampleTree));
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(sampleTree));
 
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenThrow(Exception('Database error'));
+          when(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).thenThrow(Exception('Database error'));
 
-        // ACT
-        final result = await repository.searchByResultType(
-            query, SearchResultType.fullText);
+          // ACT
+          final result = await repository.searchByResultType(
+            query,
+            SearchResultType.fullText,
+          );
 
-        // ASSERT
-        expect(result.isLeft(), true);
+          // ASSERT
+          expect(result.isLeft(), true);
 
-        result.fold(
-          (failure) {
+          result.fold((failure) {
             expect(failure, isA<DataLoadFailure>());
             expect(failure.userMessage, contains('Failed to search by type'));
-          },
-          (results) => fail('Expected failure but got success'),
-        );
-      });
+          }, (results) => fail('Expected failure but got success'));
+        },
+      );
     });
 
     // ========================================================================
@@ -2564,18 +2670,20 @@ void main() {
       // about the in-memory name gating. NOTE: we match `language` with a
       // matcher so calls carrying 'pali'/'sinh' (not just null) are stubbed too.
       void stubFtsEmpty() {
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: anyNamed('language'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => []);
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            isPhraseSearch: anyNamed('isPhraseSearch'),
+            isAnywhereInText: anyNamed('isAnywhereInText'),
+            proximityDistance: anyNamed('proximityDistance'),
+            language: anyNamed('language'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer((_) async => []);
       }
 
       Set<String> titleNodeKeys(dynamic categorized) =>
@@ -2586,45 +2694,54 @@ void main() {
 
       // ---- Title gating ------------------------------------------------------
 
-      test('Pali-only includes the Pali-name match, drops the Sinhala-name one',
-          () async {
-        const query = SearchQuery(
-          queryText: 'metta',
-          searchInPali: true,
-          searchInSinhala: false,
-        );
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeOneLangEach));
-        stubFtsEmpty();
+      test(
+        'Pali-only includes the Pali-name match, drops the Sinhala-name one',
+        () async {
+          const query = SearchQuery(
+            queryText: 'metta',
+            searchInPali: true,
+            searchInSinhala: false,
+          );
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeOneLangEach));
+          stubFtsEmpty();
 
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) => expect(titleNodeKeys(categorized), {'pali-only'}),
-        );
-      });
+          result.fold(
+            (failure) => fail('Expected success but got failure'),
+            (categorized) => expect(titleNodeKeys(categorized), {'pali-only'}),
+          );
+        },
+      );
 
-      test('Sinhala-only includes the Sinhala-name match, drops the Pali one',
-          () async {
-        const query = SearchQuery(
-          queryText: 'metta',
-          searchInPali: false,
-          searchInSinhala: true,
-        );
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeOneLangEach));
-        stubFtsEmpty();
+      test(
+        'Sinhala-only includes the Sinhala-name match, drops the Pali one',
+        () async {
+          const query = SearchQuery(
+            queryText: 'metta',
+            searchInPali: false,
+            searchInSinhala: true,
+          );
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeOneLangEach));
+          stubFtsEmpty();
 
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) => expect(titleNodeKeys(categorized), {'sinhala-only'}),
-        );
-      });
+          result.fold(
+            (failure) => fail('Expected success but got failure'),
+            (categorized) =>
+                expect(titleNodeKeys(categorized), {'sinhala-only'}),
+          );
+        },
+      );
 
       test('both languages on includes matches from either name', () async {
         const query = SearchQuery(queryText: 'metta'); // both default true
@@ -2632,51 +2749,54 @@ void main() {
             .thenAnswer((_) async => Right(treeOneLangEach));
         stubFtsEmpty();
 
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         result.fold(
           (failure) => fail('Expected success but got failure'),
-          (categorized) => expect(
-            titleNodeKeys(categorized),
-            {'pali-only', 'sinhala-only'},
-          ),
+          (categorized) =>
+              expect(titleNodeKeys(categorized), {'pali-only', 'sinhala-only'}),
         );
       });
 
-      test('a node matching BOTH names yields exactly one result (dedup)',
-          () async {
-        const query = SearchQuery(queryText: 'metta');
-        final treeBoth = [
-          const TipitakaTreeNode(
-            nodeKey: 'both',
-            paliName: 'Metta A', // contains 'metta'
-            sinhalaName: 'Metta B', // also contains 'metta'
-            hierarchyLevel: 2,
-            entryPageIndex: 0,
-            entryIndexInPage: 0,
-            parentNodeKey: null,
-            contentFileId: 'dn-1',
-          ),
-        ];
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(treeBoth));
-        stubFtsEmpty();
+      test(
+        'a node matching BOTH names yields exactly one result (dedup)',
+        () async {
+          const query = SearchQuery(queryText: 'metta');
+          final treeBoth = [
+            const TipitakaTreeNode(
+              nodeKey: 'both',
+              paliName: 'Metta A', // contains 'metta'
+              sinhalaName: 'Metta B', // also contains 'metta'
+              hierarchyLevel: 2,
+              entryPageIndex: 0,
+              entryIndexInPage: 0,
+              parentNodeKey: null,
+              contentFileId: 'dn-1',
+            ),
+          ];
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(treeBoth));
+          stubFtsEmpty();
 
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+          final result = await repository.searchTopResults(
+            query,
+            maxPerCategory: 10,
+          );
 
-        result.fold(
-          (failure) => fail('Expected success but got failure'),
-          (categorized) {
+          result.fold((failure) => fail('Expected success but got failure'), (
+            categorized,
+          ) {
             final titles = categorized.resultsByType[SearchResultType.title]!;
             expect(titles.length, 1);
             // Prefers the Sinhala name + tags 'sinhala' when both matched.
             expect(titles.first.title, 'Metta B');
             expect(titles.first.language, 'sinhala');
-          },
-        );
-      });
+          });
+        },
+      );
 
       test('language gating composes with scope as AND, not OR', () async {
         // Pali-only AND Sutta scope: a node must pass BOTH to survive.
@@ -2726,8 +2846,10 @@ void main() {
             .thenAnswer((_) async => Right(treeScoped));
         stubFtsEmpty();
 
-        final result =
-            await repository.searchTopResults(query, maxPerCategory: 10);
+        final result = await repository.searchTopResults(
+          query,
+          maxPerCategory: 10,
+        );
 
         result.fold(
           (failure) => fail('Expected success but got failure'),
@@ -2750,28 +2872,32 @@ void main() {
         ),
       ];
 
-      test('both on → searchFullText receives language: null (search both)',
-          () async {
-        const query = SearchQuery(queryText: 'dhamma'); // both default true
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(passthroughTree));
-        stubFtsEmpty();
+      test(
+        'both on → searchFullText receives language: null (search both)',
+        () async {
+          const query = SearchQuery(queryText: 'dhamma'); // both default true
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(passthroughTree));
+          stubFtsEmpty();
 
-        await repository.searchByResultType(query, SearchResultType.fullText);
+          await repository.searchByResultType(query, SearchResultType.fullText);
 
-        verify(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: null,
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
-      });
+          verify(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              isPhraseSearch: anyNamed('isPhraseSearch'),
+              isAnywhereInText: anyNamed('isAnywhereInText'),
+              proximityDistance: anyNamed('proximityDistance'),
+              language: null,
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).called(1);
+        },
+      );
 
       test('Pali-only → searchFullText receives language: pali', () async {
         const query = SearchQuery(
@@ -2785,50 +2911,54 @@ void main() {
 
         await repository.searchByResultType(query, SearchResultType.fullText);
 
-        verify(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: 'pali',
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
+        verify(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            isPhraseSearch: anyNamed('isPhraseSearch'),
+            isAnywhereInText: anyNamed('isAnywhereInText'),
+            proximityDistance: anyNamed('proximityDistance'),
+            language: 'pali',
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).called(1);
       });
 
       test(
-          'Sinhala-only → searchFullText receives the DB code sinh (not sinhala)',
-          () async {
-        const query = SearchQuery(
-          queryText: 'dhamma',
-          searchInPali: false,
-          searchInSinhala: true,
-        );
-        when(mockTreeRepository.loadNavigationTree())
-            .thenAnswer((_) async => Right(passthroughTree));
-        stubFtsEmpty();
+        'Sinhala-only → searchFullText receives the DB code sinh (not sinhala)',
+        () async {
+          const query = SearchQuery(
+            queryText: 'dhamma',
+            searchInPali: false,
+            searchInSinhala: true,
+          );
+          when(mockTreeRepository.loadNavigationTree())
+              .thenAnswer((_) async => Right(passthroughTree));
+          stubFtsEmpty();
 
-        await repository.searchByResultType(query, SearchResultType.fullText);
+          await repository.searchByResultType(query, SearchResultType.fullText);
 
-        verify(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: 'sinh', // ← guards the 'sinh' vs 'sinhala' contract
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).called(1);
-      });
+          verify(
+            mockFTSDataSource.searchFullText(
+              any,
+              editionIds: anyNamed('editionIds'),
+              scope: anyNamed('scope'),
+              isExactMatch: anyNamed('isExactMatch'),
+              isPhraseSearch: anyNamed('isPhraseSearch'),
+              isAnywhereInText: anyNamed('isAnywhereInText'),
+              proximityDistance: anyNamed('proximityDistance'),
+              language: 'sinh', // ← guards the 'sinh' vs 'sinhala' contract
+              limit: anyNamed('limit'),
+              offset: anyNamed('offset'),
+            ),
+          ).called(1);
+        },
+      );
 
-      test(
-          'countByResultType passes the SAME language to countFullTextMatches '
+      test('countByResultType passes the SAME language to countFullTextMatches '
           '(tab-badge parity)', () async {
         // The single most important regression guard: if the count path used a
         // different language than the search path, the badge would disagree
@@ -2840,29 +2970,33 @@ void main() {
         );
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => Right(passthroughTree));
-        when(mockFTSDataSource.countFullTextMatches(
-          any,
-          editionId: anyNamed('editionId'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: anyNamed('language'),
-        )).thenAnswer((_) async => 0);
+        when(
+          mockFTSDataSource.countFullTextMatches(
+            any,
+            editionId: anyNamed('editionId'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            isPhraseSearch: anyNamed('isPhraseSearch'),
+            isAnywhereInText: anyNamed('isAnywhereInText'),
+            proximityDistance: anyNamed('proximityDistance'),
+            language: anyNamed('language'),
+          ),
+        ).thenAnswer((_) async => 0);
 
         await repository.countByResultType(query);
 
-        verify(mockFTSDataSource.countFullTextMatches(
-          any,
-          editionId: anyNamed('editionId'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          isPhraseSearch: anyNamed('isPhraseSearch'),
-          isAnywhereInText: anyNamed('isAnywhereInText'),
-          proximityDistance: anyNamed('proximityDistance'),
-          language: 'sinh',
-        )).called(1);
+        verify(
+          mockFTSDataSource.countFullTextMatches(
+            any,
+            editionId: anyNamed('editionId'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            isPhraseSearch: anyNamed('isPhraseSearch'),
+            isAnywhereInText: anyNamed('isAnywhereInText'),
+            proximityDistance: anyNamed('proximityDistance'),
+            language: 'sinh',
+          ),
+        ).called(1);
       });
     });
 
@@ -2895,32 +3029,38 @@ void main() {
       Future<SearchResult> searchOneEntry(String rawEntryText) async {
         when(mockTreeRepository.loadNavigationTree())
             .thenAnswer((_) async => const Right([node]));
-        when(mockFTSDataSource.searchFullText(
-          any,
-          editionIds: anyNamed('editionIds'),
-          scope: anyNamed('scope'),
-          isExactMatch: anyNamed('isExactMatch'),
-          limit: anyNamed('limit'),
-          offset: anyNamed('offset'),
-        )).thenAnswer((_) async => [
-              FTSMatch(
-                editionId: 'bjt',
-                id: 1,
-                filename: 'dn-1',
-                eind: '0-0',
-                language: 'pali',
-                type: 'paragraph',
-                level: 0,
-                nodeKey: 'dn-1',
-              ),
-            ]);
-        when(mockContentDataSource.loadPageSides(any)).thenAnswer((_) async => {
-              (fileId: 'dn-1', pageIndex: 0, language: 'pali'): {
-                'entries': [
-                  {'text': rawEntryText},
-                ],
-              },
-            });
+        when(
+          mockFTSDataSource.searchFullText(
+            any,
+            editionIds: anyNamed('editionIds'),
+            scope: anyNamed('scope'),
+            isExactMatch: anyNamed('isExactMatch'),
+            limit: anyNamed('limit'),
+            offset: anyNamed('offset'),
+          ),
+        ).thenAnswer(
+          (_) async => [
+            FTSMatch(
+              editionId: 'bjt',
+              id: 1,
+              filename: 'dn-1',
+              eind: '0-0',
+              language: 'pali',
+              type: 'paragraph',
+              level: 0,
+              nodeKey: 'dn-1',
+            ),
+          ],
+        );
+        when(mockContentDataSource.loadPageSides(any)).thenAnswer(
+          (_) async => {
+            (fileId: 'dn-1', pageIndex: 0, language: 'pali'): {
+              'entries': [
+                {'text': rawEntryText},
+              ],
+            },
+          },
+        );
 
         final result = await repository.searchTopResults(
           const SearchQuery(queryText: 'ඡන්දරාගවෙමත්තතාති'),
@@ -2934,7 +3074,8 @@ void main() {
 
       test('rejoins a word the bold markers split', () async {
         // atta-sn-3 page 47 entry 0, abridged — the reported crash.
-        const raw = 'පඤ්චක්ඛන්ධෙ මුඤ්චිත්වා උපාදානං නත්ථි. '
+        const raw =
+            'පඤ්චක්ඛන්ධෙ මුඤ්චිත්වා උපාදානං නත්ථි. '
             '**ඡන්දරාගවෙමත්තතා**ති ඡන්දරාගනානත්තං.';
         final hit = await searchOneEntry(raw);
 

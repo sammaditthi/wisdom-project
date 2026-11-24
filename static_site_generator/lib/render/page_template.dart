@@ -98,16 +98,18 @@ class PageTemplate {
     // restates it, and a structured trail that disagrees with the visible one
     // is worse markup than none.
     final trail = tree.ancestorsOf(page.nodeKey).reversed.toList();
-    body.writeln(toolbar(
-      withLayouts: withLayouts,
-      build: build,
-      trail: trail,
-      current: page.node,
-      parent: tree.parentOf(page.nodeKey),
-      // Reading pages only, the same test as the layout radios: so wherever the
-      // layout group is, the ⋮ it folds into on a phone is too.
-      appUrl: page.isReadable ? build.inApp(page.url) : null,
-    ));
+    body.writeln(
+      toolbar(
+        withLayouts: withLayouts,
+        build: build,
+        trail: trail,
+        current: page.node,
+        parent: tree.parentOf(page.nodeKey),
+        // Reading pages only, the same test as the layout radios: so wherever the
+        // layout group is, the ⋮ it folds into on a phone is too.
+        appUrl: page.isReadable ? build.inApp(page.url) : null,
+      ),
+    );
 
     // `<main>`, not a div: a landmark is what lets a screen reader skip the bar
     // and start at the text.
@@ -127,8 +129,10 @@ class PageTemplate {
     // distinguish Pali from a translation this page does not have.
     final navOnly = !page.isReadable;
     final solo = page.isReadable && !bothLanguages;
-    body.writeln('<main class="content'
-        '${navOnly ? ' nav' : ''}${solo ? ' solo' : ''}">');
+    body.writeln(
+      '<main class="content'
+      '${navOnly ? ' nav' : ''}${solo ? ' solo' : ''}">',
+    );
     body.writeln('<h1 class="page-title">${_headingHtml(page.node)}</h1>');
     // A chapter carries two link sets — one for the run, one per section — and
     // which of them a reader wants is decided by the URL fragment rather than
@@ -144,18 +148,29 @@ class PageTemplate {
       case PageKind.sutta:
         body.writeln(_rows(slices[page.nodeKey], depths, _PageLabels()));
       case PageKind.chapter:
-        body.writeln(_chapter(page, slices, shown.preamble, depths,
-            previous: previous, next: next));
+        body.writeln(
+          _chapter(
+            page,
+            slices,
+            shown.preamble,
+            depths,
+            previous: previous,
+            next: next,
+          ),
+        );
       case PageKind.toc:
         if (shown.preamble != null && shown.preamble!.rows.isNotEmpty) {
           // Labels only where the preamble is read; a nav-only contents page
           // is for finding.
           final labels = page.isReadable ? _PageLabels() : null;
-          body.writeln('<div class="preamble">'
-              '${_rows(shown.preamble, depths, labels)}</div>');
+          body.writeln(
+            '<div class="preamble">'
+            '${_rows(shown.preamble, depths, labels)}</div>',
+          );
         }
         body.writeln(
-            tocList(tree.childrenOf(page.nodeKey), urlFor: build.urlFor));
+          tocList(tree.childrenOf(page.nodeKey), urlFor: build.urlFor),
+        );
     }
 
     // A container never offers "next", for a structural reason rather than a
@@ -165,17 +180,19 @@ class PageTemplate {
     // prints. "Prev" stays: it is the one thing on the page pointing backwards
     // out of the section, which neither the list nor the breadcrumb offers.
     if (page.isReadable) {
-      body.writeln(_pager(
-        switch (page.kind) {
-          PageKind.chapter => _wholePage(previous),
-          PageKind.sutta || PageKind.toc => _runEdge(previous, first: false),
-        },
-        switch (page.kind) {
-          PageKind.chapter => _wholePage(next),
-          PageKind.sutta => _runEdge(next, first: true),
-          PageKind.toc => null,
-        },
-      ));
+      body.writeln(
+        _pager(
+          switch (page.kind) {
+            PageKind.chapter => _wholePage(previous),
+            PageKind.sutta || PageKind.toc => _runEdge(previous, first: false),
+          },
+          switch (page.kind) {
+            PageKind.chapter => _wholePage(next),
+            PageKind.sutta => _runEdge(next, first: true),
+            PageKind.toc => null,
+          },
+        ),
+      );
     }
     body.writeln('</main>');
 
@@ -186,12 +203,9 @@ class PageTemplate {
       // which stays true whether or not the renderer showed all of it. The
       // suppressed row is named separately so the two never have to be guessed
       // apart.
-      head: _provenance(page, slices, preamble, shown.dropped, sourceFile) +
-          breadcrumbJsonLd(
-            build: build,
-            trail: trail,
-            current: page.node,
-          ),
+      head:
+          _provenance(page, slices, preamble, shown.dropped, sourceFile) +
+          breadcrumbJsonLd(build: build, trail: trail, current: page.node),
       body: body.toString(),
     );
   }
@@ -203,10 +217,10 @@ class PageTemplate {
   /// page itself: "1 section" describes nothing, and the sentence reads better
   /// without a clause than with a true but empty one.
   int? _sectionCount(SitePage page) => switch (page.kind) {
-        PageKind.sutta => null,
-        PageKind.chapter => page.suttas.length,
-        PageKind.toc => tree.childrenOf(page.nodeKey).length,
-      };
+    PageKind.sutta => null,
+    PageKind.chapter => page.suttas.length,
+    PageKind.toc => tree.childrenOf(page.nodeKey).length,
+  };
 
   /// The preamble minus a heading that merely repeats the page's own `<h1>`.
   ///
@@ -277,10 +291,12 @@ class PageTemplate {
   /// Canonical is always **self**, including on the commentary pages
   /// (`FIGURES.commentaryPages`): a commentary and its canon twin are different
   /// texts, not duplicates, so neither ever points at the other (§10).
-  String _document(SitePage page,
-      {required bool bothLanguages,
-      required String head,
-      required String body}) {
+  String _document(
+    SitePage page, {
+    required bool bothLanguages,
+    required String head,
+    required String body,
+  }) {
     final location = _locationParts(page.node);
     return htmlDocument(
       // Name and vagga: enough to tell same-named suttas apart for search,
@@ -360,8 +376,10 @@ class PageTemplate {
   String _layoutRadios() {
     final buffer = StringBuffer();
     for (final layout in readingLayouts) {
-      buffer.write('<input class="layout-input" type="radio" name="layout"'
-          ' id="${layout.id}" value="${layout.token}"');
+      buffer.write(
+        '<input class="layout-input" type="radio" name="layout"'
+        ' id="${layout.id}" value="${layout.token}"',
+      );
       if (layout.id == defaultLayoutId) buffer.write(' checked');
       buffer.write(' aria-label="${build.strings.html(layout.labelKey)}">');
     }
@@ -473,23 +491,23 @@ class PageTemplate {
   /// [rel] only on the pager that speaks for the document — the file's own
   /// neighbours. A chapter's sections are inside one document and would give a
   /// reader mode a second, conflicting answer.
-  String _pager(
-    _PagerTarget? previous,
-    _PagerTarget? next, {
-    bool rel = true,
-  }) {
+  String _pager(_PagerTarget? previous, _PagerTarget? next, {bool rel = true}) {
     final buffer = StringBuffer('<nav class="pager" aria-label="ගමන්">');
     if (previous != null) {
-      buffer.write('<a class="prev"${rel ? ' rel="prev"' : ''} '
-          'href="${previous.url}">'
-          '<span class="label">පෙර</span>${nodeLabelHtml(previous.node)}</a>');
+      buffer.write(
+        '<a class="prev"${rel ? ' rel="prev"' : ''} '
+        'href="${previous.url}">'
+        '<span class="label">පෙර</span>${nodeLabelHtml(previous.node)}</a>',
+      );
     } else {
       buffer.write('<span class="spacer"></span>');
     }
     if (next != null) {
-      buffer.write('<a class="next"${rel ? ' rel="next"' : ''} '
-          'href="${next.url}">'
-          '<span class="label">ඊළඟ</span>${nodeLabelHtml(next.node)}</a>');
+      buffer.write(
+        '<a class="next"${rel ? ' rel="next"' : ''} '
+        'href="${next.url}">'
+        '<span class="label">ඊළඟ</span>${nodeLabelHtml(next.node)}</a>',
+      );
     } else {
       buffer.write('<span class="spacer"></span>');
     }
@@ -572,8 +590,9 @@ class PageTemplate {
     // nothing local holding it, and its failure would be silent *and* doubled:
     // the literal `null` in the page, and every section link wrapped away below
     // behind a run-link that was never written.
-    final runLink =
-        build.speaksForRun(page) ? _commentaryLink(page.node) : null;
+    final runLink = build.speaksForRun(page)
+        ? _commentaryLink(page.node)
+        : null;
     if (runLink != null) buffer.write('<div class="run-link">$runLink</div>');
     // Shown only when a sutta is targeted — the way back to the whole run.
     //
@@ -582,13 +601,16 @@ class PageTemplate {
     // link from the page to itself. The `:has(:target)` filter still applies
     // and still does the right thing; there is simply nothing filtered away.
     if (page.suttas.length > 1) {
-      buffer.write('<p class="chapter-bar">'
-          '<a href="${page.url}">සම්පූර්ණ පරිච්ඡේදය</a></p>');
+      buffer.write(
+        '<p class="chapter-bar">'
+        '<a href="${page.url}">සම්පූර්ණ පරිච්ඡේදය</a></p>',
+      );
     }
     final labels = _PageLabels();
     if (preamble != null && preamble.rows.isNotEmpty) {
       buffer.write(
-          '<div class="preamble">${_rows(preamble, depths, labels)}</div>');
+        '<div class="preamble">${_rows(preamble, depths, labels)}</div>',
+      );
     }
     labels.endPreamble();
     // Inside the section, so the `:has(:target)` filter carries it: the
@@ -610,9 +632,11 @@ class PageTemplate {
       buffer.write('<section class="sutta" id="${sutta.nodeKey}">');
       final commentary = _commentaryLink(sutta);
       if (commentary != null) {
-        buffer.write(runLink != null
-            ? '<div class="section-links">$commentary</div>'
-            : commentary);
+        buffer.write(
+          runLink != null
+              ? '<div class="section-links">$commentary</div>'
+              : commentary,
+        );
       }
       buffer.write(_rows(slices[sutta.nodeKey], depths, labels, section: true));
       // The page's own pager walks files, which in the filtered view would skip
@@ -708,7 +732,8 @@ class PageTemplate {
         // apart — the same seam `content_text_formatter.dart` holds in the app.
         buffer.write('<div class="si" lang="si">');
         buffer.write(
-            entries.render(sinhala, isPali: false, headingDepths: depths));
+          entries.render(sinhala, isPali: false, headingDepths: depths),
+        );
         buffer.write('</div>');
       }
       buffer.write('</div>');

@@ -58,28 +58,32 @@ void main() {
   });
 
   group('appendDictionaryFilter', () {
-    test('empty id set → nothing appended, no args (means "all dictionaries")',
-        () {
-      final buffer = StringBuffer('WHERE word = ?');
-      final args = <Object>['abc'];
+    test(
+      'empty id set → nothing appended, no args (means "all dictionaries")',
+      () {
+        final buffer = StringBuffer('WHERE word = ?');
+        final args = <Object>['abc'];
 
-      appendDictionaryFilter(buffer, args, <String>{});
+        appendDictionaryFilter(buffer, args, <String>{});
 
-      expect(buffer.toString(), 'WHERE word = ?');
-      expect(args, ['abc']); // unchanged
-    });
+        expect(buffer.toString(), 'WHERE word = ?');
+        expect(args, ['abc']); // unchanged
+      },
+    );
 
-    test('non-empty set → IN clause with one placeholder per id, args appended',
-        () {
-      final buffer = StringBuffer();
-      final args = <Object>[];
+    test(
+      'non-empty set → IN clause with one placeholder per id, args appended',
+      () {
+        final buffer = StringBuffer();
+        final args = <Object>[];
 
-      // LinkedHashSet preserves insertion order, so placeholders and args align.
-      appendDictionaryFilter(buffer, args, {'BUS', 'MS'});
+        // LinkedHashSet preserves insertion order, so placeholders and args align.
+        appendDictionaryFilter(buffer, args, {'BUS', 'MS'});
 
-      expect(buffer.toString(), ' AND dict_id IN (?, ?)');
-      expect(args, ['BUS', 'MS']);
-    });
+        expect(buffer.toString(), ' AND dict_id IN (?, ?)');
+        expect(args, ['BUS', 'MS']);
+      },
+    );
 
     test('one ? per id ⇔ one bound arg per id (lock-step invariant)', () {
       final buffer = StringBuffer();

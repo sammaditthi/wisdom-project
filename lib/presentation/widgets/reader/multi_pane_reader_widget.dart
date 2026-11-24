@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wisdom_shared/wisdom_shared.dart' show beautifyPaliText;
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../models/reader_layout.dart';
 import '../../models/in_page_search_state.dart';
@@ -301,8 +302,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       } else {
         _animateAsUser(
           position,
-          (position.pixels + sign * position.viewportDimension * 0.8)
-              .clamp(position.minScrollExtent, position.maxScrollExtent),
+          (position.pixels + sign * position.viewportDimension * 0.8).clamp(
+            position.minScrollExtent,
+            position.maxScrollExtent,
+          ),
           duration: const Duration(milliseconds: 100),
           curve: Curves.easeInOut,
         );
@@ -338,8 +341,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     final from = pending != null && (pending - position.pixels) * delta > 0
         ? pending
         : position.pixels;
-    final target = (from + delta)
-        .clamp(position.minScrollExtent, position.maxScrollExtent);
+    final target = (from + delta).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
     // Held at the end: already heading there. Restarting would also let the
     // old scroll's whenComplete drop the entry while this one still runs.
     if (target == pending) return;
@@ -350,8 +355,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
     )
-        // Finished, or cut short by a drag, the wheel or a page key.
-        .whenComplete(() {
+    // Finished, or cut short by a drag, the wheel or a page key.
+    .whenComplete(() {
       if (_lineTargets[position] == target) _lineTargets.remove(position);
     });
   }
@@ -403,7 +408,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     });
 
     if ((saved > maxExtent || saved < minExtent) && retriesLeft > 0) {
-      final progressed = lastMaxExtent == null ||
+      final progressed =
+          lastMaxExtent == null ||
           maxExtent > lastMaxExtent ||
           minExtent < lastMinExtent!;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -521,8 +527,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // until both are in.
     ref.listen<DocumentSlice?>(activeDocumentSliceProvider, (previous, next) {
       if (next != null && previous == null) {
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _restoreScrollWithRetry());
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _restoreScrollWithRetry(),
+        );
       }
     });
 
@@ -534,8 +541,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     ref.listen<ReaderLayout>(activeReaderLayoutProvider, (previous, next) {
       if (previous != null && previous != next && !_switchingTabs) {
         // Capture top-visible entry from the OLD layout (still mounted)
-        final topEntry =
-            _entryKeyRegistry.findTopVisibleEntry(_scrollController);
+        final topEntry = _entryKeyRegistry.findTopVisibleEntry(
+          _scrollController,
+        );
         // Clear stale keys from old layout before rebuild
         _entryKeyRegistry.clear();
 
@@ -552,8 +560,10 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
 
     // Listen to in-page search state changes to trigger scroll-to-match, and
     // to bring the toolbar back when find closes.
-    ref.listen<InPageSearchState>(activeInPageSearchStateProvider,
-        (previous, next) {
+    ref.listen<InPageSearchState>(activeInPageSearchStateProvider, (
+      previous,
+      next,
+    ) {
       if (next.currentMatch != null &&
           next.revealCount != previous?.revealCount &&
           !_switchingTabs) {
@@ -590,7 +600,8 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // AnimatedSlide and the toolbar's menus all read the same flag. Pinned
     // for screen readers, to whom a control that moves away is lost.
     final hasContent = slice != null && !slice.isEmpty;
-    final showToolbar = hasContent &&
+    final showToolbar =
+        hasContent &&
         !searchState.isVisible &&
         (MediaQuery.accessibleNavigationOf(context) || _toolbarAutoHide.shown);
 
@@ -683,8 +694,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
                               .openSearch(),
                           previous: _stepTarget(previousNode),
                           next: _stepTarget(nextNode),
-                          onScrollToBeginning:
-                              _isScrolledDown ? _scrollToBeginning : null,
+                          onScrollToBeginning: _isScrolledDown
+                              ? _scrollToBeginning
+                              : null,
                         ),
                       ),
                     ),
@@ -792,7 +804,9 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
         _tapPointer = null;
         _tapDownPosition = null;
         final slop = computeHitSlop(
-            event.kind, MediaQuery.maybeGestureSettingsOf(context));
+          event.kind,
+          MediaQuery.maybeGestureSettingsOf(context),
+        );
         if ((event.position - down).distance <= slop) _clearAllHighlights();
       },
       onPointerCancel: (event) {

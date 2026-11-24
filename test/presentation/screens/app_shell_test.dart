@@ -49,11 +49,13 @@ void main() {
     when(dataSource.loadNavigationTree())
         .thenAnswer((_) async => TestData.sampleTree);
 
-    final container = createTestContainer(overrides: [
-      TestProviderOverrides.treeDataSource(dataSource),
-      TestProviderOverrides.sharedPreferences(prefs),
-      ...overrides,
-    ]);
+    final container = createTestContainer(
+      overrides: [
+        TestProviderOverrides.treeDataSource(dataSource),
+        TestProviderOverrides.sharedPreferences(prefs),
+        ...overrides,
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(
@@ -79,8 +81,9 @@ void main() {
   );
 
   group('AppShell settings gear', () {
-    testWidgets('sits at the foot of the rail, and is not a destination',
-        (tester) async {
+    testWidgets('sits at the foot of the rail, and is not a destination', (
+      tester,
+    ) async {
       await pumpShell(tester);
 
       expect(railGear, findsOneWidget);
@@ -98,7 +101,8 @@ void main() {
       expect(
         tester.getTopLeft(railGear).dy,
         greaterThan(
-            tester.getBottomLeft(find.byIcon(Icons.auto_awesome_outlined)).dy),
+          tester.getBottomLeft(find.byIcon(Icons.auto_awesome_outlined)).dy,
+        ),
       );
     });
 
@@ -150,8 +154,9 @@ void main() {
       expect(bar.destinations.length, 2);
     });
 
-    testWidgets('a hidden rail takes the gear with it (Decisions 7)',
-        (tester) async {
+    testWidgets('a hidden rail takes the gear with it (Decisions 7)', (
+      tester,
+    ) async {
       final container = await pumpShell(tester);
       expect(railGear, findsOneWidget);
 
@@ -160,8 +165,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(NavigationRail), findsNothing);
-      expect(find.byIcon(Icons.settings_outlined), findsNothing,
-          reason: 'Cmd/Ctrl+, opens Settings without the rail');
+      expect(
+        find.byIcon(Icons.settings_outlined),
+        findsNothing,
+        reason: 'Cmd/Ctrl+, opens Settings without the rail',
+      );
 
       // The reader menu is still the way back, and brings the gear with it.
       container.read(navigationRailHiddenProvider.notifier).state = false;

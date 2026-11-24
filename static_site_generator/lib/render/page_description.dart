@@ -118,13 +118,13 @@ class PageDescription {
   /// sentence over budget fails to compile at the `const` that writes it,
   /// rather than shipping with an ellipsis nobody chose.
   const PageDescription.written(String text)
-      : assert(
-          text.length <= _descriptionMaxChars,
-          'A written description must fit the snippet budget — shorten the '
-          'sentence rather than leaving it to be cut.',
-        ),
-        snippet = text,
-        subtitle = text;
+    : assert(
+        text.length <= _descriptionMaxChars,
+        'A written description must fit the snippet budget — shorten the '
+        'sentence rather than leaving it to be cut.',
+      ),
+      snippet = text,
+      subtitle = text;
 }
 
 /// Builds the description for one page.

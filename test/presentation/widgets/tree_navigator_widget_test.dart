@@ -19,23 +19,20 @@ void main() {
   // Loading State Tests
   // ============================================================
   group('Loading state', () {
-    testWidgets('should show CircularProgressIndicator while loading',
-        (tester) async {
+    testWidgets('should show CircularProgressIndicator while loading', (
+      tester,
+    ) async {
       // ARRANGE - Use a Completer to control when the future completes
-      when(mockDataSource.loadNavigationTree()).thenAnswer(
-        (_) async {
-          // Return immediately but the FutureProvider will show loading first
-          await Future.delayed(Duration.zero);
-          return TestData.sampleTree;
-        },
-      );
+      when(mockDataSource.loadNavigationTree()).thenAnswer((_) async {
+        // Return immediately but the FutureProvider will show loading first
+        await Future.delayed(Duration.zero);
+        return TestData.sampleTree;
+      });
 
       // ACT - Pump widget without settling
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
 
       // Just pump once to see loading state
@@ -61,9 +58,7 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
@@ -85,30 +80,31 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
       // ASSERT - Should show root nodes (default is Sinhala)
       expect(
-          find.text('සූත්‍ර පිටකය'), findsOneWidget); // Sutta Pitaka in Sinhala
+        find.text('සූත්‍ර පිටකය'),
+        findsOneWidget,
+      ); // Sutta Pitaka in Sinhala
       expect(
-          find.text('විනය පිටකය'), findsOneWidget); // Vinaya Pitaka in Sinhala
+        find.text('විනය පිටකය'),
+        findsOneWidget,
+      ); // Vinaya Pitaka in Sinhala
     });
 
-    testWidgets('should show "No content available" when tree is empty',
-        (tester) async {
+    testWidgets('should show "No content available" when tree is empty', (
+      tester,
+    ) async {
       // ARRANGE
       when(mockDataSource.loadNavigationTree()).thenAnswer((_) async => []);
 
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
@@ -125,8 +121,9 @@ void main() {
   // Node Expansion Tests
   // ============================================================
   group('Node expansion', () {
-    testWidgets('should show expand icon for nodes with children',
-        (tester) async {
+    testWidgets('should show expand icon for nodes with children', (
+      tester,
+    ) async {
       // ARRANGE
       when(mockDataSource.loadNavigationTree())
           .thenAnswer((_) async => TestData.sampleTree);
@@ -134,9 +131,7 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
@@ -144,8 +139,9 @@ void main() {
       expect(find.byIcon(Icons.chevron_right), findsWidgets);
     });
 
-    testWidgets('should expand node and show children when chevron tapped',
-        (tester) async {
+    testWidgets('should expand node and show children when chevron tapped', (
+      tester,
+    ) async {
       // ARRANGE
       when(mockDataSource.loadNavigationTree())
           .thenAnswer((_) async => TestData.sampleTree);
@@ -153,9 +149,7 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
@@ -181,8 +175,9 @@ void main() {
       expect(find.text('දීඝ නිකාය'), findsOneWidget);
     });
 
-    testWidgets('should change icon to expand_more when expanded',
-        (tester) async {
+    testWidgets('should change icon to expand_more when expanded', (
+      tester,
+    ) async {
       // ARRANGE
       when(mockDataSource.loadNavigationTree())
           .thenAnswer((_) async => TestData.sampleTree);
@@ -190,9 +185,7 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 
@@ -217,9 +210,7 @@ void main() {
       // ACT
       await tester.pumpApp(
         const TreeNavigatorWidget(),
-        overrides: [
-          TestProviderOverrides.treeDataSource(mockDataSource),
-        ],
+        overrides: [TestProviderOverrides.treeDataSource(mockDataSource)],
       );
       await tester.pumpAndSettle();
 

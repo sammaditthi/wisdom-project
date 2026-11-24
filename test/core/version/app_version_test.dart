@@ -20,7 +20,8 @@ void main() {
     expect(
       match,
       isNotNull,
-      reason: 'pubspec.yaml has no `version: MAJOR.MINOR.PATCH+BUILD` line. '
+      reason:
+          'pubspec.yaml has no `version: MAJOR.MINOR.PATCH+BUILD` line. '
           'pub rejects a two-part version and the stores compare the build '
           'number, so both parts are required.',
     );
@@ -28,7 +29,8 @@ void main() {
     expect(
       [AppVersion.name, AppVersion.build],
       [match![1], int.parse(match[2]!)],
-      reason: 'lib/core/version/app_version.gen.dart has drifted from '
+      reason:
+          'lib/core/version/app_version.gen.dart has drifted from '
           'pubspec.yaml. It is generated and must never be hand-edited; '
           'the version moves only through ./scripts/release.sh.',
     );

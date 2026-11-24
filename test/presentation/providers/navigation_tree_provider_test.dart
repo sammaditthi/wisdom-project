@@ -57,8 +57,10 @@ void main() {
 
     test('should add node to expanded set when not already expanded', () {
       // ARRANGE - Start with default (only Sutta Pitaka expanded)
-      expect(container.read(expandedNodesProvider),
-          equals({TipitakaNodeKeys.suttaPitaka}));
+      expect(
+        container.read(expandedNodesProvider),
+        equals({TipitakaNodeKeys.suttaPitaka}),
+      );
 
       // ACT - Toggle a new node
       container.read(toggleNodeExpansionProvider)('vinaya-pitaka');
@@ -90,7 +92,9 @@ void main() {
     test('should toggle the same node twice (expand then collapse)', () {
       // ARRANGE
       expect(
-          container.read(expandedNodesProvider).contains('test-node'), isFalse);
+        container.read(expandedNodesProvider).contains('test-node'),
+        isFalse,
+      );
 
       // ACT - Toggle to expand
       container.read(toggleNodeExpansionProvider)('test-node');
@@ -101,7 +105,9 @@ void main() {
 
       // ASSERT
       expect(
-          container.read(expandedNodesProvider).contains('test-node'), isFalse);
+        container.read(expandedNodesProvider).contains('test-node'),
+        isFalse,
+      );
     });
   });
 
@@ -222,9 +228,7 @@ void main() {
       expect(container.read(scrollToNodeRequestProvider), isNull);
     });
 
-    test(
-        'should allow setting same value consecutively using null-then-set pattern',
-        () {
+    test('should allow setting same value consecutively using null-then-set pattern', () {
       // This tests the pattern used in syncNavigatorToActiveTabProvider
       // to force listeners to fire even when re-selecting the same node
 
@@ -258,8 +262,10 @@ void main() {
 
     test('should default to Sinhala', () {
       // ASSERT
-      expect(container.read(contentLanguageProvider),
-          equals(ContentLanguage.sinhala));
+      expect(
+        container.read(contentLanguageProvider),
+        equals(ContentLanguage.sinhala),
+      );
     });
 
     test('should toggle to Pali', () async {
@@ -269,8 +275,10 @@ void main() {
           .setLanguage(ContentLanguage.pali);
 
       // ASSERT
-      expect(container.read(contentLanguageProvider),
-          equals(ContentLanguage.pali));
+      expect(
+        container.read(contentLanguageProvider),
+        equals(ContentLanguage.pali),
+      );
     });
 
     test('should toggle back to Sinhala', () async {
@@ -282,8 +290,10 @@ void main() {
       await notifier.setLanguage(ContentLanguage.sinhala);
 
       // ASSERT
-      expect(container.read(contentLanguageProvider),
-          equals(ContentLanguage.sinhala));
+      expect(
+        container.read(contentLanguageProvider),
+        equals(ContentLanguage.sinhala),
+      );
     });
   });
 
@@ -433,7 +443,7 @@ void main() {
       // Set some existing expanded nodes
       container.read(expandedNodesProvider.notifier).state = {
         TipitakaNodeKeys.vinayaPitaka,
-        'mahavagga'
+        'mahavagga',
       };
 
       // ACT - Expand path to dn-1
@@ -594,8 +604,9 @@ void main() {
           const Duration(seconds: 1),
           () => Right([
             _createTestTreeNode(
-                nodeKey: TipitakaNodeKeys.suttaPitaka,
-                paliName: 'Sutta Pitaka'),
+              nodeKey: TipitakaNodeKeys.suttaPitaka,
+              paliName: 'Sutta Pitaka',
+            ),
           ]),
         ),
       );
@@ -607,8 +618,9 @@ void main() {
       );
 
       // ACT - Don't wait for the tree to load
-      final node =
-          container.read(nodeByKeyProvider(TipitakaNodeKeys.suttaPitaka));
+      final node = container.read(
+        nodeByKeyProvider(TipitakaNodeKeys.suttaPitaka),
+      );
 
       // ASSERT - Should return null while loading
       expect(node, isNull);
@@ -631,12 +643,17 @@ void main() {
       // ARRANGE
       final tree = [
         _createTestTreeNode(
-            nodeKey: TipitakaNodeKeys.suttaPitaka, paliName: 'Sutta Pitaka'),
+          nodeKey: TipitakaNodeKeys.suttaPitaka,
+          paliName: 'Sutta Pitaka',
+        ),
         _createTestTreeNode(
-            nodeKey: TipitakaNodeKeys.vinayaPitaka, paliName: 'Vinaya Pitaka'),
+          nodeKey: TipitakaNodeKeys.vinayaPitaka,
+          paliName: 'Vinaya Pitaka',
+        ),
         _createTestTreeNode(
-            nodeKey: TipitakaNodeKeys.abhidhammaPitaka,
-            paliName: 'Abhidhamma Pitaka'),
+          nodeKey: TipitakaNodeKeys.abhidhammaPitaka,
+          paliName: 'Abhidhamma Pitaka',
+        ),
       ];
 
       when(mockRepository.loadNavigationTree())

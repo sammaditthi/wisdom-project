@@ -46,8 +46,9 @@ const _guidePath = 'docs/general/how-to-release.md';
 /// Commits no app reader sees, kept from Claude: docs, tests and CI by type,
 /// the website and release tooling by scope. It judges the rest (a `refactor`
 /// can rename a menu item, a `style` change an icon, a `chore` the app name).
-final _unseenCommit =
-    RegExp(r'^((docs|test|ci)[(:!]|\w+\((static-site|site|release|ops)\))');
+final _unseenCommit = RegExp(
+  r'^((docs|test|ci)[(:!]|\w+\((static-site|site|release|ops)\))',
+);
 
 /// How a drifted version file is found: by hand, since it was edited by hand.
 const _findHandEdit =
@@ -65,29 +66,29 @@ int _status(Directory root) {
   if (tag == null) {
     stdout.writeln('tag        none yet');
   } else {
-    stdout.writeln('tag        $tag at ${_gitOut(root, [
-          'rev-parse',
-          '--short',
-          tag,
-        ])}');
-    stdout.writeln('commits    ${_gitOut(root, [
-          'rev-list',
-          '--count',
-          '$tag..HEAD',
-        ])} since $tag');
+    stdout.writeln(
+      'tag        $tag at ${_gitOut(root, ['rev-parse', '--short', tag])}',
+    );
+    stdout.writeln(
+      'commits    ${_gitOut(root, ['rev-list', '--count', '$tag..HEAD'])} since $tag',
+    );
   }
 
   if (_generatedText(root) == _render(version)) {
     stdout.writeln('generated  up to date');
   } else {
-    stdout.writeln('generated  DRIFTED — undo the hand edit, then commit. Find '
-        'it with\n           $_findHandEdit');
+    stdout.writeln(
+      'generated  DRIFTED — undo the hand edit, then commit. Find '
+      'it with\n           $_findHandEdit',
+    );
   }
-  stdout.writeln(_tagExists(root, 'v${version.name}')
-      ? 'next       ./scripts/release.sh patch|minor|major (Claude drafts '
-          'the notes\n           under "$_unreleased" if there are none)'
-      : 'next       ./scripts/deploy.sh --prod   (v${version.name} is not '
-          'tagged yet)');
+  stdout.writeln(
+    _tagExists(root, 'v${version.name}')
+        ? 'next       ./scripts/release.sh patch|minor|major (Claude drafts '
+              'the notes\n           under "$_unreleased" if there are none)'
+        : 'next       ./scripts/deploy.sh --prod   (v${version.name} is not '
+              'tagged yet)',
+  );
   return 0;
 }
 
@@ -111,11 +112,11 @@ int _cut(Directory root, String part) {
     'major' => _Version(before.major + 1, 0, 0, before.build + 1),
     'minor' => _Version(before.major, before.minor + 1, 0, before.build + 1),
     'patch' => _Version(
-        before.major,
-        before.minor,
-        before.patch + 1,
-        before.build + 1,
-      ),
+      before.major,
+      before.minor,
+      before.patch + 1,
+      before.build + 1,
+    ),
     _ => throw _Fail('cut takes major, minor or patch (got "$part").'),
   };
   // Without a terminal (automation) nobody can approve a draft, so the notes
@@ -126,8 +127,10 @@ int _cut(Directory root, String part) {
       try {
         _writeDraft(root, since);
       } on _Fail catch (failure) {
-        throw _Fail('${failure.message}.\n       Write the notes under '
-            '"$_unreleased" in $_changelogPath by hand, then run this again.');
+        throw _Fail(
+          '${failure.message}.\n       Write the notes under '
+          '"$_unreleased" in $_changelogPath by hand, then run this again.',
+        );
       }
     }
     _review(root, since);
@@ -145,11 +148,13 @@ int _cut(Directory root, String part) {
   try {
     // The one line, rewritten in place: a YAML round-trip would strip the
     // pubspec's comments.
-    _pubspecFile(root).writeAsStringSync(
-        pubspec.replaceFirst(_versionLine, 'version: $after'));
+    _pubspecFile(
+      root,
+    ).writeAsStringSync(pubspec.replaceFirst(_versionLine, 'version: $after'));
     stdout.writeln('pubspec    $before → $after');
     _changelogFile(root).writeAsStringSync(
-        changelog.replaceRange(heading.start, heading.end, dated));
+      changelog.replaceRange(heading.start, heading.end, dated),
+    );
     stdout.writeln('changelog  $_unreleased → $dated');
     _writeGenerated(root, after);
     // Exactly the release paths, leaving anything else staged alone.
@@ -182,8 +187,9 @@ int _check(Directory root) {
   final version = _readVersion(_pubspecText(root));
   if (_generatedText(root) != _render(version)) {
     stderr.writeln('error: $_generatedPath does not match pubspec $version.');
-    stderr
-        .writeln('       The version moves only through ./scripts/release.sh.');
+    stderr.writeln(
+      '       The version moves only through ./scripts/release.sh.',
+    );
     stderr.writeln('       Undo the hand edit, then commit. Find it with');
     stderr.writeln('       $_findHandEdit');
     return 1;
@@ -262,7 +268,8 @@ _Version _readVersion(String pubspec) {
 /// `1.4.0 (128)` — the one display rule, mirrored by `AppVersion.display`.
 String _display(_Version version) => '${version.name} (${version.build})';
 
-String _render(_Version version) => '''
+String _render(_Version version) =>
+    '''
 // GENERATED by tools/release.dart — do not edit.
 // Source: the `version:` line of pubspec.yaml.
 
@@ -298,14 +305,16 @@ void _writeGenerated(Directory root, _Version version) {
 /// `--porcelain` so untracked files count. Not trimmed in front: that would eat
 /// the first line's status column.
 void _requireCleanTree(Directory root) {
-  final dirty = (_run(root, 'git', [
-    'status',
-    '--porcelain',
-    '--',
-    '.',
-    ':(exclude)$_changelogPath',
-  ]).stdout as String)
-      .trimRight();
+  final dirty =
+      (_run(root, 'git', [
+                'status',
+                '--porcelain',
+                '--',
+                '.',
+                ':(exclude)$_changelogPath',
+              ]).stdout
+              as String)
+          .trimRight();
   if (dirty.isEmpty) return;
   throw _Fail(
     'working tree is dirty — commit or stash first; only $_changelogPath may '
@@ -391,14 +400,17 @@ void _review(Directory root, String since) {
     final heading = _unreleasedHeading(shown);
     final next = shown.indexOf(_entryHeading, heading.end);
     stdout.writeln(
-        '\n${shown.substring(heading.start, next < 0 ? null : next).trim()}\n');
+      '\n${shown.substring(heading.start, next < 0 ? null : next).trim()}\n',
+    );
     try {
       stdout.writeln('rules      kept: ${_requireNotes(shown, heading)}');
     } on _Fail catch (failure) {
       stdout.writeln('rules      BROKEN: ${failure.message}');
     }
-    stdout.write('Edit $_changelogPath now if you like. Release with these '
-        'notes? [y]es / [r]egenerate / [N]o ');
+    stdout.write(
+      'Edit $_changelogPath now if you like. Release with these '
+      'notes? [y]es / [r]egenerate / [N]o ',
+    );
     switch ((stdin.readLineSync() ?? '').trim().toLowerCase()) {
       case 'y' || 'yes':
         final edited = _changelogText(root);
@@ -415,8 +427,10 @@ void _review(Directory root, String since) {
           stdout.writeln('draft      ${failure.message}; notes unchanged');
         }
       default:
-        throw const _Fail('stopped. The notes stay in $_changelogPath: edit '
-            'them, then run this again.');
+        throw const _Fail(
+          'stopped. The notes stay in $_changelogPath: edit '
+          'them, then run this again.',
+        );
     }
   }
 }
@@ -453,21 +467,26 @@ void _writeDraft(Directory root, String since) {
 /// entry. It gets no tools: all it reads is in the prompt, and it replies
 /// with JSON, so this script alone writes the Markdown.
 String _draft(Directory root, String since) {
-  final commits = _gitOut(root, [
-    'log',
-    '--no-merges',
-    '--format=%s%n%b%x1e',
-    '$since..HEAD',
-  ])
-      .split('\x1e')
-      .map((commit) => commit.trim())
-      .where((commit) => commit.isNotEmpty && !_unseenCommit.hasMatch(commit))
-      .map((commit) => commit
-          .split('\n')
-          .where((line) => !line.startsWith('Co-Authored-By:'))
-          .join('\n')
-          .trim())
-      .join('\n\n');
+  final commits =
+      _gitOut(root, [
+            'log',
+            '--no-merges',
+            '--format=%s%n%b%x1e',
+            '$since..HEAD',
+          ])
+          .split('\x1e')
+          .map((commit) => commit.trim())
+          .where(
+            (commit) => commit.isNotEmpty && !_unseenCommit.hasMatch(commit),
+          )
+          .map(
+            (commit) => commit
+                .split('\n')
+                .where((line) => !line.startsWith('Co-Authored-By:'))
+                .join('\n')
+                .trim(),
+          )
+          .join('\n\n');
   if (commits.isEmpty) {
     throw _Fail('no commits since $since that an app reader would notice');
   }
@@ -485,11 +504,14 @@ String _draft(Directory root, String since) {
   final recent = released.isEmpty
       ? ''
       : changelog
-          .substring(released.first.start,
-              released.length > 2 ? released[2].start : null)
-          .trim();
+            .substring(
+              released.first.start,
+              released.length > 2 ? released[2].start : null,
+            )
+            .trim();
 
-  final prompt = '''
+  final prompt =
+      '''
 Draft the release notes for the next version of an app from the commits below.
 
 Reply with only this JSON, nothing before or after it:
@@ -513,25 +535,23 @@ $commits
 </commits>
 ''';
 
-  stdout.writeln('draft      Claude Sonnet is reading the commits since '
-      '$since...');
+  stdout.writeln(
+    'draft      Claude Sonnet is reading the commits since '
+    '$since...',
+  );
   final ProcessResult result;
   try {
     // Run from the temp folder so this repo's CLAUDE.md and memory stay out.
     // The prompt goes before --tools, which would take it as a tool name.
-    result = Process.runSync(
-      'claude',
-      [
-        '-p',
-        prompt,
-        '--model',
-        'sonnet',
-        '--tools',
-        '',
-        '--no-session-persistence',
-      ],
-      workingDirectory: Directory.systemTemp.path,
-    );
+    result = Process.runSync('claude', [
+      '-p',
+      prompt,
+      '--model',
+      'sonnet',
+      '--tools',
+      '',
+      '--no-session-persistence',
+    ], workingDirectory: Directory.systemTemp.path);
   } on ProcessException {
     throw const _Fail('Claude Code (the claude command) is not installed');
   }
@@ -606,20 +626,23 @@ String _changelogText(Directory root) {
 /// `--match` so a per-product tag (`site-v*`, deferred but planned) could never
 /// be reported as the repo's last version.
 String? _lastTag(Directory root) {
-  final result = Process.runSync(
-    'git',
-    ['describe', '--tags', '--abbrev=0', '--match', 'v*'],
-    workingDirectory: root.path,
-  );
+  final result = Process.runSync('git', [
+    'describe',
+    '--tags',
+    '--abbrev=0',
+    '--match',
+    'v*',
+  ], workingDirectory: root.path);
   return result.exitCode == 0 ? (result.stdout as String).trim() : null;
 }
 
 bool _tagExists(Directory root, String tag) =>
-    Process.runSync(
-      'git',
-      ['rev-parse', '--verify', '--quiet', 'refs/tags/$tag'],
-      workingDirectory: root.path,
-    ).exitCode ==
+    Process.runSync('git', [
+      'rev-parse',
+      '--verify',
+      '--quiet',
+      'refs/tags/$tag',
+    ], workingDirectory: root.path).exitCode ==
     0;
 
 String _gitOut(Directory root, List<String> args) =>

@@ -108,20 +108,18 @@ void main() {
       // §11.8: Cloudflare dedups by content hash, so unstable ordering would
       // re-upload every page on an unchanged corpus.
       Map<String, dynamic> source() => {
-            'p': _row(null),
-            'p-b': _row('p'),
-            'p-a': _row('p'),
-            'p-2': _row('p'),
-            'p-1': _row('p'),
-          };
+        'p': _row(null),
+        'p-b': _row('p'),
+        'p-a': _row('p'),
+        'p-2': _row('p'),
+        'p-1': _row('p'),
+      };
 
       expect(
-        TipitakaTree.fromJson(source())
-            .allNodes
+        TipitakaTree.fromJson(source()).allNodes
             .map((n) => n.childKeys)
             .toList(),
-        TipitakaTree.fromJson(source())
-            .allNodes
+        TipitakaTree.fromJson(source()).allNodes
             .map((n) => n.childKeys)
             .toList(),
       );
@@ -129,19 +127,23 @@ void main() {
   });
 
   group('malformed input fails loudly', () {
-    test('a parent that does not exist throws rather than stranding a subtree',
-        () {
-      // Silently dropping these would delete a whole branch from navigation
-      // with no error anywhere.
-      expect(
-        () => TipitakaTree.fromJson({'orphan': _row('nobody')}),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          contains('nobody'),
-        )),
-      );
-    });
+    test(
+      'a parent that does not exist throws rather than stranding a subtree',
+      () {
+        // Silently dropping these would delete a whole branch from navigation
+        // with no error anywhere.
+        expect(
+          () => TipitakaTree.fromJson({'orphan': _row('nobody')}),
+          throwsA(
+            isA<FormatException>().having(
+              (e) => e.message,
+              'message',
+              contains('nobody'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('a row with the wrong field count is named', () {
       expect(
@@ -150,25 +152,29 @@ void main() {
             'pali',
             'sinh',
             1,
-            [0, 0]
+            [0, 0],
           ],
         }),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          allOf(contains('short'), contains('4 fields')),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('short'), contains('4 fields')),
+          ),
+        ),
       );
     });
 
     test('a row that is not a list is named', () {
       expect(
         () => TipitakaTree.fromJson({'weird': 'not a row'}),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          contains('weird'),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('weird'),
+          ),
+        ),
       );
     });
 
@@ -182,14 +188,16 @@ void main() {
             1,
             [0],
             'root',
-            'f'
+            'f',
           ],
         }),
-        throwsA(isA<FormatException>().having(
-          (e) => e.message,
-          'message',
-          allOf(contains('bad'), contains('coordinate')),
-        )),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('bad'), contains('coordinate')),
+          ),
+        ),
       );
     });
   });
@@ -204,10 +212,11 @@ void main() {
     });
 
     test('leaves are found depth-first in reading order', () {
-      expect(
-        tree.leavesUnder('an-1').map((n) => n.nodeKey),
-        ['an-1-1-1', 'an-1-1-2', 'an-1-2'],
-      );
+      expect(tree.leavesUnder('an-1').map((n) => n.nodeKey), [
+        'an-1-1-1',
+        'an-1-1-2',
+        'an-1-2',
+      ]);
     });
 
     test('a leaf returns itself, so callers need no special case', () {
@@ -215,10 +224,10 @@ void main() {
     });
 
     test('ancestors run nearest-first for breadcrumbs', () {
-      expect(
-        tree.ancestorsOf('an-1-1-1').map((n) => n.nodeKey),
-        ['an-1-1', 'an-1'],
-      );
+      expect(tree.ancestorsOf('an-1-1-1').map((n) => n.nodeKey), [
+        'an-1-1',
+        'an-1',
+      ]);
     });
 
     test('one step up is the first ancestor, and null at the top', () {
@@ -263,10 +272,7 @@ void main() {
       // Each key is visited at most once, and the starting node counts as
       // already seen — so a → b → a stops at ['b'] rather than looping or
       // listing the start node as its own ancestor.
-      final cyclic = TipitakaTree.fromJson({
-        'a': _row('b'),
-        'b': _row('a'),
-      });
+      final cyclic = TipitakaTree.fromJson({'a': _row('b'), 'b': _row('a')});
       expect(cyclic.ancestorsOf('a').map((n) => n.nodeKey), ['b']);
       expect(cyclic.ancestorsOf('b').map((n) => n.nodeKey), ['a']);
     });
@@ -280,8 +286,11 @@ void main() {
       expect(tree.isAncestorOf('an-1-1', 'an-1-1-1'), isTrue);
       expect(tree.isAncestorOf('an-1-1-1', 'an-1'), isFalse);
       expect(tree.isAncestorOf('an-1-2', 'an-1-1-1'), isFalse);
-      expect(tree.isAncestorOf('an-1', 'an-1'), isFalse,
-          reason: 'a key is never its own ancestor');
+      expect(
+        tree.isAncestorOf('an-1', 'an-1'),
+        isFalse,
+        reason: 'a key is never its own ancestor',
+      );
       expect(tree.isAncestorOf('nope', 'an-1-1'), isFalse);
       expect(tree.isAncestorOf('an-1', 'nope'), isFalse);
 
@@ -294,9 +303,11 @@ void main() {
       expect(cyclic.isAncestorOf('a', 'a'), isFalse);
       expect(cyclic.isAncestorOf('x', 'x'), isFalse);
       for (final key in ['a', 'b', 'x']) {
-        expect(cyclic.isAncestorOf(key, key),
-            cyclic.ancestorsOf(key).any((n) => n.nodeKey == key),
-            reason: 'the two spellings disagree on $key');
+        expect(
+          cyclic.isAncestorOf(key, key),
+          cyclic.ancestorsOf(key).any((n) => n.nodeKey == key),
+          reason: 'the two spellings disagree on $key',
+        );
       }
     });
   });
@@ -310,10 +321,7 @@ void main() {
       final key = correctedTreeCoordinates.keys.first;
       final corrected = correctedTreeCoordinates[key]!;
       // A raw coordinate no correction can equal.
-      final source = {
-        'p': _row(null),
-        key: _row('p', page: -1, entry: -1),
-      };
+      final source = {'p': _row(null), key: _row('p', page: -1, entry: -1)};
 
       final byDefault = TipitakaTree.fromJson(source)[key]!;
       expect(
@@ -341,12 +349,11 @@ List<dynamic> _row(
   String file = 'f',
   int page = 0,
   int entry = 0,
-}) =>
-    [
-      'pali',
-      'sinh',
-      level,
-      <int>[page, entry],
-      parent ?? 'root',
-      file
-    ];
+}) => [
+  'pali',
+  'sinh',
+  level,
+  <int>[page, entry],
+  parent ?? 'root',
+  file,
+];

@@ -48,31 +48,38 @@ void main() {
     });
   });
 
-  group('leafBefore / leafAfter — the stops are suttas, never a vagga title',
-      () {
-    test('next steps off the last leaf actually rendered', () {
-      // bk-2's unit ended at bk-2-2, so next is the sutta after *that*.
-      expect(_resolver.leafAfter('bk-2')?.nodeKey, 'bk-3');
-    });
+  group(
+    'leafBefore / leafAfter — the stops are suttas, never a vagga title',
+    () {
+      test('next steps off the last leaf actually rendered', () {
+        // bk-2's unit ended at bk-2-2, so next is the sutta after *that*.
+        expect(_resolver.leafAfter('bk-2')?.nodeKey, 'bk-3');
+      });
 
-    test('a unit cut short by a file boundary steps off where it stopped', () {
-      // bk rendered f1 only, so next is f2's first sutta and not whatever
-      // follows the whole book.
-      expect(_resolver.leafAfter('bk')?.nodeKey, 'bk-4-1');
-    });
-
-    test('previous is the sutta before the unit, not the container above it',
+      test(
+        'a unit cut short by a file boundary steps off where it stopped',
         () {
-      expect(_resolver.leafBefore('bk-2')?.nodeKey, 'bk-1');
-      expect(_resolver.leafBefore('bk-2-2')?.nodeKey, 'bk-2-1');
-    });
+          // bk rendered f1 only, so next is f2's first sutta and not whatever
+          // follows the whole book.
+          expect(_resolver.leafAfter('bk')?.nodeKey, 'bk-4-1');
+        },
+      );
 
-    test('null at each end of the corpus', () {
-      expect(_resolver.leafBefore('bk'), isNull);
-      expect(_resolver.leafBefore('bk-1'), isNull);
-      expect(_resolver.leafAfter('bk-4-2'), isNull);
-    });
-  });
+      test(
+        'previous is the sutta before the unit, not the container above it',
+        () {
+          expect(_resolver.leafBefore('bk-2')?.nodeKey, 'bk-1');
+          expect(_resolver.leafBefore('bk-2-2')?.nodeKey, 'bk-2-1');
+        },
+      );
+
+      test('null at each end of the corpus', () {
+        expect(_resolver.leafBefore('bk'), isNull);
+        expect(_resolver.leafBefore('bk-1'), isNull);
+        expect(_resolver.leafAfter('bk-4-2'), isNull);
+      });
+    },
+  );
 
   group('keyAt — which node owns a row', () {
     test('a row inside a node belongs to that node', () {
@@ -155,5 +162,4 @@ List<dynamic> _row({
   required String? parent,
   required List<int> at,
   required String? file,
-}) =>
-    ['pali', 'sinhala', 1, at, parent ?? 'root', file];
+}) => ['pali', 'sinhala', 1, at, parent ?? 'root', file];

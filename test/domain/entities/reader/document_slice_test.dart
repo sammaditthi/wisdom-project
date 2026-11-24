@@ -34,27 +34,39 @@ void main() {
   group('of — a range the document cannot honour', () {
     test('a start outside the document is empty, not a crash', () {
       expect(
-          DocumentSlice.of(_document(2), _range((5, 0), null)).isEmpty, true);
+        DocumentSlice.of(_document(2), _range((5, 0), null)).isEmpty,
+        true,
+      );
       expect(
-          DocumentSlice.of(_document(2), _range((-1, 0), null)).isEmpty, true);
+        DocumentSlice.of(_document(2), _range((-1, 0), null)).isEmpty,
+        true,
+      );
       expect(
-          DocumentSlice.of(_document(0), _range((0, 0), null)).isEmpty, true);
+        DocumentSlice.of(_document(0), _range((0, 0), null)).isEmpty,
+        true,
+      );
     });
 
-    test('an end past the last page clamps, and drops its entry bound with it',
-        () {
-      final slice = DocumentSlice.of(_document(2), _range((0, 0), (9, 3)));
-      expect(slice.pages.map((p) => p.pageNumber), [0, 1]);
-      // The end named a page that does not exist, so nothing on the real last
-      // page may be cut off at entry 3.
-      expect(slice.entriesOn(1, 10), (0, 10));
-    });
+    test(
+      'an end past the last page clamps, and drops its entry bound with it',
+      () {
+        final slice = DocumentSlice.of(_document(2), _range((0, 0), (9, 3)));
+        expect(slice.pages.map((p) => p.pageNumber), [0, 1]);
+        // The end named a page that does not exist, so nothing on the real last
+        // page may be cut off at entry 3.
+        expect(slice.entriesOn(1, 10), (0, 10));
+      },
+    );
 
     test('an end at or before the start leaves nothing to render', () {
       expect(
-          DocumentSlice.of(_document(3), _range((1, 0), (1, 0))).isEmpty, true);
+        DocumentSlice.of(_document(3), _range((1, 0), (1, 0))).isEmpty,
+        true,
+      );
       expect(
-          DocumentSlice.of(_document(3), _range((2, 0), (1, 5))).isEmpty, true);
+        DocumentSlice.of(_document(3), _range((2, 0), (1, 5))).isEmpty,
+        true,
+      );
     });
   });
 
@@ -82,31 +94,31 @@ void main() {
 }
 
 SliceRange _range((int, int) start, (int, int)? end) => SliceRange(
-      nodeKey: 'bk-1',
-      start: SliceCoordinate(start.$1, start.$2),
-      end: end == null ? null : SliceCoordinate(end.$1, end.$2),
-    );
+  nodeKey: 'bk-1',
+  start: SliceCoordinate(start.$1, start.$2),
+  end: end == null ? null : SliceCoordinate(end.$1, end.$2),
+);
 
 /// A document of [pageCount] pages, each numbered with its own index so a
 /// slice's pages name the absolute positions they came from.
 BJTDocument _document(int pageCount) => BJTDocument(
-      fileId: 'f1',
-      editionId: 'bjt',
-      pages: [
-        for (var i = 0; i < pageCount; i++)
-          BJTPage(
-            pageNumber: i,
-            sinhalaPageNumber: null,
-            paliSection: const BJTSection(
-              languageCode: 'pi',
-              entries: [],
-              footnotes: [],
-            ),
-            sinhalaSection: const BJTSection(
-              languageCode: 'si',
-              entries: [],
-              footnotes: [],
-            ),
-          ),
-      ],
-    );
+  fileId: 'f1',
+  editionId: 'bjt',
+  pages: [
+    for (var i = 0; i < pageCount; i++)
+      BJTPage(
+        pageNumber: i,
+        sinhalaPageNumber: null,
+        paliSection: const BJTSection(
+          languageCode: 'pi',
+          entries: [],
+          footnotes: [],
+        ),
+        sinhalaSection: const BJTSection(
+          languageCode: 'si',
+          entries: [],
+          footnotes: [],
+        ),
+      ),
+  ],
+);

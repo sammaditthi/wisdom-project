@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/theme/app_typography.dart';
 import '../../utils/content_icons.dart';
 import '../../utils/content_text_formatter.dart';
@@ -183,16 +184,16 @@ class _TabBarWidgetState extends ConsumerState<TabBarWidget> {
 
     _scrollController
         .animateTo(
-      target,
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOut,
-    )
+          target,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        )
         .then((_) {
-      // Verify against the settled layout once the scroll ends. With the
-      // constant floating-chevron viewport this is normally a no-op
-      // confirmation; it also corrects if the tab list changed mid-scroll.
-      _revealActiveTab();
-    });
+          // Verify against the settled layout once the scroll ends. With the
+          // constant floating-chevron viewport this is normally a no-op
+          // confirmation; it also corrects if the tab list changed mid-scroll.
+          _revealActiveTab();
+        });
   }
 
   /// Resolves the scroll offset that makes the active tab fully visible.
@@ -271,10 +272,7 @@ class _TabBarWidgetState extends ConsumerState<TabBarWidget> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLowest,
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 1),
         ),
       ),
       // The tab list spans the full width; the scroll chevrons float on
@@ -371,10 +369,7 @@ class _ScrollChevron extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isRight = icon == Icons.chevron_right;
-    final divider = BorderSide(
-      color: theme.dividerColor,
-      width: 1,
-    );
+    final divider = BorderSide(color: theme.dividerColor, width: 1);
 
     // IgnorePointer stops a faded-out chevron from intercepting taps meant
     // for the tab beneath it — the chevron keeps its width while invisible,
@@ -403,11 +398,7 @@ class _ScrollChevron extends StatelessWidget {
                     right: isRight ? BorderSide.none : divider,
                   ),
                 ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: theme.colorScheme.onSurface,
-                ),
+                child: Icon(icon, size: 20, color: theme.colorScheme.onSurface),
               ),
             ),
           ),
@@ -466,22 +457,13 @@ class _TabItem extends ConsumerWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(
-            minWidth: 120,
-            maxWidth: maxWidth,
-          ),
+          constraints: const BoxConstraints(minWidth: 120, maxWidth: maxWidth),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             border: Border(
-              right: BorderSide(
-                color: theme.dividerColor,
-                width: 1,
-              ),
+              right: BorderSide(color: theme.dividerColor, width: 1),
               bottom: isActive
-                  ? BorderSide(
-                      color: colors.primary,
-                      width: 2,
-                    )
+                  ? BorderSide(color: colors.primary, width: 2)
                   : BorderSide.none,
             ),
           ),
@@ -507,8 +489,10 @@ class _TabItem extends ConsumerWidget {
                   message: displayLabel,
                   child: Text(
                     displayLabel,
-                    style: context.typography
-                        .tabLabelFor(displayLabel, active: isActive),
+                    style: context.typography.tabLabelFor(
+                      displayLabel,
+                      active: isActive,
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),

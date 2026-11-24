@@ -143,10 +143,14 @@ void main() {
 
     test('a numbered name with a colon meets the query typed either way', () {
       const name = '1: එකකනිද්දෙසවණ්ණනා';
-      expect(normalizeForTitleMatch(name),
-          contains(normalizeForTitleMatch(sanitizeSearchQuery('1: එකක')!)));
-      expect(normalizeForTitleMatch(name),
-          contains(normalizeForTitleMatch(sanitizeSearchQuery('1 එකක')!)));
+      expect(
+        normalizeForTitleMatch(name),
+        contains(normalizeForTitleMatch(sanitizeSearchQuery('1: එකක')!)),
+      );
+      expect(
+        normalizeForTitleMatch(name),
+        contains(normalizeForTitleMatch(sanitizeSearchQuery('1 එකක')!)),
+      );
     });
   });
 

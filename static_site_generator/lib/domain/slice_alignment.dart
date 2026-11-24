@@ -357,7 +357,9 @@ class SliceAlignment {
   /// is one bare number and nothing else — its own coordinate, correctly
   /// placed — is not "corrected" onto itself.
   static SliceMisalignment? _strandedLeadingNumber(
-      TipitakaNode leaf, NodeSlice slice) {
+    TipitakaNode leaf,
+    NodeSlice slice,
+  ) {
     final closing = _lastTextBelow(slice);
     if (closing == null) return null;
     if (!PreamblePlanner.chromeTypes.contains(closing.type)) return null;

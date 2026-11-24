@@ -61,38 +61,42 @@ void main() {
   // documented key, dispose the container (simulates app shutdown), then spin up
   // a fresh container over the SAME in-memory store — the value must be restored.
   group('Relaunch round-trip -', () {
-    test('specialConjuncts persists and is restored across container restart',
-        () async {
-      final store = InMemoryKeyValueStore();
+    test(
+      'specialConjuncts persists and is restored across container restart',
+      () async {
+        final store = InMemoryKeyValueStore();
 
-      // First "launch": set specialConjuncts to true.
-      final container1 = ProviderContainer(
-        overrides: [keyValueStoreProvider.overrideWithValue(store)],
-      );
-      await container1.read(specialConjunctsProvider.notifier).set(true);
+        // First "launch": set specialConjuncts to true.
+        final container1 = ProviderContainer(
+          overrides: [keyValueStoreProvider.overrideWithValue(store)],
+        );
+        await container1.read(specialConjunctsProvider.notifier).set(true);
 
-      // Assert the value was written under the documented storage key.
-      expect(store.getBool(StorageKeys.paliSpecialConjuncts), isTrue);
-      container1.dispose();
+        // Assert the value was written under the documented storage key.
+        expect(store.getBool(StorageKeys.paliSpecialConjuncts), isTrue);
+        container1.dispose();
 
-      // Second "launch" over the SAME store: state must hydrate from disk.
-      final container2 = ProviderContainer(
-        overrides: [keyValueStoreProvider.overrideWithValue(store)],
-      );
-      addTearDown(container2.dispose);
+        // Second "launch" over the SAME store: state must hydrate from disk.
+        final container2 = ProviderContainer(
+          overrides: [keyValueStoreProvider.overrideWithValue(store)],
+        );
+        addTearDown(container2.dispose);
 
-      expect(container2.read(specialConjunctsProvider), isTrue);
+        expect(container2.read(specialConjunctsProvider), isTrue);
 
-      // The combined provider must also reflect the restored specialConjuncts flag.
-      expect(
-        container2.read(paliLetterOptionsProvider),
-        equals(const PaliLetterOptions(
-          standardLigatures: true,
-          specialConjuncts: true,
-          touching: true,
-        )),
-      );
-    });
+        // The combined provider must also reflect the restored specialConjuncts flag.
+        expect(
+          container2.read(paliLetterOptionsProvider),
+          equals(
+            const PaliLetterOptions(
+              standardLigatures: true,
+              specialConjuncts: true,
+              touching: true,
+            ),
+          ),
+        );
+      },
+    );
 
     test('standardLigatures persists under its declared key', () async {
       final store = InMemoryKeyValueStore();
@@ -132,21 +136,23 @@ void main() {
       expect(container2.read(touchingProvider), isFalse);
     });
 
-    test('set() is a no-op when the value is unchanged (state stays stable)',
-        () async {
-      final store = InMemoryKeyValueStore();
+    test(
+      'set() is a no-op when the value is unchanged (state stays stable)',
+      () async {
+        final store = InMemoryKeyValueStore();
 
-      final container = ProviderContainer(
-        overrides: [keyValueStoreProvider.overrideWithValue(store)],
-      );
-      addTearDown(container.dispose);
+        final container = ProviderContainer(
+          overrides: [keyValueStoreProvider.overrideWithValue(store)],
+        );
+        addTearDown(container.dispose);
 
-      // specialConjuncts starts false (default). Calling set(false) must not write.
-      await container.read(specialConjunctsProvider.notifier).set(false);
+        // specialConjuncts starts false (default). Calling set(false) must not write.
+        await container.read(specialConjunctsProvider.notifier).set(false);
 
-      // The key should still be absent (no write occurred).
-      expect(store.getBool(StorageKeys.paliSpecialConjuncts), isNull);
-    });
+        // The key should still be absent (no write occurred).
+        expect(store.getBool(StorageKeys.paliSpecialConjuncts), isNull);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -186,7 +192,9 @@ void main() {
 
       // The combined provider also reflects the change.
       expect(
-          container.read(paliLetterOptionsProvider).specialConjuncts, isTrue);
+        container.read(paliLetterOptionsProvider).specialConjuncts,
+        isTrue,
+      );
     });
   });
 
@@ -216,8 +224,10 @@ void main() {
 
     test('defaults and baseline are not equal', () {
       // Ensures the equality implementation distinguishes the two canonical singletons.
-      expect(PaliLetterOptions.defaults,
-          isNot(equals(PaliLetterOptions.baseline)));
+      expect(
+        PaliLetterOptions.defaults,
+        isNot(equals(PaliLetterOptions.baseline)),
+      );
     });
 
     test('any flag difference breaks equality', () {
@@ -229,27 +239,39 @@ void main() {
 
       expect(
         base,
-        isNot(equals(const PaliLetterOptions(
-          standardLigatures: false, // flipped
-          specialConjuncts: false,
-          touching: true,
-        ))),
+        isNot(
+          equals(
+            const PaliLetterOptions(
+              standardLigatures: false, // flipped
+              specialConjuncts: false,
+              touching: true,
+            ),
+          ),
+        ),
       );
       expect(
         base,
-        isNot(equals(const PaliLetterOptions(
-          standardLigatures: true,
-          specialConjuncts: true, // flipped
-          touching: true,
-        ))),
+        isNot(
+          equals(
+            const PaliLetterOptions(
+              standardLigatures: true,
+              specialConjuncts: true, // flipped
+              touching: true,
+            ),
+          ),
+        ),
       );
       expect(
         base,
-        isNot(equals(const PaliLetterOptions(
-          standardLigatures: true,
-          specialConjuncts: false,
-          touching: false, // flipped
-        ))),
+        isNot(
+          equals(
+            const PaliLetterOptions(
+              standardLigatures: true,
+              specialConjuncts: false,
+              touching: false, // flipped
+            ),
+          ),
+        ),
       );
     });
   });

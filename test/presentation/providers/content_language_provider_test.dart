@@ -107,8 +107,7 @@ void main() {
   });
 
   group('contentLanguageProvider persistence (1.6) -', () {
-    test(
-        'setLanguage persists, and a fresh notifier over the same store '
+    test('setLanguage persists, and a fresh notifier over the same store '
         'restores it (relaunch round-trip)', () async {
       final store = InMemoryKeyValueStore();
 
@@ -136,13 +135,10 @@ void main() {
       );
     });
 
-    test(
-        'a failing store write does not throw and state still flips '
+    test('a failing store write does not throw and state still flips '
         '(best-effort persistence)', () async {
       final container = ProviderContainer(
-        overrides: [
-          keyValueStoreProvider.overrideWithValue(_ThrowingStore()),
-        ],
+        overrides: [keyValueStoreProvider.overrideWithValue(_ThrowingStore())],
       );
       addTearDown(container.dispose);
 

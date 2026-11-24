@@ -70,6 +70,8 @@ class _RenderSnapToPixels extends RenderProxyBox {
     double nudge(double x) =>
         (x * _devicePixelRatio).roundToDouble() / _devicePixelRatio - x;
     super.paint(
-        context, offset + Offset(nudge(onScreen.dx), nudge(onScreen.dy)));
+      context,
+      offset + Offset(nudge(onScreen.dx), nudge(onScreen.dy)),
+    );
   }
 }

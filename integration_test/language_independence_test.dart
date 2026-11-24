@@ -84,62 +84,87 @@ void main() {
     Locale appLocale(WidgetTester tester) =>
         tester.widget<MaterialApp>(find.byType(MaterialApp)).locale!;
 
-    testWidgets(
-      'moving one language axis never moves the other',
-      (tester) async {
-        final container = await pumpApp(tester);
+    testWidgets('moving one language axis never moves the other', (
+      tester,
+    ) async {
+      final container = await pumpApp(tester);
 
-        // Open a deep sutta whose Pali and Sinhala names genuinely differ
-        // (dn-1-1 = බ්‍රහ්මජාලසුත්තං), so the Content-Language switch is visible.
-        final leaf = container.read(nodeByKeyProvider('dn-1-1'))!;
-        final sinhalaName = leaf.sinhalaName;
-        final paliTransformed =
-            beautifyPaliText(leaf.paliName, PaliLetterOptions.defaults);
+      // Open a deep sutta whose Pali and Sinhala names genuinely differ
+      // (dn-1-1 = බ්‍රහ්මජාලසුත්තං), so the Content-Language switch is visible.
+      final leaf = container.read(nodeByKeyProvider('dn-1-1'))!;
+      final sinhalaName = leaf.sinhalaName;
+      final paliTransformed = beautifyPaliText(
+        leaf.paliName,
+        PaliLetterOptions.defaults,
+      );
 
-        await openTab(tester, container, tabFromNode(container, 'dn-1-1'));
+      await openTab(tester, container, tabFromNode(container, 'dn-1-1'));
 
-        // ---------- Baseline: App = English, Content = Sinhala ----------
-        expect(appLocale(tester), const Locale('en'));
-        expect(chrome(tester), AppLocalizationsEn().settings,
-            reason: 'chrome starts in English');
-        expect(breadcrumbText(tester), contains(sinhalaName),
-            reason: 'data label starts in Sinhala (default Content Language)');
+      // ---------- Baseline: App = English, Content = Sinhala ----------
+      expect(appLocale(tester), const Locale('en'));
+      expect(
+        chrome(tester),
+        AppLocalizationsEn().settings,
+        reason: 'chrome starts in English',
+      );
+      expect(
+        breadcrumbText(tester),
+        contains(sinhalaName),
+        reason: 'data label starts in Sinhala (default Content Language)',
+      );
 
-        // ---------- Move App Language ONLY → Sinhala ----------
-        await container
-            .read(appLanguageProvider.notifier)
-            .setLanguage(AppLanguage.sinhala);
-        await pumpForSettle(tester);
+      // ---------- Move App Language ONLY → Sinhala ----------
+      await container
+          .read(appLanguageProvider.notifier)
+          .setLanguage(AppLanguage.sinhala);
+      await pumpForSettle(tester);
 
-        // Chrome localized to Sinhala...
-        expect(appLocale(tester), const Locale('si'),
-            reason: 'MaterialApp.locale follows App Language');
-        expect(chrome(tester), AppLocalizationsSi().settings,
-            reason: 'chrome string is now Sinhala');
-        // ...but the DATA label did NOT move (Content Language untouched).
-        expect(breadcrumbText(tester), contains(sinhalaName),
-            reason: 'App Language change must NOT alter data labels');
-        expect(breadcrumbText(tester), isNot(contains(paliTransformed)));
+      // Chrome localized to Sinhala...
+      expect(
+        appLocale(tester),
+        const Locale('si'),
+        reason: 'MaterialApp.locale follows App Language',
+      );
+      expect(
+        chrome(tester),
+        AppLocalizationsSi().settings,
+        reason: 'chrome string is now Sinhala',
+      );
+      // ...but the DATA label did NOT move (Content Language untouched).
+      expect(
+        breadcrumbText(tester),
+        contains(sinhalaName),
+        reason: 'App Language change must NOT alter data labels',
+      );
+      expect(breadcrumbText(tester), isNot(contains(paliTransformed)));
 
-        final chromeAfterAppSwitch = chrome(tester);
+      final chromeAfterAppSwitch = chrome(tester);
 
-        // ---------- Move Content Language ONLY → Pali ----------
-        await container
-            .read(contentLanguageProvider.notifier)
-            .setLanguage(ContentLanguage.pali);
-        await pumpForSettle(tester);
+      // ---------- Move Content Language ONLY → Pali ----------
+      await container
+          .read(contentLanguageProvider.notifier)
+          .setLanguage(ContentLanguage.pali);
+      await pumpForSettle(tester);
 
-        // Data label switched to Pali (with conjuncts); Sinhala gone...
-        expect(breadcrumbText(tester), contains(paliTransformed),
-            reason: 'Content Language change switches data labels to Pali');
-        expect(breadcrumbText(tester), isNot(contains(sinhalaName)));
-        // ...but the CHROME did NOT move (App Language untouched).
-        expect(appLocale(tester), const Locale('si'),
-            reason: 'Content Language change must NOT alter chrome locale');
-        expect(chrome(tester), chromeAfterAppSwitch,
-            reason: 'chrome string is unaffected by Content Language');
-      },
-    );
+      // Data label switched to Pali (with conjuncts); Sinhala gone...
+      expect(
+        breadcrumbText(tester),
+        contains(paliTransformed),
+        reason: 'Content Language change switches data labels to Pali',
+      );
+      expect(breadcrumbText(tester), isNot(contains(sinhalaName)));
+      // ...but the CHROME did NOT move (App Language untouched).
+      expect(
+        appLocale(tester),
+        const Locale('si'),
+        reason: 'Content Language change must NOT alter chrome locale',
+      );
+      expect(
+        chrome(tester),
+        chromeAfterAppSwitch,
+        reason: 'chrome string is unaffected by Content Language',
+      );
+    });
   });
 }
 

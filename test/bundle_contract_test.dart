@@ -14,14 +14,16 @@ void main() {
     expect(
       declared,
       isNotEmpty,
-      reason: 'Found no assets under flutter: -> assets:. The pubspec layout '
+      reason:
+          'Found no assets under flutter: -> assets:. The pubspec layout '
           'changed and this guard can no longer see what ships.',
     );
 
     expect(
       declared.where((asset) => asset.startsWith('assets/text')),
       isEmpty,
-      reason: 'assets/text is declared in pubspec.yaml again. The Tipitaka '
+      reason:
+          'assets/text is declared in pubspec.yaml again. The Tipitaka '
           'JSON must not ship: the app reads its text from the bjt_content '
           'table in assets/databases/bjt.db, so bundling the JSON as well adds '
           '~340 MiB to the installed app and buys nothing. The files stay in '

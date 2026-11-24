@@ -186,8 +186,8 @@ class SitePlan {
     this._readableIndex,
     this._owningPage,
     this.tree,
-  )   : pages = List.unmodifiable(pages),
-        readablePages = List.unmodifiable(readablePages);
+  ) : pages = List.unmodifiable(pages),
+      readablePages = List.unmodifiable(readablePages);
 
   /// Walks each of [rootKeys] top-down and decides what every node becomes.
   ///
@@ -266,11 +266,7 @@ class SitePlan {
 
     void walk(TipitakaNode node) {
       if (node.isLeaf) {
-        pages.add(SitePage(
-          kind: PageKind.sutta,
-          node: node,
-          suttas: [node],
-        ));
+        pages.add(SitePage(kind: PageKind.sutta, node: node, suttas: [node]));
         return;
       }
 
@@ -303,20 +299,20 @@ class SitePlan {
             'unrendered — the snapshot has been hand-edited.',
           );
         }
-        pages.add(SitePage(
-          kind: PageKind.chapter,
-          node: node,
-          suttas: children,
-        ));
+        pages.add(
+          SitePage(kind: PageKind.chapter, node: node, suttas: children),
+        );
         return; // children are inside the chapter file
       }
 
-      pages.add(SitePage(
-        kind: PageKind.toc,
-        node: node,
-        suttas: const [],
-        ownsRunningText: textBearingContainerKeys.contains(node.nodeKey),
-      ));
+      pages.add(
+        SitePage(
+          kind: PageKind.toc,
+          node: node,
+          suttas: const [],
+          ownsRunningText: textBearingContainerKeys.contains(node.nodeKey),
+        ),
+      );
       // Every folded child has to end up inside some run. A leaf whose nearest
       // preceding sibling is a *container* has none to join — runs only extend
       // forwards from an unfolded leaf — so it would otherwise be dropped from
@@ -341,11 +337,13 @@ class SitePlan {
           run.add(children[j]);
           attached.add(children[j].nodeKey);
         }
-        pages.add(SitePage(
-          kind: run.length == 1 ? PageKind.sutta : PageKind.chapter,
-          node: child,
-          suttas: run,
-        ));
+        pages.add(
+          SitePage(
+            kind: run.length == 1 ? PageKind.sutta : PageKind.chapter,
+            node: child,
+            suttas: run,
+          ),
+        );
       }
       final stranded = [
         for (final child in children)
@@ -389,8 +387,10 @@ class SitePlan {
           throw StateError('Root "$a" is listed twice.');
         }
         if (tree.isAncestorOf(a, b) || tree.isAncestorOf(b, a)) {
-          throw StateError('Roots "$a" and "$b" overlap — one contains the '
-              'other. Roots must not repeat or nest.');
+          throw StateError(
+            'Roots "$a" and "$b" overlap — one contains the '
+            'other. Roots must not repeat or nest.',
+          );
         }
       }
     }
@@ -609,7 +609,7 @@ class SitePlan {
   /// of what `PageTemplate` emits, read by the figures and by
   /// `verify_corpus_invariants`. No order is promised.
   List<TipitakaNode> crossLinkedNodes(SitePage page) => [
-        if (page.kind == PageKind.toc) page.node else ...page.suttas,
-        if (speaksForRun(page)) page.node,
-      ];
+    if (page.kind == PageKind.toc) page.node else ...page.suttas,
+    if (speaksForRun(page)) page.node,
+  ];
 }

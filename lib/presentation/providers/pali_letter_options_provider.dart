@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/storage/key_value_store.dart';
 import '../../core/storage/key_value_store_provider.dart';
 import '../../core/storage/storage_keys.dart';
@@ -14,7 +15,7 @@ import '../../core/utils/pali_letter_options.dart';
 /// shape as `ContentLanguageNotifier`.
 class BoolSettingNotifier extends StateNotifier<bool> {
   BoolSettingNotifier(this._store, this._key, {required bool fallback})
-      : super(_store.getBool(_key) ?? fallback);
+    : super(_store.getBool(_key) ?? fallback);
 
   final KeyValueStore _store;
   final String _key;
@@ -38,26 +39,27 @@ class BoolSettingNotifier extends StateNotifier<bool> {
 /// Default ON.
 final standardLigaturesProvider =
     StateNotifierProvider<BoolSettingNotifier, bool>((ref) {
-  return BoolSettingNotifier(
-    ref.watch(keyValueStoreProvider),
-    StorageKeys.paliStandardLigatures,
-    fallback: true,
-  );
-});
+      return BoolSettingNotifier(
+        ref.watch(keyValueStoreProvider),
+        StorageKeys.paliStandardLigatures,
+        fallback: true,
+      );
+    });
 
 /// Switch 2 — special / rare old-Pali ligatures (7). Default OFF.
 final specialConjunctsProvider =
     StateNotifierProvider<BoolSettingNotifier, bool>((ref) {
-  return BoolSettingNotifier(
-    ref.watch(keyValueStoreProvider),
-    StorageKeys.paliSpecialConjuncts,
-    fallback: false,
-  );
-});
+      return BoolSettingNotifier(
+        ref.watch(keyValueStoreProvider),
+        StorageKeys.paliSpecialConjuncts,
+        fallback: false,
+      );
+    });
 
 /// Switch 1 — touching + vowel shortening. Default ON.
-final touchingProvider =
-    StateNotifierProvider<BoolSettingNotifier, bool>((ref) {
+final touchingProvider = StateNotifierProvider<BoolSettingNotifier, bool>((
+  ref,
+) {
   return BoolSettingNotifier(
     ref.watch(keyValueStoreProvider),
     StorageKeys.paliTouching,

@@ -61,10 +61,18 @@ class BJTDocumentParser {
         pageJson['sinh'] as Map<String, dynamic>;
 
     // Pali before Sinhala: the order the segment ids are counted in.
-    final paliSection =
-        _parseSection(paliJson, 'pi', fileId, generateSegmentIndex);
-    final sinhalaSection =
-        _parseSection(sinhJson, 'si', fileId, generateSegmentIndex);
+    final paliSection = _parseSection(
+      paliJson,
+      'pi',
+      fileId,
+      generateSegmentIndex,
+    );
+    final sinhalaSection = _parseSection(
+      sinhJson,
+      'si',
+      fileId,
+      generateSegmentIndex,
+    );
     final printed = printedPages(
       fileId,
       pageJson['pageNum'] as int,
@@ -94,7 +102,8 @@ class BJTDocumentParser {
       return _parseEntry(entryJson as Map<String, dynamic>, segmentId);
     }).toList();
 
-    final footnotes = footnotesJson?.map((footnoteJson) {
+    final footnotes =
+        footnotesJson?.map((footnoteJson) {
           final Map<String, dynamic> footnote =
               footnoteJson as Map<String, dynamic>;
           return footnote['text'] as String;

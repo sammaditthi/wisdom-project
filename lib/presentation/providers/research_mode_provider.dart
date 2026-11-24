@@ -28,5 +28,5 @@ class ResearchModeNotifier extends StateNotifier<ResearchMode> {
 /// [ResearchModeNotifier] for why it isn't persisted.
 final researchModeProvider =
     StateNotifierProvider<ResearchModeNotifier, ResearchMode>((ref) {
-  return ResearchModeNotifier();
-});
+      return ResearchModeNotifier();
+    });

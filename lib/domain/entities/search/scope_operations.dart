@@ -67,8 +67,7 @@ class ScopeOperations {
   static Set<String> findCoveringAncestors(
     String nodeKey,
     Set<String> candidateAncestors,
-  ) =>
-      ScopePatterns.findCoveringAncestors(nodeKey, candidateAncestors);
+  ) => ScopePatterns.findCoveringAncestors(nodeKey, candidateAncestors);
 
   // ============================================================================
   // CHIP OPERATIONS (from ScopeUtils)
@@ -455,8 +454,10 @@ class ScopeOperations {
   static bool? getCheckboxState(TipitakaTreeNode node, Set<String> scope) {
     final isAllSel = isAllSelected(scope);
     final isDirectlySelected = scope.contains(node.nodeKey);
-    final isImplicitlySelected =
-        findCoveringAncestors(node.nodeKey, scope).isNotEmpty;
+    final isImplicitlySelected = findCoveringAncestors(
+      node.nodeKey,
+      scope,
+    ).isNotEmpty;
     final hasSelectedDesc = hasSelectedDescendant(node, scope);
 
     if (isAllSel || isDirectlySelected || isImplicitlySelected) {

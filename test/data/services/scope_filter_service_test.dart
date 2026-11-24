@@ -38,10 +38,7 @@ void main() {
 
         // ASSERT - 5 keys for sp + 5 for atta-sp = 10 OR-ed pairs
         expect(whereClause, contains('OR'));
-        expect(
-          whereClause,
-          equals('(${List.filled(10, kPair).join(' OR ')})'),
-        );
+        expect(whereClause, equals('(${List.filled(10, kPair).join(' OR ')})'));
       });
 
       // Test 4: Specific nikaya keys

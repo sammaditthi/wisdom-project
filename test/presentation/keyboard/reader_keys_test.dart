@@ -27,30 +27,46 @@ void main() {
   testWidgets('⌥⌘> and ⇧⌥⌘> step to the next sutta', (tester) async {
     final fake = await pumpWithFake(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.period,
-        primary: true, alt: true);
-    await pressKeys(tester, LogicalKeyboardKey.period,
-        primary: true, alt: true, shift: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.period,
+      primary: true,
+      alt: true,
+    );
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.period,
+      primary: true,
+      alt: true,
+      shift: true,
+    );
     await pressKeys(tester, LogicalKeyboardKey.comma, primary: true, alt: true);
 
     expect(fake.steps, [ReaderStep.next, ReaderStep.next, ReaderStep.previous]);
   }, variant: mac);
 
   // A browser names ⇧, and ⇧. by the characters they type.
-  testWidgets('⇧ with the keys from a browser, as < and >, steps too',
-      (tester) async {
+  testWidgets('⇧ with the keys from a browser, as < and >, steps too', (
+    tester,
+  ) async {
     final fake = await pumpWithFake(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.greater,
-        primary: true,
-        alt: true,
-        shift: true,
-        physicalKey: PhysicalKeyboardKey.period);
-    await pressKeys(tester, LogicalKeyboardKey.less,
-        primary: true,
-        alt: true,
-        shift: true,
-        physicalKey: PhysicalKeyboardKey.comma);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.greater,
+      primary: true,
+      alt: true,
+      shift: true,
+      physicalKey: PhysicalKeyboardKey.period,
+    );
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.less,
+      primary: true,
+      alt: true,
+      shift: true,
+      physicalKey: PhysicalKeyboardKey.comma,
+    );
 
     expect(fake.steps, [ReaderStep.next, ReaderStep.previous]);
   }, variant: mac);
@@ -58,13 +74,18 @@ void main() {
   testWidgets('⌥⌘> at the last sutta does nothing', (tester) async {
     final fake = await pumpWithFake(tester, canStep: false);
 
-    await pressKeys(tester, LogicalKeyboardKey.period,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.period,
+      primary: true,
+      alt: true,
+    );
     expect(fake.steps, isEmpty);
   }, variant: mac);
 
-  testWidgets('↓ with nothing focused scrolls a line, PgDn a page',
-      (tester) async {
+  testWidgets('↓ with nothing focused scrolls a line, PgDn a page', (
+    tester,
+  ) async {
     final fake = await pumpWithFake(tester);
 
     await pressKeys(tester, LogicalKeyboardKey.arrowDown);
@@ -76,8 +97,9 @@ void main() {
     ]);
   }, variant: mac);
 
-  testWidgets('↓ on a focused button outside the reader does not scroll',
-      (tester) async {
+  testWidgets('↓ on a focused button outside the reader does not scroll', (
+    tester,
+  ) async {
     final fake = await pumpWithFake(
       tester,
       home: Scaffold(
@@ -93,8 +115,9 @@ void main() {
     expect(fake.scrolls, isEmpty);
   }, variant: mac);
 
-  testWidgets('↓ with a popup menu open does not scroll the reader',
-      (tester) async {
+  testWidgets('↓ with a popup menu open does not scroll the reader', (
+    tester,
+  ) async {
     // The reader menu is a plain PopupMenuButton: a route, not on the
     // overlay stack. Its scope takes focus, and ↓ must stay with the menu.
     final fake = await pumpWithFake(

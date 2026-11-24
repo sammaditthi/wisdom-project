@@ -17,8 +17,9 @@ void main() {
   }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
 
   // The , and . keys show as < and > only where they step through texts.
-  testWidgets('Settings shows a comma; the text step keys show < and >',
-      (tester) async {
+  testWidgets('Settings shows a comma; the text step keys show < and >', (
+    tester,
+  ) async {
     // Tall enough that the list builds every row.
     tester.view.physicalSize = const Size(800, 3000);
     tester.view.devicePixelRatio = 1;
@@ -26,10 +27,12 @@ void main() {
     await tester.pumpAppWithScaffold(const KeyboardShortcutsPage());
 
     List<String> capsOf(String label) => tester
-        .widgetList<Text>(find.descendant(
-          of: find.widgetWithText(SettingsRow, label),
-          matching: find.byType(Text),
-        ))
+        .widgetList<Text>(
+          find.descendant(
+            of: find.widgetWithText(SettingsRow, label),
+            matching: find.byType(Text),
+          ),
+        )
         .map((t) => t.data!)
         .where((text) => text != label)
         .toList();

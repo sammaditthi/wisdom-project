@@ -35,9 +35,11 @@ void main() {
       ['run', 'bin/generate.dart', '--root', _roots, '--out', out.path],
     );
     if (result.exitCode != 0) {
-      fail('The generator failed. Run `dart test` from the '
-          'static_site_generator/ package root.\n'
-          '${result.stdout}${result.stderr}');
+      fail(
+        'The generator failed. Run `dart test` from the '
+        'static_site_generator/ package root.\n'
+        '${result.stdout}${result.stderr}',
+      );
     }
   });
 
@@ -58,8 +60,9 @@ void main() {
             .existsSync())
           '$fontsOutputDir/${face.relativePath}',
     ];
-    final fontToken =
-        fontsVersion([for (final face in faces) _bytes(out, face)]);
+    final fontToken = fontsVersion([
+      for (final face in faces) _bytes(out, face),
+    ]);
     final valid = {
       ...assetUrls(expected).values,
       for (final face in faces) '/$face?v=$fontToken',
@@ -73,12 +76,18 @@ void main() {
 
     // Guards against a scan that finds nothing and so passes.
     expect(linked, containsAll(assetUrls(expected).values));
-    expect(linked.where((link) => link.startsWith('/$fontsOutputDir/')),
-        isNotEmpty);
-    expect(linked.difference(valid), isEmpty,
-        reason: 'These links are not the URL SiteAssets derives from the '
-            'bytes written beside them: no ?v=, or one for other bytes. The '
-            'immutable rule caches them for a year either way.');
+    expect(
+      linked.where((link) => link.startsWith('/$fontsOutputDir/')),
+      isNotEmpty,
+    );
+    expect(
+      linked.difference(valid),
+      isEmpty,
+      reason:
+          'These links are not the URL SiteAssets derives from the '
+          'bytes written beside them: no ?v=, or one for other bytes. The '
+          'immutable rule caches them for a year either way.',
+    );
   });
 
   test('every _headers path rule names something the build wrote', () {
@@ -89,14 +98,19 @@ void main() {
       if (!rule.pattern.startsWith('/')) continue;
       if (rule.pattern.endsWith('/*')) {
         final directory = Directory(
-            '${out.path}${rule.pattern.substring(0, rule.pattern.length - 2)}');
+          '${out.path}${rule.pattern.substring(0, rule.pattern.length - 2)}',
+        );
         expect(
-            directory.existsSync() && directory.listSync().isNotEmpty, isTrue,
-            reason:
-                '${rule.pattern} names a directory the build leaves empty.');
+          directory.existsSync() && directory.listSync().isNotEmpty,
+          isTrue,
+          reason: '${rule.pattern} names a directory the build leaves empty.',
+        );
       } else {
-        expect(File('${out.path}${rule.pattern}').existsSync(), isTrue,
-            reason: '${rule.pattern} names a file the build does not write.');
+        expect(
+          File('${out.path}${rule.pattern}').existsSync(),
+          isTrue,
+          reason: '${rule.pattern} names a file the build does not write.',
+        );
       }
     }
   });
@@ -127,13 +141,19 @@ void main() {
           continue;
         }
         final digest = sha256.convert(utf8.encode(script.group(2)!));
-        expect(allowed, contains('sha256-${base64.encode(digest.bytes)}'),
-            reason: '${page.path} has an inline script the CSP refuses.');
+        expect(
+          allowed,
+          contains('sha256-${base64.encode(digest.bytes)}'),
+          reason: '${page.path} has an inline script the CSP refuses.',
+        );
         checked++;
       }
     }
-    expect(checked, isPositive,
-        reason: 'No inline script found, so nothing was checked.');
+    expect(
+      checked,
+      isPositive,
+      reason: 'No inline script found, so nothing was checked.',
+    );
   });
 }
 
@@ -146,6 +166,7 @@ String _text(Directory out, String path) =>
 List<int> _bytes(Directory out, String path) =>
     File('${out.path}/$path').readAsBytesSync();
 
-ThemeTokens _themeTokens() =>
-    ThemeTokens(jsonDecode(File('assets/theme_tokens.json').readAsStringSync())
-        as Map<String, dynamic>);
+ThemeTokens _themeTokens() => ThemeTokens(
+  jsonDecode(File('assets/theme_tokens.json').readAsStringSync())
+      as Map<String, dynamic>,
+);

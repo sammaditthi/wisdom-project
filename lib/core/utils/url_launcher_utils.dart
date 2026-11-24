@@ -10,8 +10,10 @@ abstract final class UrlLauncherUtils {
 
   /// Regex to extract the href attribute from an <a> tag.
   /// Handles both double-quoted and single-quoted href values.
-  static final _hrefRegex =
-      RegExp(r'''<a\s+href=["']([^"']*)["'][^>]*>''', caseSensitive: false);
+  static final _hrefRegex = RegExp(
+    r'''<a\s+href=["']([^"']*)["'][^>]*>''',
+    caseSensitive: false,
+  );
 
   /// Launches [urlString] in an in-app browser view.
   ///
@@ -31,20 +33,15 @@ abstract final class UrlLauncherUtils {
     final errorMessage = AppLocalizations.of(context).couldNotOpenLink;
 
     try {
-      final launched = await launchUrl(
-        uri,
-        mode: LaunchMode.inAppBrowserView,
-      );
+      final launched = await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
       if (!launched && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     } catch (_) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMessage)));
       }
     }
   }

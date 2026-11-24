@@ -295,18 +295,24 @@ class SiteGenerator {
     // text that costs the build nothing, so a subtree preview is discoverable
     // exactly the way production is. Both name [origin], which is why they are
     // here rather than anywhere a page is written.
-    _write('$outputDir/$sitemapOutputPath',
-        buildSitemap(origin: origin, plan: plan));
+    _write(
+      '$outputDir/$sitemapOutputPath',
+      buildSitemap(origin: origin, plan: plan),
+    );
     _write('$outputDir/$robotsOutputPath', buildRobots(origin: origin));
     if (script != null) _writeBytes('$outputDir/$siteScriptOutputPath', script);
     if (ogCard != null) _writeBytes('$outputDir/$ogCardOutputPath', ogCard);
     if (favicon != null) _writeBytes('$outputDir/$faviconOutputPath', favicon);
     for (final font in fonts) {
       _writeBytes(
-          '$outputDir/$fontsOutputDir/${font.face.relativePath}', font.bytes);
+        '$outputDir/$fontsOutputDir/${font.face.relativePath}',
+        font.bytes,
+      );
     }
-    manifest.writeTo('$outputDir/$manifestOutputPath',
-        generatorVersion: generatorVersion);
+    manifest.writeTo(
+      '$outputDir/$manifestOutputPath',
+      generatorVersion: generatorVersion,
+    );
 
     return BuildReport(
       suttaPages: suttaPages,

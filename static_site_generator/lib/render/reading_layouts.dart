@@ -113,7 +113,8 @@ const String narrowFallbackLayoutId = stackedLayoutId;
 const String layoutScript = '<script>$layoutScriptSource</script>';
 
 /// What the browser hashes for the CSP: the text between the tags, exactly.
-const String layoutScriptSource = '(function(){'
+const String layoutScriptSource =
+    '(function(){'
     'var K="wisdom.layout",r=document.getElementsByName("layout");'
     'function on(t){for(var i=0;i<r.length;i++)'
     'if(r[i].value===t){r[i].checked=true;return true}return false}'

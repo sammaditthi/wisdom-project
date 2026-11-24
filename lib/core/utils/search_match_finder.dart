@@ -62,12 +62,15 @@ class SearchMatchFinder {
     int searchStart = 0;
 
     while (true) {
-      final normIndex =
-          matcher.normalized.indexOf(_normalizedQuery, searchStart);
+      final normIndex = matcher.normalized.indexOf(
+        _normalizedQuery,
+        searchStart,
+      );
       if (normIndex == -1) break;
 
-      ranges.add(matcher.mapToOriginal(
-          normIndex, normIndex + _normalizedQuery.length));
+      ranges.add(
+        matcher.mapToOriginal(normIndex, normIndex + _normalizedQuery.length),
+      );
       searchStart = normIndex + _normalizedQuery.length;
     }
 
@@ -85,7 +88,8 @@ class SearchMatchFinder {
 
   /// Finds all phrase occurrences (words adjacent).
   List<({int start, int end})> _findPhraseRanges(
-      NormalizedTextMatcher matcher) {
+    NormalizedTextMatcher matcher,
+  ) {
     if (_queryWords.isEmpty) return [];
     if (_queryWords.length == 1) return _findWordRanges(matcher);
 
@@ -93,8 +97,10 @@ class SearchMatchFinder {
     int searchStart = 0;
 
     while (searchStart < matcher.normalized.length) {
-      final firstWordIndex =
-          matcher.normalized.indexOf(_queryWords.first, searchStart);
+      final firstWordIndex = matcher.normalized.indexOf(
+        _queryWords.first,
+        searchStart,
+      );
       if (firstWordIndex == -1) break;
 
       bool allWordsFound = true;
@@ -102,10 +108,14 @@ class SearchMatchFinder {
       int phraseEndPos = currentPos;
 
       for (int i = 1; i < _queryWords.length; i++) {
-        final searchEnd =
-            (currentPos + maxGap).clamp(0, matcher.normalized.length);
-        final searchWindow =
-            matcher.normalized.substring(currentPos, searchEnd);
+        final searchEnd = (currentPos + maxGap).clamp(
+          0,
+          matcher.normalized.length,
+        );
+        final searchWindow = matcher.normalized.substring(
+          currentPos,
+          searchEnd,
+        );
         final nextWordIndex = searchWindow.indexOf(_queryWords[i]);
 
         if (nextWordIndex == -1) {
@@ -205,18 +215,18 @@ class NormalizedTextMatcher {
 ///
 /// Assumes the query has already been sanitized by [sanitizeSearchQuery],
 /// which strips punctuation before this is called.
-List<String> splitQueryWords(String query) =>
-    normalizeText(query, toLowerCase: true)
-        .split(' ')
-        .where((w) => w.isNotEmpty)
-        .toList();
+List<String> splitQueryWords(String query) => normalizeText(
+  query,
+  toLowerCase: true,
+).split(' ').where((w) => w.isNotEmpty).toList();
 
 /// Merges overlapping ranges into non-overlapping ranges.
 ///
 /// Assumes [ranges] is sorted by start position.
 /// Returns a new list with overlapping ranges combined.
 List<({int start, int end})> mergeOverlappingRanges(
-    List<({int start, int end})> ranges) {
+  List<({int start, int end})> ranges,
+) {
   if (ranges.isEmpty) return ranges;
 
   final merged = <({int start, int end})>[];

@@ -94,8 +94,10 @@ class TipitakaLink {
     this.pageIndex,
     this.entryIndex,
     this.originKey,
-  }) : assert(pageKey == null || originKey == null,
-            'pageKey and originKey both claim the fragment');
+  }) : assert(
+         pageKey == null || originKey == null,
+         'pageKey and originKey both claim the fragment',
+       );
 
   /// The dev/QA custom scheme (never used in shared links).
   static const String customScheme = 'sammaditthi';
@@ -119,8 +121,9 @@ class TipitakaLink {
   /// This is a *syntactic* guard only; whether the key exists is the tree's
   /// business, so a well-formed key that names nothing resolves to "not found"
   /// exactly like a typo'd `sn-99-99` does.
-  static final RegExp _nodeKeyPattern =
-      RegExp(r'^[a-z0-9]+(?:[-.][a-z0-9]+)*$');
+  static final RegExp _nodeKeyPattern = RegExp(
+    r'^[a-z0-9]+(?:[-.][a-z0-9]+)*$',
+  );
 
   /// Parses a URI into a [TipitakaLink], or `null` if it isn't one.
   ///
@@ -227,8 +230,10 @@ class TipitakaLink {
     final base = Uri.parse(baseUrl);
     // A scheme-less base ("sammaditthi.net") parses as a path, producing a
     // broken URL. Developer-controlled input (LINK_BASE_URL) → dev-time guard.
-    assert(base.hasScheme,
-        'baseUrl must include a scheme, e.g. https://sammaditthi.net — got "$baseUrl"');
+    assert(
+      base.hasScheme,
+      'baseUrl must include a scheme, e.g. https://sammaditthi.net — got "$baseUrl"',
+    );
     final entryValue = _entryValue;
     return Uri(
       scheme: base.scheme,
@@ -280,7 +285,8 @@ class TipitakaLink {
       Object.hash(nodeKey, pageKey, pageIndex, entryIndex, originKey);
 
   @override
-  String toString() => 'TipitakaLink(nodeKey: $nodeKey, pageKey: $pageKey, '
+  String toString() =>
+      'TipitakaLink(nodeKey: $nodeKey, pageKey: $pageKey, '
       'pageIndex: $pageIndex, entryIndex: $entryIndex, '
       'originKey: $originKey)';
 }

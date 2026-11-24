@@ -25,8 +25,9 @@ final _severalWords = RegExp(r'\s\S');
 /// What the button label shows. A record, so `select` rebuilds the button
 /// only when one of these changes, not on every keystroke.
 ({bool exact, _Placement? placement, int? distance}) _labelOf(SearchState s) {
-  final placement =
-      _severalWords.hasMatch(s.effectiveQueryText) ? _placementOf(s) : null;
+  final placement = _severalWords.hasMatch(s.effectiveQueryText)
+      ? _placementOf(s)
+      : null;
   return (
     exact: s.isExactMatch,
     placement: placement,
@@ -100,27 +101,32 @@ class _MatchMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    final options = ref.watch(searchStateProvider.select((s) => (
+    final options = ref.watch(
+      searchStateProvider.select(
+        (s) => (
           exact: s.isExactMatch,
           placement: _placementOf(s),
           distance: s.proximityDistance,
           severalWords: _severalWords.hasMatch(s.effectiveQueryText),
-        )));
+        ),
+      ),
+    );
     final notifier = ref.read(searchStateProvider.notifier);
 
     // Only the options on show count: with one word, the hidden "how words
     // sit" choice can't be seen to reset.
     const defaults = SearchState();
-    final isDefault = options.exact == defaults.isExactMatch &&
+    final isDefault =
+        options.exact == defaults.isExactMatch &&
         (!options.severalWords ||
             (options.placement == _placementOf(defaults) &&
                 options.distance == defaults.proximityDistance));
 
     void setNear({int? distance}) => notifier.setMatchOptions(
-          isPhraseSearch: false,
-          isAnywhereInText: false,
-          proximityDistance: distance,
-        );
+      isPhraseSearch: false,
+      isAnywhereInText: false,
+      proximityDistance: distance,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -183,11 +189,11 @@ class _MatchMenu extends ConsumerWidget {
           onPressed: isDefault
               ? null
               : () => notifier.setMatchOptions(
-                    isExactMatch: defaults.isExactMatch,
-                    isPhraseSearch: defaults.isPhraseSearch,
-                    isAnywhereInText: defaults.isAnywhereInText,
-                    proximityDistance: defaults.proximityDistance,
-                  ),
+                  isExactMatch: defaults.isExactMatch,
+                  isPhraseSearch: defaults.isPhraseSearch,
+                  isAnywhereInText: defaults.isAnywhereInText,
+                  proximityDistance: defaults.proximityDistance,
+                ),
           style: MenuItemButton.styleFrom(
             textStyle: context.typography.listRowTitle,
           ),
@@ -249,8 +255,9 @@ class _MatchOption<T> extends StatelessWidget {
         onChanged: (_) => onSelected(value),
         closeOnActivate: false,
         style: MenuItemButton.styleFrom(
-          backgroundColor:
-              selected ? AppMenuTheme.selectedRowColor(colors) : null,
+          backgroundColor: selected
+              ? AppMenuTheme.selectedRowColor(colors)
+              : null,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         child: SizedBox(
@@ -283,7 +290,8 @@ class _DistanceStepper extends StatelessWidget {
     final theme = Theme.of(context);
     // Where the option titles start: row padding, radio, then the menu's
     // gap after an icon (12, less at compact density).
-    final textStart = 16 +
+    final textStart =
+        16 +
         Checkbox.width +
         math.max(4, 12 + theme.visualDensity.horizontal * 2);
 

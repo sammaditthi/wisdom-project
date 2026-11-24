@@ -48,15 +48,19 @@ class RefineDictionaryDialog extends StatefulWidget {
     required Set<String> selectedIds,
     required ValueChanged<Set<String>> onFilterChanged,
   }) async {
-    final overlayStack = ProviderScope.containerOf(context, listen: false)
-        .read(overlayStackProvider.notifier);
+    final overlayStack = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(overlayStackProvider.notifier);
     final navigator = Navigator.of(context, rootNavigator: true);
-    overlayStack.push(DismissibleOverlay(
-      id: 'refine-dictionary-dialog',
-      dismiss: () {
-        if (navigator.canPop()) navigator.pop();
-      },
-    ));
+    overlayStack.push(
+      DismissibleOverlay(
+        id: 'refine-dictionary-dialog',
+        dismiss: () {
+          if (navigator.canPop()) navigator.pop();
+        },
+      ),
+    );
     try {
       await showDialog<void>(
         context: context,
@@ -129,10 +133,7 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
 
     return Dialog(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 400,
-          maxHeight: 600,
-        ),
+        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 600),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -162,15 +163,9 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
   Widget _buildHeader(ThemeData theme, AppLocalizations l10n) {
     return Row(
       children: [
-        Icon(
-          Icons.filter_list,
-          color: theme.colorScheme.onPrimaryContainer,
-        ),
+        Icon(Icons.filter_list, color: theme.colorScheme.onPrimaryContainer),
         const SizedBox(width: 8),
-        Text(
-          l10n.dictRefineTitle,
-          style: theme.textTheme.titleLarge,
-        ),
+        Text(l10n.dictRefineTitle, style: theme.textTheme.titleLarge),
         const Spacer(),
         IconButton(
           icon: const Icon(Icons.close),
@@ -205,8 +200,9 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
                 onPressed: () => _commitSelection({}),
                 child: Text(
                   l10n.clear,
-                  style: context.typography.actionLabel
-                      .copyWith(color: theme.colorScheme.primary),
+                  style: context.typography.actionLabel.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
           ],
@@ -215,9 +211,7 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
-              ),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
               borderRadius: BorderRadius.circular(8),
             ),
             child: ClipRRect(
@@ -225,8 +219,10 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
               child: SingleChildScrollView(
                 child: Column(
                   children: _buildLanguageGroups(l10n)
-                      .map((group) =>
-                          _buildLanguageGroup(theme, group, selectedIds))
+                      .map(
+                        (group) =>
+                            _buildLanguageGroup(theme, group, selectedIds),
+                      )
                       .toList(),
                 ),
               ),
@@ -246,8 +242,9 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
     final effective = _effectiveSelection(selectedIds);
 
     // Compute tristate: null = some selected, true = all, false = none
-    final selectedCount =
-        group.dictIds.where((id) => effective.contains(id)).length;
+    final selectedCount = group.dictIds
+        .where((id) => effective.contains(id))
+        .length;
     final bool? checkboxValue;
     if (selectedCount == 0) {
       checkboxValue = false;
@@ -306,8 +303,9 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
                     child: Text(
                       info?.name ?? dictId,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -382,10 +380,7 @@ class _RefineDictionaryDialogState extends State<RefineDictionaryDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        TextButton(
-          onPressed: _resetToDefaults,
-          child: Text(l10n.reset),
-        ),
+        TextButton(onPressed: _resetToDefaults, child: Text(l10n.reset)),
         const SizedBox(width: 8),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(),

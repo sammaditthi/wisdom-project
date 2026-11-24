@@ -27,24 +27,29 @@ void main() {
     await tester.pumpApp(
       const TodayCard(),
       overrides: [
-        minuteClockProvider
-            .overrideWith((ref) => StoppedClock(midday.subtract(left))),
+        minuteClockProvider.overrideWith(
+          (ref) => StoppedClock(midday.subtract(left)),
+        ),
       ],
       theme: AppTheme.light(),
     );
     return AppLocalizations.of(tester.element(find.byType(TodayCard)));
   }
 
-  testWidgets('40 s before midday reads "1 min", never "0 min"',
-      (tester) async {
+  testWidgets('40 s before midday reads "1 min", never "0 min"', (
+    tester,
+  ) async {
     final l10n = await pumpCard(tester, const Duration(seconds: 40));
     expect(find.text(l10n.vinayaTimesMiddayIn(1)), findsOneWidget);
   });
 
-  testWidgets('59 min 30 s before midday rounds up to a whole "1 h"',
-      (tester) async {
-    final l10n =
-        await pumpCard(tester, const Duration(minutes: 59, seconds: 30));
+  testWidgets('59 min 30 s before midday rounds up to a whole "1 h"', (
+    tester,
+  ) async {
+    final l10n = await pumpCard(
+      tester,
+      const Duration(minutes: 59, seconds: 30),
+    );
     expect(find.text(l10n.vinayaTimesMiddayInWholeHours(1)), findsOneWidget);
   });
 

@@ -62,21 +62,12 @@ Future<void> _pumpHosted(
 }) async {
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
-        ...defaultTestOverrides(),
-        ...overrides,
-      ],
+      overrides: [...defaultTestOverrides(), ...overrides],
       child: MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         // Fixed size so layout doesn't depend on the host device.
-        home: Scaffold(
-          body: SizedBox(
-            width: 800,
-            height: 600,
-            child: child,
-          ),
-        ),
+        home: Scaffold(body: SizedBox(width: 800, height: 600, child: child)),
       ),
     ),
   );
@@ -86,10 +77,7 @@ Future<void> _pumpHosted(
 /// [currentBJTDocumentProvider] in the few cases where we need "data" rather
 /// than "no document". Pages are an empty list — fine for the tests below
 /// since none of them render the reader's page list.
-BJTDocument _emptyDocument() => const BJTDocument(
-      fileId: 'stub',
-      pages: [],
-    );
+BJTDocument _emptyDocument() => const BJTDocument(fileId: 'stub', pages: []);
 
 void main() {
   // =========================================================================
@@ -97,14 +85,16 @@ void main() {
   // =========================================================================
 
   group('TreeNavigatorWidget — status states', () {
-    testWidgets('empty data → empty variant with folder icon override',
-        (tester) async {
+    testWidgets('empty data → empty variant with folder icon override', (
+      tester,
+    ) async {
       await _pumpHosted(
         tester,
         const TreeNavigatorWidget(),
         overrides: [
-          navigationTreeProvider
-              .overrideWith((ref) async => const <TipitakaTreeNode>[]),
+          navigationTreeProvider.overrideWith(
+            (ref) async => const <TipitakaTreeNode>[],
+          ),
         ],
       );
       await tester.pumpAndSettle();
@@ -119,33 +109,35 @@ void main() {
     });
 
     testWidgets(
-        'generic error → error variant with errorLoadingTree, raw error not shown, no Retry',
-        (tester) async {
-      await _pumpHosted(
-        tester,
-        const TreeNavigatorWidget(),
-        overrides: [
-          navigationTreeProvider.overrideWith(
-            (ref) => Future<List<TipitakaTreeNode>>.error(
-              Exception('LEAKED-RAW-MESSAGE'),
+      'generic error → error variant with errorLoadingTree, raw error not shown, no Retry',
+      (tester) async {
+        await _pumpHosted(
+          tester,
+          const TreeNavigatorWidget(),
+          overrides: [
+            navigationTreeProvider.overrideWith(
+              (ref) => Future<List<TipitakaTreeNode>>.error(
+                Exception('LEAKED-RAW-MESSAGE'),
+              ),
             ),
-          ),
-        ],
-      );
-      await tester.pumpAndSettle();
+          ],
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Error loading navigation tree'), findsOneWidget);
-      expect(find.text('Please try again in a moment.'), findsOneWidget);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      // Retry was deliberately removed — error states are non-actionable.
-      expect(find.text('Retry'), findsNothing);
-      expect(find.byIcon(Icons.refresh), findsNothing);
-      // Critical: error.toString() must NOT be on screen.
-      expect(find.textContaining('LEAKED-RAW-MESSAGE'), findsNothing);
-    });
+        expect(find.text('Error loading navigation tree'), findsOneWidget);
+        expect(find.text('Please try again in a moment.'), findsOneWidget);
+        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        // Retry was deliberately removed — error states are non-actionable.
+        expect(find.text('Retry'), findsNothing);
+        expect(find.byIcon(Icons.refresh), findsNothing);
+        // Critical: error.toString() must NOT be on screen.
+        expect(find.textContaining('LEAKED-RAW-MESSAGE'), findsNothing);
+      },
+    );
 
-    testWidgets('offline error → cloud_off + offline copy, no Retry',
-        (tester) async {
+    testWidgets('offline error → cloud_off + offline copy, no Retry', (
+      tester,
+    ) async {
       await _pumpHosted(
         tester,
         const TreeNavigatorWidget(),
@@ -160,10 +152,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Cannot reach the server'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again.'),
-        findsOneWidget,
-      );
+      expect(find.text('Check your connection and try again.'), findsOneWidget);
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
       // No Retry; web users can refresh the page instead.
       expect(find.text('Retry'), findsNothing);
@@ -177,8 +166,9 @@ void main() {
   group('SearchResultsPanel — fullResults states (specific tab)', () {
     Widget panel() => const SearchResultsPanel();
 
-    testWidgets('null results (invalid query) → invalid variant',
-        (tester) async {
+    testWidgets('null results (invalid query) → invalid variant', (
+      tester,
+    ) async {
       final notifier = FakeSearchStateNotifier(
         const SearchState(
           rawQueryText: '',
@@ -190,9 +180,7 @@ void main() {
       await _pumpHosted(
         tester,
         panel(),
-        overrides: [
-          searchStateProvider.overrideWith((ref) => notifier),
-        ],
+        overrides: [searchStateProvider.overrideWith((ref) => notifier)],
       );
       await tester.pumpAndSettle();
 
@@ -212,9 +200,7 @@ void main() {
       await _pumpHosted(
         tester,
         panel(),
-        overrides: [
-          searchStateProvider.overrideWith((ref) => notifier),
-        ],
+        overrides: [searchStateProvider.overrideWith((ref) => notifier)],
       );
       await tester.pumpAndSettle();
 
@@ -239,9 +225,7 @@ void main() {
       await _pumpHosted(
         tester,
         panel(),
-        overrides: [
-          searchStateProvider.overrideWith((ref) => notifier),
-        ],
+        overrides: [searchStateProvider.overrideWith((ref) => notifier)],
       );
       await tester.pumpAndSettle();
 
@@ -253,38 +237,37 @@ void main() {
     });
 
     testWidgets(
-        'offline error (Failure wraps SocketException) → offline copy, no Retry',
-        (tester) async {
-      const failure = Failure.dataLoadFailure(
-        message: 'fts',
-        error: SocketException('failed host lookup'),
-      );
-      final notifier = FakeSearchStateNotifier(
-        SearchState(
-          rawQueryText: 'metta',
-          effectiveQueryText: 'metta',
-          selectedResultType: SearchResultType.title,
-          fullResults: AsyncValue.error(failure, StackTrace.current),
-        ),
-      );
-      await _pumpHosted(
-        tester,
-        panel(),
-        overrides: [
-          searchStateProvider.overrideWith((ref) => notifier),
-        ],
-      );
-      await tester.pumpAndSettle();
+      'offline error (Failure wraps SocketException) → offline copy, no Retry',
+      (tester) async {
+        const failure = Failure.dataLoadFailure(
+          message: 'fts',
+          error: SocketException('failed host lookup'),
+        );
+        final notifier = FakeSearchStateNotifier(
+          SearchState(
+            rawQueryText: 'metta',
+            effectiveQueryText: 'metta',
+            selectedResultType: SearchResultType.title,
+            fullResults: AsyncValue.error(failure, StackTrace.current),
+          ),
+        );
+        await _pumpHosted(
+          tester,
+          panel(),
+          overrides: [searchStateProvider.overrideWith((ref) => notifier)],
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Cannot reach the server'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again.'),
-        findsOneWidget,
-      );
-      expect(find.byIcon(Icons.cloud_off), findsOneWidget);
-      // No Retry; on web the user can refresh the page instead.
-      expect(find.text('Retry'), findsNothing);
-    });
+        expect(find.text('Cannot reach the server'), findsOneWidget);
+        expect(
+          find.text('Check your connection and try again.'),
+          findsOneWidget,
+        );
+        expect(find.byIcon(Icons.cloud_off), findsOneWidget);
+        // No Retry; on web the user can refresh the page instead.
+        expect(find.text('Retry'), findsNothing);
+      },
+    );
   });
 
   // =========================================================================
@@ -294,8 +277,9 @@ void main() {
   group('SearchResultsPanel — Top Results tab states', () {
     Widget panel() => const SearchResultsPanel();
 
-    testWidgets('null grouped results → invalid variant on All tab',
-        (tester) async {
+    testWidgets('null grouped results → invalid variant on All tab', (
+      tester,
+    ) async {
       final notifier = FakeSearchStateNotifier(
         const SearchState(
           rawQueryText: '',
@@ -306,9 +290,7 @@ void main() {
       await _pumpHosted(
         tester,
         panel(),
-        overrides: [
-          searchStateProvider.overrideWith((ref) => notifier),
-        ],
+        overrides: [searchStateProvider.overrideWith((ref) => notifier)],
       );
       await tester.pumpAndSettle();
 
@@ -322,8 +304,9 @@ void main() {
   // =========================================================================
 
   group('MultiPaneReaderWidget — content states', () {
-    testWidgets('no sutta selected → info variant + emblem override',
-        (tester) async {
+    testWidgets('no sutta selected → info variant + emblem override', (
+      tester,
+    ) async {
       await _pumpHosted(
         tester,
         const MultiPaneReaderWidget(),
@@ -332,8 +315,9 @@ void main() {
           // No file → currentBJTDocumentProvider naturally returns
           // AsyncValue.data(null), but override explicitly so the test
           // doesn't depend on activeTabIndex/tabs hydration.
-          currentBJTDocumentProvider
-              .overrideWith((ref) => const AsyncValue<BJTDocument?>.data(null)),
+          currentBJTDocumentProvider.overrideWith(
+            (ref) => const AsyncValue<BJTDocument?>.data(null),
+          ),
         ],
       );
       await tester.pumpAndSettle();
@@ -350,31 +334,32 @@ void main() {
     });
 
     testWidgets(
-        'generic error → errorLoadingContent + clean copy, raw not shown, no Retry',
-        (tester) async {
-      await _pumpHosted(
-        tester,
-        const MultiPaneReaderWidget(),
-        overrides: [
-          activeContentFileIdProvider.overrideWith((ref) => 'dn-1'),
-          currentBJTDocumentProvider.overrideWith(
-            (ref) => AsyncValue<BJTDocument?>.error(
-              Exception('LEAKED-READER-RAW'),
-              StackTrace.current,
+      'generic error → errorLoadingContent + clean copy, raw not shown, no Retry',
+      (tester) async {
+        await _pumpHosted(
+          tester,
+          const MultiPaneReaderWidget(),
+          overrides: [
+            activeContentFileIdProvider.overrideWith((ref) => 'dn-1'),
+            currentBJTDocumentProvider.overrideWith(
+              (ref) => AsyncValue<BJTDocument?>.error(
+                Exception('LEAKED-READER-RAW'),
+                StackTrace.current,
+              ),
             ),
-          ),
-        ],
-      );
-      await tester.pumpAndSettle();
+          ],
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Error loading content'), findsOneWidget);
-      expect(find.text('Please try again in a moment.'), findsOneWidget);
-      expect(find.byIcon(Icons.error_outline), findsOneWidget);
-      // Reader has no Retry — error states are non-actionable.
-      expect(find.text('Retry'), findsNothing);
-      expect(find.byIcon(Icons.refresh), findsNothing);
-      expect(find.textContaining('LEAKED-READER-RAW'), findsNothing);
-    });
+        expect(find.text('Error loading content'), findsOneWidget);
+        expect(find.text('Please try again in a moment.'), findsOneWidget);
+        expect(find.byIcon(Icons.error_outline), findsOneWidget);
+        // Reader has no Retry — error states are non-actionable.
+        expect(find.text('Retry'), findsNothing);
+        expect(find.byIcon(Icons.refresh), findsNothing);
+        expect(find.textContaining('LEAKED-READER-RAW'), findsNothing);
+      },
+    );
 
     testWidgets('offline error → cloud_off + offline copy', (tester) async {
       await _pumpHosted(
@@ -393,15 +378,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Cannot reach the server'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again.'),
-        findsOneWidget,
-      );
+      expect(find.text('Check your connection and try again.'), findsOneWidget);
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
     });
 
-    testWidgets('document with zero pages in range → empty variant',
-        (tester) async {
+    testWidgets('document with zero pages in range → empty variant', (
+      tester,
+    ) async {
       // Document loads successfully but `pagesToShow` ends up empty because
       // there are no pages at all. This exercises the StatusVariant.empty
       // branch added by the change.
@@ -450,16 +433,19 @@ void main() {
             // Override every lookup with the desired AsyncValue regardless of
             // params. We can't use `overrideWithValue` on a family directly,
             // so we use `overrideWith` and synchronously throw / return.
-            dictionaryLookupProvider.overrideWith(
-              (ref, DictionaryLookupParams params) async {
-                return entriesValue.when(
-                  data: (entries) => entries,
-                  loading: () => Future<List<DictionaryEntry>>.delayed(
-                      const Duration(seconds: 30), () => const []),
-                  error: (e, st) => Future<List<DictionaryEntry>>.error(e, st),
-                );
-              },
-            ),
+            dictionaryLookupProvider.overrideWith((
+              ref,
+              DictionaryLookupParams params,
+            ) async {
+              return entriesValue.when(
+                data: (entries) => entries,
+                loading: () => Future<List<DictionaryEntry>>.delayed(
+                  const Duration(seconds: 30),
+                  () => const [],
+                ),
+                error: (e, st) => Future<List<DictionaryEntry>>.error(e, st),
+              );
+            }),
             dictionaryLookupCountProvider.overrideWith(
               (ref, DictionaryLookupParams params) async => 0,
             ),
@@ -488,8 +474,9 @@ void main() {
     testWidgets('no definitions → empty variant', (tester) async {
       await pumpSheet(
         tester,
-        entriesValue:
-            const AsyncValue<List<DictionaryEntry>>.data(<DictionaryEntry>[]),
+        entriesValue: const AsyncValue<List<DictionaryEntry>>.data(
+          <DictionaryEntry>[],
+        ),
       );
       await tester.pumpAndSettle();
 
@@ -497,8 +484,9 @@ void main() {
       expect(find.byIcon(Icons.search_off), findsOneWidget);
     });
 
-    testWidgets('generic error → errorLoadingDefinitions + clean copy',
-        (tester) async {
+    testWidgets('generic error → errorLoadingDefinitions + clean copy', (
+      tester,
+    ) async {
       await pumpSheet(
         tester,
         entriesValue: AsyncValue<List<DictionaryEntry>>.error(
@@ -525,10 +513,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Cannot reach the server'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again.'),
-        findsOneWidget,
-      );
+      expect(find.text('Check your connection and try again.'), findsOneWidget);
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
     });
   });

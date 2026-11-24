@@ -197,9 +197,7 @@ void main() {
     });
 
     test('a commentary with no canon side anywhere gets no link', () {
-      final tree = _tree({
-        'atta-solo': (null, 'අනුරූප මූලයක් නැති අට්ඨකථා'),
-      });
+      final tree = _tree({'atta-solo': (null, 'අනුරූප මූලයක් නැති අට්ඨකථා')});
 
       expect(crossLinkTargetKey(tree, 'atta-solo'), isNull);
     });
@@ -251,8 +249,9 @@ void main() {
       // sutta was left — and `crossLinkTargetKey` turns that back into the
       // vaṇṇanā. Without it the link opens the chapter: a run of commentaries
       // instead of the one clicked.
-      final link =
-          TipitakaLink.tryParse('https://host/tipitaka/atta-bk-1#via_bk-1-3');
+      final link = TipitakaLink.tryParse(
+        'https://host/tipitaka/atta-bk-1#via_bk-1-3',
+      );
       expect(link?.nodeKey, 'atta-bk-1', reason: 'the path, as before');
       expect(link?.originKey, 'bk-1-3');
       expect(crossLinkTargetKey(tree, link!.originKey!), 'atta-bk-1-2');

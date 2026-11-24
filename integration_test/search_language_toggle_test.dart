@@ -38,45 +38,47 @@ void main() {
       tester.getResultCounts()[SearchResultType.fullText] ?? 0;
 
   group('Search language toggle (පාළි / සිංහල)', () {
-    testWidgets(
-      'narrowing the search language re-filters FTS counts end-to-end',
-      (tester) async {
-        await tester.pumpSearchApp(prefs);
+    testWidgets('narrowing the search language re-filters FTS counts end-to-end', (
+      tester,
+    ) async {
+      await tester.pumpSearchApp(prefs);
 
-        // "dhamma" (Sinhala script) — a common term with matches in both the
-        // Pali source and the Sinhala translation.
-        await tester.searchFor('ධම්ම');
-        final both = ftsCount(tester);
-        expect(both, greaterThan(0),
-            reason: 'baseline (both languages) should find FTS matches');
+      // "dhamma" (Sinhala script) — a common term with matches in both the
+      // Pali source and the Sinhala translation.
+      await tester.searchFor('ධම්ම');
+      final both = ftsCount(tester);
+      expect(
+        both,
+        greaterThan(0),
+        reason: 'baseline (both languages) should find FTS matches',
+      );
 
-        // Narrow to Pali only.
-        await tester.setSearchLanguages(pali: true, sinhala: false);
-        final paliOnly = ftsCount(tester);
+      // Narrow to Pali only.
+      await tester.setSearchLanguages(pali: true, sinhala: false);
+      final paliOnly = ftsCount(tester);
 
-        // Narrow to Sinhala only.
-        await tester.setSearchLanguages(pali: false, sinhala: true);
-        final sinhalaOnly = ftsCount(tester);
+      // Narrow to Sinhala only.
+      await tester.setSearchLanguages(pali: false, sinhala: true);
+      final sinhalaOnly = ftsCount(tester);
 
-        // A single-language subset can't exceed the both-languages total...
-        expect(paliOnly, lessThanOrEqualTo(both));
-        expect(sinhalaOnly, lessThanOrEqualTo(both));
-        // ...and the two subsets must partition it exactly (one language per
-        // row). This fails loudly if the language filter is ignored.
-        //
-        // Assumes the bundled DB's integrity: every FTS row has exactly one
-        // meta partner whose language is pali|sinh. `both` is a bare MATCH count
-        // (no meta join) while the singles JOIN meta — so an orphan FTS row (no
-        // meta partner) or a stray third language would inflate `both` and break
-        // this exact `==` first. If the DB-build pipeline ever changes and this
-        // flakes, relax to `>=`; don't delete it — the `<=` guards above stay
-        // valid regardless, but only this `==` catches a silently-dropped filter.
-        expect(paliOnly + sinhalaOnly, equals(both));
+      // A single-language subset can't exceed the both-languages total...
+      expect(paliOnly, lessThanOrEqualTo(both));
+      expect(sinhalaOnly, lessThanOrEqualTo(both));
+      // ...and the two subsets must partition it exactly (one language per
+      // row). This fails loudly if the language filter is ignored.
+      //
+      // Assumes the bundled DB's integrity: every FTS row has exactly one
+      // meta partner whose language is pali|sinh. `both` is a bare MATCH count
+      // (no meta join) while the singles JOIN meta — so an orphan FTS row (no
+      // meta partner) or a stray third language would inflate `both` and break
+      // this exact `==` first. If the DB-build pipeline ever changes and this
+      // flakes, relax to `>=`; don't delete it — the `<=` guards above stay
+      // valid regardless, but only this `==` catches a silently-dropped filter.
+      expect(paliOnly + sinhalaOnly, equals(both));
 
-        // Restoring both languages returns to the baseline count.
-        await tester.setSearchLanguages(pali: true, sinhala: true);
-        expect(ftsCount(tester), equals(both));
-      },
-    );
+      // Restoring both languages returns to the baseline count.
+      await tester.setSearchLanguages(pali: true, sinhala: true);
+      expect(ftsCount(tester), equals(both));
+    });
   });
 }

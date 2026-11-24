@@ -47,244 +47,242 @@ void main() {
   });
 
   group('Search + Tab + FTS Highlight Lifecycle', () {
-    testWidgets(
-      'FTS highlight lifecycle across search, tabs, and close',
-      (tester) async {
-        // ---- SETUP ----
-        // Desktop width: the box sits in the app bar, the panel at the side,
-        // and all three tabs fit.
-        tester.view.physicalSize = const Size(1280, 800);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.reset);
+    testWidgets('FTS highlight lifecycle across search, tabs, and close', (
+      tester,
+    ) async {
+      // ---- SETUP ----
+      // Desktop width: the box sits in the app bar, the panel at the side,
+      // and all three tabs fit.
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              sharedPreferencesProvider.overrideWithValue(prefs),
-              bjtDocumentDataSourceProvider
-                  .overrideWithValue(BJTDocumentLocalDataSourceImpl()),
-              keyValueStoreOverride(),
-            ],
-            child: const MaterialApp(
-              localizationsDelegates: appLocalizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              home: ReaderScreen(),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            bjtDocumentDataSourceProvider.overrideWithValue(
+              BJTDocumentLocalDataSourceImpl(),
             ),
+            keyValueStoreOverride(),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: appLocalizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: ReaderScreen(),
           ),
-        );
+        ),
+      );
 
-        final container = ProviderScope.containerOf(
-          tester.element(find.byType(MaterialApp)),
-        );
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MaterialApp)),
+      );
 
-        // Wait for the navigation tree to load (needed for nodeByKeyProvider)
-        await container.read(navigationTreeProvider.future);
-        await pumpForSettle(tester);
+      // Wait for the navigation tree to load (needed for nodeByKeyProvider)
+      await container.read(navigationTreeProvider.future);
+      await pumpForSettle(tester);
 
-        // ================================================================
-        // STEP 1: Search "mahaasathi" → verify counts
-        // ================================================================
-        await tester.searchFor('mahaasathi');
+      // ================================================================
+      // STEP 1: Search "mahaasathi" → verify counts
+      // ================================================================
+      await tester.searchFor('mahaasathi');
 
-        final counts = container.read(searchStateProvider).countByResultType;
-        expect(
-          counts[SearchResultType.fullText],
-          greaterThan(0),
-          reason: 'Step 1: FTS count should be > 0',
-        );
-        expect(
-          counts[SearchResultType.title],
-          greaterThan(0),
-          reason: 'Step 1: Title count should be > 0',
-        );
+      final counts = container.read(searchStateProvider).countByResultType;
+      expect(
+        counts[SearchResultType.fullText],
+        greaterThan(0),
+        reason: 'Step 1: FTS count should be > 0',
+      );
+      expect(
+        counts[SearchResultType.title],
+        greaterThan(0),
+        reason: 'Step 1: Title count should be > 0',
+      );
 
-        // ================================================================
-        // STEP 2: Switch to "Full Text" tab, tap first result
-        //         → FTS highlight set for tab 0, 1 tab open
-        // ================================================================
-        await tester.tap(find.text('Full Text'));
-        await pumpForSettle(tester);
-        await tester.waitForSearchResults();
+      // ================================================================
+      // STEP 2: Switch to "Full Text" tab, tap first result
+      //         → FTS highlight set for tab 0, 1 tab open
+      // ================================================================
+      await tester.tap(find.text('Full Text'));
+      await pumpForSettle(tester);
+      await tester.waitForSearchResults();
 
-        // Tap the first ListTile (search result)
-        final ftsListTiles = find.byType(ListTile);
-        expect(ftsListTiles, findsWidgets,
-            reason: 'Step 2: FTS results visible');
-        await tester.tap(ftsListTiles.first);
-        await pumpForSettle(tester);
+      // Tap the first ListTile (search result)
+      final ftsListTiles = find.byType(ListTile);
+      expect(ftsListTiles, findsWidgets, reason: 'Step 2: FTS results visible');
+      await tester.tap(ftsListTiles.first);
+      await pumpForSettle(tester);
 
-        // Verify: 1 tab open, FTS highlight set for tab 0
-        expect(
-          container.read(tabsProvider).length,
-          1,
-          reason: 'Step 2: Should have 1 tab',
-        );
-        expect(
-          container.read(ftsHighlightProvider).containsKey(0),
-          isTrue,
-          reason: 'Step 2: ftsHighlightProvider should have entry for tab 0',
-        );
+      // Verify: 1 tab open, FTS highlight set for tab 0
+      expect(
+        container.read(tabsProvider).length,
+        1,
+        reason: 'Step 2: Should have 1 tab',
+      );
+      expect(
+        container.read(ftsHighlightProvider).containsKey(0),
+        isTrue,
+        reason: 'Step 2: ftsHighlightProvider should have entry for tab 0',
+      );
 
-        // ================================================================
-        // STEP 3: Reopen search panel, switch to "Titles", tap first result
-        //         → 2 tabs, ftsHighlight has key 0 only
-        // ================================================================
+      // ================================================================
+      // STEP 3: Reopen search panel, switch to "Titles", tap first result
+      //         → 2 tabs, ftsHighlight has key 0 only
+      // ================================================================
 
-        // Panel was dismissed in step 2 but results are still loaded.
-        // Re-focus the search bar to reopen the panel (sets isPanelDismissed: false).
-        await tester.tap(find.byType(TextField));
-        await pumpForSettle(tester);
+      // Panel was dismissed in step 2 but results are still loaded.
+      // Re-focus the search bar to reopen the panel (sets isPanelDismissed: false).
+      await tester.tap(find.byType(TextField));
+      await pumpForSettle(tester);
 
-        // Switch to Titles tab in search results (results already loaded)
-        await tester.tap(find.text('Titles'));
-        await pumpForSettle(tester);
-        await tester.waitForSearchResults();
+      // Switch to Titles tab in search results (results already loaded)
+      await tester.tap(find.text('Titles'));
+      await pumpForSettle(tester);
+      await tester.waitForSearchResults();
 
-        // Tap the first Title result
-        final titleListTiles = find.byType(ListTile);
-        expect(
-          titleListTiles,
-          findsWidgets,
-          reason: 'Step 3: Title results visible',
-        );
-        await tester.tap(titleListTiles.first);
-        await pumpForSettle(tester);
+      // Tap the first Title result
+      final titleListTiles = find.byType(ListTile);
+      expect(
+        titleListTiles,
+        findsWidgets,
+        reason: 'Step 3: Title results visible',
+      );
+      await tester.tap(titleListTiles.first);
+      await pumpForSettle(tester);
 
-        // Verify: 2 tabs open
-        expect(
-          container.read(tabsProvider).length,
-          2,
-          reason: 'Step 3: Should have 2 tabs',
-        );
+      // Verify: 2 tabs open
+      expect(
+        container.read(tabsProvider).length,
+        2,
+        reason: 'Step 3: Should have 2 tabs',
+      );
 
-        // FTS highlight map should have key 0 only (not key 1, since title
-        // results don't set FTS highlights)
-        final highlightMap3 = container.read(ftsHighlightProvider);
-        expect(
-          highlightMap3.containsKey(0),
-          isTrue,
-          reason: 'Step 3: Tab 0 (FTS) should still have highlight',
-        );
-        expect(
-          highlightMap3.containsKey(1),
-          isFalse,
-          reason: 'Step 3: Tab 1 (Title) should NOT have highlight',
-        );
+      // FTS highlight map should have key 0 only (not key 1, since title
+      // results don't set FTS highlights)
+      final highlightMap3 = container.read(ftsHighlightProvider);
+      expect(
+        highlightMap3.containsKey(0),
+        isTrue,
+        reason: 'Step 3: Tab 0 (FTS) should still have highlight',
+      );
+      expect(
+        highlightMap3.containsKey(1),
+        isFalse,
+        reason: 'Step 3: Tab 1 (Title) should NOT have highlight',
+      );
 
-        // ================================================================
-        // STEP 4: Switch to FTS tab (tab 0) via switchTabProvider
-        //         → activeFtsHighlightProvider != null
-        // ================================================================
-        container.read(switchTabProvider)(0);
-        await pumpForSettle(tester);
+      // ================================================================
+      // STEP 4: Switch to FTS tab (tab 0) via switchTabProvider
+      //         → activeFtsHighlightProvider != null
+      // ================================================================
+      container.read(switchTabProvider)(0);
+      await pumpForSettle(tester);
 
-        expect(
-          container.read(activeTabIndexProvider),
-          0,
-          reason: 'Step 4: Active tab should be 0',
-        );
-        expect(
-          container.read(activeFtsHighlightProvider),
-          isNotNull,
-          reason: 'Step 4: Active FTS highlight should exist for FTS tab',
-        );
+      expect(
+        container.read(activeTabIndexProvider),
+        0,
+        reason: 'Step 4: Active tab should be 0',
+      );
+      expect(
+        container.read(activeFtsHighlightProvider),
+        isNotNull,
+        reason: 'Step 4: Active FTS highlight should exist for FTS tab',
+      );
 
-        // ================================================================
-        // STEP 5: Open "dn-2-9" (Mahasatipatthana Sutta) via
-        //         openTabFromNodeKeyProvider → 3 tabs, no active FTS highlight
-        // ================================================================
-        final newIndex = container.read(openTabFromNodeKeyProvider)('dn-2-9');
-        expect(
-          newIndex,
-          greaterThanOrEqualTo(0),
-          reason: 'Step 5: Node dn-2-9 should be found in tree',
-        );
-        await pumpForSettle(tester);
+      // ================================================================
+      // STEP 5: Open "dn-2-9" (Mahasatipatthana Sutta) via
+      //         openTabFromNodeKeyProvider → 3 tabs, no active FTS highlight
+      // ================================================================
+      final newIndex = container.read(openTabFromNodeKeyProvider)('dn-2-9');
+      expect(
+        newIndex,
+        greaterThanOrEqualTo(0),
+        reason: 'Step 5: Node dn-2-9 should be found in tree',
+      );
+      await pumpForSettle(tester);
 
-        expect(
-          container.read(tabsProvider).length,
-          3,
-          reason: 'Step 5: Should have 3 tabs',
-        );
-        expect(
-          container.read(activeFtsHighlightProvider),
-          isNull,
-          reason: 'Step 5: Navigator-opened tab should have no FTS highlight',
-        );
+      expect(
+        container.read(tabsProvider).length,
+        3,
+        reason: 'Step 5: Should have 3 tabs',
+      );
+      expect(
+        container.read(activeFtsHighlightProvider),
+        isNull,
+        reason: 'Step 5: Navigator-opened tab should have no FTS highlight',
+      );
 
-        // ================================================================
-        // STEP 6: Switch back to FTS tab (tab 0)
-        //         → activeFtsHighlightProvider != null (highlight persisted)
-        // ================================================================
-        container.read(switchTabProvider)(0);
-        await pumpForSettle(tester);
+      // ================================================================
+      // STEP 6: Switch back to FTS tab (tab 0)
+      //         → activeFtsHighlightProvider != null (highlight persisted)
+      // ================================================================
+      container.read(switchTabProvider)(0);
+      await pumpForSettle(tester);
 
-        expect(
-          container.read(activeFtsHighlightProvider),
-          isNotNull,
-          reason:
-              'Step 6: FTS tab highlight should persist after switching back',
-        );
+      expect(
+        container.read(activeFtsHighlightProvider),
+        isNotNull,
+        reason: 'Step 6: FTS tab highlight should persist after switching back',
+      );
 
-        // ================================================================
-        // STEP 7: Clear highlight for active tab (simulates reader tap)
-        //         → activeFtsHighlightProvider == null, map empty
-        // ================================================================
-        container.read(ftsHighlightProvider.notifier).clearForActiveTab();
-        await tester.pump();
+      // ================================================================
+      // STEP 7: Clear highlight for active tab (simulates reader tap)
+      //         → activeFtsHighlightProvider == null, map empty
+      // ================================================================
+      container.read(ftsHighlightProvider.notifier).clearForActiveTab();
+      await tester.pump();
 
-        expect(
-          container.read(activeFtsHighlightProvider),
-          isNull,
-          reason: 'Step 7: Active FTS highlight should be null after clear',
-        );
-        expect(
-          container.read(ftsHighlightProvider),
-          isEmpty,
-          reason: 'Step 7: FTS highlight map should be empty',
-        );
+      expect(
+        container.read(activeFtsHighlightProvider),
+        isNull,
+        reason: 'Step 7: Active FTS highlight should be null after clear',
+      );
+      expect(
+        container.read(ftsHighlightProvider),
+        isEmpty,
+        reason: 'Step 7: FTS highlight map should be empty',
+      );
 
-        // ================================================================
-        // STEP 8: Close FTS tab (tab 0) via close button in TabBarWidget
-        //         → map empty, 2 remaining tabs, active index in bounds
-        // ================================================================
+      // ================================================================
+      // STEP 8: Close FTS tab (tab 0) via close button in TabBarWidget
+      //         → map empty, 2 remaining tabs, active index in bounds
+      // ================================================================
 
-        // Tab 0 is active. Find close buttons — one per tab (3 tabs).
-        // The first close button corresponds to tab 0.
-        final closeButtons = find.byIcon(Icons.close);
-        expect(
-          closeButtons,
-          findsNWidgets(3),
-          reason: 'Step 8: Should find 3 close buttons (one per tab)',
-        );
-        await tester.tap(closeButtons.first);
-        await pumpForSettle(tester);
+      // Tab 0 is active. Find close buttons — one per tab (3 tabs).
+      // The first close button corresponds to tab 0.
+      final closeButtons = find.byIcon(Icons.close);
+      expect(
+        closeButtons,
+        findsNWidgets(3),
+        reason: 'Step 8: Should find 3 close buttons (one per tab)',
+      );
+      await tester.tap(closeButtons.first);
+      await pumpForSettle(tester);
 
-        // Verify: 2 tabs remaining, map still empty, active index in bounds
-        final remainingTabs = container.read(tabsProvider);
-        expect(
-          remainingTabs.length,
-          2,
-          reason: 'Step 8: Should have 2 tabs after closing FTS tab',
-        );
-        expect(
-          container.read(ftsHighlightProvider),
-          isEmpty,
-          reason: 'Step 8: FTS highlight map should still be empty',
-        );
+      // Verify: 2 tabs remaining, map still empty, active index in bounds
+      final remainingTabs = container.read(tabsProvider);
+      expect(
+        remainingTabs.length,
+        2,
+        reason: 'Step 8: Should have 2 tabs after closing FTS tab',
+      );
+      expect(
+        container.read(ftsHighlightProvider),
+        isEmpty,
+        reason: 'Step 8: FTS highlight map should still be empty',
+      );
 
-        final activeIndex = container.read(activeTabIndexProvider);
-        expect(
-          activeIndex,
-          greaterThanOrEqualTo(0),
-          reason: 'Step 8: Active index should be >= 0',
-        );
-        expect(
-          activeIndex,
-          lessThan(remainingTabs.length),
-          reason: 'Step 8: Active index should be within bounds',
-        );
-      },
-    );
+      final activeIndex = container.read(activeTabIndexProvider);
+      expect(
+        activeIndex,
+        greaterThanOrEqualTo(0),
+        reason: 'Step 8: Active index should be >= 0',
+      );
+      expect(
+        activeIndex,
+        lessThan(remainingTabs.length),
+        reason: 'Step 8: Active index should be within bounds',
+      );
+    });
   });
 }

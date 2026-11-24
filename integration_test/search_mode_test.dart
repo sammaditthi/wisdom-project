@@ -107,8 +107,9 @@ void main() {
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
-          bjtDocumentDataSourceProvider
-              .overrideWithValue(BJTDocumentLocalDataSourceImpl()),
+          bjtDocumentDataSourceProvider.overrideWithValue(
+            BJTDocumentLocalDataSourceImpl(),
+          ),
           keyValueStoreOverride(),
         ],
         child: MaterialApp(
@@ -132,9 +133,9 @@ void main() {
   // Every simulated key names its physical key. Left out, the simulator looks
   // one up by debug name, which release web builds drop: a null error.
   Future<void> pressEsc(WidgetTester tester) => tester.sendKeyEvent(
-        LogicalKeyboardKey.escape,
-        physicalKey: PhysicalKeyboardKey.escape,
-      );
+    LogicalKeyboardKey.escape,
+    physicalKey: PhysicalKeyboardKey.escape,
+  );
 
   /// System back, as Android's back button sends it; true when the screen
   /// took it. Untaken, it would ask the platform to quit the app: that call
@@ -142,7 +143,9 @@ void main() {
   Future<bool> pressSystemBack(WidgetTester tester) async {
     final messenger = tester.binding.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(
-        SystemChannels.platform, (_) async => null);
+      SystemChannels.platform,
+      (_) async => null,
+    );
     final bool handled;
     try {
       handled = await tester.binding.handlePopRoute();
@@ -158,11 +161,9 @@ void main() {
     await pumpForSettle(tester);
   }
 
-  EditableText field(WidgetTester tester) =>
-      tester.widget<EditableText>(find.descendant(
-        of: searchField,
-        matching: find.byType(EditableText),
-      ));
+  EditableText field(WidgetTester tester) => tester.widget<EditableText>(
+    find.descendant(of: searchField, matching: find.byType(EditableText)),
+  );
 
   // Closed at phone width: the breadcrumb and the icon, no field. Also checks
   // that a closed search mode disposed its field without throwing.
@@ -189,184 +190,222 @@ void main() {
 
     await resize(tester, shortScreen);
     expect(recentRows, findsNWidgets(recentQueries.length), reason: step);
-    expect(listBottom(), greaterThan(keyboardTop),
-        reason: '$step: the full list must reach the keyboard, or this '
-            'checks nothing');
+    expect(
+      listBottom(),
+      greaterThan(keyboardTop),
+      reason:
+          '$step: the full list must reach the keyboard, or this '
+          'checks nothing',
+    );
 
     tester.view.viewInsets = const FakeViewPadding(bottom: keyboard);
     await pumpForSettle(tester);
-    expect(listBottom(), lessThanOrEqualTo(keyboardTop),
-        reason: '$step: the list ends above the keyboard');
+    expect(
+      listBottom(),
+      lessThanOrEqualTo(keyboardTop),
+      reason: '$step: the list ends above the keyboard',
+    );
     tester.view.resetViewInsets();
   }
 
-  testWidgets(
-    'phone width: the search icon opens search mode; a tap outside, '
-    'widening, back arrow, system back, Esc and picking a result close it; '
-    'system back then closes a reader menu first',
-    (tester) async {
-      // Picking a result (step 13) saves a recent search.
-      forgetRecentSearchesAfterTest();
-      final container = await pumpReader(tester, const Size(400, 800));
+  testWidgets('phone width: the search icon opens search mode; a tap outside, '
+      'widening, back arrow, system back, Esc and picking a result close it; '
+      'system back then closes a reader menu first', (tester) async {
+    // Picking a result (step 13) saves a recent search.
+    forgetRecentSearchesAfterTest();
+    final container = await pumpReader(tester, const Size(400, 800));
 
-      bool fieldHasFocus() => field(tester).focusNode.hasFocus;
+    bool fieldHasFocus() => field(tester).focusNode.hasFocus;
 
-      Future<void> openSearchMode() async {
-        await tester.tap(searchIcon);
-        await pumpForSettle(tester);
-      }
-
-      // The platform's own: Cmd+Shift+F on macOS, Ctrl+Shift+F elsewhere.
-      // [otherPlatform] presses the other one, which must do nothing — one
-      // modifier per platform (keyboard-shortcuts-sheet.md, rule 2).
-      Future<void> pressSearchShortcut({bool otherPlatform = false}) async {
-        final apple = defaultTargetPlatform == TargetPlatform.macOS ||
-            defaultTargetPlatform == TargetPlatform.iOS;
-        final (modifier, physicalModifier) = apple != otherPlatform
-            ? (LogicalKeyboardKey.metaLeft, PhysicalKeyboardKey.metaLeft)
-            : (LogicalKeyboardKey.controlLeft, PhysicalKeyboardKey.controlLeft);
-        await tester.sendKeyDownEvent(modifier, physicalKey: physicalModifier);
-        await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft,
-            physicalKey: PhysicalKeyboardKey.shiftLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.keyF,
-            physicalKey: PhysicalKeyboardKey.keyF);
-        await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft,
-            physicalKey: PhysicalKeyboardKey.shiftLeft);
-        await tester.sendKeyUpEvent(modifier, physicalKey: physicalModifier);
-        await pumpForSettle(tester);
-      }
-
-      // The shell keeps the reader alive behind other sections. This test
-      // has no shell, so the reader stays on screen; only the section moves.
-      final section = container.read(selectedAppSectionProvider.notifier);
-
-      // ---- 1. Closed at first ----
-      expectClosed(container, '1. start');
-
-      // ---- 2. The icon opens search mode, with the field focused ----
-      await openSearchMode();
-      expect(searchField, findsOneWidget);
-      expect(find.byType(BreadcrumbWidget), findsNothing);
-      expect(menuButton, findsNothing,
-          reason: '2. search mode has no menu button');
-      expect(find.byType(ReaderSettingsMenuButton), findsNothing,
-          reason: '2. nor a settings button');
-      expect(backArrow, findsOneWidget);
-      expect(fieldHasFocus(), isTrue, reason: '2. typing can start at once');
-      // The field spans the bar, 8px from each side.
-      final bar = tester.getRect(find.byType(AppBar));
-      final box = tester.getRect(searchField);
-      expect(box.left - bar.left, 8, reason: '2. gap at the start');
-      expect(bar.right - box.right, 8, reason: '2. gap at the end');
-
-      // ---- 3. With no query, a tap below the bar closes it ----
-      await tester.tapAt(const Offset(200, 600));
+    Future<void> openSearchMode() async {
+      await tester.tap(searchIcon);
       await pumpForSettle(tester);
-      expectClosed(container, '3. tap outside');
+    }
 
-      // ---- 4. Widening to the box ends search mode ----
-      // A tablet turned sideways. Narrowing again shows the breadcrumb.
-      await openSearchMode();
-      await resize(tester, const Size(1200, 800));
-      expect(searchField, findsOneWidget, reason: '4. the box');
-      expect(container.read(searchModeProvider), isFalse);
-      await resize(tester, const Size(400, 800));
-      expectClosed(container, '4. widened, then narrowed');
-
-      // ---- 5. Typing opens the full-screen panel ----
-      await openSearchMode();
-      await tester.searchFor('mahaasathi');
-      expect(find.byType(SearchResultsPanel), findsOneWidget);
-
-      // ---- 6. The back arrow closes everything but keeps the query ----
-      await tester.tap(backArrow);
-      await pumpForSettle(tester);
-      expectClosed(container, '6. back arrow');
-      expect(container.read(searchStateProvider).rawQueryText, 'mahaasathi');
-
-      // ---- 7. Reopening shows the last query and its results ----
-      await openSearchMode();
-      expect(fieldHasFocus(), isTrue);
-      expect(field(tester).controller.text, 'mahaasathi');
-      expect(
-        field(tester).controller.selection,
-        const TextSelection(baseOffset: 0, extentOffset: 'mahaasathi'.length),
-        reason: '7. all selected, so the next key replaces it',
+    // The platform's own: Cmd+Shift+F on macOS, Ctrl+Shift+F elsewhere.
+    // [otherPlatform] presses the other one, which must do nothing — one
+    // modifier per platform (keyboard-shortcuts-sheet.md, rule 2).
+    Future<void> pressSearchShortcut({bool otherPlatform = false}) async {
+      final apple =
+          defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.iOS;
+      final (modifier, physicalModifier) = apple != otherPlatform
+          ? (LogicalKeyboardKey.metaLeft, PhysicalKeyboardKey.metaLeft)
+          : (LogicalKeyboardKey.controlLeft, PhysicalKeyboardKey.controlLeft);
+      await tester.sendKeyDownEvent(modifier, physicalKey: physicalModifier);
+      await tester.sendKeyDownEvent(
+        LogicalKeyboardKey.shiftLeft,
+        physicalKey: PhysicalKeyboardKey.shiftLeft,
       );
-      expect(find.byType(SearchResultsPanel), findsOneWidget);
-
-      // ---- 8. System back closes it ----
-      expect(await pressSystemBack(tester), isTrue,
-          reason: '8. the screen takes the back');
-      expectClosed(container, '8. system back');
-
-      // ---- 9. Esc closes it ----
-      await openSearchMode();
-      expect(find.byType(SearchResultsPanel), findsOneWidget);
-      await pressEsc(tester);
-      await pumpForSettle(tester);
-      expectClosed(container, '9. Esc');
-
-      // ---- 10. On another section the shortcut does nothing ----
-      section.state = AppSection.home;
-      await pressSearchShortcut();
-      expectClosed(container, '10. shortcut on Home');
-      section.state = AppSection.reader;
-      await pumpForSettle(tester);
-
-      // ---- 11. Cmd/Ctrl+Shift+F opens it with no field to focus ----
-      await pressSearchShortcut();
-      expect(searchField, findsOneWidget,
-          reason: '11. Cmd/Ctrl+Shift+F opens search mode');
-      expect(fieldHasFocus(), isTrue);
-      await pressEsc(tester);
-      await pumpForSettle(tester);
-      expectClosed(container, '11. Esc again');
-      // The other platform's modifier does nothing.
-      await pressSearchShortcut(otherPlatform: true);
-      expectClosed(container, "11. the other platform's modifier");
-      // Reopened, as step 12 expects.
-      await pressSearchShortcut();
-      expect(fieldHasFocus(), isTrue);
-
-      // ---- 12. On another section, back leaves the reader's search alone ----
-      section.state = AppSection.home;
-      await pumpForSettle(tester);
-      expect(await pressSystemBack(tester), isFalse,
-          reason: '12. the reader leaves back to the section');
-      expect(container.read(searchModeProvider), isTrue,
-          reason: '12. back on Home keeps it open');
-      section.state = AppSection.reader;
-      await pumpForSettle(tester);
-
-      // ---- 13. Picking a result opens it and leaves search mode ----
-      expect(find.byType(SearchResultsPanel), findsOneWidget);
-      await tester.tap(find.byType(SearchResultTile).first);
-      await pumpForSettle(tester);
-      expect(container.read(tabsProvider), hasLength(1));
-      expectClosed(container, '13. result picked');
-      // The breadcrumb names what opened.
-      expect(
-        find.descendant(
-          of: find.byType(BreadcrumbWidget),
-          matching: find.byType(RichText),
-        ),
-        findsOneWidget,
+      await tester.sendKeyEvent(
+        LogicalKeyboardKey.keyF,
+        physicalKey: PhysicalKeyboardKey.keyF,
       );
-
-      // ---- 14. System back closes a toolbar menu, not the app ----
-      // Flutter's menus don't take back themselves.
-      await tester.tap(find.byTooltip('More options'));
+      await tester.sendKeyUpEvent(
+        LogicalKeyboardKey.shiftLeft,
+        physicalKey: PhysicalKeyboardKey.shiftLeft,
+      );
+      await tester.sendKeyUpEvent(modifier, physicalKey: physicalModifier);
       await pumpForSettle(tester);
-      expect(find.text('Copy link'), findsOneWidget, reason: '14. menu open');
-      expect(await pressSystemBack(tester), isTrue,
-          reason: '14. the screen takes the back');
-      expect(find.text('Copy link'), findsNothing,
-          reason: '14. back closed the menu');
-      expect(await pressSystemBack(tester), isFalse,
-          reason: '14. with nothing open, back is the app\'s');
-    },
-  );
+    }
+
+    // The shell keeps the reader alive behind other sections. This test
+    // has no shell, so the reader stays on screen; only the section moves.
+    final section = container.read(selectedAppSectionProvider.notifier);
+
+    // ---- 1. Closed at first ----
+    expectClosed(container, '1. start');
+
+    // ---- 2. The icon opens search mode, with the field focused ----
+    await openSearchMode();
+    expect(searchField, findsOneWidget);
+    expect(find.byType(BreadcrumbWidget), findsNothing);
+    expect(
+      menuButton,
+      findsNothing,
+      reason: '2. search mode has no menu button',
+    );
+    expect(
+      find.byType(ReaderSettingsMenuButton),
+      findsNothing,
+      reason: '2. nor a settings button',
+    );
+    expect(backArrow, findsOneWidget);
+    expect(fieldHasFocus(), isTrue, reason: '2. typing can start at once');
+    // The field spans the bar, 8px from each side.
+    final bar = tester.getRect(find.byType(AppBar));
+    final box = tester.getRect(searchField);
+    expect(box.left - bar.left, 8, reason: '2. gap at the start');
+    expect(bar.right - box.right, 8, reason: '2. gap at the end');
+
+    // ---- 3. With no query, a tap below the bar closes it ----
+    await tester.tapAt(const Offset(200, 600));
+    await pumpForSettle(tester);
+    expectClosed(container, '3. tap outside');
+
+    // ---- 4. Widening to the box ends search mode ----
+    // A tablet turned sideways. Narrowing again shows the breadcrumb.
+    await openSearchMode();
+    await resize(tester, const Size(1200, 800));
+    expect(searchField, findsOneWidget, reason: '4. the box');
+    expect(container.read(searchModeProvider), isFalse);
+    await resize(tester, const Size(400, 800));
+    expectClosed(container, '4. widened, then narrowed');
+
+    // ---- 5. Typing opens the full-screen panel ----
+    await openSearchMode();
+    await tester.searchFor('mahaasathi');
+    expect(find.byType(SearchResultsPanel), findsOneWidget);
+
+    // ---- 6. The back arrow closes everything but keeps the query ----
+    await tester.tap(backArrow);
+    await pumpForSettle(tester);
+    expectClosed(container, '6. back arrow');
+    expect(container.read(searchStateProvider).rawQueryText, 'mahaasathi');
+
+    // ---- 7. Reopening shows the last query and its results ----
+    await openSearchMode();
+    expect(fieldHasFocus(), isTrue);
+    expect(field(tester).controller.text, 'mahaasathi');
+    expect(
+      field(tester).controller.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 'mahaasathi'.length),
+      reason: '7. all selected, so the next key replaces it',
+    );
+    expect(find.byType(SearchResultsPanel), findsOneWidget);
+
+    // ---- 8. System back closes it ----
+    expect(
+      await pressSystemBack(tester),
+      isTrue,
+      reason: '8. the screen takes the back',
+    );
+    expectClosed(container, '8. system back');
+
+    // ---- 9. Esc closes it ----
+    await openSearchMode();
+    expect(find.byType(SearchResultsPanel), findsOneWidget);
+    await pressEsc(tester);
+    await pumpForSettle(tester);
+    expectClosed(container, '9. Esc');
+
+    // ---- 10. On another section the shortcut does nothing ----
+    section.state = AppSection.home;
+    await pressSearchShortcut();
+    expectClosed(container, '10. shortcut on Home');
+    section.state = AppSection.reader;
+    await pumpForSettle(tester);
+
+    // ---- 11. Cmd/Ctrl+Shift+F opens it with no field to focus ----
+    await pressSearchShortcut();
+    expect(
+      searchField,
+      findsOneWidget,
+      reason: '11. Cmd/Ctrl+Shift+F opens search mode',
+    );
+    expect(fieldHasFocus(), isTrue);
+    await pressEsc(tester);
+    await pumpForSettle(tester);
+    expectClosed(container, '11. Esc again');
+    // The other platform's modifier does nothing.
+    await pressSearchShortcut(otherPlatform: true);
+    expectClosed(container, "11. the other platform's modifier");
+    // Reopened, as step 12 expects.
+    await pressSearchShortcut();
+    expect(fieldHasFocus(), isTrue);
+
+    // ---- 12. On another section, back leaves the reader's search alone ----
+    section.state = AppSection.home;
+    await pumpForSettle(tester);
+    expect(
+      await pressSystemBack(tester),
+      isFalse,
+      reason: '12. the reader leaves back to the section',
+    );
+    expect(
+      container.read(searchModeProvider),
+      isTrue,
+      reason: '12. back on Home keeps it open',
+    );
+    section.state = AppSection.reader;
+    await pumpForSettle(tester);
+
+    // ---- 13. Picking a result opens it and leaves search mode ----
+    expect(find.byType(SearchResultsPanel), findsOneWidget);
+    await tester.tap(find.byType(SearchResultTile).first);
+    await pumpForSettle(tester);
+    expect(container.read(tabsProvider), hasLength(1));
+    expectClosed(container, '13. result picked');
+    // The breadcrumb names what opened.
+    expect(
+      find.descendant(
+        of: find.byType(BreadcrumbWidget),
+        matching: find.byType(RichText),
+      ),
+      findsOneWidget,
+    );
+
+    // ---- 14. System back closes a toolbar menu, not the app ----
+    // Flutter's menus don't take back themselves.
+    await tester.tap(find.byTooltip('More options'));
+    await pumpForSettle(tester);
+    expect(find.text('Copy link'), findsOneWidget, reason: '14. menu open');
+    expect(
+      await pressSystemBack(tester),
+      isTrue,
+      reason: '14. the screen takes the back',
+    );
+    expect(
+      find.text('Copy link'),
+      findsNothing,
+      reason: '14. back closed the menu',
+    );
+    expect(
+      await pressSystemBack(tester),
+      isFalse,
+      reason: '14. with nothing open, back is the app\'s',
+    );
+  });
 
   testWidgets(
     '360px phone: nothing overflows, the breadcrumb ends 16px before the '
@@ -378,16 +417,23 @@ void main() {
 
       // A deep sutta: its trail is longer than the bar.
       await openTab(tester, container, tabFromNode(container, 'dn-1-1'));
-      final trailWindow = tester.getRect(find.descendant(
-        of: find.byType(BreadcrumbWidget),
-        matching: find.byType(Scrollable),
-      ));
-      final trail = tester.getRect(find.descendant(
-        of: find.byType(BreadcrumbWidget),
-        matching: find.byType(RichText),
-      ));
-      expect(trail.width, greaterThan(trailWindow.width),
-          reason: 'the trail must be cut, or this checks nothing');
+      final trailWindow = tester.getRect(
+        find.descendant(
+          of: find.byType(BreadcrumbWidget),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      final trail = tester.getRect(
+        find.descendant(
+          of: find.byType(BreadcrumbWidget),
+          matching: find.byType(RichText),
+        ),
+      );
+      expect(
+        trail.width,
+        greaterThan(trailWindow.width),
+        reason: 'the trail must be cut, or this checks nothing',
+      );
       expect(
         tester.getRect(searchIcon).left - trailWindow.right,
         greaterThanOrEqualTo(16),
@@ -404,14 +450,19 @@ void main() {
       expect(fieldWidth, 360 - 2 * 8);
       final preview = tester.getSize(find.byType(SinglishPreview)).width;
       expect(preview, lessThanOrEqualTo(fieldWidth * 0.45));
-      expect(preview, greaterThan(fieldWidth * 0.45 - 1),
-          reason: 'the query must reach the cap, or this checks nothing');
+      expect(
+        preview,
+        greaterThan(fieldWidth * 0.45 - 1),
+        reason: 'the query must reach the cap, or this checks nothing',
+      );
       // The typed text keeps the rest, about a third of the field.
       final typed = tester
-          .getSize(find.descendant(
-            of: searchField,
-            matching: find.byType(EditableText),
-          ))
+          .getSize(
+            find.descendant(
+              of: searchField,
+              matching: find.byType(EditableText),
+            ),
+          )
           .width;
       expect(typed, greaterThan(fieldWidth / 4));
     },
@@ -438,14 +489,19 @@ void main() {
 
       // A short screen, so the full list would run under the keyboard.
       await expectRecentListClearsKeyboard(
-          tester, const Size(400, 560), 'phone');
+        tester,
+        const Size(400, 560),
+        'phone',
+      );
       await resize(tester, const Size(400, 800));
 
       // Tapping a row searches it.
-      await tester.tap(find.descendant(
-        of: find.byType(RecentSearchOverlay),
-        matching: find.text('සති'),
-      ));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(RecentSearchOverlay),
+          matching: find.text('සති'),
+        ),
+      );
       await tester.waitForSearchResults();
       expect(container.read(searchStateProvider).rawQueryText, 'සති');
       expect(field(tester).controller.text, 'සති');
@@ -482,7 +538,10 @@ void main() {
       // ---- 3. The recent list clears the keyboard; Esc closes it ----
       await tester.tap(searchField);
       await expectRecentListClearsKeyboard(
-          tester, const Size(900, 560), '3. tablet');
+        tester,
+        const Size(900, 560),
+        '3. tablet',
+      );
       await pressEsc(tester);
       await resize(tester, const Size(900, 800));
       expect(find.byType(RecentSearchOverlay), findsNothing);
@@ -504,8 +563,11 @@ void main() {
       await tester.tap(searchField);
       await tester.waitForSearchResults();
       expect(find.byType(SearchResultsPanel), findsOneWidget);
-      expect(await pressSystemBack(tester), isTrue,
-          reason: '6. the screen takes the back');
+      expect(
+        await pressSystemBack(tester),
+        isTrue,
+        reason: '6. the screen takes the back',
+      );
       expect(find.byType(SearchResultsPanel), findsNothing);
     },
   );
@@ -523,10 +585,9 @@ void main() {
       final l10n = AppLocalizations.of(tester.element(searchField));
       expect(
         tester
-            .widgetList<Text>(find.descendant(
-              of: searchField,
-              matching: find.byType(Text),
-            ))
+            .widgetList<Text>(
+              find.descendant(of: searchField, matching: find.byType(Text)),
+            )
             .map((text) => text.data),
         [l10n.searchHint],
         reason: '1. no shortcut text',
@@ -563,10 +624,16 @@ void main() {
       await tester.tapAt(const Offset(200, 700), kind: PointerDeviceKind.mouse);
       await pumpForSettle(tester);
       expect(find.byType(RecentSearchOverlay), findsNothing);
-      expect(tester.getSearchState().scope, sutta,
-          reason: '4. the Sutta filter stays');
-      expect(tester.getSearchState().isExactMatch, isTrue,
-          reason: '4. the match option stays');
+      expect(
+        tester.getSearchState().scope,
+        sutta,
+        reason: '4. the Sutta filter stays',
+      );
+      expect(
+        tester.getSearchState().isExactMatch,
+        isTrue,
+        reason: '4. the match option stays',
+      );
 
       // ---- 5. Narrowed to 900px with the panel open: nothing changes ----
       await tester.searchFor('mahaasathi');

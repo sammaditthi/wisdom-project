@@ -7,23 +7,25 @@ part of 'reader_tab.dart';
 // **************************************************************************
 
 _ReaderTab _$ReaderTabFromJson(Map<String, dynamic> json) => _ReaderTab(
-      label: json['label'] as String,
-      fullName: json['fullName'] as String,
-      nodeKey: json['nodeKey'] as String?,
-      anchorPageIndex: (json['anchorPageIndex'] as num?)?.toInt(),
-      anchorEntryIndex: (json['anchorEntryIndex'] as num?)?.toInt(),
-      paliName: json['paliName'] as String?,
-      sinhalaName: json['sinhalaName'] as String?,
-      textId: json['textId'] as String?,
-      panes: (json['panes'] as List<dynamic>?)
-              ?.map((e) => ReaderPane.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      layout: $enumDecodeNullable(_$ReaderLayoutEnumMap, json['layout']) ??
-          ReaderLayout.paliOnly,
-      splitRatio: (json['splitRatio'] as num?)?.toDouble() ?? 0.5,
-      scrollOffset: (json['scrollOffset'] as num?)?.toDouble() ?? 0.0,
-    );
+  label: json['label'] as String,
+  fullName: json['fullName'] as String,
+  nodeKey: json['nodeKey'] as String?,
+  anchorPageIndex: (json['anchorPageIndex'] as num?)?.toInt(),
+  anchorEntryIndex: (json['anchorEntryIndex'] as num?)?.toInt(),
+  paliName: json['paliName'] as String?,
+  sinhalaName: json['sinhalaName'] as String?,
+  textId: json['textId'] as String?,
+  panes:
+      (json['panes'] as List<dynamic>?)
+          ?.map((e) => ReaderPane.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  layout:
+      $enumDecodeNullable(_$ReaderLayoutEnumMap, json['layout']) ??
+      ReaderLayout.paliOnly,
+  splitRatio: (json['splitRatio'] as num?)?.toDouble() ?? 0.5,
+  scrollOffset: (json['scrollOffset'] as num?)?.toDouble() ?? 0.0,
+);
 
 Map<String, dynamic> _$ReaderTabToJson(_ReaderTab instance) =>
     <String, dynamic>{

@@ -92,9 +92,9 @@ class StatusMessageView extends StatelessWidget {
     this.action,
     this.padding = const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
   }) : assert(
-          variant == StatusVariant.loading || title != null,
-          'A non-loading StatusMessageView must have a title.',
-        );
+         variant == StatusVariant.loading || title != null,
+         'A non-loading StatusMessageView must have a title.',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,8 @@ class StatusMessageView extends StatelessWidget {
         child: CircularProgressIndicator(strokeWidth: 3),
       );
     } else {
-      visual = leading ??
+      visual =
+          leading ??
           Icon(
             iconOverride ?? _defaultIcon(variant),
             size: _leadingSize,
@@ -125,8 +126,9 @@ class StatusMessageView extends StatelessWidget {
     final bool isNegative =
         variant == StatusVariant.error || variant == StatusVariant.offline;
 
-    final TextStyle titleStyle =
-        isNegative ? typography.errorMessage : typography.emptyStateMessage;
+    final TextStyle titleStyle = isNegative
+        ? typography.errorMessage
+        : typography.emptyStateMessage;
 
     // Same colour as an informational title; the smaller size keeps it below.
     final TextStyle descriptionStyle = typography.resultSubtitle;
@@ -143,11 +145,7 @@ class StatusMessageView extends StatelessWidget {
             visual,
             if (title != null) ...[
               const SizedBox(height: 12),
-              Text(
-                title!,
-                style: titleStyle,
-                textAlign: TextAlign.center,
-              ),
+              Text(title!, style: titleStyle, textAlign: TextAlign.center),
             ],
             if (description != null) ...[
               const SizedBox(height: 4),
@@ -157,10 +155,7 @@ class StatusMessageView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ],
-            if (action != null) ...[
-              const SizedBox(height: 16),
-              action!,
-            ],
+            if (action != null) ...[const SizedBox(height: 16), action!],
           ],
         ),
       ),

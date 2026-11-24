@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'search_result_type.dart';
 import 'search_result.dart';
 

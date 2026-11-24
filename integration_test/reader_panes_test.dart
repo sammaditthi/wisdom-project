@@ -57,9 +57,13 @@ void main() {
           tester.getRect(readerRow(3, 3)).bottom;
 
       final inTheList = gapAboveHeading();
-      expect(inTheList, greaterThan(0),
-          reason: 'A heading that is not its page\'s first row takes a gap '
-              'above it — the reference this test compares against');
+      expect(
+        inTheList,
+        greaterThan(0),
+        reason:
+            'A heading that is not its page\'s first row takes a gap '
+            'above it — the reference this test compares against',
+      );
 
       // Now the heading is the anchor row: the first row of the part below
       // the anchor, with the paragraph in the part above. Nothing about the
@@ -67,54 +71,73 @@ void main() {
       container.read(tabsProvider.notifier).setTabAnchor(0, (3, 4));
       await pumpForSettle(tester);
 
-      expect(gapAboveHeading(), inTheList,
-          reason: 'Splitting the page at the anchor must not drop the '
-              'heading\'s gap: it is still not the page\'s first row');
-    },
-  );
-
-  testWidgets(
-    'stacked: a sutta number the same on both sides shows once',
-    (tester) async {
-      pinDesktopWindow(tester);
-      final container = await pumpReaderApp(tester);
-
-      await openTab(
-        tester,
-        container,
-        tabFromNode(container, 'dn-1-1').copyWith(layout: ReaderLayout.stacked),
+      expect(
+        gapAboveHeading(),
+        inTheList,
+        reason:
+            'Splitting the page at the anchor must not drop the '
+            'heading\'s gap: it is still not the page\'s first row',
       );
-
-      int entriesIn(Finder row) => find
-          .descendant(of: row, matching: find.byType(TextEntryWidget))
-          .evaluate()
-          .length;
-      expect(entriesIn(readerRow(0, 4)), 1,
-          reason: 'The sutta number shows once, on the Pali side');
-      expect(entriesIn(readerRow(0, 5)), 2,
-          reason: 'The title after it still shows both languages');
-
-      // Nor may in-page search count the copy it hid. Side-by-side shows
-      // both, so it is the control that the query reaches the row at all.
-      bool sinhalaNumberMatched() =>
-          container.read(inPageSearchStatesProvider)[0]!.matches.any((m) =>
-              m.pageIndex == 0 && m.entryIndex == 4 && m.languageCode == 'si');
-
-      final search = container.read(inPageSearchStatesProvider.notifier);
-      search.openSearch();
-      search.updateQuery('1');
-      // 300 ms debounce + buffer, then settle for the match computation.
-      await tester.pump(const Duration(milliseconds: 400));
-      await pumpForSettle(tester);
-      expect(sinhalaNumberMatched(), isFalse,
-          reason: 'Stacked hides the Sinhala copy, so it is not a match');
-
-      container.read(updateActiveTabLayoutProvider)(ReaderLayout.sideBySide);
-      await pumpForSettle(tester);
-      expect(sinhalaNumberMatched(), isTrue,
-          reason: 'Side-by-side shows the Sinhala copy, so it is a match');
     },
   );
+
+  testWidgets('stacked: a sutta number the same on both sides shows once', (
+    tester,
+  ) async {
+    pinDesktopWindow(tester);
+    final container = await pumpReaderApp(tester);
+
+    await openTab(
+      tester,
+      container,
+      tabFromNode(container, 'dn-1-1').copyWith(layout: ReaderLayout.stacked),
+    );
+
+    int entriesIn(Finder row) => find
+        .descendant(of: row, matching: find.byType(TextEntryWidget))
+        .evaluate()
+        .length;
+    expect(
+      entriesIn(readerRow(0, 4)),
+      1,
+      reason: 'The sutta number shows once, on the Pali side',
+    );
+    expect(
+      entriesIn(readerRow(0, 5)),
+      2,
+      reason: 'The title after it still shows both languages',
+    );
+
+    // Nor may in-page search count the copy it hid. Side-by-side shows
+    // both, so it is the control that the query reaches the row at all.
+    bool sinhalaNumberMatched() => container
+        .read(inPageSearchStatesProvider)[0]!
+        .matches
+        .any(
+          (m) =>
+              m.pageIndex == 0 && m.entryIndex == 4 && m.languageCode == 'si',
+        );
+
+    final search = container.read(inPageSearchStatesProvider.notifier);
+    search.openSearch();
+    search.updateQuery('1');
+    // 300 ms debounce + buffer, then settle for the match computation.
+    await tester.pump(const Duration(milliseconds: 400));
+    await pumpForSettle(tester);
+    expect(
+      sinhalaNumberMatched(),
+      isFalse,
+      reason: 'Stacked hides the Sinhala copy, so it is not a match',
+    );
+
+    container.read(updateActiveTabLayoutProvider)(ReaderLayout.sideBySide);
+    await pumpForSettle(tester);
+    expect(
+      sinhalaNumberMatched(),
+      isTrue,
+      reason: 'Side-by-side shows the Sinhala copy, so it is a match',
+    );
+  });
 
   // The column gate's select-all branch leans on how Flutter's scroll-view
   // selection container handles select-all (see `_ColumnGate`). This is the
@@ -148,12 +171,18 @@ void main() {
         await tester.pump(const Duration(milliseconds: 600));
         // The physical keys are named because a web release build can't
         // infer them: the simulator matches keys by their debug names.
-        await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft,
-            physicalKey: PhysicalKeyboardKey.metaLeft);
-        await tester.sendKeyEvent(LogicalKeyboardKey.keyA,
-            physicalKey: PhysicalKeyboardKey.keyA);
-        await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft,
-            physicalKey: PhysicalKeyboardKey.metaLeft);
+        await tester.sendKeyDownEvent(
+          LogicalKeyboardKey.metaLeft,
+          physicalKey: PhysicalKeyboardKey.metaLeft,
+        );
+        await tester.sendKeyEvent(
+          LogicalKeyboardKey.keyA,
+          physicalKey: PhysicalKeyboardKey.keyA,
+        );
+        await tester.sendKeyUpEvent(
+          LogicalKeyboardKey.metaLeft,
+          physicalKey: PhysicalKeyboardKey.metaLeft,
+        );
         await pumpForSettle(tester);
         // The Pali display text joins conjuncts with ZWJ; compare letters.
         return (container.read(lastSelectedTextProvider) ?? '')
@@ -166,87 +195,120 @@ void main() {
 
       // Pali: a click in the left margin beside the row. A click on Pali
       // text would look the word up instead.
-      final paliSelection =
-          await selectAllAfterClickAt(Offset(reader.left + 12, row.top + 10));
-      expect(paliSelection, contains(pali),
-          reason: 'Cmd+A after a click in the Pali column selects its rows');
-      expect(paliSelection, isNot(contains(sinhala)),
-          reason: 'and none of the Sinhala column');
+      final paliSelection = await selectAllAfterClickAt(
+        Offset(reader.left + 12, row.top + 10),
+      );
+      expect(
+        paliSelection,
+        contains(pali),
+        reason: 'Cmd+A after a click in the Pali column selects its rows',
+      );
+      expect(
+        paliSelection,
+        isNot(contains(sinhala)),
+        reason: 'and none of the Sinhala column',
+      );
 
       // Sinhala: a click on its text, three quarters across the row. Sinhala
       // words take no dictionary tap, so the selection gets the click.
       final sinhalaSelection = await selectAllAfterClickAt(
-          Offset(row.left + row.width * 0.75, row.top + 10));
-      expect(sinhalaSelection, contains(sinhala),
-          reason: 'Cmd+A after a click in the Sinhala column selects its rows');
-      expect(sinhalaSelection, isNot(contains(pali)),
-          reason: 'and none of the Pali column');
+        Offset(row.left + row.width * 0.75, row.top + 10),
+      );
+      expect(
+        sinhalaSelection,
+        contains(sinhala),
+        reason: 'Cmd+A after a click in the Sinhala column selects its rows',
+      );
+      expect(
+        sinhalaSelection,
+        isNot(contains(pali)),
+        reason: 'and none of the Pali column',
+      );
     },
   );
 
   // Next replaces the selected text without Flutter reporting the selection
   // gone, and focus leaves the reader, so Cmd+C reaches the remembered
   // selection. OverlayStackSync forgets it when the tab's sutta changes.
-  testWidgets(
-    'Cmd+C after Next copies nothing of the sutta left behind',
-    (tester) async {
-      pinDesktopWindow(tester);
-      // What the app sends to the clipboard; the real one stays untouched.
-      String? copied;
-      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+  testWidgets('Cmd+C after Next copies nothing of the sutta left behind', (
+    tester,
+  ) async {
+    pinDesktopWindow(tester);
+    // What the app sends to the clipboard; the real one stays untouched.
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String;
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         SystemChannels.platform,
-        (call) async {
-          if (call.method == 'Clipboard.setData') {
-            copied = (call.arguments as Map)['text'] as String;
-          }
-          return null;
-        },
-      );
-      addTearDown(() => tester.binding.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform, null));
+        null,
+      ),
+    );
 
-      final container = await pumpReaderApp(tester, withShortcuts: true);
-      await openTab(
-        tester,
+    final container = await pumpReaderApp(tester, withShortcuts: true);
+    await openTab(
+      tester,
+      container,
+      tabFromNode(
         container,
-        tabFromNode(container, 'dn-1-1')
-            .copyWith(layout: ReaderLayout.sideBySide),
+        'dn-1-1',
+      ).copyWith(layout: ReaderLayout.sideBySide),
+    );
+
+    Future<void> pressCmd(
+      LogicalKeyboardKey key,
+      PhysicalKeyboardKey physicalKey,
+    ) async {
+      await tester.sendKeyDownEvent(
+        LogicalKeyboardKey.metaLeft,
+        physicalKey: PhysicalKeyboardKey.metaLeft,
       );
-
-      Future<void> pressCmd(
-          LogicalKeyboardKey key, PhysicalKeyboardKey physicalKey) async {
-        await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft,
-            physicalKey: PhysicalKeyboardKey.metaLeft);
-        await tester.sendKeyEvent(key, physicalKey: physicalKey);
-        await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft,
-            physicalKey: PhysicalKeyboardKey.metaLeft);
-        await pumpForSettle(tester);
-      }
-
-      // The Pali column: a click in its margin, then Cmd+A.
-      final reader = tester.getRect(readerScrollView);
-      await tester.tapAt(Offset(reader.left + 12, reader.top + 150),
-          kind: PointerDeviceKind.mouse);
-      await tester.pump(const Duration(milliseconds: 600));
-      await pressCmd(LogicalKeyboardKey.keyA, PhysicalKeyboardKey.keyA);
-      final selected = container.read(lastSelectedTextProvider);
-      expect(selected, isNotEmpty, reason: 'Cmd+A selects the Pali column');
-
-      await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
-      expect(copied, selected, reason: 'Cmd+C copies the selection shown');
-
-      copied = null;
-      await tester.tap(find.byIcon(Icons.skip_next),
-          kind: PointerDeviceKind.mouse);
+      await tester.sendKeyEvent(key, physicalKey: physicalKey);
+      await tester.sendKeyUpEvent(
+        LogicalKeyboardKey.metaLeft,
+        physicalKey: PhysicalKeyboardKey.metaLeft,
+      );
       await pumpForSettle(tester);
-      expect(container.read(activeNodeKeyProvider), 'dn-1-2');
+    }
 
-      await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
-      expect(copied, isNull,
-          reason: 'Nothing is selected in dn-1-2, so Cmd+C copies nothing, '
-              'not the dn-1-1 text selected before Next');
-    },
-  );
+    // The Pali column: a click in its margin, then Cmd+A.
+    final reader = tester.getRect(readerScrollView);
+    await tester.tapAt(
+      Offset(reader.left + 12, reader.top + 150),
+      kind: PointerDeviceKind.mouse,
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    await pressCmd(LogicalKeyboardKey.keyA, PhysicalKeyboardKey.keyA);
+    final selected = container.read(lastSelectedTextProvider);
+    expect(selected, isNotEmpty, reason: 'Cmd+A selects the Pali column');
+
+    await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
+    expect(copied, selected, reason: 'Cmd+C copies the selection shown');
+
+    copied = null;
+    await tester.tap(
+      find.byIcon(Icons.skip_next),
+      kind: PointerDeviceKind.mouse,
+    );
+    await pumpForSettle(tester);
+    expect(container.read(activeNodeKeyProvider), 'dn-1-2');
+
+    await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
+    expect(
+      copied,
+      isNull,
+      reason:
+          'Nothing is selected in dn-1-2, so Cmd+C copies nothing, '
+          'not the dn-1-1 text selected before Next',
+    );
+  });
 
   testWidgets(
     'page numbers: each layout shows the printed page of the text it draws',
@@ -259,8 +321,10 @@ void main() {
       List<String> labels() => find
           .descendant(
             of: readerScrollView,
-            matching: find.byWidgetPredicate((w) =>
-                w is Text && RegExp(r'^\d+(–\d+)?$').hasMatch(w.data ?? '')),
+            matching: find.byWidgetPredicate(
+              (w) =>
+                  w is Text && RegExp(r'^\d+(–\d+)?$').hasMatch(w.data ?? ''),
+            ),
           )
           .evaluate()
           .map((e) => (e.widget as Text).data!)
@@ -282,20 +346,29 @@ void main() {
           container,
           tabFromNode(container, 'dn-1-1').copyWith(layout: layout),
         );
-        expect(labels().take(labelsAtTop.length).toList(), labelsAtTop,
-            reason: '$layout labels the first page with the printed page of '
-                'each language it shows');
+        expect(
+          labels().take(labelsAtTop.length).toList(),
+          labelsAtTop,
+          reason:
+              '$layout labels the first page with the printed page of '
+              'each language it shows',
+        );
       }
 
       // A commentary's pages match no printed page we can check.
       await openTab(
         tester,
         container,
-        tabFromNode(container, 'atta-dn-1-1')
-            .copyWith(layout: ReaderLayout.sideBySide),
+        tabFromNode(
+          container,
+          'atta-dn-1-1',
+        ).copyWith(layout: ReaderLayout.sideBySide),
       );
-      expect(readerRow(19, 6), findsOneWidget,
-          reason: 'The commentary\'s first row is drawn');
+      expect(
+        readerRow(19, 6),
+        findsOneWidget,
+        reason: 'The commentary\'s first row is drawn',
+      );
       expect(labels(), isEmpty, reason: 'A commentary shows no page numbers');
     },
   );

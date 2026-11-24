@@ -41,10 +41,7 @@ void main() {
     final tokens = <String, dynamic>{
       'meta': _meta,
       'fonts': _fonts,
-      'colors': {
-        'light': _lightColors,
-        'dark': _darkColors,
-      },
+      'colors': {'light': _lightColors, 'dark': _darkColors},
       'entryStyles': _entryStyles(),
       'paneWeights': _paneWeights,
       'spacing': _spacing(),
@@ -65,7 +62,8 @@ void main() {
 /// HTML page carries (D8) — the file says what produced it and from what.
 const Map<String, dynamic> _meta = {
   'generator': 'tools/dump_theme_tokens.dart',
-  'note': 'GENERATED — do not edit by hand. Re-run: '
+  'note':
+      'GENERATED — do not edit by hand. Re-run: '
       'flutter test tools/dump_theme_tokens.dart',
   'sources': [
     'lib/core/theme/app_colors.dart',
@@ -88,69 +86,69 @@ String _hex(Color color) {
 
 /// Font families and stacks, ready to drop into a CSS `font-family`.
 Map<String, dynamic> get _fonts => {
-      'reader': AppFonts.reader,
-      'ui': AppFonts.ui,
-      'readerFallback': AppFonts.readerFallback,
-      'uiFallback': AppFonts.uiFallback,
-      'baseFontSize': AppFonts.baseFontSize,
-      // The site is a web surface, so it inherits the web default rather than
-      // the native 1.0 — see AppFonts.webDefaultScale.
-      'webDefaultScale': AppFonts.webDefaultScale,
-      'uiLineHeight': AppFonts.uiLineHeight,
-      'uiSizes': {
-        'badge': AppFonts.badgeFontSize,
-        'label': AppFonts.labelFontSize,
-        'tab': AppFonts.tabFontSize,
-        'tree': AppFonts.treeFontSize,
-        'pageNumber': AppFonts.pageNumberFontSize,
-      },
-    };
+  'reader': AppFonts.reader,
+  'ui': AppFonts.ui,
+  'readerFallback': AppFonts.readerFallback,
+  'uiFallback': AppFonts.uiFallback,
+  'baseFontSize': AppFonts.baseFontSize,
+  // The site is a web surface, so it inherits the web default rather than
+  // the native 1.0 — see AppFonts.webDefaultScale.
+  'webDefaultScale': AppFonts.webDefaultScale,
+  'uiLineHeight': AppFonts.uiLineHeight,
+  'uiSizes': {
+    'badge': AppFonts.badgeFontSize,
+    'label': AppFonts.labelFontSize,
+    'tab': AppFonts.tabFontSize,
+    'tree': AppFonts.treeFontSize,
+    'pageNumber': AppFonts.pageNumberFontSize,
+  },
+};
 
 Map<String, String> get _lightColors => {
-      'background': _hex(LightThemeColors.background),
-      'surface': _hex(LightThemeColors.surface),
-      'onSurface': _hex(LightThemeColors.onSurface),
-      'onSurfaceVariant': _hex(LightThemeColors.onSurfaceVariant),
-      'surfaceContainerLowest': _hex(LightThemeColors.surfaceContainerLowest),
-      'surfaceContainerLow': _hex(LightThemeColors.surfaceContainerLow),
-      'surfaceContainer': _hex(LightThemeColors.surfaceContainer),
-      'surfaceContainerHigh': _hex(LightThemeColors.surfaceContainerHigh),
-      'surfaceContainerHighest': _hex(LightThemeColors.surfaceContainerHighest),
-      'surfaceDim': _hex(LightThemeColors.surfaceDim),
-      'surfaceBright': _hex(LightThemeColors.surfaceBright),
-      'primary': _hex(LightThemeColors.primary),
-      'onPrimary': _hex(LightThemeColors.onPrimary),
-      'primaryContainer': _hex(LightThemeColors.primaryContainer),
-      'onPrimaryContainer': _hex(LightThemeColors.onPrimaryContainer),
-      'secondary': _hex(LightThemeColors.secondary),
-      'secondaryContainer': _hex(LightThemeColors.secondaryContainer),
-      'onSecondaryContainer': _hex(LightThemeColors.onSecondaryContainer),
-      'tertiary': _hex(LightThemeColors.tertiary),
-      'tertiaryContainer': _hex(LightThemeColors.tertiaryContainer),
-      'outline': _hex(LightThemeColors.outline),
-      'outlineVariant': _hex(LightThemeColors.outlineVariant),
-      'error': _hex(LightThemeColors.error),
-      // Reader-specific roles — the two the content stylesheet leans on most.
-      'heading': _hex(LightThemeColors.heading),
-      'highlight': _hex(LightThemeColors.highlight),
-    };
+  'background': _hex(LightThemeColors.background),
+  'surface': _hex(LightThemeColors.surface),
+  'onSurface': _hex(LightThemeColors.onSurface),
+  'onSurfaceVariant': _hex(LightThemeColors.onSurfaceVariant),
+  'surfaceContainerLowest': _hex(LightThemeColors.surfaceContainerLowest),
+  'surfaceContainerLow': _hex(LightThemeColors.surfaceContainerLow),
+  'surfaceContainer': _hex(LightThemeColors.surfaceContainer),
+  'surfaceContainerHigh': _hex(LightThemeColors.surfaceContainerHigh),
+  'surfaceContainerHighest': _hex(LightThemeColors.surfaceContainerHighest),
+  'surfaceDim': _hex(LightThemeColors.surfaceDim),
+  'surfaceBright': _hex(LightThemeColors.surfaceBright),
+  'primary': _hex(LightThemeColors.primary),
+  'onPrimary': _hex(LightThemeColors.onPrimary),
+  'primaryContainer': _hex(LightThemeColors.primaryContainer),
+  'onPrimaryContainer': _hex(LightThemeColors.onPrimaryContainer),
+  'secondary': _hex(LightThemeColors.secondary),
+  'secondaryContainer': _hex(LightThemeColors.secondaryContainer),
+  'onSecondaryContainer': _hex(LightThemeColors.onSecondaryContainer),
+  'tertiary': _hex(LightThemeColors.tertiary),
+  'tertiaryContainer': _hex(LightThemeColors.tertiaryContainer),
+  'outline': _hex(LightThemeColors.outline),
+  'outlineVariant': _hex(LightThemeColors.outlineVariant),
+  'error': _hex(LightThemeColors.error),
+  // Reader-specific roles — the two the content stylesheet leans on most.
+  'heading': _hex(LightThemeColors.heading),
+  'highlight': _hex(LightThemeColors.highlight),
+};
 
 /// Emitted for the deferred dark mode. `DarkThemeColors` deliberately exposes a
 /// smaller, differently-named set than the light palette, so this is not a
 /// mirror of [_lightColors] and the CSS cannot assume role-for-role parity.
 Map<String, String> get _darkColors => {
-      'background': _hex(DarkThemeColors.background),
-      'surface': _hex(DarkThemeColors.surface),
-      'surfaceContainerLow': _hex(DarkThemeColors.surfaceContainerLow),
-      'surfaceContainerHigh': _hex(DarkThemeColors.surfaceContainerHigh),
-      'primary': _hex(DarkThemeColors.primary),
-      'onPrimary': _hex(DarkThemeColors.onPrimary),
-      'onBackground': _hex(DarkThemeColors.onBackground),
-      'muted': _hex(DarkThemeColors.muted),
-      'accent': _hex(DarkThemeColors.accent),
-      'divider': _hex(DarkThemeColors.divider),
-      'error': _hex(DarkThemeColors.error),
-    };
+  'background': _hex(DarkThemeColors.background),
+  'surface': _hex(DarkThemeColors.surface),
+  'surfaceContainerLow': _hex(DarkThemeColors.surfaceContainerLow),
+  'surfaceContainerHigh': _hex(DarkThemeColors.surfaceContainerHigh),
+  'primary': _hex(DarkThemeColors.primary),
+  'onPrimary': _hex(DarkThemeColors.onPrimary),
+  'onBackground': _hex(DarkThemeColors.onBackground),
+  'muted': _hex(DarkThemeColors.muted),
+  'accent': _hex(DarkThemeColors.accent),
+  'divider': _hex(DarkThemeColors.divider),
+  'error': _hex(DarkThemeColors.error),
+};
 
 /// The five corpus entry types plus the levelled heading/centered variants,
 /// exactly as `TextEntryTheme` styles them.
@@ -198,13 +196,19 @@ Map<String, dynamic> _entryStyles() {
     'unindented': style(theme.unindentedStyle, 'onSurface', 'unindentedStyle'),
     'heading': {
       for (final entry in theme.headingStyles.entries)
-        entry.key.toString():
-            style(entry.value, 'heading', 'headingStyles[${entry.key}]'),
+        entry.key.toString(): style(
+          entry.value,
+          'heading',
+          'headingStyles[${entry.key}]',
+        ),
     },
     'centered': {
       for (final entry in theme.centeredStyles.entries)
-        entry.key.toString():
-            style(entry.value, 'onSurface', 'centeredStyles[${entry.key}]'),
+        entry.key.toString(): style(
+          entry.value,
+          'onSurface',
+          'centeredStyles[${entry.key}]',
+        ),
     },
   };
 }
@@ -213,28 +217,28 @@ Map<String, dynamic> _entryStyles() {
 /// and the unit the values were authored in before `TextEntryTheme` multiplied
 /// them by the base size.
 Map<String, dynamic> _spacing() => {
-      'paragraphIndentEm': AppFonts.paragraphIndentEm,
-      'gathaIndentEm': AppFonts.gathaIndentEm,
-      'gathaLevel2IndentEm': AppFonts.gathaLevel2IndentEm,
-      // How long a line gets. The one number that has to mean the same thing on
-      // all three surfaces — native, Flutter web, this site — because it is what
-      // makes them read the same line despite rendering at three different pixel
-      // sizes. Exported for exactly the reason in this file's header: it was
-      // hand-copied into `stylesheet.dart` for a while, defended as a design
-      // decision a human makes on both sides at once, which is just as true of
-      // `gathaIndentEm` two lines up and no more of a reason there.
-      'readingColumnMeasureEm': PaneWidthConstants.readingColumnMeasureEm,
-      // The reader's vertical rhythm, read from the same constants the panes
-      // lay out with — never re-typed here.
-      'entryGapPx': AppFonts.entryGapPx,
-      'pageGapPx': AppFonts.pageGapPx,
-      'pageNumberGapPx': AppFonts.pageNumberGapPx,
-      // The stacked layout's two-part rhythm — a translation hugs the line it
-      // translates, pairs stand apart. Only the stacked layout uses these; the
-      // other three separate the languages by column or show one at a time.
-      'stackedPairGapPx': AppFonts.stackedPairGapPx,
-      'stackedPairBottomGapPx': AppFonts.stackedPairBottomGapPx,
-    };
+  'paragraphIndentEm': AppFonts.paragraphIndentEm,
+  'gathaIndentEm': AppFonts.gathaIndentEm,
+  'gathaLevel2IndentEm': AppFonts.gathaLevel2IndentEm,
+  // How long a line gets. The one number that has to mean the same thing on
+  // all three surfaces — native, Flutter web, this site — because it is what
+  // makes them read the same line despite rendering at three different pixel
+  // sizes. Exported for exactly the reason in this file's header: it was
+  // hand-copied into `stylesheet.dart` for a while, defended as a design
+  // decision a human makes on both sides at once, which is just as true of
+  // `gathaIndentEm` two lines up and no more of a reason there.
+  'readingColumnMeasureEm': PaneWidthConstants.readingColumnMeasureEm,
+  // The reader's vertical rhythm, read from the same constants the panes
+  // lay out with — never re-typed here.
+  'entryGapPx': AppFonts.entryGapPx,
+  'pageGapPx': AppFonts.pageGapPx,
+  'pageNumberGapPx': AppFonts.pageNumberGapPx,
+  // The stacked layout's two-part rhythm — a translation hugs the line it
+  // translates, pairs stand apart. Only the stacked layout uses these; the
+  // other three separate the languages by column or show one at a time.
+  'stackedPairGapPx': AppFonts.stackedPairGapPx,
+  'stackedPairBottomGapPx': AppFonts.stackedPairBottomGapPx,
+};
 
 /// Weights that a *pane* applies on top of an entry style, rather than ones
 /// `TextEntryTheme` bakes in — so they cannot be read out of [_entryStyles].
@@ -252,12 +256,12 @@ Map<String, dynamic> _spacing() => {
 /// Contrast `fonts.webDefaultScale`, which *does* take the web value — that one
 /// is a deliberate reading-size choice for a browser, not a renderer patch.
 Map<String, dynamic> get _paneWeights => {
-      // Applied to body-type entries only — paragraph, unindented and gatha.
-      // Headings and centered entries keep their theme weight, exactly as
-      // `ReaderEntryBuilder.buildEntry` documents and does.
-      'paliStacked': AppFonts.paliWeight.value,
-      'body': AppFonts.bodyWeight.value,
-    };
+  // Applied to body-type entries only — paragraph, unindented and gatha.
+  // Headings and centered entries keep their theme weight, exactly as
+  // `ReaderEntryBuilder.buildEntry` documents and does.
+  'paliStacked': AppFonts.paliWeight.value,
+  'body': AppFonts.bodyWeight.value,
+};
 
 /// Trims binary floating-point noise (1.0999999999999999 → 1.1) so re-running
 /// the dump on an unchanged theme produces a byte-identical file.

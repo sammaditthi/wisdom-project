@@ -118,8 +118,9 @@ void main() {
       // Copy a URL off the site, paste it into the app, share it again. It is
       // `sp-mid-1` — a leaf owning its page — that used to come back with a
       // fragment bolted on.
-      final pasted =
-          TipitakaLink.tryParse('$_base/tipitaka/sp-mid-1#sp-mid-1')!;
+      final pasted = TipitakaLink.tryParse(
+        '$_base/tipitaka/sp-mid-1#sp-mid-1',
+      )!;
       expect(pasted.pageKey, 'sp-mid-1', reason: 'the codec holds this now');
       expect(
         _plan.servingLink(pasted).toUri(_base).toString(),
@@ -162,8 +163,11 @@ void main() {
       // first of them. It is folded as well, so the path can name nothing
       // finer than the chapter — the fragment is the only part of the URL that
       // can say which sutta the reader left.
-      expect(canonKeysCoveredBy(_mergedTree, 'atta-ck-2'),
-          ['ck-2', 'ck-3', 'ck-4']);
+      expect(canonKeysCoveredBy(_mergedTree, 'atta-ck-2'), [
+        'ck-2',
+        'ck-3',
+        'ck-4',
+      ]);
 
       final link = TipitakaLink.tryParse('$_base/tipitaka/atta-ck#via_ck-3')!;
       expect(_mergedPlan.resolveTarget(link), 'atta-ck-2');
@@ -189,8 +193,11 @@ void main() {
         foldedLeafKeys: const {'ck-3', 'ck-4'},
         textBearingContainerKeys: const {},
       );
-      expect(crossLinkTargetKey(_mergedTree, 'ck-3'), 'atta-ck-2',
-          reason: 'the tree still knows; only the plan does not');
+      expect(
+        crossLinkTargetKey(_mergedTree, 'ck-3'),
+        'atta-ck-2',
+        reason: 'the tree still knows; only the plan does not',
+      );
 
       final link = TipitakaLink.tryParse('$_base/tipitaka/atta-ck#via_ck-3')!;
       expect(canonOnly.resolveTarget(link), 'atta-ck');
@@ -248,8 +255,11 @@ void main() {
       expect(page.nodeKey, 'ck-2');
       expect(page.anchorsRunOnLeaf, isTrue);
       for (final key in ['ck-2', 'ck-3', 'ck-4']) {
-        expect(crossLinkTargetKey(_mergedTree, key), 'atta-ck-2',
-            reason: 'fixture no longer isolates the anchor clause');
+        expect(
+          crossLinkTargetKey(_mergedTree, key),
+          'atta-ck-2',
+          reason: 'fixture no longer isolates the anchor clause',
+        );
       }
       expect(_mergedPlan.speaksForRun(page), isFalse);
     });
@@ -269,11 +279,18 @@ void main() {
       expect(lone.anchorsRunOnLeaf, isFalse);
       expect(crossLinkTargetKey(_mergedTree, 'atta-ck'), 'ck');
       expect(crossLinkTargetKey(_mergedTree, 'atta-ck-1'), 'ck-1');
-      expect(_mergedTree.isAncestorOf('ck', 'ck-1'), isTrue,
-          reason: 'fixture no longer isolates the lone-child clause');
-      expect(_mergedPlan.speaksForRun(lone), isFalse,
-          reason: 'the coarse link would be the container TOC, and the one '
-              'section already has a nearer answer');
+      expect(
+        _mergedTree.isAncestorOf('ck', 'ck-1'),
+        isTrue,
+        reason: 'fixture no longer isolates the lone-child clause',
+      );
+      expect(
+        _mergedPlan.speaksForRun(lone),
+        isFalse,
+        reason:
+            'the coarse link would be the container TOC, and the one '
+            'section already has a nearer answer',
+      );
     });
 
     test('a lone child still speaks where its own link carries markers', () {
@@ -283,8 +300,10 @@ void main() {
       // first — disjoint sets at different levels, both addressed by id from
       // the canon side. Suppress this link as "the coarser one" and the markers
       // it prints go with it, while the canon pages keep aiming at them.
-      expect(canonKeysCoveredBy(_markerTree, 'atta-mk-1'), ['mk-1', 'mk-2'],
-          reason: 'fixture no longer declares a range');
+      expect(canonKeysCoveredBy(_markerTree, 'atta-mk-1'), [
+        'mk-1',
+        'mk-2',
+      ], reason: 'fixture no longer declares a range');
       expect(linksThroughOriginMarkers(_markerTree, 'atta-mk-1'), isTrue);
       final lone = SitePage(
         kind: PageKind.chapter,
@@ -299,12 +318,13 @@ void main() {
       expect(_markerPlan.speaksForRun(lone), isTrue);
       // Unordered on purpose — see [SitePlan.crossLinkedNodes]. What matters is
       // that the page's own node is in there beside its section.
-      expect(_markerPlan.crossLinkedNodes(lone).map((n) => n.nodeKey),
-          unorderedEquals(['atta-mk-1', 'atta-mk-1-1']));
+      expect(
+        _markerPlan.crossLinkedNodes(lone).map((n) => n.nodeKey),
+        unorderedEquals(['atta-mk-1', 'atta-mk-1-1']),
+      );
     });
 
-    test('a lone child speaks where its coarse link is its section\'s page',
-        () {
+    test('a lone child speaks where its coarse link is its section\'s page', () {
       // The same-file exception, mirroring `atta-sn-4-1-17`: one vaṇṇanā on a
       // whole vagga, whose own link (`wr-1`) and its section's (`wr-1-1`) name
       // one file — so the coarse link is that page unfiltered, and a reader
@@ -314,12 +334,17 @@ void main() {
       expect(lone.suttas.map((s) => s.nodeKey), ['atta-wr-1-1']);
       // Every earlier clause would suppress it: one section, no markers, and
       // that section's twin sits under the run's.
-      expect(linksThroughOriginMarkers(_wholeRunTree, 'atta-wr-1'), isFalse,
-          reason: 'the marker exception would mask the clause under test');
+      expect(
+        linksThroughOriginMarkers(_wholeRunTree, 'atta-wr-1'),
+        isFalse,
+        reason: 'the marker exception would mask the clause under test',
+      );
       expect(_wholeRunTree.isAncestorOf('wr-1', 'wr-1-1'), isTrue);
       // The two halves of the exception, stated rather than implied.
       expect(
-          _wholeRunPlan.pageOf('wr-1'), same(_wholeRunPlan.pageOf('wr-1-1')));
+        _wholeRunPlan.pageOf('wr-1'),
+        same(_wholeRunPlan.pageOf('wr-1-1')),
+      );
       expect(_wholeRunPlan.pageOf('wr-1')!.needsFragmentFor('wr-1'), isFalse);
       expect(_wholeRunPlan.speaksForRun(lone), isTrue);
     });
@@ -348,11 +373,15 @@ void main() {
         node: _markerTree['atta-mk-1']!,
         suttas: const [],
       );
-      expect(crossLinkTargetKey(_markerTree, 'atta-mk-1'), isNotNull,
-          reason: 'an early null target would mask the throw');
+      expect(
+        crossLinkTargetKey(_markerTree, 'atta-mk-1'),
+        isNotNull,
+        reason: 'an early null target would mask the throw',
+      );
       expect(_markerPlan.speaksForRun(empty), isTrue);
-      expect(_markerPlan.crossLinkedNodes(empty).map((n) => n.nodeKey),
-          ['atta-mk-1']);
+      expect(_markerPlan.crossLinkedNodes(empty).map((n) => n.nodeKey), [
+        'atta-mk-1',
+      ]);
     });
 
     test('a section whose commentary escapes the run keeps its own link', () {
@@ -367,9 +396,13 @@ void main() {
       );
       expect(crossLinkTargetKey(_mergedTree, 'atta-ck-1'), 'ck-1');
       expect(crossLinkTargetKey(_mergedTree, 'atta-ck-2'), 'ck-2');
-      expect(_mergedPlan.speaksForRun(escaping), isFalse,
-          reason: '`ck-2` does not sit under `ck-1`, so one link cannot reach '
-              'both');
+      expect(
+        _mergedPlan.speaksForRun(escaping),
+        isFalse,
+        reason:
+            '`ck-2` does not sit under `ck-1`, so one link cannot reach '
+            'both',
+      );
     });
 
     test('a TOC and a sutta page never speak for a run', () {
@@ -567,10 +600,10 @@ final SitePlan _markerPlan = SitePlan.build(
 /// One `tree.json` row: `[pali, sinh, level, [page, entry], parent, fileId]`.
 /// Placeholder names — [SitePlan] reads only keys and parentage.
 List<dynamic> _row(String? parent, [String title = 'pali']) => [
-      title,
-      title,
-      1,
-      const <int>[0, 0],
-      parent ?? 'root',
-      'f'
-    ];
+  title,
+  title,
+  1,
+  const <int>[0, 0],
+  parent ?? 'root',
+  'f',
+];

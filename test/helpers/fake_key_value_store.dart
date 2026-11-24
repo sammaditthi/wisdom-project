@@ -7,7 +7,7 @@ import 'package:the_wisdom_project/core/storage/key_value_store.dart';
 /// same parsing paths as production.
 class InMemoryKeyValueStore implements KeyValueStore {
   InMemoryKeyValueStore([Map<String, Object?>? initial])
-      : _store = {...?initial};
+    : _store = {...?initial};
 
   final Map<String, Object?> _store;
 

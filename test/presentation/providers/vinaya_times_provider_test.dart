@@ -22,8 +22,9 @@ void main() {
   ProviderContainer containerAt(DateTime now, {InMemoryKeyValueStore? store}) {
     final container = ProviderContainer(
       overrides: [
-        keyValueStoreProvider
-            .overrideWithValue(store ?? InMemoryKeyValueStore()),
+        keyValueStoreProvider.overrideWithValue(
+          store ?? InMemoryKeyValueStore(),
+        ),
         minuteClockProvider.overrideWith((ref) => StoppedClock(now)),
       ],
     );
@@ -67,20 +68,21 @@ void main() {
     expect(afterIt.fortnightDay, 1);
   });
 
-  test('an uposatha is the last day of its fortnight: 15 of 15, or 14 of 14',
-      () {
-    // 24 Nov closes a 15-day fortnight, 9 Nov a 14-day one.
-    final day15 = stateAt(sunOn(uposatha).dawn);
-    expect(day15.nextUposatha!.fortnightDays, 15);
-    expect(day15.fortnightDay, 15);
-
-    final day14 = stateAt(sunOn(DateTime.utc(2026, 11, 9)).dawn);
-    expect(day14.nextUposatha!.fortnightDays, 14);
-    expect(day14.fortnightDay, 14);
-  });
-
   test(
-      'Anuradhapura and Na-Uyana until chosen; a choice applies at once and '
+    'an uposatha is the last day of its fortnight: 15 of 15, or 14 of 14',
+    () {
+      // 24 Nov closes a 15-day fortnight, 9 Nov a 14-day one.
+      final day15 = stateAt(sunOn(uposatha).dawn);
+      expect(day15.nextUposatha!.fortnightDays, 15);
+      expect(day15.fortnightDay, 15);
+
+      final day14 = stateAt(sunOn(DateTime.utc(2026, 11, 9)).dawn);
+      expect(day14.nextUposatha!.fortnightDays, 14);
+      expect(day14.fortnightDay, 14);
+    },
+  );
+
+  test('Anuradhapura and Na-Uyana until chosen; a choice applies at once and '
       'survives a restart', () async {
     final store = InMemoryKeyValueStore();
     final now = DateTime.utc(2026, 11, 24, 6); // 11:30 in Sri Lanka

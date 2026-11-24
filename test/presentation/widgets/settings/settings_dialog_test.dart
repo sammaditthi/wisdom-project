@@ -71,10 +71,14 @@ void main() {
   /// selected tab's label is on screen twice and the others once.
   void expectShowing(SettingsTab tab) {
     expect(find.byType(SettingsDialog), findsOneWidget);
-    expect(find.text('General'),
-        tab == SettingsTab.general ? findsNWidgets(2) : findsOneWidget);
-    expect(find.text('Anumodanā'),
-        tab == SettingsTab.anumodana ? findsNWidgets(2) : findsOneWidget);
+    expect(
+      find.text('General'),
+      tab == SettingsTab.general ? findsNWidgets(2) : findsOneWidget,
+    );
+    expect(
+      find.text('Anumodanā'),
+      tab == SettingsTab.anumodana ? findsNWidgets(2) : findsOneWidget,
+    );
   }
 
   group('SettingsDialog on tablet and desktop', () {
@@ -106,9 +110,9 @@ void main() {
 
       // The sidebar entry, not the header title that shares its text.
       Finder sidebarItem(String label) => find.descendant(
-            of: find.byType(ListTile),
-            matching: find.text(label),
-          );
+        of: find.byType(ListTile),
+        matching: find.text(label),
+      );
 
       await tester.tap(sidebarItem('Anumodanā'));
       await tester.pumpAndSettle();
@@ -121,8 +125,9 @@ void main() {
       expect(find.text('Appearance'), findsOneWidget);
     });
 
-    testWidgets('the close button, and a tap outside, both close it',
-        (tester) async {
+    testWidgets('the close button, and a tap outside, both close it', (
+      tester,
+    ) async {
       await pumpHost(tester);
 
       await open(tester);
@@ -137,8 +142,9 @@ void main() {
       expect(find.byType(SettingsDialog), findsNothing);
     });
 
-    testWidgets('the header title sits over its page, on one gutter',
-        (tester) async {
+    testWidgets('the header title sits over its page, on one gutter', (
+      tester,
+    ) async {
       await pumpHost(tester);
       await open(tester);
 
@@ -160,42 +166,50 @@ void main() {
       );
     });
 
-    testWidgets('nothing overflows, and it clamps to a window under 760+insets',
-        (tester) async {
-      // The dialog's surface: Dialog's own Material, whose size is the
-      // SizedBox the layout asks for. `byType(SettingsDialog)` would be the
-      // whole screen, insets and barrier included.
-      final surface = find
-          .descendant(of: find.byType(Dialog), matching: find.byType(Material))
-          .first;
+    testWidgets(
+      'nothing overflows, and it clamps to a window under 760+insets',
+      (tester) async {
+        // The dialog's surface: Dialog's own Material, whose size is the
+        // SizedBox the layout asks for. `byType(SettingsDialog)` would be the
+        // whole screen, insets and barrier included.
+        final surface = find
+            .descendant(
+              of: find.byType(Dialog),
+              matching: find.byType(Material),
+            )
+            .first;
 
-      // 820 is inside the band where the preferred 760 plus Dialog's own
-      // 40px-a-side insets does not fit — what the clamp is for.
-      for (final (window, expected) in const [
-        (_desktop, Size(760, 640)),
-        (Size(820, 700), Size(740, 640)),
-      ]) {
-        await pumpHost(tester, window: window);
-        await open(tester);
+        // 820 is inside the band where the preferred 760 plus Dialog's own
+        // 40px-a-side insets does not fit — what the clamp is for.
+        for (final (window, expected) in const [
+          (_desktop, Size(760, 640)),
+          (Size(820, 700), Size(740, 640)),
+        ]) {
+          await pumpHost(tester, window: window);
+          await open(tester);
 
-        expect(tester.takeException(), isNull, reason: '$window');
-        expect(tester.getSize(surface), expected, reason: '$window');
+          expect(tester.takeException(), isNull, reason: '$window');
+          expect(tester.getSize(surface), expected, reason: '$window');
 
-        await tester.tap(find.byTooltip('Close'));
-        await tester.pumpAndSettle();
-      }
-    });
+          await tester.tap(find.byTooltip('Close'));
+          await tester.pumpAndSettle();
+        }
+      },
+    );
   });
 
   group('SettingsDialog below the mobile breakpoint', () {
-    testWidgets('goes full screen with a tab bar instead of the sidebar',
-        (tester) async {
+    testWidgets('goes full screen with a tab bar instead of the sidebar', (
+      tester,
+    ) async {
       await pumpHost(tester, window: _phone);
       await open(tester);
 
       expect(find.byType(TabBar), findsOneWidget);
-      expect(find.byType(Tab),
-          findsNWidgets(SettingsTab.available(defaultTargetPlatform).length));
+      expect(
+        find.byType(Tab),
+        findsNWidgets(SettingsTab.available(defaultTargetPlatform).length),
+      );
       // The app bar names the dialog; the pages name themselves on the tabs.
       expect(find.text('Settings'), findsOneWidget);
       expect(find.text('General'), findsOneWidget);
@@ -232,8 +246,9 @@ void main() {
   group('SettingsDialog and the Esc stack', () {
     testWidgets('registers while open and is gone once closed', (tester) async {
       final container = await pumpHost(tester);
-      List<String> stack() =>
-          [for (final o in container.read(overlayStackProvider)) o.id];
+      List<String> stack() => [
+        for (final o in container.read(overlayStackProvider)) o.id,
+      ];
 
       expect(stack(), isEmpty);
 
@@ -247,13 +262,16 @@ void main() {
       expect(stack(), isEmpty);
     });
 
-    testWidgets('Esc closes it — what dismissTop does to the top overlay',
-        (tester) async {
+    testWidgets('Esc closes it — what dismissTop does to the top overlay', (
+      tester,
+    ) async {
       final container = await pumpHost(tester);
       await open(tester);
 
       expect(
-          container.read(overlayStackProvider.notifier).dismissTop(), isTrue);
+        container.read(overlayStackProvider.notifier).dismissTop(),
+        isTrue,
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsDialog), findsNothing);
@@ -273,10 +291,8 @@ void main() {
   });
 
   group('Keyboard shortcuts tab (keyboard-shortcuts-sheet.md, rule 3)', () {
-    Finder sidebarItem(String label) => find.descendant(
-          of: find.byType(ListTile),
-          matching: find.text(label),
-        );
+    Finder sidebarItem(String label) =>
+        find.descendant(of: find.byType(ListTile), matching: find.text(label));
 
     testWidgets('desktop has three tabs in order', (tester) async {
       await pumpHost(tester);

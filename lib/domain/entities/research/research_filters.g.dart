@@ -7,11 +7,7 @@ part of 'research_filters.dart';
 // **************************************************************************
 
 _ResearchFilters _$ResearchFiltersFromJson(Map<String, dynamic> json) =>
-    _ResearchFilters(
-      basket: json['basket'] as String?,
-    );
+    _ResearchFilters(basket: json['basket'] as String?);
 
 Map<String, dynamic> _$ResearchFiltersToJson(_ResearchFilters instance) =>
-    <String, dynamic>{
-      'basket': instance.basket,
-    };
+    <String, dynamic>{'basket': instance.basket};

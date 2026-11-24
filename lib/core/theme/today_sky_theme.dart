@@ -180,8 +180,18 @@ class SkyKeyframe {
       other.moonRadius == moonRadius;
 
   @override
-  int get hashCode => Object.hash(zenith, mid, horizon, bloom, bloomAt,
-      bloomRadii, sunGlow, sunRadii, moonHalo, moonRadius);
+  int get hashCode => Object.hash(
+    zenith,
+    mid,
+    horizon,
+    bloom,
+    bloomAt,
+    bloomRadii,
+    sunGlow,
+    sunRadii,
+    moonHalo,
+    moonRadius,
+  );
 }
 
 /// The Today card's sky: five keyframes through the day, blended on the
@@ -200,14 +210,14 @@ class TodaySkyTheme extends ThemeExtension<TodaySkyTheme> {
   });
 
   factory TodaySkyTheme.standard() => const TodaySkyTheme(
-        strength: _strength,
-        lateNight: _lateNight,
-        dawn: _dawn,
-        morning: _morning,
-        afternoon: _afternoon,
-        evening: _evening,
-        stars: _stars,
-      );
+    strength: _strength,
+    lateNight: _lateNight,
+    dawn: _dawn,
+    morning: _morning,
+    afternoon: _afternoon,
+    evening: _evening,
+    stars: _stars,
+  );
 
   final double strength;
   final SkyKeyframe lateNight;
@@ -259,16 +269,15 @@ class TodaySkyTheme extends ThemeExtension<TodaySkyTheme> {
     SkyKeyframe? afternoon,
     SkyKeyframe? evening,
     List<SkyStar>? stars,
-  }) =>
-      TodaySkyTheme(
-        strength: strength ?? this.strength,
-        lateNight: lateNight ?? this.lateNight,
-        dawn: dawn ?? this.dawn,
-        morning: morning ?? this.morning,
-        afternoon: afternoon ?? this.afternoon,
-        evening: evening ?? this.evening,
-        stars: stars ?? this.stars,
-      );
+  }) => TodaySkyTheme(
+    strength: strength ?? this.strength,
+    lateNight: lateNight ?? this.lateNight,
+    dawn: dawn ?? this.dawn,
+    morning: morning ?? this.morning,
+    afternoon: afternoon ?? this.afternoon,
+    evening: evening ?? this.evening,
+    stars: stars ?? this.stars,
+  );
 
   @override
   TodaySkyTheme lerp(covariant ThemeExtension<TodaySkyTheme>? other, double t) {

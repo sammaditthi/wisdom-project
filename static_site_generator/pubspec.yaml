@@ -5,7 +5,7 @@ version: 0.1.0
 publish_to: 'none'
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ^3.13.0
 
 # NO flutter dependency, deliberately. This package compiling under a plain
 # `dart` SDK is the mechanical proof that no UI logic leaked into the

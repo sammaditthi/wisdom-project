@@ -106,8 +106,10 @@ extension SearchTestHelpers on WidgetTester {
     }
     // Explicitly fail so the error message points here, not at a
     // downstream assertion that would produce a confusing message.
-    fail('waitForSearchResults timed out after $maxWait — '
-        'CircularProgressIndicator still visible');
+    fail(
+      'waitForSearchResults timed out after $maxWait — '
+      'CircularProgressIndicator still visible',
+    );
   }
 
   // ---- Reading state ----
@@ -148,10 +150,12 @@ extension SearchTestHelpers on WidgetTester {
   /// Tap a scope filter chip by its label (e.g., "Sutta", "Commentaries").
   /// Only the chip row's text: on the real screen the word can show elsewhere.
   Future<void> tapScopeChip(String chipLabel) async {
-    await tap(find.descendant(
-      of: find.byType(ScopeFilterChips),
-      matching: find.text(chipLabel),
-    ));
+    await tap(
+      find.descendant(
+        of: find.byType(ScopeFilterChips),
+        matching: find.text(chipLabel),
+      ),
+    );
     await pump();
     await waitForSearchResults();
   }
@@ -169,24 +173,23 @@ extension SearchTestHelpers on WidgetTester {
 
   /// Pick "Anywhere in the same text" in the match options menu.
   Future<void> matchWordsAnywhere() => _inMatchMenu(() async {
-        await tap(_matchOption('Anywhere in the same text'));
-        await pump();
-      });
+    await tap(_matchOption('Anywhere in the same text'));
+    await pump();
+  });
 
   /// Pick "Near each other", then step the distance to [distance] with − / +.
   Future<void> matchWordsNear(int distance) => _inMatchMenu(() async {
-        await tap(_matchOption('Near each other'));
-        await pump();
-        // Bounded, so a missed tap fails below rather than looping forever.
-        for (var step = 0; step < 100; step++) {
-          final now = getSearchState().proximityDistance;
-          if (now == distance) break;
-          await tap(
-              find.byTooltip(now < distance ? 'Larger gap' : 'Smaller gap'));
-          await pump();
-        }
-        expect(getSearchState().proximityDistance, distance);
-      });
+    await tap(_matchOption('Near each other'));
+    await pump();
+    // Bounded, so a missed tap fails below rather than looping forever.
+    for (var step = 0; step < 100; step++) {
+      final now = getSearchState().proximityDistance;
+      if (now == distance) break;
+      await tap(find.byTooltip(now < distance ? 'Larger gap' : 'Smaller gap'));
+      await pump();
+    }
+    expect(getSearchState().proximityDistance, distance);
+  });
 
   /// Open the menu, run [choose], wait for the new search, close the menu.
   Future<void> _inMatchMenu(Future<void> Function() choose) async {
@@ -205,9 +208,9 @@ extension SearchTestHelpers on WidgetTester {
   /// A menu option by its title. Scoped to the radio rows, as the button's
   /// own label can read the same ("Starts with").
   Finder _matchOption(String title) => find.ancestor(
-        of: find.text(title),
-        matching: find.byWidgetPredicate((w) => w is RadioMenuButton),
-      );
+    of: find.text(title),
+    matching: find.byWidgetPredicate((w) => w is RadioMenuButton),
+  );
 
   // ---- Refine dialog ----
 
@@ -280,10 +283,7 @@ extension SearchTestHelpers on WidgetTester {
       );
 
       // The closest Row ancestor of the text contains [Icon, Checkbox, Text].
-      final parentRow = find.ancestor(
-        of: nodeText,
-        matching: find.byType(Row),
-      );
+      final parentRow = find.ancestor(of: nodeText, matching: find.byType(Row));
       final checkbox = find.descendant(
         of: parentRow.first,
         matching: find.byType(Checkbox),
@@ -362,8 +362,11 @@ extension SearchTestHelpers on WidgetTester {
       of: find.byType(DictionaryFilterChips),
       matching: find.text(chipLabel),
     );
-    expect(chip, findsOneWidget,
-        reason: 'Dictionary filter chip "$chipLabel" should be visible');
+    expect(
+      chip,
+      findsOneWidget,
+      reason: 'Dictionary filter chip "$chipLabel" should be visible',
+    );
     await tap(chip);
     await pump();
     await waitForSearchResults();
@@ -380,9 +383,13 @@ extension SearchTestHelpers on WidgetTester {
     return switch (chipLabel) {
       'All' => DictionaryFilterOperations.isAllSelected(ids),
       'Sinhala' => DictionaryFilterOperations.containsAllKeys(
-          ids, DictionaryFilterOperations.sinhalaIds),
+        ids,
+        DictionaryFilterOperations.sinhalaIds,
+      ),
       'English' => DictionaryFilterOperations.containsAllKeys(
-          ids, DictionaryFilterOperations.englishIds),
+        ids,
+        DictionaryFilterOperations.englishIds,
+      ),
       _ => false,
     };
   }
@@ -402,8 +409,11 @@ extension SearchTestHelpers on WidgetTester {
       of: find.byType(DictionaryFilterChips),
       matching: find.byIcon(Icons.filter_list),
     );
-    expect(refineChip, findsOneWidget,
-        reason: 'Refine chip should be visible on Definitions tab');
+    expect(
+      refineChip,
+      findsOneWidget,
+      reason: 'Refine chip should be visible on Definitions tab',
+    );
     await tap(refineChip);
     await pumpForSettle(this);
 
@@ -412,25 +422,25 @@ extension SearchTestHelpers on WidgetTester {
     // tiles behind the dialog overlay.
     final dialog = find.byType(Dialog);
     for (final name in dictNames) {
-      final dictText = find.descendant(
-        of: dialog,
-        matching: find.text(name),
+      final dictText = find.descendant(of: dialog, matching: find.text(name));
+      expect(
+        dictText,
+        findsOneWidget,
+        reason: 'Dictionary "$name" should be visible in Refine dialog',
       );
-      expect(dictText, findsOneWidget,
-          reason: 'Dictionary "$name" should be visible in Refine dialog');
 
       // The innermost Row ancestor of dictText is the dictionary item row,
       // which contains the Checkbox we need to toggle.
-      final parentRow = find.ancestor(
-        of: dictText,
-        matching: find.byType(Row),
-      );
+      final parentRow = find.ancestor(of: dictText, matching: find.byType(Row));
       final checkbox = find.descendant(
         of: parentRow.first,
         matching: find.byType(Checkbox),
       );
-      expect(checkbox, findsWidgets,
-          reason: 'Checkbox for "$name" should exist');
+      expect(
+        checkbox,
+        findsWidgets,
+        reason: 'Checkbox for "$name" should exist',
+      );
       await tap(checkbox.first);
       await pumpForSettle(this);
     }

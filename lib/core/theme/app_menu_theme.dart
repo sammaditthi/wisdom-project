@@ -9,19 +9,17 @@ abstract final class AppMenuTheme {
 
   /// Set as `ThemeData.menuTheme`, so a menu needs no style of its own.
   static MenuThemeData of(ColorScheme colors) => MenuThemeData(
-        style: MenuStyle(
-          backgroundColor: WidgetStatePropertyAll(colors.surface),
-          padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(vertical: 8),
-          ),
-          shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: colors.outline),
-            ),
-          ),
+    style: MenuStyle(
+      backgroundColor: WidgetStatePropertyAll(colors.surface),
+      padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 8)),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: colors.outline),
         ),
-      );
+      ),
+    ),
+  );
 
   /// Background of the row that holds the current choice.
   static Color selectedRowColor(ColorScheme colors) =>

@@ -22,21 +22,21 @@ enum SettingsTab {
   final IconData icon;
 
   String label(AppLocalizations l10n) => switch (this) {
-        SettingsTab.general => l10n.settingsGeneral,
-        SettingsTab.vinayaTimes => l10n.settingsVinayaTimes,
-        SettingsTab.shortcuts => l10n.settingsKeyboardShortcuts,
-        SettingsTab.anumodana => l10n.settingsAnumodana,
-      };
+    SettingsTab.general => l10n.settingsGeneral,
+    SettingsTab.vinayaTimes => l10n.settingsVinayaTimes,
+    SettingsTab.shortcuts => l10n.settingsKeyboardShortcuts,
+    SettingsTab.anumodana => l10n.settingsAnumodana,
+  };
 
   /// The tabs [platform] shows: Keyboard shortcuts only on desktop, and
   /// the Time tab only with Home, whose Today card it sets up.
   static List<SettingsTab> available(TargetPlatform platform) => [
-        for (final tab in values)
-          if (switch (tab) {
-            shortcuts => isDesktopPlatform(platform),
-            vinayaTimes => kEnableHome,
-            general || anumodana => true,
-          })
-            tab,
-      ];
+    for (final tab in values)
+      if (switch (tab) {
+        shortcuts => isDesktopPlatform(platform),
+        vinayaTimes => kEnableHome,
+        general || anumodana => true,
+      })
+        tab,
+  ];
 }

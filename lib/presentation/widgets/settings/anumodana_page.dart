@@ -45,12 +45,7 @@ class AnumodanaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        settingsGutter,
-        0,
-        settingsGutter,
-        28,
-      ),
+      padding: const EdgeInsets.fromLTRB(settingsGutter, 0, settingsGutter, 28),
       children: [
         // Hidden until the wording is refined. When it comes back it is the
         // first section again, and Text sources drops `isFirst`.
@@ -173,7 +168,8 @@ class AnumodanaPage extends StatelessWidget {
           title: l10n.anumodanaLicences,
           children: const [
             SettingsRow(
-              label: 'Noto Sans, Noto Serif, Noto Sans Sinhala, '
+              label:
+                  'Noto Sans, Noto Serif, Noto Sans Sinhala, '
                   'Noto Serif Sinhala',
               hint: 'SIL Open Font License 1.1',
               leading: SettingsTile(icon: Icons.text_fields_outlined),
@@ -190,11 +186,9 @@ class AnumodanaPage extends StatelessWidget {
   /// Alphabetical, not `DictionaryInfo.all`'s order — that one ranks them for
   /// the lookup sheet, and a ranking here would read as a recommendation.
   static List<DictionaryInfo> _dictionariesFor(String targetLanguage) => [
-        for (final d in DictionaryInfo.all.values)
-          if (d.targetLanguage == targetLanguage) d,
-      ]..sort(
-          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-        );
+    for (final d in DictionaryInfo.all.values)
+      if (d.targetLanguage == targetLanguage) d,
+  ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 }
 
 /// One language group of dictionary rows, under a small label.
@@ -217,8 +211,9 @@ class _DictionaryGroup extends StatelessWidget {
         for (final d in dictionaries)
           SettingsRow(
             label: d.name,
-            hint:
-                d.id == AnumodanaPage._dpdId ? l10n.anumodanaDpdLicence : null,
+            hint: d.id == AnumodanaPage._dpdId
+                ? l10n.anumodanaDpdLicence
+                : null,
             leading: SettingsTile(text: d.abbreviation),
             trailing: d.id == AnumodanaPage._dpdId
                 ? _OpenLinkButton(name: d.name, url: AnumodanaPage._dpdUrl)

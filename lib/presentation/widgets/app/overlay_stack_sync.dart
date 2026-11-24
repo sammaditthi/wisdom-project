@@ -59,12 +59,14 @@ class OverlayStackSync extends ConsumerWidget {
       searchStateProvider.select((s) => s.isResultsPanelVisible),
       (_, isOpen) {
         if (isOpen) {
-          stack.push(DismissibleOverlay(
-            id: 'fts-panel',
-            // Same path as the field's back arrow: releases the search
-            // bar, closes the panel, and leaves search mode.
-            dismiss: () => ref.read(closeSearchProvider)(),
-          ));
+          stack.push(
+            DismissibleOverlay(
+              id: 'fts-panel',
+              // Same path as the field's back arrow: releases the search
+              // bar, closes the panel, and leaves search mode.
+              dismiss: () => ref.read(closeSearchProvider)(),
+            ),
+          );
         } else {
           stack.remove('fts-panel');
         }
@@ -78,11 +80,13 @@ class OverlayStackSync extends ConsumerWidget {
       activeInPageSearchStateProvider.select((s) => s.isVisible),
       (_, isOpen) {
         if (isOpen) {
-          stack.push(DismissibleOverlay(
-            id: inPageSearchOverlayId,
-            dismiss: () =>
-                ref.read(inPageSearchStatesProvider.notifier).closeSearch(),
-          ));
+          stack.push(
+            DismissibleOverlay(
+              id: inPageSearchOverlayId,
+              dismiss: () =>
+                  ref.read(inPageSearchStatesProvider.notifier).closeSearch(),
+            ),
+          );
         } else {
           stack.remove(inPageSearchOverlayId);
         }
@@ -114,13 +118,15 @@ class OverlayStackSync extends ConsumerWidget {
     // the manual close path inside DictionaryBottomSheet.
     ref.listen<String?>(selectedDictionaryWordProvider, (_, word) {
       if (word != null) {
-        stack.push(DismissibleOverlay(
-          id: dictionaryOverlayId,
-          dismiss: () {
-            ref.read(selectedDictionaryWordProvider.notifier).state = null;
-            ref.read(dictionaryHighlightProvider.notifier).state = null;
-          },
-        ));
+        stack.push(
+          DismissibleOverlay(
+            id: dictionaryOverlayId,
+            dismiss: () {
+              ref.read(selectedDictionaryWordProvider.notifier).state = null;
+              ref.read(dictionaryHighlightProvider.notifier).state = null;
+            },
+          ),
+        );
       } else {
         stack.remove(dictionaryOverlayId);
       }

@@ -156,9 +156,7 @@ String weldTitle(String title) =>
 /// string means the form a search engine holds is not the form they typed. That argument covers strings a *crawler* reads and nothing else;
 /// applying it to visible chrome as well (as this first did) diverges from both
 /// the app and tipitaka.lk, which un-welds `document.title` alone.
-String unweldTitle(String title) => weldTitle(title).replaceAllMapped(
-      _touchingInTitle,
-      (match) => '${match[1]}්${match[2]}',
-    );
+String unweldTitle(String title) => weldTitle(title)
+    .replaceAllMapped(_touchingInTitle, (match) => '${match[1]}්${match[2]}');
 
 final RegExp _touchingInTitle = RegExp('([ක-ෆ])‍්([ක-ෆ])');

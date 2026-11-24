@@ -33,12 +33,8 @@ class InPageMatch {
           matchIndexInEntry == other.matchIndexInEntry;
 
   @override
-  int get hashCode => Object.hash(
-        pageIndex,
-        entryIndex,
-        languageCode,
-        matchIndexInEntry,
-      );
+  int get hashCode =>
+      Object.hash(pageIndex, entryIndex, languageCode, matchIndexInEntry);
 }
 
 /// State for the in-page search feature, scoped per tab.
@@ -105,8 +101,8 @@ class InPageSearchState {
   /// The current match, if any
   InPageMatch? get currentMatch =>
       currentMatchIndex >= 0 && currentMatchIndex < matches.length
-          ? matches[currentMatchIndex]
-          : null;
+      ? matches[currentMatchIndex]
+      : null;
 
   /// Set of (pageIndex, entryIndex, languageCode) tuples that have at least
   /// one match. Used by the renderer to avoid highlighting entries that are

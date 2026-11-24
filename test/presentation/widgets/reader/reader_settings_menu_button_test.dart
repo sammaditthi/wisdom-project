@@ -46,8 +46,9 @@ void main() {
   }
 
   group('ReaderSettingsMenuButton', () {
-    testWidgets('opens under the sliders icon, named "Reader settings"',
-        (tester) async {
+    testWidgets('opens under the sliders icon, named "Reader settings"', (
+      tester,
+    ) async {
       await pumpMenu(tester);
 
       // The gear is the app Settings dialog's now; this menu is sliders.
@@ -60,8 +61,9 @@ void main() {
       expect(find.byType(PopupMenuItem<String>), findsWidgets);
     });
 
-    testWidgets('holds Font size and App layout, and nothing app-wide',
-        (tester) async {
+    testWidgets('holds Font size and App layout, and nothing app-wide', (
+      tester,
+    ) async {
       await pumpMenu(tester);
       await openMenu(tester);
 
@@ -84,8 +86,9 @@ void main() {
       expect(find.textContaining('Version'), findsNothing);
     });
 
-    testWidgets('on a phone there is no rail, so Font size is alone',
-        (tester) async {
+    testWidgets('on a phone there is no rail, so Font size is alone', (
+      tester,
+    ) async {
       tester.useWindow(const Size(390, 800));
       await pumpMenu(tester);
       await openMenu(tester);
@@ -97,8 +100,9 @@ void main() {
       expect(find.text('Hide navigation bar'), findsNothing);
     });
 
-    testWidgets('the slider writes the font scale, rounded to 0.05',
-        (tester) async {
+    testWidgets('the slider writes the font scale, rounded to 0.05', (
+      tester,
+    ) async {
       final container = await pumpMenu(tester);
       await openMenu(tester);
 
@@ -118,14 +122,18 @@ void main() {
       expect(find.text('125%'), findsOneWidget);
     });
 
-    testWidgets('Reset shows only off the default, and restores it',
-        (tester) async {
+    testWidgets('Reset shows only off the default, and restores it', (
+      tester,
+    ) async {
       final container = await pumpMenu(tester);
       await openMenu(tester);
 
       final notifier = container.read(fontScaleProvider.notifier);
-      expect(find.text('Reset'), findsNothing,
-          reason: 'nothing to reset at the default scale');
+      expect(
+        find.text('Reset'),
+        findsNothing,
+        reason: 'nothing to reset at the default scale',
+      );
 
       tester.widget<Slider>(find.byType(Slider)).onChanged!(1.35);
       await tester.pumpAndSettle();
@@ -138,8 +146,9 @@ void main() {
       expect(find.text('Reset'), findsNothing);
     });
 
-    testWidgets('Hide navigation bar toggles the rail provider',
-        (tester) async {
+    testWidgets('Hide navigation bar toggles the rail provider', (
+      tester,
+    ) async {
       final container = await pumpMenu(tester);
       await openMenu(tester);
 
@@ -156,13 +165,15 @@ void main() {
       expect(container.read(navigationRailHiddenProvider), isFalse);
     });
 
-    testWidgets('every row is disabled, so no tap can select or close',
-        (tester) async {
+    testWidgets('every row is disabled, so no tap can select or close', (
+      tester,
+    ) async {
       await pumpMenu(tester);
       await openMenu(tester);
 
       final items = tester.widgetList<PopupMenuItem<String>>(
-          find.byType(PopupMenuItem<String>));
+        find.byType(PopupMenuItem<String>),
+      );
       expect(items, isNotEmpty);
       for (final item in items) {
         expect(item.enabled, isFalse);

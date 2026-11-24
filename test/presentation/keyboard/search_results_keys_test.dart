@@ -102,18 +102,21 @@ void main() {
     expect(stops[0].hasPrimaryFocus, isTrue);
   }, variant: mac);
 
-  testWidgets('↓ ↑ step through the stops; ↑ from the first returns to the box',
-      (tester) async {
-    await pumpSearch(tester);
+  testWidgets(
+    '↓ ↑ step through the stops; ↑ from the first returns to the box',
+    (tester) async {
+      await pumpSearch(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.arrowDown);
-    await pressKeys(tester, LogicalKeyboardKey.arrowDown);
-    expect(stops[1].hasPrimaryFocus, isTrue);
-    await pressKeys(tester, LogicalKeyboardKey.arrowUp);
-    expect(stops[0].hasPrimaryFocus, isTrue);
-    await pressKeys(tester, LogicalKeyboardKey.arrowUp);
-    expect(box.hasPrimaryFocus, isTrue);
-  }, variant: mac);
+      await pressKeys(tester, LogicalKeyboardKey.arrowDown);
+      await pressKeys(tester, LogicalKeyboardKey.arrowDown);
+      expect(stops[1].hasPrimaryFocus, isTrue);
+      await pressKeys(tester, LogicalKeyboardKey.arrowUp);
+      expect(stops[0].hasPrimaryFocus, isTrue);
+      await pressKeys(tester, LogicalKeyboardKey.arrowUp);
+      expect(box.hasPrimaryFocus, isTrue);
+    },
+    variant: mac,
+  );
 
   testWidgets('↓ on the last stop stays there', (tester) async {
     await pumpSearch(tester);
@@ -127,8 +130,9 @@ void main() {
   // Esc and opening a result both close search this way. Flutter used to
   // hand focus from the closing result back to the box, and the box
   // reopened the panel, so it took a second Esc.
-  testWidgets('closing search from a result leaves the box unfocused',
-      (tester) async {
+  testWidgets('closing search from a result leaves the box unfocused', (
+    tester,
+  ) async {
     final c = await pumpSearch(tester);
     await pressKeys(tester, LogicalKeyboardKey.arrowDown);
     expect(stops[0].hasPrimaryFocus, isTrue);
@@ -147,13 +151,12 @@ void main() {
     expect(box.hasPrimaryFocus, isTrue);
   }, variant: mac);
 
-  testWidgets('↑ to a result already in view does not scroll the list',
-      (tester) async {
+  testWidgets('↑ to a result already in view does not scroll the list', (
+    tester,
+  ) async {
     final list = ScrollController();
     addTearDown(list.dispose);
-    final many = [
-      for (var i = 0; i < 30; i++) FocusNode(debugLabel: 'row $i'),
-    ];
+    final many = [for (var i = 0; i < 30; i++) FocusNode(debugLabel: 'row $i')];
     addTearDown(() {
       for (final node in many) {
         node.dispose();
@@ -286,8 +289,9 @@ void main() {
     return visited;
   }
 
-  testWidgets('Tab goes from the box to match options; Shift+Tab comes back',
-      (tester) async {
+  testWidgets('Tab goes from the box to match options; Shift+Tab comes back', (
+    tester,
+  ) async {
     final c = await pumpRealPanel(tester);
 
     await pressKeys(tester, LogicalKeyboardKey.tab);
@@ -299,8 +303,9 @@ void main() {
 
   // Shift+Tab used to step back as ↑ does, and ↑ from the first result goes
   // to the box.
-  testWidgets('Shift+Tab from the first result goes back to the tabs',
-      (tester) async {
+  testWidgets('Shift+Tab from the first result goes back to the tabs', (
+    tester,
+  ) async {
     final c = await pumpRealPanel(tester);
     await tabToResult(tester, c);
     expect(focusedStop(c), 'result');
@@ -312,8 +317,9 @@ void main() {
   // Rows scrolled up out of view still sit above the header on screen, so
   // they could sort in among the chips; and Flutter's own Tab only scrolls
   // down, so it would land on a row above the view and leave it there.
-  testWidgets('scrolled list: Tab walks the panel in order to a row in view',
-      (tester) async {
+  testWidgets('scrolled list: Tab walks the panel in order to a row in view', (
+    tester,
+  ) async {
     final c = await pumpRealPanel(tester);
     final list = find.descendant(
       of: find.byType(SearchResultsPanel),
@@ -348,14 +354,17 @@ void main() {
   }, variant: mac);
 
   test('↓ tries results first, then scrolling', () {
-    final down = shortcutMap(TargetPlatform.macOS).entries.singleWhere((e) {
-      final activator = e.key as SingleActivator;
-      return activator.trigger == LogicalKeyboardKey.arrowDown &&
-          !activator.meta;
-    }).value as PrioritizedIntents;
-    expect(
-      down.orderedIntents.map((i) => i.runtimeType),
-      [MoveIntoSearchResultsIntent, NextSearchResultIntent, ScrollReaderIntent],
-    );
+    final down =
+        shortcutMap(TargetPlatform.macOS).entries.singleWhere((e) {
+              final activator = e.key as SingleActivator;
+              return activator.trigger == LogicalKeyboardKey.arrowDown &&
+                  !activator.meta;
+            }).value
+            as PrioritizedIntents;
+    expect(down.orderedIntents.map((i) => i.runtimeType), [
+      MoveIntoSearchResultsIntent,
+      NextSearchResultIntent,
+      ScrollReaderIntent,
+    ]);
   });
 }

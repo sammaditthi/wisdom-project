@@ -42,48 +42,46 @@ void main() {
   group('lookupWord', () {
     test('returns entries on success', () async {
       // Arrange
-      when(mockDataSource.lookupWord(
-        testWord,
-        exactMatch: false,
-        dictionaryIds: const {},
-        limit: 50,
-      )).thenAnswer((_) async => testEntries);
+      when(
+        mockDataSource.lookupWord(
+          testWord,
+          exactMatch: false,
+          dictionaryIds: const {},
+          limit: 50,
+        ),
+      ).thenAnswer((_) async => testEntries);
 
       // Act
       final result = await repository.lookupWord(testWord);
 
       // Assert
       expect(result.isRight(), true);
-      result.fold(
-        (failure) => fail('Expected Right but got Left'),
-        (entries) {
-          expect(entries, equals(testEntries));
-          expect(entries.length, equals(2));
-        },
-      );
+      result.fold((failure) => fail('Expected Right but got Left'), (entries) {
+        expect(entries, equals(testEntries));
+        expect(entries.length, equals(2));
+      });
     });
 
     test('returns failure on datasource error', () async {
       // Arrange
-      when(mockDataSource.lookupWord(
-        testWord,
-        exactMatch: false,
-        dictionaryIds: const {},
-        limit: 50,
-      )).thenThrow(Exception('Database error'));
+      when(
+        mockDataSource.lookupWord(
+          testWord,
+          exactMatch: false,
+          dictionaryIds: const {},
+          limit: 50,
+        ),
+      ).thenThrow(Exception('Database error'));
 
       // Act
       final result = await repository.lookupWord(testWord);
 
       // Assert
       expect(result.isLeft(), true);
-      result.fold(
-        (failure) {
-          expect(failure, isA<DataLoadFailure>());
-          expect(failure.userMessage, contains('Failed to lookup word'));
-        },
-        (entries) => fail('Expected Left but got Right'),
-      );
+      result.fold((failure) {
+        expect(failure, isA<DataLoadFailure>());
+        expect(failure.userMessage, contains('Failed to lookup word'));
+      }, (entries) => fail('Expected Left but got Right'));
     });
 
     test('returns empty list for whitespace input', () async {
@@ -98,12 +96,14 @@ void main() {
       );
 
       // Verify datasource was never called
-      verifyNever(mockDataSource.lookupWord(
-        any,
-        exactMatch: anyNamed('exactMatch'),
-        dictionaryIds: anyNamed('dictionaryIds'),
-        limit: anyNamed('limit'),
-      ));
+      verifyNever(
+        mockDataSource.lookupWord(
+          any,
+          exactMatch: anyNamed('exactMatch'),
+          dictionaryIds: anyNamed('dictionaryIds'),
+          limit: anyNamed('limit'),
+        ),
+      );
     });
   });
 }

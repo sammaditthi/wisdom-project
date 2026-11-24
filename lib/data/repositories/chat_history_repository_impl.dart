@@ -83,16 +83,18 @@ class ChatHistoryRepositoryImpl implements ChatHistoryRepository {
         final limited = index.take(_maxChats).toList();
 
         await _store.setJson(
-            _chatKey(summary.id), messages.map((m) => m.toJson()).toList());
+          _chatKey(summary.id),
+          messages.map((m) => m.toJson()).toList(),
+        );
         await _writeIndex(limited);
       });
 
   @override
   Future<void> deleteChat(String id) => _serialized(() async {
-        await _store.remove(_chatKey(id));
-        final index = _readIndex()..removeWhere((s) => s.id == id);
-        await _writeIndex(index);
-      });
+    await _store.remove(_chatKey(id));
+    final index = _readIndex()..removeWhere((s) => s.id == id);
+    await _writeIndex(index);
+  });
 
   /// Decode the index, degrading to empty (and clearing the corrupted key)
   /// on any parse failure — matches RecentSearchesRepositoryImpl.

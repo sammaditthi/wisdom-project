@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'citation.dart';
 
 part 'research_answer.freezed.dart';

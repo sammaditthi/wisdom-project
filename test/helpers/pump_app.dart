@@ -30,8 +30,8 @@ import 'fake_key_value_store.dart';
 /// [keyValueStoreProvider] again in their per-call `overrides:` —
 /// caller-supplied overrides win because they come last.
 List<Override> defaultTestOverrides() => [
-      keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore()),
-    ];
+  keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore()),
+];
 
 /// Creates a test wrapper with Riverpod ProviderScope
 ///
@@ -102,7 +102,8 @@ class TestProviderOverrides {
 
   /// Creates an override for the NavigationTreeRepository
   static Override navigationTreeRepository(
-      NavigationTreeRepository repository) {
+    NavigationTreeRepository repository,
+  ) {
     return navigationTreeRepositoryProvider.overrideWithValue(repository);
   }
 
@@ -128,7 +129,8 @@ class TestProviderOverrides {
 
   /// Creates an override for RecentSearchesRepository
   static Override recentSearchesRepository(
-      RecentSearchesRepository repository) {
+    RecentSearchesRepository repository,
+  ) {
     return recentSearchesRepositoryProvider.overrideWithValue(repository);
   }
 }
@@ -159,11 +161,7 @@ class ProviderTestWidget extends ConsumerWidget {
   final Widget child;
   final void Function(WidgetRef ref)? onBuild;
 
-  const ProviderTestWidget({
-    super.key,
-    required this.child,
-    this.onBuild,
-  });
+  const ProviderTestWidget({super.key, required this.child, this.onBuild});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

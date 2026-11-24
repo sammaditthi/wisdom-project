@@ -25,6 +25,7 @@
 library;
 
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import 'entry_renderer.dart';
 import 'node_labels.dart';
 import 'site_build.dart';

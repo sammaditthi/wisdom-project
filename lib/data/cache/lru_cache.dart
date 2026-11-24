@@ -1,4 +1,5 @@
 import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 
 /// Generic LRU (Least Recently Used) cache.
@@ -66,11 +67,11 @@ class LRUCache<K, V> {
 
   /// Immutable snapshot of current cache statistics.
   CacheStats get stats => CacheStats(
-        size: _map.length,
-        maxSize: capacity,
-        hits: _hits,
-        misses: _misses,
-      );
+    size: _map.length,
+    maxSize: capacity,
+    hits: _hits,
+    misses: _misses,
+  );
 }
 
 /// Immutable snapshot of cache statistics for diagnostics.

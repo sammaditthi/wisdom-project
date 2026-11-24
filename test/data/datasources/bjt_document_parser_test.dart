@@ -49,29 +49,42 @@ void main() {
     test('page numbers: Pali from pageNum, Sinhala facing, none unprinted', () {
       // kn-jat starts at printed page 2 and skips odd numbers, so an
       // implementation that used the index would still look plausible.
-      expect(document.pages.map((p) => p.pageNumber), equals([2, 4]),
-          reason: 'Pali page is pageNum, not the page index');
-      expect(document.pages.map((p) => p.sinhalaPageNumber), equals([3, 5]),
-          reason: 'Sinhala is printed on the page facing the Pali');
+      expect(
+        document.pages.map((p) => p.pageNumber),
+        equals([2, 4]),
+        reason: 'Pali page is pageNum, not the page index',
+      );
+      expect(
+        document.pages.map((p) => p.sinhalaPageNumber),
+        equals([3, 5]),
+        reason: 'Sinhala is printed on the page facing the Pali',
+      );
 
       // Their pageNums match no printed page we can check, so they show none.
       for (final fileId in ['atta-kn-jat', 'anya-vm']) {
         final pages = BJTDocumentParser.parseDocument(fileId, fixture).pages;
-        expect(pages.map((p) => p.pageNumber), equals([null, null]),
-            reason: '$fileId has no Pali page number');
-        expect(pages.map((p) => p.sinhalaPageNumber), equals([null, null]),
-            reason: '$fileId has no Sinhala page number');
+        expect(
+          pages.map((p) => p.pageNumber),
+          equals([null, null]),
+          reason: '$fileId has no Pali page number',
+        );
+        expect(
+          pages.map((p) => p.sinhalaPageNumber),
+          equals([null, null]),
+          reason: '$fileId has no Sinhala page number',
+        );
       }
 
       final paliOnly = BJTDocumentParser.parseDocument(
-          'ap-pat',
-          _pageWith({
-            'type': 'paragraph',
-            'text': 'ඒ භගවත්',
-          })).pages.single;
+        'ap-pat',
+        _pageWith({'type': 'paragraph', 'text': 'ඒ භගවත්'}),
+      ).pages.single;
       expect(paliOnly.pageNumber, equals(1));
-      expect(paliOnly.sinhalaPageNumber, isNull,
-          reason: 'No Sinhala text (Paṭṭhāna), so no Sinhala page');
+      expect(
+        paliOnly.sinhalaPageNumber,
+        isNull,
+        reason: 'No Sinhala text (Paṭṭhāna), so no Sinhala page',
+      );
     });
 
     test('sections are tagged pi / si', () {
@@ -90,8 +103,11 @@ void main() {
           ('sinh', page.sinhalaSection),
         ]) {
           final source = _sourceEntries(fixture, i, code);
-          expect(section.entryCount, equals(source.length),
-              reason: 'page $i / $code entry count');
+          expect(
+            section.entryCount,
+            equals(source.length),
+            reason: 'page $i / $code entry count',
+          );
           expect(
             section.entries.map((e) => e.rawText).toList(),
             equals(source.map((e) => e['text']).toList()),
@@ -114,10 +130,14 @@ void main() {
       expect(firstPali[0].entryType, equals(EntryType.centered));
       expect(firstPali[2].entryType, equals(EntryType.heading));
       expect(firstPali[7].entryType, equals(EntryType.gatha));
-      expect(document.pages[0].sinhalaSection.entries[7].entryType,
-          equals(EntryType.paragraph));
-      expect(document.pages[1].paliSection.entries[13].entryType,
-          equals(EntryType.unindented));
+      expect(
+        document.pages[0].sinhalaSection.entries[7].entryType,
+        equals(EntryType.paragraph),
+      );
+      expect(
+        document.pages[1].paliSection.entries[13].entryType,
+        equals(EntryType.unindented),
+      );
     });
 
     test('level is preserved, including where the source omits it', () {
@@ -156,8 +176,10 @@ void main() {
       expect(notes.last, equals('9. චුල්ලක – මඡසං, ස්යා'));
 
       // getFootnote is 1-based, matching the {n} markers above.
-      expect(document.pages[0].paliSection.getFootnote(4),
-          equals('4. වණ්ණපථ – මඡසං'));
+      expect(
+        document.pages[0].paliSection.getFootnote(4),
+        equals('4. වණ්ණපථ – මඡසං'),
+      );
       expect(document.pages[0].paliSection.getFootnote(0), isNull);
     });
 
@@ -194,34 +216,29 @@ void main() {
             for (final entry in section.entries) entry.segmentId,
       ];
       expect(ids.length, equals(60));
-      expect(
-        ids,
-        equals([for (var i = 0; i < 60; i++) '$_fileId:bjt:$i']),
-      );
+      expect(ids, equals([for (var i = 0; i < 60; i++) '$_fileId:bjt:$i']));
     });
   });
 
   group('BJTDocumentParser - degenerate input', () {
     test('an unrecognised type falls back to paragraph', () {
       final parsed = BJTDocumentParser.parseDocument(
-          'x',
-          _pageWith({
-            'type': 'marginalia',
-            'text': 'ඒ භගවත්',
-          }));
-      expect(parsed.pages[0].paliSection.entries[0].entryType,
-          equals(EntryType.paragraph));
+        'x',
+        _pageWith({'type': 'marginalia', 'text': 'ඒ භගවත්'}),
+      );
+      expect(
+        parsed.pages[0].paliSection.entries[0].entryType,
+        equals(EntryType.paragraph),
+      );
     });
 
     test('a section with no footnotes key gives an empty list, not null', () {
       // `_pageWith` writes no `footnotes` key, which is the shape a page blob
       // may well store rather than an explicit `[]`.
       final parsed = BJTDocumentParser.parseDocument(
-          'x',
-          _pageWith({
-            'type': 'paragraph',
-            'text': 'ඒ භගවත්',
-          }));
+        'x',
+        _pageWith({'type': 'paragraph', 'text': 'ඒ භගවත්'}),
+      );
       final section = parsed.pages[0].paliSection;
       expect(section.footnotes, isEmpty);
       expect(section.hasFootnotes, isFalse);
@@ -230,13 +247,13 @@ void main() {
 
     test('type matching ignores case', () {
       final parsed = BJTDocumentParser.parseDocument(
-          'x',
-          _pageWith({
-            'type': 'Gatha',
-            'text': 'ඒ භගවත්',
-          }));
-      expect(parsed.pages[0].paliSection.entries[0].entryType,
-          equals(EntryType.gatha));
+        'x',
+        _pageWith({'type': 'Gatha', 'text': 'ඒ භගවත්'}),
+      );
+      expect(
+        parsed.pages[0].paliSection.entries[0].entryType,
+        equals(EntryType.gatha),
+      );
     });
   });
 }
@@ -255,13 +272,13 @@ List<Map<String, dynamic>> _sourceEntries(
 
 /// A one-page document whose single Pali entry is [entry].
 Map<String, dynamic> _pageWith(Map<String, dynamic> entry) => {
-      'pages': [
-        {
-          'pageNum': 1,
-          'pali': {
-            'entries': [entry]
-          },
-          'sinh': {'entries': <dynamic>[]},
-        }
-      ],
-    };
+  'pages': [
+    {
+      'pageNum': 1,
+      'pali': {
+        'entries': [entry],
+      },
+      'sinh': {'entries': <dynamic>[]},
+    },
+  ],
+};

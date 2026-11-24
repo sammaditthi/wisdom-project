@@ -20,8 +20,9 @@ void main() {
   }) {
     final container = ProviderContainer(
       overrides: [
-        keyValueStoreProvider
-            .overrideWithValue(store ?? InMemoryKeyValueStore()),
+        keyValueStoreProvider.overrideWithValue(
+          store ?? InMemoryKeyValueStore(),
+        ),
         deviceLocalesProvider.overrideWithValue(deviceLocales),
       ],
     );
@@ -43,8 +44,10 @@ void main() {
     test('a saved value wins over the device locale', () {
       // Device says Sinhala, but the user previously chose English.
       final store = InMemoryKeyValueStore({StorageKeys.appLanguage: 'english'});
-      final container =
-          makeContainer(deviceLocales: const [Locale('si')], store: store);
+      final container = makeContainer(
+        deviceLocales: const [Locale('si')],
+        store: store,
+      );
 
       expect(container.read(appLanguageProvider), equals(AppLanguage.english));
     });
@@ -53,8 +56,10 @@ void main() {
   group('appLanguageProvider persistence (1.7) -', () {
     test('the device-derived default is NOT persisted', () {
       final store = InMemoryKeyValueStore();
-      final container =
-          makeContainer(deviceLocales: const [Locale('si')], store: store);
+      final container = makeContainer(
+        deviceLocales: const [Locale('si')],
+        store: store,
+      );
 
       // Reading resolves to Sinhala from the device...
       expect(container.read(appLanguageProvider), equals(AppLanguage.sinhala));
@@ -64,8 +69,10 @@ void main() {
 
     test('an explicit setLanguage persists the choice', () async {
       final store = InMemoryKeyValueStore();
-      final container =
-          makeContainer(deviceLocales: const [Locale('si')], store: store);
+      final container = makeContainer(
+        deviceLocales: const [Locale('si')],
+        store: store,
+      );
 
       await container
           .read(appLanguageProvider.notifier)

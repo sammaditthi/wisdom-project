@@ -22,7 +22,8 @@ void main() {
       );
       expect(
         TipitakaLink.tryParse(
-            'https://app.sammaditthi.net/tipitaka/sn-2-3-1-3'),
+          'https://app.sammaditthi.net/tipitaka/sn-2-3-1-3',
+        ),
         expected,
       );
     });
@@ -34,13 +35,15 @@ void main() {
       );
     });
 
-    test('the sammaditthi:// dev scheme, where "tipitaka" parses as the host',
-        () {
-      expect(
-        TipitakaLink.tryParse('sammaditthi://tipitaka/sn-2-3?e=12.4'),
-        const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 4),
-      );
-    });
+    test(
+      'the sammaditthi:// dev scheme, where "tipitaka" parses as the host',
+      () {
+        expect(
+          TipitakaLink.tryParse('sammaditthi://tipitaka/sn-2-3?e=12.4'),
+          const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 4),
+        );
+      },
+    );
 
     test('a base-href prefix, for the web app served under /app', () {
       expect(
@@ -88,15 +91,17 @@ void main() {
       );
     });
 
-    test('a custom-scheme link with an unexpected host, treated as a prefix',
-        () {
-      // Only the last two segments are load-bearing, so `sammaditthi://foo/…`
-      // resolves exactly like the `/app/` base-href case above.
-      expect(
-        TipitakaLink.tryParse('sammaditthi://foo/tipitaka/sn-2-3'),
-        const TipitakaLink(nodeKey: 'sn-2-3'),
-      );
-    });
+    test(
+      'a custom-scheme link with an unexpected host, treated as a prefix',
+      () {
+        // Only the last two segments are load-bearing, so `sammaditthi://foo/…`
+        // resolves exactly like the `/app/` base-href case above.
+        expect(
+          TipitakaLink.tryParse('sammaditthi://foo/tipitaka/sn-2-3'),
+          const TipitakaLink(nodeKey: 'sn-2-3'),
+        );
+      },
+    );
   });
 
   group('dotted commentary keys resolve (regression)', () {
@@ -161,8 +166,10 @@ void main() {
         'https://host/tipitaka/sn-2-3#', // empty
       ]) {
         expect(
-            TipitakaLink.tryParse(url), const TipitakaLink(nodeKey: 'sn-2-3'),
-            reason: url);
+          TipitakaLink.tryParse(url),
+          const TipitakaLink(nodeKey: 'sn-2-3'),
+          reason: url,
+        );
       }
     });
 
@@ -175,7 +182,8 @@ void main() {
       // carries it and `openTipitakaLinkProvider` resolves it.
       expect(
         TipitakaLink.tryParse(
-            'https://host/tipitaka/atta-sn-2-3-1#via_sn-2-3-1-3'),
+          'https://host/tipitaka/atta-sn-2-3-1#via_sn-2-3-1-3',
+        ),
         const TipitakaLink(nodeKey: 'atta-sn-2-3-1', originKey: 'sn-2-3-1-3'),
       );
     });
@@ -232,9 +240,10 @@ void main() {
         isEmpty,
       );
       expect(
-        const TipitakaLink(nodeKey: 'sn-2-1-10-4', pageKey: 'sn-2-1-10-3')
-            .toUri('https://host')
-            .toString(),
+        const TipitakaLink(
+          nodeKey: 'sn-2-1-10-4',
+          pageKey: 'sn-2-1-10-3',
+        ).toUri('https://host').toString(),
         'https://host/tipitaka/sn-2-1-10-3#sn-2-1-10-4',
       );
     });
@@ -408,28 +417,37 @@ void main() {
 
     test('page and entry are joined with a dot', () {
       expect(
-        const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 4)
-            .toUri('https://sammaditthi.net'),
+        const TipitakaLink(
+          nodeKey: 'sn-2-3',
+          pageIndex: 12,
+          entryIndex: 4,
+        ).toUri('https://sammaditthi.net'),
         Uri.parse('https://sammaditthi.net/tipitaka/sn-2-3?e=12.4'),
       );
     });
 
     test('a page with no entry emits the bare page', () {
       expect(
-        const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12)
-            .toUri('https://sammaditthi.net'),
+        const TipitakaLink(
+          nodeKey: 'sn-2-3',
+          pageIndex: 12,
+        ).toUri('https://sammaditthi.net'),
         Uri.parse('https://sammaditthi.net/tipitaka/sn-2-3?e=12'),
       );
     });
 
-    test('an entry with no page emits nothing — the entry is meaningless alone',
-        () {
-      expect(
-        const TipitakaLink(nodeKey: 'sn-2-3', entryIndex: 4)
-            .toUri('https://sammaditthi.net'),
-        Uri.parse('https://sammaditthi.net/tipitaka/sn-2-3'),
-      );
-    });
+    test(
+      'an entry with no page emits nothing — the entry is meaningless alone',
+      () {
+        expect(
+          const TipitakaLink(
+            nodeKey: 'sn-2-3',
+            entryIndex: 4,
+          ).toUri('https://sammaditthi.net'),
+          Uri.parse('https://sammaditthi.net/tipitaka/sn-2-3'),
+        );
+      },
+    );
 
     test('a path on the base is preserved as a prefix', () {
       expect(
@@ -465,9 +483,10 @@ void main() {
 
     test('the custom scheme puts "tipitaka" in the host position', () {
       expect(
-        const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12)
-            .toCustomSchemeUri()
-            .toString(),
+        const TipitakaLink(
+          nodeKey: 'sn-2-3',
+          pageIndex: 12,
+        ).toCustomSchemeUri().toString(),
         'sammaditthi://tipitaka/sn-2-3?e=12',
       );
     });
@@ -498,18 +517,20 @@ void main() {
       TipitakaLink(nodeKey: 'sn-2-3-1', pageKey: 'sn-2-3-1'),
       // Both keys and a position — what a research citation deep link carries.
       TipitakaLink(
-          nodeKey: 'sn-2-3-1-3',
-          pageKey: 'sn-2-3-1',
-          pageIndex: 4,
-          entryIndex: 1),
+        nodeKey: 'sn-2-3-1-3',
+        pageKey: 'sn-2-3-1',
+        pageIndex: 4,
+        entryIndex: 1,
+      ),
       // The origin form: the other user of the fragment, and the reason
       // `pageKey` and `originKey` exclude each other.
       TipitakaLink(nodeKey: 'atta-sn-2-3-1', originKey: 'sn-2-3-1-3'),
       TipitakaLink(
-          nodeKey: 'atta-sn-2-3-1',
-          originKey: 'sn-2-3-1-3',
-          pageIndex: 4,
-          entryIndex: 1),
+        nodeKey: 'atta-sn-2-3-1',
+        originKey: 'sn-2-3-1-3',
+        pageIndex: 4,
+        entryIndex: 1,
+      ),
     ];
 
     for (final link in links) {
@@ -542,49 +563,67 @@ void main() {
       // are canonicalised to the *same object*, so comparing them would pass
       // even if `==` were `identical` — the assertion has to cross an object
       // boundary to say anything about value semantics at all.
-      final parsed =
-          TipitakaLink.tryParse('https://host/tipitaka/sn-2-3?e=12.4')!;
-      const literal =
-          TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 4);
+      final parsed = TipitakaLink.tryParse(
+        'https://host/tipitaka/sn-2-3?e=12.4',
+      )!;
+      const literal = TipitakaLink(
+        nodeKey: 'sn-2-3',
+        pageIndex: 12,
+        entryIndex: 4,
+      );
       expect(identical(parsed, literal), isFalse);
       expect(parsed, literal);
       expect(parsed.hashCode, literal.hashCode);
     });
 
     test('each field participates in equality', () {
-      const base =
-          TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 4);
+      const base = TipitakaLink(
+        nodeKey: 'sn-2-3',
+        pageIndex: 12,
+        entryIndex: 4,
+      );
       expect(
-          base,
-          isNot(const TipitakaLink(
-              nodeKey: 'sn-2-4', pageIndex: 12, entryIndex: 4)));
+        base,
+        isNot(
+          const TipitakaLink(nodeKey: 'sn-2-4', pageIndex: 12, entryIndex: 4),
+        ),
+      );
       expect(
-          base,
-          isNot(const TipitakaLink(
-              nodeKey: 'sn-2-3', pageIndex: 13, entryIndex: 4)));
+        base,
+        isNot(
+          const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 13, entryIndex: 4),
+        ),
+      );
       expect(
-          base,
-          isNot(const TipitakaLink(
-              nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 5)));
+        base,
+        isNot(
+          const TipitakaLink(nodeKey: 'sn-2-3', pageIndex: 12, entryIndex: 5),
+        ),
+      );
       const marked = TipitakaLink(nodeKey: 'atta-sn-2-3', originKey: 'sn-2-4');
       expect(marked, isNot(const TipitakaLink(nodeKey: 'atta-sn-2-3')));
       expect(
-          marked,
-          isNot(
-              const TipitakaLink(nodeKey: 'atta-sn-2-3', originKey: 'sn-2-5')));
-    });
-
-    test('a link cannot be both served elsewhere and arrived at through a door',
-        () {
-      // Both write the fragment and a URL has one. Caught in the constructor
-      // rather than silently resolved by the writer, where whichever branch
-      // came first would quietly win.
-      expect(
-        () => TipitakaLink(
-            nodeKey: 'sn-2-3', pageKey: 'sn-2', originKey: 'sn-2-4'),
-        throwsA(isA<AssertionError>()),
+        marked,
+        isNot(const TipitakaLink(nodeKey: 'atta-sn-2-3', originKey: 'sn-2-5')),
       );
     });
+
+    test(
+      'a link cannot be both served elsewhere and arrived at through a door',
+      () {
+        // Both write the fragment and a URL has one. Caught in the constructor
+        // rather than silently resolved by the writer, where whichever branch
+        // came first would quietly win.
+        expect(
+          () => TipitakaLink(
+            nodeKey: 'sn-2-3',
+            pageKey: 'sn-2',
+            originKey: 'sn-2-4',
+          ),
+          throwsA(isA<AssertionError>()),
+        );
+      },
+    );
 
     test('a missing position is not the same as position zero', () {
       expect(

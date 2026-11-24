@@ -18,20 +18,21 @@ List<HeaderRule> parseHeaderRules(String file) {
     if (rules.isEmpty || colon < 0) {
       throw FormatException('Not a header under a pattern: "$line"');
     }
-    rules.last.headers[line.substring(0, colon).trim().toLowerCase()] =
-        line.substring(colon + 1).trim();
+    rules.last.headers[line.substring(0, colon).trim().toLowerCase()] = line
+        .substring(colon + 1)
+        .trim();
   }
   return rules;
 }
 
 /// Every URL [assets] holds, by field name.
 Map<String, String> assetUrls(SiteAssets assets) => {
-      'stylesheet': assets.stylesheet,
-      'script': assets.script,
-      'searchIndex': assets.searchIndex,
-      'ogCard': assets.ogCard,
-      'favicon': assets.favicon,
-    };
+  'stylesheet': assets.stylesheet,
+  'script': assets.script,
+  'searchIndex': assets.searchIndex,
+  'ogCard': assets.ogCard,
+  'favicon': assets.favicon,
+};
 
 /// The path of every `/assets/` or `/fonts/` link in [source], query included,
 /// origin dropped, in document order. Only text right after a quote or a `(`
@@ -44,4 +45,5 @@ Iterable<String> assetLinksIn(String source) => _assetLink
     .map((link) => link.startsWith('../') ? link.substring(2) : link);
 
 final RegExp _assetLink = RegExp(
-    r'''["'(](?:https?://[^/"']+)?((?:\.\.)?/(?:assets|fonts)/[^"'()<>\s]+)''');
+  r'''["'(](?:https?://[^/"']+)?((?:\.\.)?/(?:assets|fonts)/[^"'()<>\s]+)''',
+);

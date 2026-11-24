@@ -29,10 +29,10 @@ void main() {
   const defaultParagraph = 17.6;
 
   TextEntryTheme themeAt([double fontScale = 1.0]) => TextEntryTheme.standard(
-        headingColor: const Color(0xFF000000),
-        bodyColor: const Color(0xFF000000),
-        fontScale: fontScale,
-      );
+    headingColor: const Color(0xFF000000),
+    bodyColor: const Color(0xFF000000),
+    fontScale: fontScale,
+  );
 
   group('TextEntryTheme.readingPadding', () {
     group('narrow panes keep the standard uniform 24px padding', () {
@@ -54,8 +54,7 @@ void main() {
       });
     });
 
-    group('wide panes cap the column and split the rest into equal margins',
-        () {
+    group('wide panes cap the column and split the rest into equal margins', () {
       test('just past the threshold grows continuously from 24 (no jump)', () {
         // One pixel past the boundary the horizontal padding is still ~24.5,
         // so there is no visible jump.
@@ -97,27 +96,36 @@ void main() {
           // A 2560px pane is wide enough that every scale is capped.
           final padding = themeAt(scale).readingPadding(2560);
           final column = 2560 - padding.horizontal;
-          expect(column / (defaultParagraph * scale), closeTo(54.5, 0.01),
-              reason: 'measure drifted at ${scale}x');
+          expect(
+            column / (defaultParagraph * scale),
+            closeTo(54.5, 0.01),
+            reason: 'measure drifted at ${scale}x',
+          );
         }
       });
 
       test('a 1.5x reader gets a visibly wider column than a 1.0x one', () {
         // Wider column means narrower margins.
-        expect(themeAt(1.5).readingPadding(2560).left,
-            lessThan(themeAt().readingPadding(2560).left));
+        expect(
+          themeAt(1.5).readingPadding(2560).left,
+          lessThan(themeAt().readingPadding(2560).left),
+        );
       });
     });
   });
 
   group('TextEntryTheme.readingPadding(columns: 2)', () {
-    test('a laptop pane is untouched — the pair still gets the whole window',
-        () {
-      // 1440 is well under 1918.4 + 24*2, so side-by-side reads exactly as it
-      // did before the cap existed.
-      expect(
-          themeAt().readingPadding(1440, columns: 2), const EdgeInsets.all(24));
-    });
+    test(
+      'a laptop pane is untouched — the pair still gets the whole window',
+      () {
+        // 1440 is well under 1918.4 + 24*2, so side-by-side reads exactly as it
+        // did before the cap existed.
+        expect(
+          themeAt().readingPadding(1440, columns: 2),
+          const EdgeInsets.all(24),
+        );
+      },
+    );
 
     test('exactly at the threshold (1918.4 + 48) still stays uniform', () {
       expect(
@@ -129,8 +137,10 @@ void main() {
     test('large external monitor (2560) -> ~321px each side', () {
       // (2560 - 1918.4) / 2 = 320.8 — without this each column would be
       // 1240px, as long a line as the single-column layout used to allow.
-      expect(themeAt().readingPadding(2560, columns: 2).left,
-          closeTo(320.8, 0.01));
+      expect(
+        themeAt().readingPadding(2560, columns: 2).left,
+        closeTo(320.8, 0.01),
+      );
     });
 
     test('the pair is exactly twice the single-script measure', () {

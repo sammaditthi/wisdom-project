@@ -75,7 +75,8 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
   /// Enter sends; Shift+Enter falls through so the field inserts a newline.
   /// Mid-composition, Enter belongs to the IME (it commits the word).
   KeyEventResult _onComposerKey(FocusNode node, KeyEvent event) {
-    final isEnter = event.logicalKey == LogicalKeyboardKey.enter ||
+    final isEnter =
+        event.logicalKey == LogicalKeyboardKey.enter ||
         event.logicalKey == LogicalKeyboardKey.numpadEnter;
     if (event is KeyUpEvent ||
         !isEnter ||
@@ -122,7 +123,8 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
       // restore the user's question to the input so they can edit and
       // rephrase it (plan §4.4). Only fill an empty field, so we never
       // clobber what they're typing.
-      final becameCannotAnswer = next.errorType == ApiErrorType.cannotAnswer &&
+      final becameCannotAnswer =
+          next.errorType == ApiErrorType.cannotAnswer &&
           prev?.errorType != ApiErrorType.cannotAnswer;
       if (becameCannotAnswer &&
           _controller.text.isEmpty &&
@@ -142,7 +144,8 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
     // affordance is derived from the transcript's shape instead, with a
     // neutral message. Without this, a failed FINAL question would be stuck
     // for good behind the turn-limit banner.
-    final hasUnansweredQuestion = state.errorType == null &&
+    final hasUnansweredQuestion =
+        state.errorType == null &&
         !state.isLoading &&
         state.messages.isNotEmpty &&
         state.messages.last.isUser;
@@ -237,14 +240,18 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline,
-                      size: 20, color: colors.onSurfaceVariant),
+                  Icon(
+                    Icons.info_outline,
+                    size: 20,
+                    color: colors.onSurfaceVariant,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       l10n.researchChatLimitReached,
-                      style: context.typography.definitionBody
-                          .copyWith(color: colors.onSurfaceVariant),
+                      style: context.typography.definitionBody.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -344,14 +351,16 @@ class _ResearchChatViewState extends ConsumerState<ResearchChatView> {
                     builder: (context, value, _) {
                       final singleRowTextWidth =
                           constraints.maxWidth - _kControlsReserve;
-                      final painter = TextPainter(
-                        text: TextSpan(text: value.text, style: inputStyle),
-                        maxLines: null,
-                        textDirection: Directionality.of(context),
-                      )..layout(
-                          maxWidth:
-                              singleRowTextWidth > 0 ? singleRowTextWidth : 0,
-                        );
+                      final painter =
+                          TextPainter(
+                            text: TextSpan(text: value.text, style: inputStyle),
+                            maxLines: null,
+                            textDirection: Directionality.of(context),
+                          )..layout(
+                            maxWidth: singleRowTextWidth > 0
+                                ? singleRowTextWidth
+                                : 0,
+                          );
                       final isMultiline =
                           painter.computeLineMetrics().length > 1;
 
@@ -480,8 +489,9 @@ class _MessageTurn extends StatelessWidget {
           // are the same size at every scale.
           child: SelectableText(
             message.content,
-            style: context.typography.definitionBody
-                .copyWith(color: colors.onPrimaryContainer),
+            style: context.typography.definitionBody.copyWith(
+              color: colors.onPrimaryContainer,
+            ),
           ),
         ),
       );
@@ -501,8 +511,11 @@ class _MessageTurn extends StatelessWidget {
                   color: colors.primary,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:
-                    Icon(Icons.auto_awesome, size: 16, color: colors.onPrimary),
+                child: Icon(
+                  Icons.auto_awesome,
+                  size: 16,
+                  color: colors.onPrimary,
+                ),
               ),
               const SizedBox(width: 8),
               Text(

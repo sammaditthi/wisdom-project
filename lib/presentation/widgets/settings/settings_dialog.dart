@@ -51,15 +51,19 @@ class SettingsDialog extends StatefulWidget {
     BuildContext context, {
     SettingsTab initial = SettingsTab.general,
   }) async {
-    final overlayStack = ProviderScope.containerOf(context, listen: false)
-        .read(overlayStackProvider.notifier);
+    final overlayStack = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(overlayStackProvider.notifier);
     final navigator = Navigator.of(context, rootNavigator: true);
-    overlayStack.push(DismissibleOverlay(
-      id: overlayId,
-      dismiss: () {
-        if (navigator.canPop()) navigator.pop();
-      },
-    ));
+    overlayStack.push(
+      DismissibleOverlay(
+        id: overlayId,
+        dismiss: () {
+          if (navigator.canPop()) navigator.pop();
+        },
+      ),
+    );
     try {
       await showDialog<void>(
         context: context,
@@ -81,8 +85,9 @@ class _SettingsDialogState extends State<SettingsDialog>
   late final TabController _tabs;
 
   /// The tabs this platform shows (no Keyboard shortcuts off desktop).
-  final List<SettingsTab> _available =
-      SettingsTab.available(defaultTargetPlatform);
+  final List<SettingsTab> _available = SettingsTab.available(
+    defaultTargetPlatform,
+  );
 
   @override
   void initState() {
@@ -111,11 +116,11 @@ class _SettingsDialogState extends State<SettingsDialog>
   void _close() => Navigator.of(context).pop();
 
   Widget _pageFor(SettingsTab tab) => switch (tab) {
-        SettingsTab.general => const GeneralSettingsPage(),
-        SettingsTab.vinayaTimes => const VinayaTimesSettingsPage(),
-        SettingsTab.shortcuts => const KeyboardShortcutsPage(),
-        SettingsTab.anumodana => const AnumodanaPage(),
-      };
+    SettingsTab.general => const GeneralSettingsPage(),
+    SettingsTab.vinayaTimes => const VinayaTimesSettingsPage(),
+    SettingsTab.shortcuts => const KeyboardShortcutsPage(),
+    SettingsTab.anumodana => const AnumodanaPage(),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +137,10 @@ class _SettingsDialogState extends State<SettingsDialog>
     // are Dialog's defaults, counted on both sides: 40 each horizontally,
     // 24 each vertically.
     final width = math.min(SettingsDialog._preferredWidth, screen.width - 80);
-    final height =
-        math.min(SettingsDialog._preferredHeight, screen.height - 48);
+    final height = math.min(
+      SettingsDialog._preferredHeight,
+      screen.height - 48,
+    );
 
     return Dialog(
       backgroundColor: colors.surfaceContainerLowest,
@@ -152,10 +159,7 @@ class _SettingsDialogState extends State<SettingsDialog>
             Expanded(
               child: Column(
                 children: [
-                  _PageHeader(
-                    title: _selected.label(l10n),
-                    onClose: _close,
-                  ),
+                  _PageHeader(title: _selected.label(l10n), onClose: _close),
                   Expanded(child: _pageFor(_selected)),
                 ],
               ),
@@ -195,9 +199,7 @@ class _SettingsDialogState extends State<SettingsDialog>
         ),
         body: TabBarView(
           controller: _tabs,
-          children: [
-            for (final tab in _available) _pageFor(tab),
-          ],
+          children: [for (final tab in _available) _pageFor(tab)],
         ),
       ),
     );
@@ -247,8 +249,9 @@ class _Sidebar extends StatelessWidget {
                   title: Text(
                     tab.label(l10n),
                     style: context.typography.resultTitle.copyWith(
-                      fontWeight:
-                          tab == selected ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: tab == selected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                       color: tab == selected
                           ? colors.onSecondaryContainer
                           : colors.onSurface,
@@ -285,9 +288,7 @@ class _PageHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(settingsGutter, 14, 8, 2),
       child: Row(
         children: [
-          Expanded(
-            child: Text(title, style: context.typography.dialogTitle),
-          ),
+          Expanded(child: Text(title, style: context.typography.dialogTitle)),
           IconButton(
             icon: const Icon(Icons.close),
             tooltip: AppLocalizations.of(context).close,

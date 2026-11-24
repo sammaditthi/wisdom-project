@@ -48,21 +48,22 @@ final linkBaseUrlProvider = Provider<String>(
 /// that is right in most cases beats a button that silently does nothing.
 final tipitakaLinkUrlBuilderProvider =
     Provider<Future<Uri> Function(TipitakaLink)>((ref) {
-  final baseUrl = ref.watch(linkBaseUrlProvider);
-  return (link) async {
-    try {
-      final plan = await ref.read(sitePlanProvider.future);
-      return plan.servingLink(link).toUri(baseUrl);
-    } catch (_) {
-      return link.toUri(baseUrl);
-    }
-  };
-});
+      final baseUrl = ref.watch(linkBaseUrlProvider);
+      return (link) async {
+        try {
+          final plan = await ref.read(sitePlanProvider.future);
+          return plan.servingLink(link).toUri(baseUrl);
+        } catch (_) {
+          return link.toUri(baseUrl);
+        }
+      };
+    });
 
 /// Copies a [TipitakaLink]'s shareable URL to the clipboard: the one "Copy
 /// link" path. Each caller shows its own confirmation.
-final copyTipitakaLinkProvider =
-    Provider<Future<void> Function(TipitakaLink)>((ref) {
+final copyTipitakaLinkProvider = Provider<Future<void> Function(TipitakaLink)>((
+  ref,
+) {
   return (link) async {
     final url = await ref.read(tipitakaLinkUrlBuilderProvider)(link);
     await Clipboard.setData(ClipboardData(text: url.toString()));
@@ -78,31 +79,31 @@ final copyTipitakaLinkProvider =
 /// tree/search opens and syncs the navigator. Returns true when a tab opened.
 final openTipitakaLinkProvider =
     Provider<Future<bool> Function(TipitakaLink, {bool isPortraitMode})>((ref) {
-  return (TipitakaLink link, {bool isPortraitMode = false}) async {
-    try {
-      await ref.read(navigationTreeProvider.future);
-    } catch (_) {
-      return false; // Tree failed to load — nothing to open into.
-    }
+      return (TipitakaLink link, {bool isPortraitMode = false}) async {
+        try {
+          await ref.read(navigationTreeProvider.future);
+        } catch (_) {
+          return false; // Tree failed to load — nothing to open into.
+        }
 
-    final newIndex = ref.read(openTabFromNodeKeyProvider)(
-      await _resolveTarget(ref, link),
-      isPortraitMode: isPortraitMode,
-      // Passed through untouched. What a page without an entry means is
-      // `openTabFromNodeKeyProvider`'s rule to state, and it already states
-      // it — a second copy here is only somewhere for the two to drift apart.
-      pageIndex: link.pageIndex,
-      entryStart: link.entryIndex,
-    );
-    if (newIndex == -1) return false;
+        final newIndex = ref.read(openTabFromNodeKeyProvider)(
+          await _resolveTarget(ref, link),
+          isPortraitMode: isPortraitMode,
+          // Passed through untouched. What a page without an entry means is
+          // `openTabFromNodeKeyProvider`'s rule to state, and it already states
+          // it — a second copy here is only somewhere for the two to drift apart.
+          pageIndex: link.pageIndex,
+          entryStart: link.entryIndex,
+        );
+        if (newIndex == -1) return false;
 
-    // The tab opened into the Reader section — make that section visible,
-    // whichever section (Home/Research/Notes) the link was opened from.
-    ref.read(selectedAppSectionProvider.notifier).state = AppSection.reader;
-    ref.read(syncNavigatorToActiveTabProvider)();
-    return true;
-  };
-});
+        // The tab opened into the Reader section — make that section visible,
+        // whichever section (Home/Research/Notes) the link was opened from.
+        ref.read(selectedAppSectionProvider.notifier).state = AppSection.reader;
+        ref.read(syncNavigatorToActiveTabProvider)();
+        return true;
+      };
+    });
 
 /// Which node a link opens, with the plan loaded and not trusted to load.
 ///

@@ -8,22 +8,28 @@ void main() {
 
   // [pixels] into a unit that ends at [end].
   ScrollMetrics at(double pixels) => FixedScrollMetrics(
-        minScrollExtent: 0,
-        maxScrollExtent: end,
-        pixels: pixels,
-        viewportDimension: 600,
-        axisDirection: AxisDirection.down,
-        devicePixelRatio: 1,
-      );
+    minScrollExtent: 0,
+    maxScrollExtent: end,
+    pixels: pixels,
+    viewportDimension: 600,
+    axisDirection: AxisDirection.down,
+    devicePixelRatio: 1,
+  );
 
   test('reading on hides it mid-unit, not at the top or the end', () {
     final toolbar = ToolbarAutoHide();
 
-    expect(toolbar.userScrolled(20, at(ToolbarAutoHide.topZone)), isFalse,
-        reason: 'still in the top zone');
+    expect(
+      toolbar.userScrolled(20, at(ToolbarAutoHide.topZone)),
+      isFalse,
+      reason: 'still in the top zone',
+    );
     expect(toolbar.userScrolled(20, at(end)), isFalse, reason: 'at the end');
-    expect(toolbar.userScrolled(20, at(end + 30)), isFalse,
-        reason: 'bouncing past the end');
+    expect(
+      toolbar.userScrolled(20, at(end + 30)),
+      isFalse,
+      reason: 'bouncing past the end',
+    );
     expect(toolbar.shown, isTrue);
 
     expect(toolbar.userScrolled(20, at(500)), isTrue);

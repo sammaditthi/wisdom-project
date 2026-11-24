@@ -86,10 +86,7 @@ List<InlineSpan> dictionaryMeaningSpans(
     if (last.text != null) {
       final trimmed = last.text!.trimRight();
       if (trimmed != last.text) {
-        spans[spans.length - 1] = TextSpan(
-          text: trimmed,
-          style: last.style,
-        );
+        spans[spans.length - 1] = TextSpan(text: trimmed, style: last.style);
       }
     }
   }

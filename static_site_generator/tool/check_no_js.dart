@@ -19,23 +19,28 @@ Future<void> main(List<String> args) async {
 
   final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
-    stderr.writeln('no build directory at $rootPath. Generate one first, or '
-        'pass --build <dir>.');
+    stderr.writeln(
+      'no build directory at $rootPath. Generate one first, or '
+      'pass --build <dir>.',
+    );
     exitCode = 1;
     return;
   }
   stdout.writeln('build   $rootPath');
 
-  final pages = Directory(rootPath)
-      .listSync(recursive: true)
-      .whereType<File>()
-      .map((f) => f.path.substring(rootPath.length + 1))
-      .where((p) => p.endsWith('.html'))
-      .toList()
-    ..sort();
+  final pages =
+      Directory(rootPath)
+          .listSync(recursive: true)
+          .whereType<File>()
+          .map((f) => f.path.substring(rootPath.length + 1))
+          .where((p) => p.endsWith('.html'))
+          .toList()
+        ..sort();
   if (pages.isEmpty) {
-    stdout.writeln('\nFAIL — found no .html files at all, so nothing was '
-        'checked. Treated as a failure.');
+    stdout.writeln(
+      '\nFAIL — found no .html files at all, so nothing was '
+      'checked. Treated as a failure.',
+    );
     exitCode = 1;
     return;
   }
@@ -93,8 +98,10 @@ Future<void> main(List<String> args) async {
 
   stdout.writeln('pages   ${pages.length} checked');
   if (findings.isEmpty) {
-    stdout.writeln('\nPASS — no page depends on JavaScript for its text or '
-        'its navigation.');
+    stdout.writeln(
+      '\nPASS — no page depends on JavaScript for its text or '
+      'its navigation.',
+    );
     return;
   }
 
@@ -110,8 +117,10 @@ Future<void> main(List<String> args) async {
 
 const String _siteScript = '/assets/site.js';
 
-final RegExp _inlineHandler = RegExp(r'\son(?:click|change|input|submit|load|'
-    r'mousedown|mouseup|keydown|keyup|focus|blur)\s*=');
+final RegExp _inlineHandler = RegExp(
+  r'\son(?:click|change|input|submit|load|'
+  r'mousedown|mouseup|keydown|keyup|focus|blur)\s*=',
+);
 final RegExp _anchor = RegExp('<a [^>]*href="([^"]*)"');
 final RegExp _script = RegExp('<script[^>]*>');
 final RegExp _searchTrigger = RegExp('<button[^>]*id="search-open"[^>]*>');

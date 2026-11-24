@@ -45,7 +45,8 @@ class FTSDataSourceImpl implements FTSDataSource {
     } catch (e) {
       _log('Error initializing $editionId: $e');
       throw Exception(
-          'Failed to initialize FTS database for edition $editionId: $e');
+        'Failed to initialize FTS database for edition $editionId: $e',
+      );
     }
   }
 
@@ -317,7 +318,8 @@ class FTSDataSourceImpl implements FTSDataSource {
     // Report if any errors occurred
     if (errors.isNotEmpty) {
       _log(
-          'Failed to close ${errors.length} database(s): ${errors.keys.join(', ')}');
+        'Failed to close ${errors.length} database(s): ${errors.keys.join(', ')}',
+      );
     }
   }
 }

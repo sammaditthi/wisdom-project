@@ -38,13 +38,15 @@ void main() {
       Offset? tappedPosition;
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        text: sinhalaText,
-        onWordTap: (word, position) {
-          tappedWord = word;
-          tappedPosition = position;
-        },
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          text: sinhalaText,
+          onWordTap: (word, position) {
+            tappedWord = word;
+            tappedPosition = position;
+          },
+        ),
+      );
 
       // Find the Text.rich widget and tap it
       final textFinder = find.byType(Text);
@@ -139,18 +141,21 @@ void main() {
       expect(testRef.read(dictionaryHighlightProvider), isNull);
     });
 
-    testWidgets('detects Unicode/Sinhala script words correctly',
-        (tester) async {
+    testWidgets('detects Unicode/Sinhala script words correctly', (
+      tester,
+    ) async {
       // Arrange
       final tappedWords = <String>[];
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        text: sinhalaText,
-        onWordTap: (word, position) {
-          tappedWords.add(word);
-        },
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          text: sinhalaText,
+          onWordTap: (word, position) {
+            tappedWords.add(word);
+          },
+        ),
+      );
 
       // Tap on different parts of the Sinhala text
       final textFinder = find.byType(Text);
@@ -198,20 +203,23 @@ void main() {
       }
 
       testWidgets(
-          'non-tappable text WITH inPageSearchQuery renders as Text.rich',
-          (tester) async {
-        await tester.pumpWidget(buildSearchWidget(
-          text: sinhalaTranslation,
-          enableTap: false,
-          inPageSearchQuery: 'දහමට', // matches text
-        ));
+        'non-tappable text WITH inPageSearchQuery renders as Text.rich',
+        (tester) async {
+          await tester.pumpWidget(
+            buildSearchWidget(
+              text: sinhalaTranslation,
+              enableTap: false,
+              inPageSearchQuery: 'දහමට', // matches text
+            ),
+          );
 
-        // Should render as Text.rich (because in-page highlights are present)
-        final textWidget = tester.widget<Text>(find.byType(Text));
-        // Text.rich has textSpan instead of data
-        expect(textWidget.textSpan, isNotNull);
-        expect(textWidget.data, isNull);
-      });
+          // Should render as Text.rich (because in-page highlights are present)
+          final textWidget = tester.widget<Text>(find.byType(Text));
+          // Text.rich has textSpan instead of data
+          expect(textWidget.textSpan, isNotNull);
+          expect(textWidget.data, isNull);
+        },
+      );
 
       testWidgets('in-page search suppresses FTS highlighting', (tester) async {
         // Set up FTS highlight state AND in-page search query simultaneously
@@ -240,7 +248,9 @@ void main() {
         );
 
         // Set FTS highlight that also matches this text
-        testRef.read(ftsHighlightProvider.notifier).setForTab(
+        testRef
+            .read(ftsHighlightProvider.notifier)
+            .setForTab(
               0,
               const FtsHighlightState(
                 queryText: 'භාසති',

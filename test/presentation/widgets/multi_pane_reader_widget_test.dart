@@ -23,8 +23,9 @@ void main() {
   // Empty State Tests
   // ============================================================
   group('Empty state', () {
-    testWidgets('should show placeholder when no content selected',
-        (tester) async {
+    testWidgets('should show placeholder when no content selected', (
+      tester,
+    ) async {
       // ACT - No tab open, so the active unit resolves to null
       await tester.pumpApp(
         const MultiPaneReaderWidget(),
@@ -49,8 +50,9 @@ void main() {
   // Keyboard bridge (keyboard-shortcuts-sheet.md: sutta and scroll keys)
   // ============================================================
   group('Keyboard bridge', () {
-    testWidgets('the reader attaches to the keyboard bridge while mounted',
-        (tester) async {
+    testWidgets('the reader attaches to the keyboard bridge while mounted', (
+      tester,
+    ) async {
       final overrides = [
         TestProviderOverrides.bjtDocumentRepository(mockRepository),
       ];
@@ -69,9 +71,8 @@ void main() {
     // A held key repeats faster than one scroll animation. Each press adds
     // to where the last one was heading, so none of it is lost.
     testWidgets('a press during a key scroll adds a full line', (tester) async {
-      when(mockRepository.loadDocument('dn-1')).thenAnswer(
-        (_) async => Right(TestData.sampleDocument),
-      );
+      when(mockRepository.loadDocument('dn-1'))
+          .thenAnswer((_) async => Right(TestData.sampleDocument));
       // Short, so the sample text scrolls.
       tester.view.physicalSize = const Size(800, 200);
       tester.view.devicePixelRatio = 1;
@@ -119,9 +120,8 @@ void main() {
 
     // Reading on with the keys hides the toolbar, as the wheel does.
     testWidgets('a key scroll down hides the toolbar', (tester) async {
-      when(mockRepository.loadDocument('dn-1')).thenAnswer(
-        (_) async => Right(TestData.sampleDocument),
-      );
+      when(mockRepository.loadDocument('dn-1'))
+          .thenAnswer((_) async => Right(TestData.sampleDocument));
       // Short, so the sample text scrolls.
       tester.view.physicalSize = const Size(800, 200);
       tester.view.devicePixelRatio = 1;
@@ -163,8 +163,9 @@ void main() {
   // Error State Tests
   // ============================================================
   group('Error state', () {
-    testWidgets('should show error when document loading fails',
-        (tester) async {
+    testWidgets('should show error when document loading fails', (
+      tester,
+    ) async {
       // ARRANGE - Mock repository to return a Failure wrapped in Either
       when(mockRepository.loadDocument('dn-1')).thenAnswer(
         (_) async => const Left(
@@ -197,12 +198,10 @@ void main() {
   group('Content loading', () {
     testWidgets('should show loading indicator initially', (tester) async {
       // ARRANGE - Set up a delayed response with Either<Failure, BJTDocument>
-      when(mockRepository.loadDocument('dn-1')).thenAnswer(
-        (_) async {
-          await Future.delayed(Duration.zero);
-          return Right(TestData.sampleDocument);
-        },
-      );
+      when(mockRepository.loadDocument('dn-1')).thenAnswer((_) async {
+        await Future.delayed(Duration.zero);
+        return Right(TestData.sampleDocument);
+      });
 
       // ACT
       await tester.pumpApp(
@@ -250,7 +249,8 @@ void main() {
 /// The reader as a real tab leaves it: a unit resolved for `dn-1`, and the
 /// file it names.
 List<Override> _readingDn1() => [
-      activeReaderUnitProvider
-          .overrideWith((ref) => AsyncValue.data(TestData.readerUnit('dn-1'))),
-      activeContentFileIdProvider.overrideWith((ref) => 'dn-1'),
-    ];
+  activeReaderUnitProvider.overrideWith(
+    (ref) => AsyncValue.data(TestData.readerUnit('dn-1')),
+  ),
+  activeContentFileIdProvider.overrideWith((ref) => 'dn-1'),
+];

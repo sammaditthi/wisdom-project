@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'app_fonts.dart';
 import 'app_theme.dart';
 
@@ -61,16 +62,17 @@ class ThemeNotifier extends StateNotifier<AppThemeMode> {
 /// Provider for theme state management
 final themeNotifierProvider =
     StateNotifierProvider<ThemeNotifier, AppThemeMode>((ref) {
-  return ThemeNotifier();
-});
+      return ThemeNotifier();
+    });
 
 /// Font scale factor for the entire app.
 ///
 /// Defaults to 0.9 on web and 1.0 on native. The user can adjust this via
 /// the font size slider in settings. The value is persisted to
 /// SharedPreferences.
-final fontScaleProvider =
-    StateNotifierProvider<FontScaleNotifier, double>((ref) {
+final fontScaleProvider = StateNotifierProvider<FontScaleNotifier, double>((
+  ref,
+) {
   return FontScaleNotifier();
 });
 
@@ -82,8 +84,9 @@ class FontScaleNotifier extends StateNotifier<double> {
   static const double minScale = 0.7;
   static const double maxScale = 1.5;
 
-  static const double _platformDefault =
-      kIsWeb ? AppFonts.webDefaultScale : 1.0;
+  static const double _platformDefault = kIsWeb
+      ? AppFonts.webDefaultScale
+      : 1.0;
 
   FontScaleNotifier() : super(_platformDefault);
 

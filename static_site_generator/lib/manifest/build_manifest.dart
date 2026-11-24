@@ -52,9 +52,8 @@ class BuildManifest {
       };
     }
     const encoder = JsonEncoder.withIndent('  ');
-    File(path).writeAsStringSync('${encoder.convert({
-          'generator': 'wisdom-ssg $generatorVersion',
-          'sources': sources,
-        })}\n');
+    File(path).writeAsStringSync(
+      '${encoder.convert({'generator': 'wisdom-ssg $generatorVersion', 'sources': sources})}\n',
+    );
   }
 }

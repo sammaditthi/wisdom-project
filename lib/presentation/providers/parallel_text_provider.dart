@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // `TipitakaNodeKeys` comes from here, not the app's constants.dart, which
 // re-exports the same shared one — importing both is what the analyzer flags.
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import 'navigation_tree_provider.dart';
 import 'navigator_sync_provider.dart';
 import 'tab_provider.dart';
@@ -44,7 +45,9 @@ final parallelTextNodeProvider = Provider.autoDispose((ref) {
 
   // Null while the tree is still decoding, so the button appears with the
   // text rather than before it. `nodeIndexProvider` beside it does the same.
-  final targetKey = ref.watch(sharedTreeProvider).maybeWhen(
+  final targetKey = ref
+      .watch(sharedTreeProvider)
+      .maybeWhen(
         data: (tree) => crossLinkTargetKey(tree, nodeKey),
         orElse: () => null,
       );
@@ -60,22 +63,23 @@ final parallelTextNodeProvider = Provider.autoDispose((ref) {
 /// Goes through [openTabFromNodeKeyProvider] like the tree and breadcrumb, so
 /// it shares their layout seeding and the tab limit. Callers pass
 /// [isPortraitMode] since providers can't access context.
-final openParallelTextProvider =
-    Provider<void Function({bool isPortraitMode})>((ref) {
-  return ({bool isPortraitMode = false}) {
-    final targetNode = ref.read(parallelTextNodeProvider);
-    if (targetNode == null) {
-      return;
-    }
+final openParallelTextProvider = Provider<void Function({bool isPortraitMode})>(
+  (ref) {
+    return ({bool isPortraitMode = false}) {
+      final targetNode = ref.read(parallelTextNodeProvider);
+      if (targetNode == null) {
+        return;
+      }
 
-    final index = ref.read(openTabFromNodeKeyProvider)(
-      targetNode.nodeKey,
-      isPortraitMode: isPortraitMode,
-    );
-    // Refused at the tab limit: leave the tree as the reader had it.
-    if (index < 0) return;
+      final index = ref.read(openTabFromNodeKeyProvider)(
+        targetNode.nodeKey,
+        isPortraitMode: isPortraitMode,
+      );
+      // Refused at the tab limit: leave the tree as the reader had it.
+      if (index < 0) return;
 
-    // Sync navigator to the new active tab.
-    ref.read(syncNavigatorToActiveTabProvider)();
-  };
-});
+      // Sync navigator to the new active tab.
+      ref.read(syncNavigatorToActiveTabProvider)();
+    };
+  },
+);

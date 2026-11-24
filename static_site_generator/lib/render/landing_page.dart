@@ -73,17 +73,13 @@ class LandingPage {
   /// from how Cloudflare serves `404.html`.
   final bool isNotFound;
 
-  const LandingPage({
-    required this.roots,
-    required this.build,
-  }) : isNotFound = false;
+  const LandingPage({required this.roots, required this.build})
+    : isNotFound = false;
 
   /// `404.html` — the same page under a heading that says the address was
   /// wrong.
-  const LandingPage.notFound({
-    required this.roots,
-    required this.build,
-  }) : isNotFound = true;
+  const LandingPage.notFound({required this.roots, required this.build})
+    : isNotFound = true;
 
   /// Written flat at the site root, so its URL is `/`.
   static const String outputPath = 'index.html';
@@ -133,8 +129,10 @@ class LandingPage {
       build.strings[_homageKey],
       isPali: true,
     );
-    body.writeln('<p class="e-paragraph landing-homage" lang="pi-Sinh">'
-        '${escapeHtml(homage)}</p>');
+    body.writeln(
+      '<p class="e-paragraph landing-homage" lang="pi-Sinh">'
+      '${escapeHtml(homage)}</p>',
+    );
     // The same hint under both headings, and it is the right sentence twice:
     // what follows is the list of roots either way, and the reader's next move
     // is the same one.
@@ -154,8 +152,9 @@ class LandingPage {
       // Cloudflare serves these bytes at every address the site has no file
       // for, so a description here is a sentence written on behalf of URLs
       // nobody has seen. The `noindex` below is the whole answer.
-      description:
-          isNotFound ? null : const PageDescription.written(_description),
+      description: isNotFound
+          ? null
+          : const PageDescription.written(_description),
       // The one page on the site that is the site rather than a document in it,
       // which is the whole of `og:type`'s question. `404.html` never reaches
       // the branch — it has no canonical, so it emits no Open Graph at all.
@@ -180,7 +179,8 @@ const String _hintKey = 'statusSelectSuttaToRead';
 /// `/`'s description, written because it has no node to generate one from.
 /// Worded after tipitaka.lk's `Welcome.vue`, with the tree's `අට්ඨකථා` and the
 /// site name's `ත්‍රිපිටකය`. No edition: the commentaries are not Buddha Jayanti.
-const String _description = 'ත්‍රිපිටකයේ පාළි පෙළ, අට්ඨකථා සහ '
+const String _description =
+    'ත්‍රිපිටකයේ පාළි පෙළ, අට්ඨකථා සහ '
     'සිංහල පරිවර්තනය. සම්පූර්ණ ත්‍රිපිටකය සහ අට්ඨකථා නොමිලේ කියවන්න.';
 
 /// ARB key of the not-found heading — "no content available", which is what a

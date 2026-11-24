@@ -30,8 +30,8 @@ import '../tree/tipitaka_tree.dart';
 /// which is a question about the corpus rather than about a link.
 String twinKeyOf(String nodeKey) =>
     nodeKey.startsWith(TipitakaNodeKeys.commentary)
-        ? nodeKey.substring(TipitakaNodeKeys.commentary.length)
-        : '${TipitakaNodeKeys.commentary}$nodeKey';
+    ? nodeKey.substring(TipitakaNodeKeys.commentary.length)
+    : '${TipitakaNodeKeys.commentary}$nodeKey';
 
 /// `2-4. කුසලමූලසමුච්ඡෙදසුත්තාදිවණ්ණනා` → 3, the count of suttas it treats.
 ///
@@ -162,9 +162,9 @@ String originId(String canonKey) => '$originIdPrefix$canonKey';
 /// pattern it holds the path key to.
 String? canonKeyFromOriginId(String fragment) =>
     fragment.length > originIdPrefix.length &&
-            fragment.startsWith(originIdPrefix)
-        ? fragment.substring(originIdPrefix.length)
-        : null;
+        fragment.startsWith(originIdPrefix)
+    ? fragment.substring(originIdPrefix.length)
+    : null;
 
 /// Every canon key whose `අට්ඨකථා` link resolves to [commentaryKey], in reading
 /// order — the inverse of [crossLinkTargetKey] on the canon side.

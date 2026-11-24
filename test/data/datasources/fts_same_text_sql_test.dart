@@ -16,8 +16,9 @@ void main() {
   // The index's own tokenchars, the whole Sinhala block, so a word keeps its
   // combining marks. Built from the range rather than pasted: one invisible
   // character in a literal would quietly retokenize every row.
-  final tokenchars =
-      String.fromCharCodes([for (var c = 0x0D80; c <= 0x0DFF; c++) c]);
+  final tokenchars = String.fromCharCodes([
+    for (var c = 0x0D80; c <= 0x0DFF; c++) c,
+  ]);
 
   const anathapindiko = 'අනාථපිණ්ඩිකො';
   const sariyut = 'සැරියුත්';
@@ -36,10 +37,10 @@ void main() {
     String type = 'paragraph',
   }) async {
     final id = nextId++;
-    await db.customStatement(
-      'INSERT INTO bjt_fts(rowid, text) VALUES (?, ?)',
-      [id, text],
-    );
+    await db.customStatement('INSERT INTO bjt_fts(rowid, text) VALUES (?, ?)', [
+      id,
+      text,
+    ]);
     await db.customStatement(
       'INSERT INTO bjt_meta VALUES (?, ?, ?, ?, ?, ?, ?)',
       [id, filename, eind, language, type, 0, nodeKey],
@@ -128,11 +129,11 @@ void main() {
   tearDown(() async => db.close());
 
   List<String> wordsFor(String query) => FtsSameTextSql.wordQueries(
-        query,
-        isExactMatch: false,
-        isPhraseSearch: false,
-        isAnywhereInText: true,
-      )!;
+    query,
+    isExactMatch: false,
+    isPhraseSearch: false,
+    isAnywhereInText: true,
+  )!;
 
   Future<List<Map<String, dynamic>>> sameText(
     String query, {
@@ -186,10 +187,7 @@ void main() {
 
   group('the bug', () {
     test('the old per-row AND found only the commentary', () async {
-      expect(
-        await perRowAnd('$anathapindiko $sariyut'),
-        ['atta-mn-3-5-1'],
-      );
+      expect(await perRowAnd('$anathapindiko $sariyut'), ['atta-mn-3-5-1']);
     });
 
     test('words in different entries of one sutta now match', () async {
@@ -244,18 +242,20 @@ void main() {
   });
 
   group('paging', () {
-    test('walks the ranked list without repeating or dropping a sutta',
-        () async {
-      const query = '$anathapindiko $sariyut';
-      final all = await matchedNodeKeys(query);
-      expect(all.length, greaterThan(1));
-      final paged = <String>[];
-      for (var offset = 0; offset < all.length; offset++) {
-        final page = await sameText(query, limit: 1, offset: offset);
-        paged.add(page.single['nodeKey'] as String);
-      }
-      expect(paged, all);
-    });
+    test(
+      'walks the ranked list without repeating or dropping a sutta',
+      () async {
+        const query = '$anathapindiko $sariyut';
+        final all = await matchedNodeKeys(query);
+        expect(all.length, greaterThan(1));
+        final paged = <String>[];
+        for (var offset = 0; offset < all.length; offset++) {
+          final page = await sameText(query, limit: 1, offset: offset);
+          paged.add(page.single['nodeKey'] as String);
+        }
+        expect(paged, all);
+      },
+    );
   });
 
   group('filters', () {
@@ -267,17 +267,20 @@ void main() {
     });
 
     test('a language filter applies to every word', () async {
-      expect(await matchedNodeKeys('$anathapindiko $sariyut', language: 'pali'),
-          isEmpty);
       expect(
-          await countSameText('$anathapindiko $sariyut', language: 'pali'), 0);
+        await matchedNodeKeys('$anathapindiko $sariyut', language: 'pali'),
+        isEmpty,
+      );
+      expect(
+        await countSameText('$anathapindiko $sariyut', language: 'pali'),
+        0,
+      );
     });
 
     test('a scope filter applies to every word', () async {
-      expect(
-        await matchedNodeKeys('$anathapindiko $sariyut', scope: {'mn'}),
-        ['mn-3-5-1'],
-      );
+      expect(await matchedNodeKeys('$anathapindiko $sariyut', scope: {'mn'}), [
+        'mn-3-5-1',
+      ]);
     });
   });
 

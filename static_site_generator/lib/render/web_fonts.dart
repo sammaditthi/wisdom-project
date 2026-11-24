@@ -37,12 +37,7 @@ class WebFontFace {
 /// They are in `assets/fonts/` for the Flutter app, which bundles them for UI
 /// chrome the static site does not have.
 List<WebFontFace> webFontFaces(ThemeTokens tokens) {
-  const weights = {
-    'Regular': 400,
-    'Medium': 500,
-    'SemiBold': 600,
-    'Bold': 700,
-  };
+  const weights = {'Regular': 400, 'Medium': 500, 'SemiBold': 600, 'Bold': 700};
   // A list of pairs rather than a map keyed by family name: the two names come
   // from the theme, and if it ever pointed both at one family a map would
   // collapse to a single entry and quietly ship 4 faces instead of 8 — a

@@ -101,8 +101,11 @@ final List<AppShortcut> appShortcuts = [
     desktopOnly: false,
   ),
   AppShortcut(
-    keys:
-        const ShortcutKeys(LogicalKeyboardKey.keyF, primary: true, shift: true),
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.keyF,
+      primary: true,
+      shift: true,
+    ),
     intent: const OpenMainSearchIntent(),
     group: ShortcutGroup.search,
     // The search box's own word: it searches the commentaries too.
@@ -177,8 +180,11 @@ final List<AppShortcut> appShortcuts = [
   // do, and answer with or without ⇧. Not ⌥⌘← →, which Chrome keeps.
   // With ⇧ a browser can name the key by its typed character, < or >.
   AppShortcut(
-    keys:
-        const ShortcutKeys(LogicalKeyboardKey.comma, primary: true, alt: true),
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.comma,
+      primary: true,
+      alt: true,
+    ),
     alsoKeys: const [
       ShortcutKeys(
         LogicalKeyboardKey.comma,
@@ -199,8 +205,11 @@ final List<AppShortcut> appShortcuts = [
     keyCap: '<',
   ),
   AppShortcut(
-    keys:
-        const ShortcutKeys(LogicalKeyboardKey.period, primary: true, alt: true),
+    keys: const ShortcutKeys(
+      LogicalKeyboardKey.period,
+      primary: true,
+      alt: true,
+    ),
     alsoKeys: const [
       ShortcutKeys(
         LogicalKeyboardKey.period,
@@ -259,29 +268,37 @@ final List<AppShortcut> appShortcuts = [
   // Same label: ↑ and ↓ share one row in the Settings tab, as do PgUp PgDn.
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowUp),
-    intent:
-        const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.line),
+    intent: const ScrollReaderIntent(
+      AxisDirection.up,
+      ScrollIncrementType.line,
+    ),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScroll,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.arrowDown),
-    intent:
-        const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.line),
+    intent: const ScrollReaderIntent(
+      AxisDirection.down,
+      ScrollIncrementType.line,
+    ),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScroll,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.pageUp),
-    intent:
-        const ScrollReaderIntent(AxisDirection.up, ScrollIncrementType.page),
+    intent: const ScrollReaderIntent(
+      AxisDirection.up,
+      ScrollIncrementType.page,
+    ),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScrollPage,
   ),
   AppShortcut(
     keys: const ShortcutKeys(LogicalKeyboardKey.pageDown),
-    intent:
-        const ScrollReaderIntent(AxisDirection.down, ScrollIncrementType.page),
+    intent: const ScrollReaderIntent(
+      AxisDirection.down,
+      ScrollIncrementType.page,
+    ),
     group: ShortcutGroup.reader,
     label: (l10n) => l10n.shortcutScrollPage,
   ),

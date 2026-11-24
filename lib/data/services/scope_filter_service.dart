@@ -13,12 +13,11 @@ class ScopeFilterService {
     Set<String> searchScope, {
     String tableAlias = 'm',
     String columnName = 'nodeKey',
-  }) =>
-      ScopeFilterSql.buildWhereClause(
-        searchScope,
-        tableAlias: tableAlias,
-        columnName: columnName,
-      );
+  }) => ScopeFilterSql.buildWhereClause(
+    searchScope,
+    tableAlias: tableAlias,
+    columnName: columnName,
+  );
 
   /// Gets the SQL parameters (exact key + subtree pattern per key).
   /// Returns empty list if [scope] is empty (no parameters needed).
@@ -31,12 +30,11 @@ class ScopeFilterService {
     String? language, {
     String tableAlias = 'm',
     String columnName = 'language',
-  }) =>
-      ScopeFilterSql.buildLanguageClause(
-        language,
-        tableAlias: tableAlias,
-        columnName: columnName,
-      );
+  }) => ScopeFilterSql.buildLanguageClause(
+    language,
+    tableAlias: tableAlias,
+    columnName: columnName,
+  );
 
   /// The bound parameter(s) for the language filter (empty when no filter).
   static List<String> getLanguageParams(String? language) =>

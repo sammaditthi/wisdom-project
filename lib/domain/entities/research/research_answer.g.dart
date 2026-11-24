@@ -10,7 +10,8 @@ _ResearchAnswer _$ResearchAnswerFromJson(Map<String, dynamic> json) =>
     _ResearchAnswer(
       answer: json['answer'] as String,
       lang: json['lang'] as String,
-      citations: (json['citations'] as List<dynamic>?)
+      citations:
+          (json['citations'] as List<dynamic>?)
               ?.map((e) => Citation.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],

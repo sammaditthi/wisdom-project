@@ -35,8 +35,10 @@ Future<void> main(List<String> args) async {
 
   final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
-    stderr.writeln('no build directory at $rootPath. Generate one first, or '
-        'pass --build <dir>.');
+    stderr.writeln(
+      'no build directory at $rootPath. Generate one first, or '
+      'pass --build <dir>.',
+    );
     exitCode = 1;
     return;
   }
@@ -44,13 +46,17 @@ Future<void> main(List<String> args) async {
 
   final shapes = _discover(rootPath);
   if (shapes == null) {
-    stdout.writeln('\nFAIL — could not find one page of every shape in the '
-        'build, so there was nothing to check. Treated as a failure.');
+    stdout.writeln(
+      '\nFAIL — could not find one page of every shape in the '
+      'build, so there was nothing to check. Treated as a failure.',
+    );
     exitCode = 1;
     return;
   }
-  stdout.writeln('pages   leaf ${shapes.leaf}, chapter ${shapes.chapter}, '
-      'container ${shapes.containerToc}, top ${shapes.topToc}');
+  stdout.writeln(
+    'pages   leaf ${shapes.leaf}, chapter ${shapes.chapter}, '
+    'container ${shapes.containerToc}, top ${shapes.topToc}',
+  );
 
   if (options['--shots'] != null) {
     shots = Directory(options['--shots']!)..createSync(recursive: true);
@@ -81,8 +87,10 @@ Future<void> main(List<String> args) async {
     profile = Directory.systemTemp.createTempSync('wisdom-check-chrome');
     final chromePath = options['--chrome'] ?? _findChrome();
     if (chromePath == null) {
-      stderr.writeln('no Chrome found. Pass --chrome <path> or set '
-          'CHROME_PATH.');
+      stderr.writeln(
+        'no Chrome found. Pass --chrome <path> or set '
+        'CHROME_PATH.',
+      );
       exitCode = 1;
       return;
     }
@@ -126,8 +134,10 @@ Future<void> main(List<String> args) async {
 
   stdout.writeln('');
   if (_failed.isEmpty) {
-    stdout.writeln('PASS — the site behaves with script off, with webfonts '
-        'off, across history, and from every page shape.');
+    stdout.writeln(
+      'PASS — the site behaves with script off, with webfonts '
+      'off, across history, and from every page shape.',
+    );
     return;
   }
   for (final failure in _failed) {
@@ -150,17 +160,21 @@ Future<void> _checkScriptOff(_Shapes shapes) async {
     final tall = main == null ? 0.0 : await heightOf(main);
     final links = await queryAll('main.content a[href^="/"]');
     _expect(
-        main != null && tall > 200 && links.isNotEmpty,
-        '${shape.key} renders with script off',
-        'main ${tall}px, ${links.length} internal links');
+      main != null && tall > 200 && links.isNotEmpty,
+      '${shape.key} renders with script off',
+      'main ${tall}px, ${links.length} internal links',
+    );
 
     // site.js is the only thing that unhides the search button, so a button
     // still hidden is also the proof that no script ran.
     final trigger = await query('#search-open');
     if (trigger != null) {
       final hidden = (await attributesOf(trigger)).containsKey('hidden');
-      _expect(hidden && await displayOf(trigger) == 'none',
-          '${shape.key}: search button never appears', 'hidden=$hidden');
+      _expect(
+        hidden && await displayOf(trigger) == 'none',
+        '${shape.key}: search button never appears',
+        'hidden=$hidden',
+      );
     }
   }
 
@@ -185,9 +199,10 @@ Future<void> _checkScriptOff(_Shapes shapes) async {
     final paliShown = pali == null ? 'missing' : await displayOf(pali);
     final siShown = si == null ? 'missing' : await displayOf(si);
     _expect(
-        paliShown == layout.value.$1 && siShown == layout.value.$2,
-        'layout ${layout.key} applies with script off',
-        '.pali=$paliShown .si=$siShown');
+      paliShown == layout.value.$1 && siShown == layout.value.$2,
+      'layout ${layout.key} applies with script off',
+      '.pali=$paliShown .si=$siShown',
+    );
     await shot('script-off-${layout.key}');
   }
 
@@ -199,8 +214,11 @@ Future<void> _checkScriptOff(_Shapes shapes) async {
   } else {
     final parent = (await attributesOf(crumbs.last))['href'];
     await clickAndWait(crumbs.last);
-    _expect(await currentUrl() == '$origin$parent',
-        'breadcrumb link navigates with script off', await currentUrl());
+    _expect(
+      await currentUrl() == '$origin$parent',
+      'breadcrumb link navigates with script off',
+      await currentUrl(),
+    );
   }
 
   // …and the up button, which the stylesheet shows at phone width only.
@@ -212,8 +230,11 @@ Future<void> _checkScriptOff(_Shapes shapes) async {
   } else {
     final parent = (await attributesOf(up))['href'];
     await clickAndWait(up);
-    _expect(await currentUrl() == '$origin$parent',
-        'up button navigates with script off', await currentUrl());
+    _expect(
+      await currentUrl() == '$origin$parent',
+      'up button navigates with script off',
+      await currentUrl(),
+    );
   }
   await shot('script-off-phone');
   await setViewport(wide.w, wide.h);
@@ -230,8 +251,11 @@ Future<void> _checkWebfontOff(_Shapes shapes) async {
   await go(shapes.leaf);
   final withFonts = await _fontsUsed('.sutta .row .pali p');
   stdout.writeln('   on   ${_describe(withFonts)}');
-  _expect(withFonts.keys.any((font) => font.endsWith(_webfontMark)),
-      'the self-hosted face is what renders normally', _describe(withFonts));
+  _expect(
+    withFonts.keys.any((font) => font.endsWith(_webfontMark)),
+    'the self-hosted face is what renders normally',
+    _describe(withFonts),
+  );
 
   await cdp.call('Network.setBlockedURLs', {
     'urls': ['*.woff2', '*.woff', '*/fonts/*'],
@@ -246,30 +270,38 @@ Future<void> _checkWebfontOff(_Shapes shapes) async {
   await shot('webfonts-off');
 
   _expect(
-      !pali.keys.any((font) => font.endsWith(_webfontMark)) &&
-          !sinhala.keys.any((font) => font.endsWith(_webfontMark)),
-      'no self-hosted face survives the block',
-      '${_describe(pali)} | ${_describe(sinhala)}');
+    !pali.keys.any((font) => font.endsWith(_webfontMark)) &&
+        !sinhala.keys.any((font) => font.endsWith(_webfontMark)),
+    'no self-hosted face survives the block',
+    '${_describe(pali)} | ${_describe(sinhala)}',
+  );
 
   for (final column in {'pali': pali, 'si': sinhala, 'ui': crumb}.entries) {
     // `ui` is one breadcrumb crumb, so it paints a handful of glyphs where a
     // paragraph paints dozens.
     final least = column.key == 'ui' ? 8 : 20;
     _expect(
-        _readsSinhala(column.value, least) && !_tofu(column.value),
-        '${column.key} falls back to a system Sinhala face',
-        _describe(column.value));
+      _readsSinhala(column.value, least) && !_tofu(column.value),
+      '${column.key} falls back to a system Sinhala face',
+      _describe(column.value),
+    );
   }
 
   final body = await query('body');
-  _expect(body != null && await heightOf(body) > 500,
-      'the page still lays out with no webfont', 'body height');
+  _expect(
+    body != null && await heightOf(body) > 500,
+    'the page still lays out with no webfont',
+    'body height',
+  );
 
   await setViewport(phone.w, phone.h);
   await go(shapes.leaf);
   final onPhone = await _fontsUsed('.sutta .row .si p');
-  _expect(_readsSinhala(onPhone, 20) && !_tofu(onPhone),
-      'phone width falls back the same way', _describe(onPhone));
+  _expect(
+    _readsSinhala(onPhone, 20) && !_tofu(onPhone),
+    'phone width falls back the same way',
+    _describe(onPhone),
+  );
   await shot('webfonts-off-phone');
   await setViewport(wide.w, wide.h);
 
@@ -309,44 +341,67 @@ Future<void> _checkAnchorHistory(_Shapes shapes) async {
     return bar != null && await displayOf(bar) != 'none';
   }
 
-  _expect((await shown()).length == ids.length,
-      'the bare URL shows the whole run', '${(await shown()).length}');
+  _expect(
+    (await shown()).length == ids.length,
+    'the bare URL shows the whole run',
+    '${(await shown()).length}',
+  );
   _expect(!await barShown(), 'no chapter bar on the bare URL');
 
   await go('${shapes.chapter}#$first');
-  _expect((await shown()).join(',') == first, 'the first anchor filters to it',
-      '${await shown()}');
+  _expect(
+    (await shown()).join(',') == first,
+    'the first anchor filters to it',
+    '${await shown()}',
+  );
   _expect(await barShown(), 'the chapter bar appears in the filtered view');
   await shot('anchor-first');
 
   await go('${shapes.chapter}#$third');
-  _expect((await shown()).join(',') == third, 'the third anchor filters to it',
-      '${await shown()}');
+  _expect(
+    (await shown()).join(',') == third,
+    'the third anchor filters to it',
+    '${await shown()}',
+  );
 
   await history(-1);
-  _expect((await shown()).join(',') == first, 'Back re-evaluates the filter',
-      '${await shown()}');
+  _expect(
+    (await shown()).join(',') == first,
+    'Back re-evaluates the filter',
+    '${await shown()}',
+  );
 
   await history(-1);
-  _expect((await shown()).length == ids.length,
-      'Back again re-evaluates to the whole run', '${(await shown()).length}');
+  _expect(
+    (await shown()).length == ids.length,
+    'Back again re-evaluates to the whole run',
+    '${(await shown()).length}',
+  );
   _expect(!await barShown(), 'the chapter bar goes away again');
 
   await history(1);
-  _expect((await shown()).join(',') == first, 'Forward re-evaluates the filter',
-      '${await shown()}');
+  _expect(
+    (await shown()).join(',') == first,
+    'Forward re-evaluates the filter',
+    '${await shown()}',
+  );
 
   await history(1);
-  _expect((await shown()).join(',') == third,
-      'Forward again re-evaluates the filter', '${await shown()}');
+  _expect(
+    (await shown()).join(',') == third,
+    'Forward again re-evaluates the filter',
+    '${await shown()}',
+  );
   await shot('anchor-forward');
 
   // The pager swap rides on the same gate: filtered, the page's own pager
   // gives way to the targeted section's.
   final pagePager = await query('.chapter ~ .pager');
   if (pagePager != null) {
-    _expect(await displayOf(pagePager) == 'none',
-        "the page's own pager hides in the filtered view");
+    _expect(
+      await displayOf(pagePager) == 'none',
+      "the page's own pager hides in the filtered view",
+    );
   }
 }
 
@@ -367,17 +422,24 @@ Future<void> _checkPageShapes(_Shapes shapes) async {
       // The home icon points here from here; what the landing shape
       // promises is that there is nothing above it to climb.
       final homeHref = home == null ? null : (await attributesOf(home))['href'];
-      _expect(crumbs.isEmpty && await query('a.up') == null && homeHref == '/',
-          'landing has nothing above it', 'crumbs=$crumbs home=$homeHref');
-      _expect((await queryAll('main a[href^="/tipitaka/"]')).isNotEmpty,
-          'landing links into the corpus');
+      _expect(
+        crumbs.isEmpty && await query('a.up') == null && homeHref == '/',
+        'landing has nothing above it',
+        'crumbs=$crumbs home=$homeHref',
+      );
+      _expect(
+        (await queryAll('main a[href^="/tipitaka/"]')).isNotEmpty,
+        'landing links into the corpus',
+      );
       await shot('shape-landing');
       continue;
     }
 
     _expect(home != null, '${shape.key}: breadcrumb starts at home');
-    _expect(await query('nav.breadcrumb span.leaf') != null,
-        '${shape.key}: breadcrumb ends in this page, not a link');
+    _expect(
+      await query('nav.breadcrumb span.leaf') != null,
+      '${shape.key}: breadcrumb ends in this page, not a link',
+    );
 
     // Each crumb is really the parent of the next: the page it names has to
     // link to the one below it, or the trail is decoration.
@@ -395,19 +457,28 @@ Future<void> _checkPageShapes(_Shapes shapes) async {
       }
     }
     _expect(
-        climbs, '${shape.key}: breadcrumb climbs a real ancestor chain', why);
+      climbs,
+      '${shape.key}: breadcrumb climbs a real ancestor chain',
+      why,
+    );
 
     final up = await query('a.up');
     final upHref = up == null ? null : (await attributesOf(up))['href'];
     final parent = crumbs.isEmpty ? null : crumbs.last;
-    _expect(upHref == parent, '${shape.key}: up button points at the parent',
-        'up=$upHref parent=$parent');
+    _expect(
+      upHref == parent,
+      '${shape.key}: up button points at the parent',
+      'up=$upHref parent=$parent',
+    );
 
     if (crumbNodes.isNotEmpty) {
       final target = (await attributesOf(crumbNodes.last))['href'];
       await clickAndWait(crumbNodes.last);
-      _expect(await currentUrl() == '$origin$target',
-          '${shape.key}: the deepest crumb is clickable', await currentUrl());
+      _expect(
+        await currentUrl() == '$origin$target',
+        '${shape.key}: the deepest crumb is clickable',
+        await currentUrl(),
+      );
     }
     await shot('shape-${shape.key}');
 
@@ -431,9 +502,10 @@ Future<void> _checkPageShapes(_Shapes shapes) async {
       }
     }
     _expect(
-        await currentUrl() == '$origin/',
-        '${shape.key}: the toolbar reaches home in $steps step(s)',
-        await currentUrl());
+      await currentUrl() == '$origin/',
+      '${shape.key}: the toolbar reaches home in $steps step(s)',
+      await currentUrl(),
+    );
     await setViewport(wide.w, wide.h);
   }
 
@@ -452,11 +524,11 @@ typedef _Shapes = ({
 extension on _Shapes {
   /// Every shape but the landing page, which has no node key.
   Map<String, String> get all => {
-        'sutta leaf': leaf,
-        'grouped chapter': chapter,
-        'container TOC': containerToc,
-        'top TOC': topToc,
-      };
+    'sutta leaf': leaf,
+    'grouped chapter': chapter,
+    'container TOC': containerToc,
+    'top TOC': topToc,
+  };
 }
 
 /// Finds one page of every shape by reading the build, so no node key is
@@ -464,13 +536,14 @@ extension on _Shapes {
 _Shapes? _discover(String rootPath) {
   final dir = Directory('$rootPath/tipitaka');
   if (!dir.existsSync()) return null;
-  final pages = dir
-      .listSync()
-      .whereType<File>()
-      .map((file) => file.path.split(Platform.pathSeparator).last)
-      .where((name) => name.endsWith('.html'))
-      .toList()
-    ..sort();
+  final pages =
+      dir
+          .listSync()
+          .whereType<File>()
+          .map((file) => file.path.split(Platform.pathSeparator).last)
+          .where((name) => name.endsWith('.html'))
+          .toList()
+        ..sort();
 
   String? leaf, chapter, containerToc, topToc;
   for (final page in pages) {
@@ -565,8 +638,9 @@ Future<String> _pageEndpoint(Directory profile) async {
   for (var attempt = 0; attempt < 60; attempt++) {
     if (portFile.existsSync()) {
       final port = portFile.readAsLinesSync().first;
-      final request =
-          await _http.getUrl(Uri.parse('http://127.0.0.1:$port/json/list'));
+      final request = await _http.getUrl(
+        Uri.parse('http://127.0.0.1:$port/json/list'),
+      );
       final body = await (await request.close()).transform(utf8.decoder).join();
       final targets = (jsonDecode(body) as List).cast<Map<String, dynamic>>();
       for (final target in targets) {
@@ -627,21 +701,26 @@ Future<int> documentRoot() async {
 }
 
 Future<int?> query(String selector) async {
-  final result = await cdp.call('DOM.querySelector',
-      {'nodeId': await documentRoot(), 'selector': selector});
+  final result = await cdp.call('DOM.querySelector', {
+    'nodeId': await documentRoot(),
+    'selector': selector,
+  });
   final nodeId = result['nodeId'] as int;
   return nodeId == 0 ? null : nodeId;
 }
 
 Future<List<int>> queryAll(String selector) async {
-  final result = await cdp.call('DOM.querySelectorAll',
-      {'nodeId': await documentRoot(), 'selector': selector});
+  final result = await cdp.call('DOM.querySelectorAll', {
+    'nodeId': await documentRoot(),
+    'selector': selector,
+  });
   return (result['nodeIds'] as List).cast<int>();
 }
 
 Future<String> displayOf(int nodeId) async {
-  final result =
-      await cdp.call('CSS.getComputedStyleForNode', {'nodeId': nodeId});
+  final result = await cdp.call('CSS.getComputedStyleForNode', {
+    'nodeId': nodeId,
+  });
   for (final property in (result['computedStyle'] as List).cast<Map>()) {
     if (property['name'] == 'display') return property['value'] as String;
   }
@@ -651,9 +730,7 @@ Future<String> displayOf(int nodeId) async {
 Future<Map<String, String>> attributesOf(int nodeId) async {
   final result = await cdp.call('DOM.getAttributes', {'nodeId': nodeId});
   final flat = (result['attributes'] as List).cast<String>();
-  return {
-    for (var i = 0; i + 1 < flat.length; i += 2) flat[i]: flat[i + 1],
-  };
+  return {for (var i = 0; i + 1 < flat.length; i += 2) flat[i]: flat[i + 1]};
 }
 
 Future<double> heightOf(int nodeId) async {
@@ -757,8 +834,9 @@ Future<void> shot(String name) async {
 Future<Map<String, int>> _fontsUsed(String selector, {int take = 6}) async {
   final totals = <String, int>{};
   for (final node in (await queryAll(selector)).take(take)) {
-    final result =
-        await cdp.call('CSS.getPlatformFontsForNode', {'nodeId': node});
+    final result = await cdp.call('CSS.getPlatformFontsForNode', {
+      'nodeId': node,
+    });
     for (final font in (result['fonts'] as List).cast<Map>()) {
       final name = font['familyName'] as String;
       final key = font['isCustomFont'] == true ? '$name$_webfontMark' : name;
@@ -774,15 +852,17 @@ String _describe(Map<String, int> fonts) => fonts.isEmpty
     : fonts.entries.map((f) => '${f.key} ${f.value}').join(', ');
 
 bool _readsSinhala(Map<String, int> fonts, int least) => fonts.entries.any(
-      (font) =>
-          font.value >= least &&
-          (font.key.contains('Sinhala') || font.key.contains('Iskoola')),
-    );
+  (font) =>
+      font.value >= least &&
+      (font.key.contains('Sinhala') || font.key.contains('Iskoola')),
+);
 
-bool _tofu(Map<String, int> fonts) => fonts.keys.any((font) =>
-    font.contains('LastResort') ||
-    font.contains('Apple Symbols') ||
-    font.trim().isEmpty);
+bool _tofu(Map<String, int> fonts) => fonts.keys.any(
+  (font) =>
+      font.contains('LastResort') ||
+      font.contains('Apple Symbols') ||
+      font.trim().isEmpty,
+);
 
 Future<({int status, String body})> _fetch(String path) async {
   final request = await _http.getUrl(Uri.parse('$origin$path'));

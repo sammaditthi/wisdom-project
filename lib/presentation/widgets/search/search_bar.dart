@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
+
 import '../../../core/theme/app_typography.dart';
 import '../../providers/main_search_focus_provider.dart';
 import '../../providers/overlay_stack_provider.dart';
@@ -18,10 +19,7 @@ class SearchBar extends ConsumerStatefulWidget {
   /// Box width; null fills the space given.
   final double? width;
 
-  const SearchBar({
-    super.key,
-    this.width = 360,
-  });
+  const SearchBar({super.key, this.width = 360});
 
   /// Search mode on phones: fills the app bar, takes focus as it appears, and
   /// shows recent searches as a card under the bar, as wide as the field.
@@ -143,7 +141,9 @@ class _SearchBarState extends ConsumerState<SearchBar> {
   void _openRecentOverlay() {
     if (_overlayController.isShowing) return;
     _overlayController.show();
-    ref.read(overlayStackProvider.notifier).push(
+    ref
+        .read(overlayStackProvider.notifier)
+        .push(
           DismissibleOverlay(
             id: 'recent-searches',
             // ESC mirrors the tap-outside flow: drop the dropdown AND
@@ -188,14 +188,16 @@ class _SearchBarState extends ConsumerState<SearchBar> {
 
     // Watch if results panel is visible (query is not empty)
     // When query has any text, the results panel is shown instead
-    final isResultsPanelVisible =
-        ref.watch(searchStateProvider.select((s) => s.isResultsPanelVisible));
+    final isResultsPanelVisible = ref.watch(
+      searchStateProvider.select((s) => s.isResultsPanelVisible),
+    );
 
     // Same scroll signal the AppBar uses, so the pill's fill stays aligned.
     final scrolledUnder = ref.watch(readerScrolledUnderProvider);
 
-    final rawQueryText =
-        ref.watch(searchStateProvider.select((s) => s.rawQueryText));
+    final rawQueryText = ref.watch(
+      searchStateProvider.select((s) => s.rawQueryText),
+    );
 
     // Search is open: the back arrow at the field's start closes it. The one
     // close button at every width.
@@ -226,98 +228,100 @@ class _SearchBarState extends ConsumerState<SearchBar> {
     });
 
     Widget searchBox(double width) => SizedBox(
-          width: width,
-          height: 40,
-          child: Container(
-            decoration: BoxDecoration(
-              // The fill says what the box is, not whether it has focus:
-              // idle, or scrolled so it merges with the AppBar.
-              color: scrolledUnder
-                  ? theme.colorScheme.surfaceContainer
-                  : theme.colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(20),
-              // Focus is the border, as on the in-page search bar. Always 1px
-              // so the change doesn't reflow inner content by the stroke width.
-              border: Border.all(
-                color: _focusNode.hasFocus
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.outline,
-                width: 1,
-              ),
+      width: width,
+      height: 40,
+      child: Container(
+        decoration: BoxDecoration(
+          // The fill says what the box is, not whether it has focus:
+          // idle, or scrolled so it merges with the AppBar.
+          color: scrolledUnder
+              ? theme.colorScheme.surfaceContainer
+              : theme.colorScheme.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(20),
+          // Focus is the border, as on the in-page search bar. Always 1px
+          // so the change doesn't reflow inner content by the stroke width.
+          border: Border.all(
+            color: _focusNode.hasFocus
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline,
+            width: 1,
+          ),
+        ),
+        child: TextField(
+          controller: _controller,
+          focusNode: _focusNode,
+          style: inputStyle,
+          decoration: InputDecoration(
+            hintText: l10n.searchHint,
+            hintStyle: hintStyle,
+            prefixIcon: isSearchOpen
+                ? BackButton(
+                    onPressed: _closeSearch,
+                    color: theme.colorScheme.onSurfaceVariant,
+                    style: const ButtonStyle(
+                      iconSize: WidgetStatePropertyAll(20),
+                    ),
+                  )
+                : Icon(
+                    Icons.search,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+            // Desktop's compact size on every platform, so the back
+            // button and the ✕ fit the 40px box on phones too.
+            prefixIconConstraints: const BoxConstraints.tightFor(
+              width: 40,
+              height: 40,
             ),
-            child: TextField(
-              controller: _controller,
-              focusNode: _focusNode,
-              style: inputStyle,
-              decoration: InputDecoration(
-                hintText: l10n.searchHint,
-                hintStyle: hintStyle,
-                prefixIcon: isSearchOpen
-                    ? BackButton(
-                        onPressed: _closeSearch,
-                        color: theme.colorScheme.onSurfaceVariant,
-                        style: const ButtonStyle(
-                          iconSize: WidgetStatePropertyAll(20),
-                        ),
-                      )
-                    : Icon(
-                        Icons.search,
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            isDense: true,
+            suffixIcon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (singlishPreview != null)
+                  SinglishPreview(singlishPreview, fieldWidth: width),
+                // Clear button (only shown when text is present)
+                if (_controller.text.isNotEmpty)
+                  SizedBox.square(
+                    dimension: 40,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.clear,
                         size: 20,
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
-                // Desktop's compact size on every platform, so the back
-                // button and the ✕ fit the 40px box on phones too.
-                prefixIconConstraints:
-                    const BoxConstraints.tightFor(width: 40, height: 40),
-                suffixIconConstraints:
-                    const BoxConstraints(minWidth: 40, minHeight: 40),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                isDense: true,
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (singlishPreview != null)
-                      SinglishPreview(singlishPreview, fieldWidth: width),
-                    // Clear button (only shown when text is present)
-                    if (_controller.text.isNotEmpty)
-                      SizedBox.square(
-                        dimension: 40,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: Icon(
-                            Icons.clear,
-                            size: 20,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          tooltip: l10n.clear,
-                          onPressed: () {
-                            // Empties the query only: filters and recent
-                            // searches stay, so the recent list comes back.
-                            _controller.clear();
-                            ref
-                                .read(searchStateProvider.notifier)
-                                .updateQuery('');
-                            _focusNode.requestFocus();
-                          },
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              onChanged: (value) {
-                ref.read(searchStateProvider.notifier).updateQuery(value);
-              },
-              onSubmitted: (value) {
-                // Dismiss keyboard on mobile when user presses Enter
-                // Note: Search happens automatically via debounced updateQuery
-                // Recent searches are saved when user clicks a result
-                _focusNode.unfocus();
-              },
+                      tooltip: l10n.clear,
+                      onPressed: () {
+                        // Empties the query only: filters and recent
+                        // searches stay, so the recent list comes back.
+                        _controller.clear();
+                        ref.read(searchStateProvider.notifier).updateQuery('');
+                        _focusNode.requestFocus();
+                      },
+                    ),
+                  ),
+              ],
             ),
           ),
-        );
+          onChanged: (value) {
+            ref.read(searchStateProvider.notifier).updateQuery(value);
+          },
+          onSubmitted: (value) {
+            // Dismiss keyboard on mobile when user presses Enter
+            // Note: Search happens automatically via debounced updateQuery
+            // Recent searches are saved when user clicks a result
+            _focusNode.unfocus();
+          },
+        ),
+      ),
+    );
 
     // Positioned from layout info, not a CompositedTransformFollower: a
     // follower breaks tooltips inside the dropdown (they need the paint
@@ -335,9 +339,10 @@ class _SearchBarState extends ConsumerState<SearchBar> {
           info.childPaintTransform,
           info.childSize.bottomRight(Offset.zero),
         );
-        final boxLeft =
-            MatrixUtils.transformPoint(info.childPaintTransform, Offset.zero)
-                .dx;
+        final boxLeft = MatrixUtils.transformPoint(
+          info.childPaintTransform,
+          Offset.zero,
+        ).dx;
         // 8px below the box; in search mode that is the app bar's bottom.
         final top = anchor.dy + 8;
 
@@ -368,9 +373,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
               Positioned(
                 top: top,
                 right: info.overlaySize.width - anchor.dx,
-                child: RecentSearchOverlay(
-                  onDismiss: _hideOverlay,
-                ),
+                child: RecentSearchOverlay(onDismiss: _hideOverlay),
               ),
           ],
         );

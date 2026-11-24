@@ -15,9 +15,8 @@ void main() {
     final container = ProviderContainer(
       overrides: [
         searchStateProvider.overrideWith(
-          (ref) => FakeSearchStateNotifier(
-            const SearchState(rawQueryText: 'Dhp 5'),
-          ),
+          (ref) =>
+              FakeSearchStateNotifier(const SearchState(rawQueryText: 'Dhp 5')),
         ),
         // No dhp5 uid: only the range holding verse 5.
         suttaCentralRefResolverProvider.overrideWith(

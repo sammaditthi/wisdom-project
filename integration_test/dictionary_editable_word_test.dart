@@ -66,15 +66,15 @@ TapGestureRecognizer? findWordRecognizer(
 
 /// Finder for the [TextField] inside the [DictionaryBottomSheet] header.
 Finder findDictionaryTextField() => find.descendant(
-      of: find.byType(DictionaryBottomSheet),
-      matching: find.byType(TextField),
-    );
+  of: find.byType(DictionaryBottomSheet),
+  matching: find.byType(TextField),
+);
 
 /// Finder for the backspace icon button inside the dictionary sheet.
 Finder findBackspaceButton() => find.descendant(
-      of: find.byType(DictionaryBottomSheet),
-      matching: find.byIcon(Icons.backspace_outlined),
-    );
+  of: find.byType(DictionaryBottomSheet),
+  matching: find.byIcon(Icons.backspace_outlined),
+);
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -110,27 +110,45 @@ void main() {
 
         // STEP 1: Tap "භික්ඛවෙ" in the Pali text
         final recognizer = findWordRecognizer(tester, 'භික්ඛවෙ');
-        expect(recognizer, isNotNull,
-            reason: 'Should find TapGestureRecognizer for භික්ඛවෙ');
+        expect(
+          recognizer,
+          isNotNull,
+          reason: 'Should find TapGestureRecognizer for භික්ඛවෙ',
+        );
         recognizer!.onTap!();
         await pumpForSettle(tester, const Duration(seconds: 1));
 
         // ASSERT: Dictionary bottom sheet is visible
-        expect(find.byType(DictionaryBottomSheet), findsOneWidget,
-            reason: 'Dictionary sheet should appear after word tap');
+        expect(
+          find.byType(DictionaryBottomSheet),
+          findsOneWidget,
+          reason: 'Dictionary sheet should appear after word tap',
+        );
 
         // ASSERT: selectedDictionaryWordProvider holds the word with conjuncts
         final selectedWord = container.read(selectedDictionaryWordProvider);
-        expect(selectedWord, isNotNull,
-            reason: 'Provider should hold the selected word');
-        expect(selectedWord, contains('\u200D'),
-            reason: 'Selected word should contain ZWJ for conjunct display');
-        expect(removeConjunctFormatting(selectedWord!), 'භික්ඛවෙ',
-            reason: 'Stripping ZWJ should yield the raw Pali word');
+        expect(
+          selectedWord,
+          isNotNull,
+          reason: 'Provider should hold the selected word',
+        );
+        expect(
+          selectedWord,
+          contains('\u200D'),
+          reason: 'Selected word should contain ZWJ for conjunct display',
+        );
+        expect(
+          removeConjunctFormatting(selectedWord!),
+          'භික්ඛවෙ',
+          reason: 'Stripping ZWJ should yield the raw Pali word',
+        );
 
         // STEP 2: Verify first result contains expected definition
-        expect(find.textContaining('monks'), findsWidgets,
-            reason: 'First result for භික්ඛවෙ should contain "monks"');
+        expect(
+          find.textContaining('monks'),
+          findsWidgets,
+          reason: 'First result for භික්ඛවෙ should contain "monks"',
+        );
 
         // STEP 3: Backspace twice to change word from භික්ඛවෙ → භික්ඛ
         // (removing ෙ then ව — each backspace deletes one char)
@@ -146,13 +164,18 @@ void main() {
         // The backspace button removes one code unit at a time, preserving
         // the ZWJ characters inserted by beautifyPaliText.
         final textField = tester.widget<TextField>(findDictionaryTextField());
-        expect(removeConjunctFormatting(textField.controller!.text), 'භික්ඛ',
-            reason:
-                'TextField should show "භික්ඛ" (with conjuncts) after 2 backspaces');
+        expect(
+          removeConjunctFormatting(textField.controller!.text),
+          'භික්ඛ',
+          reason: 'TextField should show "භික්ඛ" (with conjuncts) after 2 backspaces',
+        );
 
         // ASSERT: Results updated — first record should contain bhikkha definition
-        expect(find.textContaining('භු යාචනෙ'), findsWidgets,
-            reason: 'After editing to භික්ඛ, results should contain භු යාචනෙ');
+        expect(
+          find.textContaining('භු යාචනෙ'),
+          findsWidgets,
+          reason: 'After editing to භික්ඛ, results should contain භු යාචනෙ',
+        );
       },
     );
 
@@ -189,27 +212,38 @@ void main() {
         await pumpForSettle(tester);
 
         // ASSERT: TextField (pinned header) is still visible after expansion
-        expect(findDictionaryTextField(), findsOneWidget,
-            reason:
-                'Editable word field should be visible after dragging sheet up');
-        expect(tester.getTopLeft(findDictionaryTextField()).dy >= 0, isTrue,
-            reason: 'TextField should not be above the screen top');
+        expect(
+          findDictionaryTextField(),
+          findsOneWidget,
+          reason:
+              'Editable word field should be visible after dragging sheet up',
+        );
+        expect(
+          tester.getTopLeft(findDictionaryTextField()).dy >= 0,
+          isTrue,
+          reason: 'TextField should not be above the screen top',
+        );
 
         // Now scroll through results (fling up in the sheet content)
         await tester.fling(sheetScrollable, const Offset(0, -300), 800);
         await pumpForSettle(tester);
 
         // ASSERT: Header is STILL visible (pinned) even after scrolling content
-        expect(findDictionaryTextField(), findsOneWidget,
-            reason:
-                'Pinned header should remain visible after scrolling results');
+        expect(
+          findDictionaryTextField(),
+          findsOneWidget,
+          reason: 'Pinned header should remain visible after scrolling results',
+        );
 
         // Verify header doesn't go behind the tab bar:
         // TabBarWidget should be above the TextField
         final tabBarBottom = tester.getBottomLeft(find.byType(TabBarWidget)).dy;
         final textFieldTop = tester.getTopLeft(findDictionaryTextField()).dy;
-        expect(textFieldTop, greaterThanOrEqualTo(tabBarBottom),
-            reason: 'Dictionary header must not go behind the tab bar');
+        expect(
+          textFieldTop,
+          greaterThanOrEqualTo(tabBarBottom),
+          reason: 'Dictionary header must not go behind the tab bar',
+        );
 
         // Edit the word to trigger content change while scrolled
         await tester.tap(findBackspaceButton());
@@ -219,215 +253,275 @@ void main() {
         await pumpForSettle(tester, const Duration(seconds: 1));
 
         // ASSERT: Header still visible after content change
-        expect(findDictionaryTextField(), findsOneWidget,
-            reason:
-                'Pinned header should remain visible after content changes');
+        expect(
+          findDictionaryTextField(),
+          findsOneWidget,
+          reason: 'Pinned header should remain visible after content changes',
+        );
       },
     );
 
     // =================================================================
     // Test 3: Singlish input triggers Sinhala lookup
     // =================================================================
-    testWidgets(
-      '3. Clear word, type Singlish "abhinandhathi", verify result',
-      (tester) async {
-        final container = await pumpReaderApp(tester);
+    testWidgets('3. Clear word, type Singlish "abhinandhathi", verify result', (
+      tester,
+    ) async {
+      final container = await pumpReaderApp(tester);
 
-        final tab = tabFromNode(container, 'mn-1-1-1');
-        await openTab(tester, container, tab);
+      final tab = tabFromNode(container, 'mn-1-1-1');
+      await openTab(tester, container, tab);
 
-        // Tap a word to open sheet
-        final recognizer = findWordRecognizer(tester, 'භික්ඛවෙ');
-        recognizer!.onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 1));
+      // Tap a word to open sheet
+      final recognizer = findWordRecognizer(tester, 'භික්ඛවෙ');
+      recognizer!.onTap!();
+      await pumpForSettle(tester, const Duration(seconds: 1));
 
-        // Clear the text field and type Singlish
-        await tester.tap(findDictionaryTextField());
-        await pumpForSettle(tester);
+      // Clear the text field and type Singlish
+      await tester.tap(findDictionaryTextField());
+      await pumpForSettle(tester);
 
-        // Select all and delete
-        final textField = tester.widget<TextField>(findDictionaryTextField());
-        textField.controller!.clear();
-        await tester.pump();
+      // Select all and delete
+      final textField = tester.widget<TextField>(findDictionaryTextField());
+      textField.controller!.clear();
+      await tester.pump();
 
-        // Type Singlish "abhinandhathi"
-        await typeText(tester, findDictionaryTextField(), 'abhinandhathi');
-        await pumpForSettle(tester, const Duration(seconds: 1));
+      // Type Singlish "abhinandhathi"
+      await typeText(tester, findDictionaryTextField(), 'abhinandhathi');
+      await pumpForSettle(tester, const Duration(seconds: 1));
 
-        // ASSERT: Singlish "abhinandhathi" → අභිනන්දති via conversion.
-        // Verify the lookup returned results (not the "no results" state)
-        // and that the converted Sinhala word appears in the result tiles.
-        expect(find.byIcon(Icons.search_off), findsNothing,
-            reason: 'Should NOT show "no results" icon after Singlish lookup');
-        expect(find.textContaining('අභිනන්දති'), findsWidgets,
-            reason: 'Singlish "abhinandhathi" should convert to අභිනන්දති '
-                'and find dictionary results');
+      // ASSERT: Singlish "abhinandhathi" → අභිනන්දති via conversion.
+      // Verify the lookup returned results (not the "no results" state)
+      // and that the converted Sinhala word appears in the result tiles.
+      expect(
+        find.byIcon(Icons.search_off),
+        findsNothing,
+        reason: 'Should NOT show "no results" icon after Singlish lookup',
+      );
+      expect(
+        find.textContaining('අභිනන්දති'),
+        findsWidgets,
+        reason:
+            'Singlish "abhinandhathi" should convert to අභිනන්දති '
+            'and find dictionary results',
+      );
 
-        // Scroll through results to find "delighting" (appears in the DPD
-        // prefix-match entries further down the list). Target the Scrollable
-        // inside the sheet — NOT DictionaryBottomSheet itself, whose center
-        // falls above the visible sheet and misses hit-tests.
-        // Flinging the Scrollable first expands the DraggableScrollableSheet
-        // (since both share a ScrollController), then scrolls the content.
-        // .first targets the CustomScrollView's Scrollable (the outer one),
-        // skipping the TextField's internal Scrollable (for text input).
-        final sheetScrollable = find
-            .descendant(
-              of: find.byType(DictionaryBottomSheet),
-              matching: find.byType(Scrollable),
-            )
-            .first;
+      // Scroll through results to find "delighting" (appears in the DPD
+      // prefix-match entries further down the list). Target the Scrollable
+      // inside the sheet — NOT DictionaryBottomSheet itself, whose center
+      // falls above the visible sheet and misses hit-tests.
+      // Flinging the Scrollable first expands the DraggableScrollableSheet
+      // (since both share a ScrollController), then scrolls the content.
+      // .first targets the CustomScrollView's Scrollable (the outer one),
+      // skipping the TextField's internal Scrollable (for text input).
+      final sheetScrollable = find
+          .descendant(
+            of: find.byType(DictionaryBottomSheet),
+            matching: find.byType(Scrollable),
+          )
+          .first;
 
-        var found = false;
-        for (var i = 0; i < 15; i++) {
-          if (tester.widgetList(find.textContaining('delighting')).isNotEmpty) {
-            found = true;
-            break;
-          }
-          await tester.fling(sheetScrollable, const Offset(0, -300), 800);
-          await pumpForSettle(tester);
+      var found = false;
+      for (var i = 0; i < 15; i++) {
+        if (tester.widgetList(find.textContaining('delighting')).isNotEmpty) {
+          found = true;
+          break;
         }
+        await tester.fling(sheetScrollable, const Offset(0, -300), 800);
+        await pumpForSettle(tester);
+      }
 
-        expect(found, isTrue,
-            reason: 'Scrolling through results should reveal "delighting" '
-                'from a DPD prefix-match entry');
-      },
-    );
+      expect(
+        found,
+        isTrue,
+        reason:
+            'Scrolling through results should reveal "delighting" '
+            'from a DPD prefix-match entry',
+      );
+    });
 
     // =================================================================
     // Test 4: Refine dialog filters bottom sheet results
     // =================================================================
-    testWidgets(
-      '4. Refine dialog: filter to DPD only, then restore all',
-      (tester) async {
-        final container = await pumpReaderApp(tester);
+    testWidgets('4. Refine dialog: filter to DPD only, then restore all', (
+      tester,
+    ) async {
+      final container = await pumpReaderApp(tester);
 
-        // Open මූලපරියායසුත්තං (mn-1-1-1)
-        final tab = tabFromNode(container, 'mn-1-1-1');
-        await openTab(tester, container, tab);
+      // Open මූලපරියායසුත්තං (mn-1-1-1)
+      final tab = tabFromNode(container, 'mn-1-1-1');
+      await openTab(tester, container, tab);
 
-        // STEP 1: Tap "භගවා" in the Pali text to open dictionary sheet
-        final recognizer = findWordRecognizer(tester, 'භගවා');
-        expect(recognizer, isNotNull,
-            reason: 'Should find TapGestureRecognizer for භගවා');
-        recognizer!.onTap!();
-        await pumpForSettle(tester, const Duration(seconds: 1));
+      // STEP 1: Tap "භගවා" in the Pali text to open dictionary sheet
+      final recognizer = findWordRecognizer(tester, 'භගවා');
+      expect(
+        recognizer,
+        isNotNull,
+        reason: 'Should find TapGestureRecognizer for භගවා',
+      );
+      recognizer!.onTap!();
+      await pumpForSettle(tester, const Duration(seconds: 1));
 
-        // ASSERT: Dictionary bottom sheet is visible
-        expect(find.byType(DictionaryBottomSheet), findsOneWidget,
-            reason: 'Dictionary sheet should appear after word tap');
+      // ASSERT: Dictionary bottom sheet is visible
+      expect(
+        find.byType(DictionaryBottomSheet),
+        findsOneWidget,
+        reason: 'Dictionary sheet should appear after word tap',
+      );
 
-        // Helper: read all distinct dict IDs the lookup provider returned.
-        // We assert against the loaded provider data rather than rendered
-        // badges because the sheet opens at initialChildSize (28% of screen)
-        // and SliverList lazy-builds tiles — off-screen badges (lower-rank
-        // dicts like VRI/DPDC) aren't in the widget tree, so find.text would
-        // miss them.
-        Set<String> dictIdsFromProvider() {
-          final word = container.read(selectedDictionaryWordProvider);
-          final filter = container.read(bottomSheetDictionaryFilterProvider);
-          final exactMatch = container.read(bottomSheetExactMatchProvider);
-          final params = DictionaryLookupParams(
-            word: removeConjunctFormatting(word!),
-            dictionaryIds: filter,
-            exactMatch: exactMatch,
-          );
-          final entries =
-              container.read(dictionaryLookupProvider(params)).value;
-          expect(entries, isNotNull,
-              reason: 'Dictionary lookup should have completed');
-          return entries!.map((e) => e.dictionaryId).toSet();
-        }
-
-        // Multiple dictionaries should have results for භගවා (e.g. DPD, VRI, DPDC).
-        final allBadgeTexts = dictIdsFromProvider();
-        expect(allBadgeTexts.length, greaterThan(1),
-            reason: 'භගවා should have results from multiple dictionaries, '
-                'found: $allBadgeTexts');
-        expect(allBadgeTexts.contains('DPD'), isTrue,
-            reason: 'DPD should be among the initial results');
-
-        // STEP 2: Tap the refine (filter) icon button on the bottom sheet
-        final refineButton = find.descendant(
-          of: find.byType(DictionaryBottomSheet),
-          matching: find.byIcon(Icons.filter_list),
+      // Helper: read all distinct dict IDs the lookup provider returned.
+      // We assert against the loaded provider data rather than rendered
+      // badges because the sheet opens at initialChildSize (28% of screen)
+      // and SliverList lazy-builds tiles — off-screen badges (lower-rank
+      // dicts like VRI/DPDC) aren't in the widget tree, so find.text would
+      // miss them.
+      Set<String> dictIdsFromProvider() {
+        final word = container.read(selectedDictionaryWordProvider);
+        final filter = container.read(bottomSheetDictionaryFilterProvider);
+        final exactMatch = container.read(bottomSheetExactMatchProvider);
+        final params = DictionaryLookupParams(
+          word: removeConjunctFormatting(word!),
+          dictionaryIds: filter,
+          exactMatch: exactMatch,
         );
-        expect(refineButton, findsOneWidget,
-            reason: 'Refine icon button should be in the sheet header');
-        await tester.tap(refineButton);
-        await pumpForSettle(tester);
+        final entries = container.read(dictionaryLookupProvider(params)).value;
+        expect(
+          entries,
+          isNotNull,
+          reason: 'Dictionary lookup should have completed',
+        );
+        return entries!.map((e) => e.dictionaryId).toSet();
+      }
 
-        // ASSERT: Refine dictionary dialog is visible
-        expect(find.byType(RefineDictionaryDialog), findsOneWidget,
-            reason: 'RefineDictionaryDialog should be open');
+      // Multiple dictionaries should have results for භගවා (e.g. DPD, VRI, DPDC).
+      final allBadgeTexts = dictIdsFromProvider();
+      expect(
+        allBadgeTexts.length,
+        greaterThan(1),
+        reason:
+            'භගවා should have results from multiple dictionaries, '
+            'found: $allBadgeTexts',
+      );
+      expect(
+        allBadgeTexts.contains('DPD'),
+        isTrue,
+        reason: 'DPD should be among the initial results',
+      );
 
-        // STEP 3: Tap "Digital Pali Dictionary" to select only DPD.
-        // Since "All" is the default, clicking a leaf focuses on just that one.
-        await tester.tap(find.text('Digital Pali Dictionary'));
-        await pumpForSettle(tester);
+      // STEP 2: Tap the refine (filter) icon button on the bottom sheet
+      final refineButton = find.descendant(
+        of: find.byType(DictionaryBottomSheet),
+        matching: find.byIcon(Icons.filter_list),
+      );
+      expect(
+        refineButton,
+        findsOneWidget,
+        reason: 'Refine icon button should be in the sheet header',
+      );
+      await tester.tap(refineButton);
+      await pumpForSettle(tester);
 
-        // ASSERT: Only DPD checkbox should be checked.
-        // Verify the provider state reflects only DPD selected.
-        final filterAfterDPD =
-            container.read(bottomSheetDictionaryFilterProvider);
-        expect(filterAfterDPD, equals({'DPD'}),
-            reason:
-                'After tapping DPD from "All", only DPD should be selected');
+      // ASSERT: Refine dictionary dialog is visible
+      expect(
+        find.byType(RefineDictionaryDialog),
+        findsOneWidget,
+        reason: 'RefineDictionaryDialog should be open',
+      );
 
-        // Close the dialog
-        await tester.tap(find.text(AppLocalizations.of(
-          tester.element(find.byType(RefineDictionaryDialog)),
-        ).done));
-        await pumpForSettle(tester, const Duration(seconds: 1));
+      // STEP 3: Tap "Digital Pali Dictionary" to select only DPD.
+      // Since "All" is the default, clicking a leaf focuses on just that one.
+      await tester.tap(find.text('Digital Pali Dictionary'));
+      await pumpForSettle(tester);
 
-        // ASSERT: Only DPD entries should be returned by the lookup
-        // (asserted against the provider data rather than the lazily-built
-        // badges, for the reason explained in dictIdsFromProvider above).
-        final filteredDictIds = dictIdsFromProvider();
-        expect(filteredDictIds, equals({'DPD'}),
-            reason: 'After filtering to DPD only, the lookup should return '
-                'entries from no other dictionary, got: $filteredDictIds');
+      // ASSERT: Only DPD checkbox should be checked.
+      // Verify the provider state reflects only DPD selected.
+      final filterAfterDPD = container.read(
+        bottomSheetDictionaryFilterProvider,
+      );
+      expect(
+        filterAfterDPD,
+        equals({'DPD'}),
+        reason: 'After tapping DPD from "All", only DPD should be selected',
+      );
 
-        // STEP 4: Open refine dialog again and tap DPD to restore all.
-        // Since DPD's entire group (English) is NOT fully selected — only
-        // DPD is — tapping DPD deselects it, resulting in empty set = "All".
-        await tester.tap(refineButton);
-        await pumpForSettle(tester);
+      // Close the dialog
+      await tester.tap(
+        find.text(
+          AppLocalizations.of(
+            tester.element(find.byType(RefineDictionaryDialog)),
+          ).done,
+        ),
+      );
+      await pumpForSettle(tester, const Duration(seconds: 1));
 
-        // Tap "Digital Pali Dictionary" again — this deselects DPD.
-        // With no dictionaries selected, state normalizes to {} = "All".
-        await tester.tap(find.text('Digital Pali Dictionary'));
-        await pumpForSettle(tester);
+      // ASSERT: Only DPD entries should be returned by the lookup
+      // (asserted against the provider data rather than the lazily-built
+      // badges, for the reason explained in dictIdsFromProvider above).
+      final filteredDictIds = dictIdsFromProvider();
+      expect(
+        filteredDictIds,
+        equals({'DPD'}),
+        reason:
+            'After filtering to DPD only, the lookup should return '
+            'entries from no other dictionary, got: $filteredDictIds',
+      );
 
-        // ASSERT: All dictionaries should now be selected (empty set = All)
-        final filterAfterRestore =
-            container.read(bottomSheetDictionaryFilterProvider);
-        expect(filterAfterRestore.isEmpty, isTrue,
-            reason: 'After deselecting the only selected dict, '
-                'filter should normalize to {} (All)');
+      // STEP 4: Open refine dialog again and tap DPD to restore all.
+      // Since DPD's entire group (English) is NOT fully selected — only
+      // DPD is — tapping DPD deselects it, resulting in empty set = "All".
+      await tester.tap(refineButton);
+      await pumpForSettle(tester);
 
-        // Verify all checkboxes in the dialog show as checked.
-        // With "All" selected, _effectiveSelection returns allIds,
-        // so every checkbox should be true (not tristate, not false).
-        final checkboxes =
-            tester.widgetList<Checkbox>(find.byType(Checkbox)).toList();
-        for (final checkbox in checkboxes) {
-          expect(checkbox.value, isTrue,
-              reason: 'All checkboxes should be checked when filter is "All"');
-        }
+      // Tap "Digital Pali Dictionary" again — this deselects DPD.
+      // With no dictionaries selected, state normalizes to {} = "All".
+      await tester.tap(find.text('Digital Pali Dictionary'));
+      await pumpForSettle(tester);
 
-        // Close the dialog
-        await tester.tap(find.text(AppLocalizations.of(
-          tester.element(find.byType(RefineDictionaryDialog)),
-        ).done));
-        await pumpForSettle(tester, const Duration(seconds: 1));
+      // ASSERT: All dictionaries should now be selected (empty set = All)
+      final filterAfterRestore = container.read(
+        bottomSheetDictionaryFilterProvider,
+      );
+      expect(
+        filterAfterRestore.isEmpty,
+        isTrue,
+        reason:
+            'After deselecting the only selected dict, '
+            'filter should normalize to {} (All)',
+      );
 
-        // ASSERT: Results from multiple dictionaries should be returned again
-        final restoredBadges = dictIdsFromProvider();
-        expect(restoredBadges.length, greaterThan(1),
-            reason: 'After restoring to "All", multiple dictionary badges '
-                'should be visible again, found: $restoredBadges');
-      },
-    );
+      // Verify all checkboxes in the dialog show as checked.
+      // With "All" selected, _effectiveSelection returns allIds,
+      // so every checkbox should be true (not tristate, not false).
+      final checkboxes = tester
+          .widgetList<Checkbox>(find.byType(Checkbox))
+          .toList();
+      for (final checkbox in checkboxes) {
+        expect(
+          checkbox.value,
+          isTrue,
+          reason: 'All checkboxes should be checked when filter is "All"',
+        );
+      }
+
+      // Close the dialog
+      await tester.tap(
+        find.text(
+          AppLocalizations.of(
+            tester.element(find.byType(RefineDictionaryDialog)),
+          ).done,
+        ),
+      );
+      await pumpForSettle(tester, const Duration(seconds: 1));
+
+      // ASSERT: Results from multiple dictionaries should be returned again
+      final restoredBadges = dictIdsFromProvider();
+      expect(
+        restoredBadges.length,
+        greaterThan(1),
+        reason:
+            'After restoring to "All", multiple dictionary badges '
+            'should be visible again, found: $restoredBadges',
+      );
+    });
   });
 }

@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import '../entities/failure.dart';
 import '../repositories/navigation_tree_repository.dart';
 

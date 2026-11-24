@@ -33,24 +33,31 @@ class ContentSlicer {
   /// [nodesInFile] must be *all* of them, containers included, in the order
   /// [SliceIndex.nodesByFile] produces.
   factory ContentSlicer.forFile(
-      ContentFile file, List<TipitakaNode> nodesInFile) {
+    ContentFile file,
+    List<TipitakaNode> nodesInFile,
+  ) {
     final rows = <DocRow>[];
     final pageStart = <int>[];
 
     for (var pageIndex = 0; pageIndex < file.pages.length; pageIndex++) {
       final page = file.pages[pageIndex];
       pageStart.add(rows.length);
-      final printed = printedPages(file.fileId, page.pageNum,
-          hasSinhala: page.sinhala.isNotEmpty);
+      final printed = printedPages(
+        file.fileId,
+        page.pageNum,
+        hasSinhala: page.sinhala.isNotEmpty,
+      );
       for (var entryIndex = 0; entryIndex < page.entryCount; entryIndex++) {
-        rows.add(DocRow(
-          pageIndex: pageIndex,
-          pageNum: page.pageNum,
-          printed: printed,
-          entryIndex: entryIndex,
-          pali: page.paliAt(entryIndex),
-          sinhala: page.sinhalaAt(entryIndex),
-        ));
+        rows.add(
+          DocRow(
+            pageIndex: pageIndex,
+            pageNum: page.pageNum,
+            printed: printed,
+            entryIndex: entryIndex,
+            pali: page.paliAt(entryIndex),
+            sinhala: page.sinhalaAt(entryIndex),
+          ),
+        );
       }
     }
     pageStart.add(rows.length);

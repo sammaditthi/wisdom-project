@@ -50,9 +50,9 @@ class _DeepLinkListenerState extends ConsumerState<DeepLinkListener> {
       // onError: a platform-channel hiccup must never surface as an unhandled
       // stream error — same stance as malformed links: silently ignore.
       _subscription = AppLinks().uriLinkStream.listen(
-            _handleUri,
-            onError: (Object _) {},
-          );
+        _handleUri,
+        onError: (Object _) {},
+      );
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
+
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/text_entry_theme.dart';
 import '../../../domain/entities/content/entry_type.dart';
@@ -70,10 +71,10 @@ class StackedPane extends StatelessWidget {
           // A block holds both sides, so both pages: 14–15.
           buildPageNumber: (context, page) =>
               ReaderEntryBuilder.buildPageNumber(
-            context,
-            page.pageNumber,
-            facing: page.sinhalaPageNumber,
-          ),
+                context,
+                page.pageNumber,
+                facing: page.sinhalaPageNumber,
+              ),
           buildRows: _buildStackedEntries,
         ),
       ),
@@ -96,8 +97,10 @@ class StackedPane extends StatelessWidget {
     final absolutePageIndex = slice.absolutePageStart + index;
     // The page's first row in this unit. The anchor can split a page, so
     // [startEntry] is not always it.
-    final (pageStart, _) =
-        slice.entriesOn(index, page.paliSection.entries.length);
+    final (pageStart, _) = slice.entriesOn(
+      index,
+      page.paliSection.entries.length,
+    );
     final widgets = <Widget>[];
     final currentMatch = searchState.currentMatch;
     final effectiveQuery = searchState.effectiveQuery;
@@ -107,24 +110,28 @@ class StackedPane extends StatelessWidget {
       final entryIndex = i + startEntry;
       final paliEntry = page.paliSection.entries[entryIndex];
       // A sutta number printed the same on both sides shows once.
-      final sinhalaEntry = entryIndex < page.sinhalaSection.entryCount &&
+      final sinhalaEntry =
+          entryIndex < page.sinhalaSection.entryCount &&
               !page.repeatsNumberAt(entryIndex)
           ? page.sinhalaSection.entries[entryIndex]
           : null;
 
       // Check if either entry is the current search match
-      final isPaliCurrentMatch = currentMatch != null &&
+      final isPaliCurrentMatch =
+          currentMatch != null &&
           currentMatch.pageIndex == absolutePageIndex &&
           currentMatch.entryIndex == entryIndex &&
           currentMatch.languageCode == 'pi';
-      final isSinhalaCurrentMatch = currentMatch != null &&
+      final isSinhalaCurrentMatch =
+          currentMatch != null &&
           currentMatch.pageIndex == absolutePageIndex &&
           currentMatch.entryIndex == entryIndex &&
           currentMatch.languageCode == 'si';
 
       // Add extra space before title entries (heading/centered) to
       // visually separate them from preceding content on the same page
-      final isTitle = paliEntry.entryType == EntryType.heading ||
+      final isTitle =
+          paliEntry.entryType == EntryType.heading ||
           paliEntry.entryType == EntryType.centered;
       if (isTitle && entryIndex > pageStart) {
         widgets.add(const SizedBox(height: 12.0));
@@ -132,15 +139,17 @@ class StackedPane extends StatelessWidget {
 
       // Pali entry — heavier weight, dictionary lookup enabled. The weight
       // override keeps Pali two steps above the Sinhala body weight.
-      final paliHasMatch = hasQuery &&
+      final paliHasMatch =
+          hasQuery &&
           searchState.hasMatchInEntry(absolutePageIndex, entryIndex, 'pi');
       final paliWidget = ReaderEntryBuilder.buildEntry(
         context,
         paliEntry,
         enableDictionaryLookup: true,
         inPageSearchQuery: paliHasMatch ? effectiveQuery : null,
-        currentMatchIndexInEntry:
-            isPaliCurrentMatch ? currentMatch.matchIndexInEntry : null,
+        currentMatchIndexInEntry: isPaliCurrentMatch
+            ? currentMatch.matchIndexInEntry
+            : null,
         onWordTap: onWordTap,
         fontWeight: AppFonts.paliWeight,
       );
@@ -155,30 +164,34 @@ class StackedPane extends StatelessWidget {
 
       // Sinhala entry — regular weight, no dictionary lookup
       if (sinhalaEntry != null) {
-        final sinhalaHasMatch = hasQuery &&
+        final sinhalaHasMatch =
+            hasQuery &&
             searchState.hasMatchInEntry(absolutePageIndex, entryIndex, 'si');
         final sinhalaWidget = ReaderEntryBuilder.buildEntry(
           context,
           sinhalaEntry,
           enableDictionaryLookup: false,
           inPageSearchQuery: sinhalaHasMatch ? effectiveQuery : null,
-          currentMatchIndexInEntry:
-              isSinhalaCurrentMatch ? currentMatch.matchIndexInEntry : null,
+          currentMatchIndexInEntry: isSinhalaCurrentMatch
+              ? currentMatch.matchIndexInEntry
+              : null,
           onWordTap: onWordTap,
         );
 
         pairChildren.add(
           Padding(
-            padding:
-                const EdgeInsets.only(bottom: AppFonts.stackedPairBottomGapPx),
+            padding: const EdgeInsets.only(
+              bottom: AppFonts.stackedPairBottomGapPx,
+            ),
             child: sinhalaWidget,
           ),
         );
       } else {
         // No Sinhala entry — take the pair's outer gap so the rhythm holds
         pairChildren[0] = Padding(
-          padding:
-              const EdgeInsets.only(bottom: AppFonts.stackedPairBottomGapPx),
+          padding: const EdgeInsets.only(
+            bottom: AppFonts.stackedPairBottomGapPx,
+          ),
           child: paliWidget,
         );
       }

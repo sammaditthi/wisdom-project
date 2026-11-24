@@ -125,8 +125,9 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
     // Compute and cache
     _lastText = widget.text;
     _lastOptions = _options;
-    _cachedDisplayText =
-        widget.enableTap ? widget.text.withPaliLetters(_options) : widget.text;
+    _cachedDisplayText = widget.enableTap
+        ? widget.text.withPaliLetters(_options)
+        : widget.text;
     // Invalidate marked ranges cache (depends on display text)
     _cachedDisplayMarkedRanges = null;
     return _cachedDisplayText!;
@@ -254,7 +255,8 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
     final searchHighlight = ref.watch(activeFtsHighlightProvider);
 
     // In-page search suppresses FTS highlight to avoid confusing dual highlights
-    final hasInPageSearch = widget.inPageSearchQuery != null &&
+    final hasInPageSearch =
+        widget.inPageSearchQuery != null &&
         widget.inPageSearchQuery!.isNotEmpty;
 
     // Compute in-page search ranges if active
@@ -358,10 +360,12 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
 
     // Merge both search types into a unified highlight list
     // (in-page ranges take priority when active)
-    final effectiveSearchRanges =
-        inPageRanges.isNotEmpty ? inPageRanges : searchRanges;
-    final effectiveHighlightColor =
-        inPageRanges.isNotEmpty ? inPageMatchColor : searchHighlightColor;
+    final effectiveSearchRanges = inPageRanges.isNotEmpty
+        ? inPageRanges
+        : searchRanges;
+    final effectiveHighlightColor = inPageRanges.isNotEmpty
+        ? inPageMatchColor
+        : searchHighlightColor;
 
     final spans = <InlineSpan>[];
     int lastEnd = 0;
@@ -389,8 +393,9 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
           baseStyle: widget.style,
           recognizer: recognizer,
           markedRanges: markedRanges,
-          inPageCurrentMatchColor:
-              inPageRanges.isNotEmpty ? inPageCurrentMatchColor : null,
+          inPageCurrentMatchColor: inPageRanges.isNotEmpty
+              ? inPageCurrentMatchColor
+              : null,
           currentInPageRangeIndex: currentInPageRangeIndex,
           allInPageRanges: inPageRanges.isNotEmpty ? inPageRanges : null,
         );
@@ -398,7 +403,8 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
       }
 
       // Dictionary highlight takes priority over search highlight
-      final isDictHighlight = highlightState?.widgetId == myWidgetId &&
+      final isDictHighlight =
+          highlightState?.widgetId == myWidgetId &&
           highlightState?.position == wordPosition;
 
       if (isDictHighlight) {
@@ -407,12 +413,15 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
         if (_isInMarkedRange(wordPosition, markedRanges)) {
           style = style?.merge(_markedStyle) ?? _markedStyle;
         }
-        spans.add(TextSpan(
-          text: word,
-          style: style?.copyWith(backgroundColor: dictHighlightColor) ??
-              TextStyle(backgroundColor: dictHighlightColor),
-          recognizer: recognizer,
-        ));
+        spans.add(
+          TextSpan(
+            text: word,
+            style:
+                style?.copyWith(backgroundColor: dictHighlightColor) ??
+                TextStyle(backgroundColor: dictHighlightColor),
+            recognizer: recognizer,
+          ),
+        );
       } else {
         // Check for search highlight and/or marked styling
         final wordSpans = _buildSpansWithSearchHighlight(
@@ -423,8 +432,9 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
           baseStyle: widget.style,
           recognizer: recognizer,
           markedRanges: markedRanges,
-          inPageCurrentMatchColor:
-              inPageRanges.isNotEmpty ? inPageCurrentMatchColor : null,
+          inPageCurrentMatchColor: inPageRanges.isNotEmpty
+              ? inPageCurrentMatchColor
+              : null,
           currentInPageRangeIndex: currentInPageRangeIndex,
           allInPageRanges: inPageRanges.isNotEmpty ? inPageRanges : null,
         );
@@ -446,8 +456,9 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
         baseStyle: widget.style,
         recognizer: lastRecognizer,
         markedRanges: markedRanges,
-        inPageCurrentMatchColor:
-            inPageRanges.isNotEmpty ? inPageCurrentMatchColor : null,
+        inPageCurrentMatchColor: inPageRanges.isNotEmpty
+            ? inPageCurrentMatchColor
+            : null,
         currentInPageRangeIndex: currentInPageRangeIndex,
         allInPageRanges: inPageRanges.isNotEmpty ? inPageRanges : null,
       );
@@ -537,49 +548,58 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
     for (final range in overlappingRanges) {
       // Add non-highlighted text before this range
       if (range.start > pos) {
-        spans.addAll(_buildSpansWithMarkedStyle(
-          text: text.substring(pos, range.start),
-          textStart: textStart + pos,
-          baseStyle: baseStyle,
-          recognizer: recognizer,
-          markedRanges: markedRanges,
-        ));
+        spans.addAll(
+          _buildSpansWithMarkedStyle(
+            text: text.substring(pos, range.start),
+            textStart: textStart + pos,
+            baseStyle: baseStyle,
+            recognizer: recognizer,
+            markedRanges: markedRanges,
+          ),
+        );
       }
 
       // Determine highlight color: Golden Amber for current in-page match,
       // default color for all others
-      final isCurrentInPageMatch = inPageCurrentMatchColor != null &&
+      final isCurrentInPageMatch =
+          inPageCurrentMatchColor != null &&
           allInPageRanges != null &&
           currentInPageRangeIndex != null &&
           currentInPageRangeIndex >= 0 &&
           range.globalIndex == currentInPageRangeIndex;
 
-      final highlightColor =
-          isCurrentInPageMatch ? inPageCurrentMatchColor : searchHighlightColor;
+      final highlightColor = isCurrentInPageMatch
+          ? inPageCurrentMatchColor
+          : searchHighlightColor;
 
       // Add highlighted text (search highlight composes with marked style)
       final markedBase = _isInMarkedRange(textStart + range.start, markedRanges)
           ? (baseStyle?.merge(_markedStyle) ?? _markedStyle)
           : baseStyle;
-      spans.add(TextSpan(
-        text: text.substring(range.start, range.end),
-        style: markedBase?.copyWith(backgroundColor: highlightColor) ??
-            TextStyle(backgroundColor: highlightColor),
-        recognizer: recognizer,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(range.start, range.end),
+          style:
+              markedBase?.copyWith(backgroundColor: highlightColor) ??
+              TextStyle(backgroundColor: highlightColor),
+          recognizer: recognizer,
+        ),
+      );
 
       pos = range.end;
     }
 
     // Add remaining non-highlighted text
     if (pos < text.length) {
-      spans.addAll(_buildSpansWithMarkedStyle(
-        text: text.substring(pos),
-        textStart: textStart + pos,
-        baseStyle: baseStyle,
-        recognizer: recognizer,
-        markedRanges: markedRanges,
-      ));
+      spans.addAll(
+        _buildSpansWithMarkedStyle(
+          text: text.substring(pos),
+          textStart: textStart + pos,
+          baseStyle: baseStyle,
+          recognizer: recognizer,
+          markedRanges: markedRanges,
+        ),
+      );
     }
 
     return spans;
@@ -613,29 +633,35 @@ class _TextEntryWidgetState extends ConsumerState<TextEntryWidget> {
 
       // Add non-marked text before this range
       if (localStart > pos) {
-        spans.add(TextSpan(
-          text: text.substring(pos, localStart),
-          style: baseStyle,
-          recognizer: recognizer,
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(pos, localStart),
+            style: baseStyle,
+            recognizer: recognizer,
+          ),
+        );
       }
 
       // Add marked text
-      spans.add(TextSpan(
-        text: text.substring(localStart, localEnd),
-        style: baseStyle?.merge(_markedStyle) ?? _markedStyle,
-        recognizer: recognizer,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(localStart, localEnd),
+          style: baseStyle?.merge(_markedStyle) ?? _markedStyle,
+          recognizer: recognizer,
+        ),
+      );
       pos = localEnd;
     }
 
     // Add remaining non-marked text
     if (pos < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(pos),
-        style: baseStyle,
-        recognizer: recognizer,
-      ));
+      spans.add(
+        TextSpan(
+          text: text.substring(pos),
+          style: baseStyle,
+          recognizer: recognizer,
+        ),
+      );
     }
 
     // If no ranges overlapped, return a single plain span

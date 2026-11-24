@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/theme/text_entry_theme.dart';
@@ -31,14 +32,16 @@ class ReaderEntryBuilder {
   }) {
     final textEntryTheme = context.textEntryTheme;
     // Wrap the word tap callback to match OnWordTap signature (word, position)
-    final OnWordTap? wordTapHandler =
-        onWordTap != null ? (word, _) => onWordTap(word) : null;
+    final OnWordTap? wordTapHandler = onWordTap != null
+        ? (word, _) => onWordTap(word)
+        : null;
     TextStyle? textStyle;
 
     switch (entry.entryType) {
       case EntryType.heading:
         final level = (entry.level ?? 1).clamp(1, 5);
-        textStyle = textEntryTheme.headingStyles[level] ??
+        textStyle =
+            textEntryTheme.headingStyles[level] ??
             textEntryTheme.headingStyles[1];
         // Center so a short title still spans the full column width — without
         // it the Text shrinks to intrinsic width and TextAlign.center is moot.
@@ -56,7 +59,8 @@ class ReaderEntryBuilder {
         );
       case EntryType.centered:
         final level = (entry.level ?? 1).clamp(1, 5);
-        textStyle = textEntryTheme.centeredStyles[level] ??
+        textStyle =
+            textEntryTheme.centeredStyles[level] ??
             textEntryTheme.centeredStyles[1];
         return Center(
           child: TextEntryWidget(
@@ -146,14 +150,16 @@ class ReaderEntryBuilder {
       final absoluteEntryIndex = localIndex + entryStartOffset;
 
       // Determine if this entry contains the current match
-      final isCurrentMatchEntry = currentMatch != null &&
+      final isCurrentMatchEntry =
+          currentMatch != null &&
           currentMatch.pageIndex == absolutePageIndex &&
           currentMatch.entryIndex == absoluteEntryIndex &&
           currentMatch.languageCode == languageCode;
 
       // Only highlight entries that have matches (prevents highlighting
       // entries in adjacent suttas that share the same document file)
-      final entryHasMatch = hasQuery &&
+      final entryHasMatch =
+          hasQuery &&
           searchState.hasMatchInEntry(
             absolutePageIndex,
             absoluteEntryIndex,
@@ -167,8 +173,9 @@ class ReaderEntryBuilder {
           entry,
           enableDictionaryLookup: enableDictionaryLookup,
           inPageSearchQuery: entryHasMatch ? effectiveQuery : null,
-          currentMatchIndexInEntry:
-              isCurrentMatchEntry ? currentMatch.matchIndexInEntry : null,
+          currentMatchIndexInEntry: isCurrentMatchEntry
+              ? currentMatch.matchIndexInEntry
+              : null,
           onWordTap: onWordTap,
         ),
       );

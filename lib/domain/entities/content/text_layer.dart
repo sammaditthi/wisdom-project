@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'entry.dart';
 import '../bjt/bjt_document.dart';
 
@@ -63,8 +64,9 @@ abstract class TextLayer with _$TextLayer {
 
     // Add script indicator if the script is non-native for this language
     final needsScriptIndicator = _isNonNativeScript(languageCode, scriptCode);
-    final nameWithScript =
-        needsScriptIndicator ? '$baseName ($scriptName)' : baseName;
+    final nameWithScript = needsScriptIndicator
+        ? '$baseName ($scriptName)'
+        : baseName;
 
     // Add translator if present
     if (translator != null) {

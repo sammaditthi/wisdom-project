@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // `TipitakaNodeKeys` comes from here too — the app's constants.dart re-exports
 // the shared one, so importing both is what the analyzer flags.
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import '../../data/datasources/tree_local_datasource.dart';
 import '../../data/repositories/navigation_tree_repository_impl.dart';
 import '../../domain/entities/navigation/tipitaka_tree_node.dart';
@@ -16,15 +17,17 @@ final treeLocalDataSourceProvider = Provider<TreeLocalDataSource>((ref) {
 });
 
 // Repository provider
-final navigationTreeRepositoryProvider =
-    Provider<NavigationTreeRepository>((ref) {
+final navigationTreeRepositoryProvider = Provider<NavigationTreeRepository>((
+  ref,
+) {
   final dataSource = ref.watch(treeLocalDataSourceProvider);
   return NavigationTreeRepositoryImpl(dataSource);
 });
 
 // Use case providers
-final loadNavigationTreeUseCaseProvider =
-    Provider<LoadNavigationTreeUseCase>((ref) {
+final loadNavigationTreeUseCaseProvider = Provider<LoadNavigationTreeUseCase>((
+  ref,
+) {
   final repository = ref.watch(navigationTreeRepositoryProvider);
   return LoadNavigationTreeUseCase(repository);
 });
@@ -40,8 +43,9 @@ final loadSharedTreeUseCaseProvider = Provider<LoadSharedTreeUseCase>((ref) {
 });
 
 // Navigation tree state provider
-final navigationTreeProvider =
-    FutureProvider<List<TipitakaTreeNode>>((ref) async {
+final navigationTreeProvider = FutureProvider<List<TipitakaTreeNode>>((
+  ref,
+) async {
   final useCase = ref.watch(loadNavigationTreeUseCaseProvider);
   final result = await useCase.execute();
 
@@ -97,8 +101,9 @@ final sharedTreeProvider = FutureProvider<TipitakaTree>((ref) async {
 });
 
 // State for expanded nodes - Sutta Pitaka expanded by default
-final expandedNodesProvider =
-    StateProvider<Set<String>>((ref) => {TipitakaNodeKeys.suttaPitaka});
+final expandedNodesProvider = StateProvider<Set<String>>(
+  (ref) => {TipitakaNodeKeys.suttaPitaka},
+);
 
 // State for selected node
 final selectedNodeProvider = StateProvider<String?>((ref) => null);
@@ -140,10 +145,10 @@ final nodeIndexProvider = Provider<Map<String, TipitakaTreeNode>>((ref) {
 
 // Helper provider to get a node by key (O(1) via [nodeIndexProvider]).
 // Uses autoDispose to clean up when no listeners remain (prevents memory leaks).
-final nodeByKeyProvider =
-    Provider.autoDispose.family<TipitakaTreeNode?, String>((ref, nodeKey) {
-  return ref.watch(nodeIndexProvider)[nodeKey];
-});
+final nodeByKeyProvider = Provider.autoDispose
+    .family<TipitakaTreeNode?, String>((ref, nodeKey) {
+      return ref.watch(nodeIndexProvider)[nodeKey];
+    });
 
 /// Returns the list of node keys from root to [nodeKey] by walking up
 /// the parent chain via `parentNodeKey`.
@@ -151,8 +156,10 @@ final nodeByKeyProvider =
 /// Reused by breadcrumb display, expand-path-to-node, and any future
 /// feature that needs the ancestor path. Returns [] if the node is not
 /// found or the tree hasn't loaded.
-final ancestorKeysProvider =
-    Provider.autoDispose.family<List<String>, String>((ref, nodeKey) {
+final ancestorKeysProvider = Provider.autoDispose.family<List<String>, String>((
+  ref,
+  nodeKey,
+) {
   final keys = <String>[];
   String? currentKey = nodeKey;
 

@@ -93,11 +93,11 @@ String breadcrumbJsonLd({
 
 /// One `ListItem`. [url] is null on the last, which carries a name alone.
 Map<String, Object> _item(int position, String name, String? url) => {
-      '@type': 'ListItem',
-      'position': position,
-      'name': name,
-      if (url != null) 'item': url,
-    };
+  '@type': 'ListItem',
+  'position': position,
+  'name': name,
+  if (url != null) 'item': url,
+};
 
 /// Makes encoded JSON safe inside a `<script>` element.
 ///

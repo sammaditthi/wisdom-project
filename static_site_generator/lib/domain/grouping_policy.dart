@@ -122,7 +122,8 @@ class GroupingPolicy {
     var bestLength = -1;
     for (final entry in keyPolicies.entries) {
       final prefix = entry.key;
-      final matches = node.nodeKey == prefix ||
+      final matches =
+          node.nodeKey == prefix ||
           node.nodeKey.startsWith('$prefix-') ||
           // Dotted commentary keys (`atta-ap-dhs-2-1-1.1`) still hang off a
           // hyphenated book prefix, so this only has to allow the dot as a

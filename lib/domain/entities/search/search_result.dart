@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import 'search_result_type.dart';
 
 part 'search_result.freezed.dart';
@@ -56,8 +57,9 @@ abstract class SearchResult with _$SearchResult {
   /// Cached storage for [plainMatchedText], keyed by instance identity so it
   /// works with Freezed's const constructor. Same shape as
   /// `Entry.markedRanges`.
-  static final Expando<String> _plainMatchedTextCache =
-      Expando('plainMatchedText');
+  static final Expando<String> _plainMatchedTextCache = Expando(
+    'plainMatchedText',
+  );
 
   /// [matchedText] with the formatting markers removed — what a snippet shows.
   ///

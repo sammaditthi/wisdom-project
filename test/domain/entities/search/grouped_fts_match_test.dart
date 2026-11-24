@@ -201,7 +201,10 @@ void main() {
           // ARRANGE
           final results = [
             createSearchResult(
-                nodeKey: 'dn-1', pageIndex: 999, entryIndex: 999),
+              nodeKey: 'dn-1',
+              pageIndex: 999,
+              entryIndex: 999,
+            ),
             createSearchResult(nodeKey: 'dn-1', pageIndex: 0, entryIndex: 0),
           ];
 
@@ -228,8 +231,10 @@ void main() {
 
           // ASSERT - -1 sorts first (this is a defensive test)
           expect(grouped[0].primaryMatch.pageIndex, equals(-1));
-          expect(grouped[0].allMatches.map((m) => m.pageIndex).toList(),
-              equals([-1, 0, 1]));
+          expect(
+            grouped[0].allMatches.map((m) => m.pageIndex).toList(),
+            equals([-1, 0, 1]),
+          );
         });
       });
 
@@ -273,20 +278,22 @@ void main() {
     });
 
     group('Computed properties -', () {
-      test('hasSecondaryMatches returns true when there are secondary matches',
-          () {
-        // ARRANGE
-        final results = [
-          createSearchResult(nodeKey: 'dn-1', pageIndex: 0, entryIndex: 0),
-          createSearchResult(nodeKey: 'dn-1', pageIndex: 1, entryIndex: 0),
-        ];
+      test(
+        'hasSecondaryMatches returns true when there are secondary matches',
+        () {
+          // ARRANGE
+          final results = [
+            createSearchResult(nodeKey: 'dn-1', pageIndex: 0, entryIndex: 0),
+            createSearchResult(nodeKey: 'dn-1', pageIndex: 1, entryIndex: 0),
+          ];
 
-        // ACT
-        final grouped = GroupedFTSMatch.fromSearchResults(results);
+          // ACT
+          final grouped = GroupedFTSMatch.fromSearchResults(results);
 
-        // ASSERT
-        expect(grouped[0].hasSecondaryMatches, isTrue);
-      });
+          // ASSERT
+          expect(grouped[0].hasSecondaryMatches, isTrue);
+        },
+      );
 
       test('hasSecondaryMatches returns false when no secondary matches', () {
         // ARRANGE

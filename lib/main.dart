@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'core/localization/app_localizations_delegates.dart';
 import 'core/storage/key_value_store_provider.dart';
 import 'core/storage/shared_preferences_key_value_store.dart';
@@ -49,19 +50,15 @@ void main() async {
 /// them would be listed otherwise.
 void _registerLicences() {
   LicenseRegistry.addLicense(() async* {
-    yield LicenseEntryWithLineBreaks(
-      const [
-        'Noto Sans',
-        'Noto Serif',
-        'Noto Sans Sinhala',
-        'Noto Serif Sinhala'
-      ],
-      await rootBundle.loadString('assets/fonts/OFL.txt'),
-    );
-    yield const LicenseEntryWithLineBreaks(
-      ['sinhala-unicode-converter'],
-      _sinhalaUnicodeConverterLicence,
-    );
+    yield LicenseEntryWithLineBreaks(const [
+      'Noto Sans',
+      'Noto Serif',
+      'Noto Sans Sinhala',
+      'Noto Serif Sinhala',
+    ], await rootBundle.loadString('assets/fonts/OFL.txt'));
+    yield const LicenseEntryWithLineBreaks([
+      'sinhala-unicode-converter',
+    ], _sinhalaUnicodeConverterLicence);
     yield const LicenseEntryWithLineBreaks(['SunCalc'], _sunCalcLicence);
   });
 }
@@ -123,10 +120,15 @@ Future<void> _start() async {
   // shows the emblem. Start loading it now so it is more likely there by then:
   // the copy for this screen, the one the widget will ask for.
   if (kIsWeb) {
-    AppEmblem.image.resolve(ImageConfiguration(
-      devicePixelRatio: WidgetsBinding
-          .instance.platformDispatcher.implicitView?.devicePixelRatio,
-    ));
+    AppEmblem.image.resolve(
+      ImageConfiguration(
+        devicePixelRatio: WidgetsBinding
+            .instance
+            .platformDispatcher
+            .implicitView
+            ?.devicePixelRatio,
+      ),
+    );
   }
 
   // Initialize SharedPreferences for search history
@@ -214,10 +216,7 @@ class _DatabaseMissingError extends StatelessWidget {
                   const SizedBox(height: 24),
                   Text(
                     'This app cannot start without the database.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.red.shade700,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade700),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -303,9 +302,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         return DeepLinkListener(
           child: AppShortcuts(
             child: OverlayStackSync(
-              child: TabLimitMessage(
-                child: child ?? const SizedBox.shrink(),
-              ),
+              child: TabLimitMessage(child: child ?? const SizedBox.shrink()),
             ),
           ),
         );

@@ -39,9 +39,10 @@ void main() {
     test('both toggles on → follows the reading preference (Sinhala)', () {
       expect(
         resolve(
-            pali: true,
-            sinhala: true,
-            readingPreference: ContentLanguage.sinhala),
+          pali: true,
+          sinhala: true,
+          readingPreference: ContentLanguage.sinhala,
+        ),
         ContentLanguage.sinhala,
       );
     });
@@ -49,7 +50,10 @@ void main() {
     test('both toggles on → follows the reading preference (Pali)', () {
       expect(
         resolve(
-            pali: true, sinhala: true, readingPreference: ContentLanguage.pali),
+          pali: true,
+          sinhala: true,
+          readingPreference: ContentLanguage.pali,
+        ),
         ContentLanguage.pali,
       );
     });
@@ -59,9 +63,10 @@ void main() {
       // label contains the matched term (and agrees with the FTS snippet).
       expect(
         resolve(
-            pali: true,
-            sinhala: false,
-            readingPreference: ContentLanguage.sinhala),
+          pali: true,
+          sinhala: false,
+          readingPreference: ContentLanguage.sinhala,
+        ),
         ContentLanguage.pali,
       );
     });
@@ -69,9 +74,10 @@ void main() {
     test('Sinhala-only → Sinhala, overriding a Pali reading preference', () {
       expect(
         resolve(
-            pali: false,
-            sinhala: true,
-            readingPreference: ContentLanguage.pali),
+          pali: false,
+          sinhala: true,
+          readingPreference: ContentLanguage.pali,
+        ),
         ContentLanguage.sinhala,
       );
     });
@@ -81,9 +87,10 @@ void main() {
       // the provider must not crash — fromFlags maps (false,false) → both.
       expect(
         resolve(
-            pali: false,
-            sinhala: false,
-            readingPreference: ContentLanguage.sinhala),
+          pali: false,
+          sinhala: false,
+          readingPreference: ContentLanguage.sinhala,
+        ),
         ContentLanguage.sinhala,
       );
     });

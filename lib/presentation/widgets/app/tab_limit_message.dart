@@ -19,11 +19,13 @@ class TabLimitMessage extends ConsumerWidget {
     ref.listen<int>(tabLimitReachedProvider, (_, __) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(
-            AppLocalizations.of(context).tabLimitReached(maxOpenTabs),
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context).tabLimitReached(maxOpenTabs),
+            ),
           ),
-        ));
+        );
     });
     return child;
   }

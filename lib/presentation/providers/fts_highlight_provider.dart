@@ -80,8 +80,8 @@ class FtsHighlightNotifier extends StateNotifier<Map<int, FtsHighlightState>> {
 /// Per-tab FTS highlight state map (tab index → highlight state).
 final ftsHighlightProvider =
     StateNotifierProvider<FtsHighlightNotifier, Map<int, FtsHighlightState>>(
-  (ref) => FtsHighlightNotifier(ref),
-);
+      (ref) => FtsHighlightNotifier(ref),
+    );
 
 /// Derived provider: the FTS highlight state for the currently active tab.
 ///

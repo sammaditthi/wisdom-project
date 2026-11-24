@@ -102,17 +102,16 @@ void main() {
       testWidgets('a $name splits it', (tester) async {
         final rendered = await render(
           tester,
-          rawEntryText: 'සියා පන භන්තෙ, පඤ්චසු උපාදානක්ඛන්ධෙසු '
+          rawEntryText:
+              'සියා පන භන්තෙ, පඤ්චසු උපාදානක්ඛන්ධෙසු '
               '$head$joiner$tail? ඉති.',
           query: word,
         );
 
         expect(tester.takeException(), isNull);
-        expect(
-          rendered.highlights.map(removeConjunctFormatting),
-          [word],
-          reason: '$name should not hide the word from the snippet',
-        );
+        expect(rendered.highlights.map(removeConjunctFormatting), [
+          word,
+        ], reason: '$name should not hide the word from the snippet');
       });
     });
   });
@@ -121,11 +120,13 @@ void main() {
     // The reported crash: searching ඡන්දරාගවෙමත්තතාති blew up the commentary
     // tile with "RangeError (length): Not in inclusive range 0..914: -1".
     // Text is from atta-sn-3 page 47 entry 0, abridged.
-    const commentary = 'පඤ්චක්ඛන්ධෙ මුඤ්චිත්වා උපාදානං නත්ථි. '
+    const commentary =
+        'පඤ්චක්ඛන්ධෙ මුඤ්චිත්වා උපාදානං නත්ථි. '
         '**ඡන්දරාගවෙමත්තතා**ති ඡන්දරාගනානත්තං. **එවං ඛො භික්ඛූ**ති එවං.';
 
-    testWidgets('renders the reported commentary hit without throwing',
-        (tester) async {
+    testWidgets('renders the reported commentary hit without throwing', (
+      tester,
+    ) async {
       final rendered = await render(
         tester,
         rawEntryText: commentary,
@@ -148,20 +149,23 @@ void main() {
       expect(rendered.text, isNot(contains('{')));
     });
 
-    testWidgets('centres the snippet on the match, not the start of the entry',
-        (tester) async {
-      final rendered = await render(
-        tester,
-        rawEntryText: '${'ආදි. ' * 60}**ඡන්දරාගවෙමත්තතා**ති අන්තො.',
-        query: 'ඡන්දරාගවෙමත්තතාති',
-      );
+    testWidgets(
+      'centres the snippet on the match, not the start of the entry',
+      (tester) async {
+        final rendered = await render(
+          tester,
+          rawEntryText: '${'ආදි. ' * 60}**ඡන්දරාගවෙමත්තතා**ති අන්තො.',
+          query: 'ඡන්දරාගවෙමත්තතාති',
+        );
 
-      expect(rendered.text, startsWith('...'));
-      expect(rendered.highlights, ['ඡන්දරාගවෙමත්තතාති']);
-    });
+        expect(rendered.text, startsWith('...'));
+        expect(rendered.highlights, ['ඡන්දරාගවෙමත්තතාති']);
+      },
+    );
 
-    testWidgets('leaves the text alone when the query is absent',
-        (tester) async {
+    testWidgets('leaves the text alone when the query is absent', (
+      tester,
+    ) async {
       final rendered = await render(
         tester,
         rawEntryText: 'එවං මෙ සුතං, එකං සමයං භගවා සාවත්ථියං විහරති.',
@@ -177,26 +181,28 @@ void main() {
   // The open half, pinned so it cannot be fixed on one side only
   // ===========================================================================
 
-  testWidgets(
-    'TRIPWIRE: the elision mark still hides a word from the UI — '
-    'see docs/todo/search/word-joining-characters-in-the-fts-index.md',
-    (tester) async {
-      // `තීණි’මානි` (an-3 page 39 entry 9). U+2019 is a joiner in Pali
-      // orthography but a separator to both fts5 and the UI, so the record is
-      // neither retrievable by `තීණිමානි` nor highlightable. Fixing the index
-      // without also teaching `normalizeSearchText` about `’` leaves the hit
-      // unlocatable, so this expectation is meant to fail at that moment.
-      final rendered = await render(
-        tester,
-        rawEntryText: '47. තීණි’මානි භික්ඛවෙ සඞ්ඛතස්ස සඞ්ඛතලක්ඛණානි.',
-        query: 'තීණිමානි',
-      );
+  testWidgets('TRIPWIRE: the elision mark still hides a word from the UI — '
+      'see docs/todo/search/word-joining-characters-in-the-fts-index.md', (
+    tester,
+  ) async {
+    // `තීණි’මානි` (an-3 page 39 entry 9). U+2019 is a joiner in Pali
+    // orthography but a separator to both fts5 and the UI, so the record is
+    // neither retrievable by `තීණිමානි` nor highlightable. Fixing the index
+    // without also teaching `normalizeSearchText` about `’` leaves the hit
+    // unlocatable, so this expectation is meant to fail at that moment.
+    final rendered = await render(
+      tester,
+      rawEntryText: '47. තීණි’මානි භික්ඛවෙ සඞ්ඛතස්ස සඞ්ඛතලක්ඛණානි.',
+      query: 'තීණිමානි',
+    );
 
-      expect(tester.takeException(), isNull,
-          reason: 'an unlocatable hit must degrade, never throw');
-      expect(rendered.highlights, isEmpty);
-    },
-  );
+    expect(
+      tester.takeException(),
+      isNull,
+      reason: 'an unlocatable hit must degrade, never throw',
+    );
+    expect(rendered.highlights, isEmpty);
+  });
 
   // `cleanTextForIndexing` deletes these four as well, and `stripMarkers`
   // keeps them — so each is the `**` bug over again, waiting for a corpus
@@ -221,12 +227,16 @@ void main() {
           query: word,
         );
 
-        expect(tester.takeException(), isNull,
-            reason: 'an unlocatable hit must degrade, never throw');
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'an unlocatable hit must degrade, never throw',
+        );
         expect(
           rendered.highlights,
           isEmpty,
-          reason: 'if this now highlights, `$joiner` was taught to '
+          reason:
+              'if this now highlights, `$joiner` was taught to '
               'stripMarkers or normalizeSearchText — move its row up into '
               '`joiners` rather than deleting it',
         );

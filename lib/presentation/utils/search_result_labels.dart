@@ -71,23 +71,32 @@ SearchResultLabels searchResultLabels(WidgetRef ref, SearchResult result) {
 
   // Title: the node's own name, routed through the shared formatter (which
   // applies Pali conjunct ligatures only when the language is Pali).
-  final title =
-      formatContentLabel(node.getDisplayName(language), language, options);
+  final title = formatContentLabel(
+    node.getDisplayName(language),
+    language,
+    options,
+  );
 
   // Path: the node's ancestors. ancestorKeysProvider returns root → leaf
   // *including* the node itself, so we drop the last key — the title already
   // names the node, the path should show only what's above it.
   final keys = ref.watch(ancestorKeysProvider(result.nodeKey));
-  final ancestorKeys =
-      keys.length > 1 ? keys.sublist(0, keys.length - 1) : const <String>[];
+  final ancestorKeys = keys.length > 1
+      ? keys.sublist(0, keys.length - 1)
+      : const <String>[];
 
-  final path = ancestorKeys.map((key) {
-    final ancestor = ref.watch(nodeByKeyProvider(key));
-    return ancestor == null
-        ? key
-        : formatContentLabel(
-            ancestor.getDisplayName(language), language, options);
-  }).join(' > ');
+  final path = ancestorKeys
+      .map((key) {
+        final ancestor = ref.watch(nodeByKeyProvider(key));
+        return ancestor == null
+            ? key
+            : formatContentLabel(
+                ancestor.getDisplayName(language),
+                language,
+                options,
+              );
+      })
+      .join(' > ');
 
   // Keep the repo-built path rather than an empty string for root-level nodes.
   return (title: title, path: path.isEmpty ? result.subtitle : path);

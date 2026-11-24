@@ -77,12 +77,16 @@ void main(List<String> args) {
   };
   final unknown = args.where((a) => !modes.contains(a)).toList();
   if (unknown.isNotEmpty || args.length > 1) {
-    stderr.writeln(unknown.isEmpty
-        ? 'One mode at a time.'
-        : 'Unknown option "${unknown.first}".');
-    stderr.writeln('Usage: plan_corpus.dart [--check | --write-snapshot | '
-        '--write-figures | --write-upstream | --misaligned | '
-        '--write-alignment | --redirects]');
+    stderr.writeln(
+      unknown.isEmpty
+          ? 'One mode at a time.'
+          : 'Unknown option "${unknown.first}".',
+    );
+    stderr.writeln(
+      'Usage: plan_corpus.dart [--check | --write-snapshot | '
+      '--write-figures | --write-upstream | --misaligned | '
+      '--write-alignment | --redirects]',
+    );
     exitCode = 2;
     return;
   }
@@ -129,10 +133,14 @@ void main(List<String> args) {
     // cache. Two questions, two files, one command: they are frozen together
     // because they are read together, and a run that wrote one of them would
     // leave the plan describing a site half-built from each.
-    final folded =
-        GroupingPlanner(tree: tree, slicerFor: cache.forFile).foldedLeaves();
-    final bearing = PreamblePlanner(tree: tree, slicerFor: cache.forFile)
-        .textBearingContainers();
+    final folded = GroupingPlanner(
+      tree: tree,
+      slicerFor: cache.forFile,
+    ).foldedLeaves();
+    final bearing = PreamblePlanner(
+      tree: tree,
+      slicerFor: cache.forFile,
+    ).textBearingContainers();
 
     // Both sets clear every refusal before either file is opened. Asking
     // inside the writers ran the same checks in the same order and still let
@@ -171,12 +179,18 @@ void main(List<String> args) {
       stdout.writeln('  $line');
     }
     stdout.writeln('');
-    stdout.writeln('The snapshot describes a site this tree cannot produce. '
-        'Either assets/data/tree.json');
-    stdout.writeln('was re-synced with renumbered nodeKeys — the one event no '
-        'local design survives, and');
-    stdout.writeln('the stop-the-line moment of the sync workflow — or '
-        'grouping_snapshot.dart was hand-edited.');
+    stdout.writeln(
+      'The snapshot describes a site this tree cannot produce. '
+      'Either assets/data/tree.json',
+    );
+    stdout.writeln(
+      'was re-synced with renumbered nodeKeys — the one event no '
+      'local design survives, and',
+    );
+    stdout.writeln(
+      'the stop-the-line moment of the sync workflow — or '
+      'grouping_snapshot.dart was hand-edited.',
+    );
     exitCode = 1;
     return;
   }
@@ -242,10 +256,14 @@ void main(List<String> args) {
   // cache holds one file — and a figure printed between the two describes
   // neither, which is what `SlicerCache.parses` exists to make visible.
   final cache = SlicerCache(reader: reader, tree: tree);
-  final ruleSays =
-      GroupingPlanner(tree: tree, slicerFor: cache.forFile).foldedLeaves();
-  final preambleSays = PreamblePlanner(tree: tree, slicerFor: cache.forFile)
-      .textBearingContainers();
+  final ruleSays = GroupingPlanner(
+    tree: tree,
+    slicerFor: cache.forFile,
+  ).foldedLeaves();
+  final preambleSays = PreamblePlanner(
+    tree: tree,
+    slicerFor: cache.forFile,
+  ).textBearingContainers();
   final chars = _pageChars(plan, cache);
 
   if (!_printBudget(tree, plan, folded, parses: cache.parses)) exitCode = 1;
@@ -277,8 +295,10 @@ bool _printBudget(
 }) {
   final budget = PageBudget.of(tree: tree, plan: plan, folded: folded);
 
-  stdout.writeln('tree              ${tree.length} nodes '
-      '(${budget.leaves} leaves, ${budget.containers} containers)');
+  stdout.writeln(
+    'tree              ${tree.length} nodes '
+    '(${budget.leaves} leaves, ${budget.containers} containers)',
+  );
   stdout.writeln('snapshot          ${budget.foldedLeaves} folded leaves');
   if (parses != null) stdout.writeln('files parsed      $parses');
   // No count of the checks: it can only ever drift from `_integrity`, and once
@@ -286,19 +306,27 @@ bool _printBudget(
   stdout.writeln('integrity         ok   (no violations)');
   stdout.writeln('');
   stdout.writeln('sutta pages       ${budget.suttaPages}');
-  stdout.writeln('chapter pages     ${budget.chapterPages}   '
-      '(${budget.wholeVaggaChapters} whole-vagga '
-      '+ ${budget.midVaggaChapters} mid-vagga)');
-  stdout.writeln('container TOCs    ${budget.containerTocs}   '
-      '(${budget.readableTocs} readable, an introduction rather than a '
-      'heading)');
+  stdout.writeln(
+    'chapter pages     ${budget.chapterPages}   '
+    '(${budget.wholeVaggaChapters} whole-vagga '
+    '+ ${budget.midVaggaChapters} mid-vagga)',
+  );
+  stdout.writeln(
+    'container TOCs    ${budget.containerTocs}   '
+    '(${budget.readableTocs} readable, an introduction rather than a '
+    'heading)',
+  );
   stdout.writeln('root index        ${PageBudget.rootIndex}');
   stdout.writeln('─────────────────────────');
   stdout.writeln('real pages        ${budget.realPages}');
-  stdout.writeln('readable pages    ${plan.readablePages.length}   '
-      '(the prev/next chain)');
-  stdout.writeln('folded leaves     ${budget.foldedLeaves}   '
-      '(stubs, if picked)');
+  stdout.writeln(
+    'readable pages    ${plan.readablePages.length}   '
+    '(the prev/next chain)',
+  );
+  stdout.writeln(
+    'folded leaves     ${budget.foldedLeaves}   '
+    '(stubs, if picked)',
+  );
   stdout.writeln('with stubs        ${budget.pagesWithStubs}   (cap 20,000)');
 
   // The derivation from Part 1's Impact table. Two fixed corpus totals decide
@@ -309,9 +337,11 @@ bool _printBudget(
   final derivedSutta = budget.derivedSuttaPages;
   final derivedToc = budget.derivedContainerTocs;
   stdout.writeln('');
-  stdout.writeln('derivation        '
-      'sutta ${derivedSutta == budget.suttaPages ? 'ok' : 'MISMATCH $derivedSutta'} · '
-      'toc ${derivedToc == budget.containerTocs ? 'ok' : 'MISMATCH $derivedToc'}');
+  stdout.writeln(
+    'derivation        '
+    'sutta ${derivedSutta == budget.suttaPages ? 'ok' : 'MISMATCH $derivedSutta'} · '
+    'toc ${derivedToc == budget.containerTocs ? 'ok' : 'MISMATCH $derivedToc'}',
+  );
   if (!holds) {
     // Exits non-zero rather than only printing, because `--check` is the mode
     // that runs unattended and this is the one thing left that it alone can
@@ -319,13 +349,18 @@ bool _printBudget(
     // are here, so what remains is a node no root can reach — a parent cycle in
     // a re-synced tree.json, which nothing else in the pipeline would notice.
     stdout.writeln('');
-    stdout
-        .writeln('The tree holds leaves the walk never reached. The integrity '
-            'checks passed, so this is');
-    stdout.writeln('not a snapshot problem: it is a subtree no root can reach, '
-        'i.e. a parent cycle in');
-    stdout.writeln('assets/data/tree.json. Those pages would be missing from '
-        'the site in silence.');
+    stdout.writeln(
+      'The tree holds leaves the walk never reached. The integrity '
+      'checks passed, so this is',
+    );
+    stdout.writeln(
+      'not a snapshot problem: it is a subtree no root can reach, '
+      'i.e. a parent cycle in',
+    );
+    stdout.writeln(
+      'assets/data/tree.json. Those pages would be missing from '
+      'the site in silence.',
+    );
   }
   return holds;
 }
@@ -343,9 +378,11 @@ void _printSizes(SitePlan plan, Map<String, int> chars) {
   final promotedThin = thin
       .where((p) => GroupingPolicy.policyFor(p.node) == LeafPolicy.ownPage)
       .length;
-  stdout.writeln('thin sutta pages  ${thin.length}   '
-      '(under ${GroupingPolicy.shortLineChars} chars; '
-      '$promotedThin of them promoted books, thin on purpose)');
+  stdout.writeln(
+    'thin sutta pages  ${thin.length}   '
+    '(under ${GroupingPolicy.shortLineChars} chars; '
+    '$promotedThin of them promoted books, thin on purpose)',
+  );
 
   final biggest = [
     for (final page in plan.pages)
@@ -356,9 +393,11 @@ void _printSizes(SitePlan plan, Map<String, int> chars) {
   // can reach. Everything else here is guarded; this was the one place a `-`
   // in the printout would have arrived as a crash reading like real drift.
   final top = biggest.isEmpty ? null : biggest.first;
-  stdout.writeln('biggest chapter   '
-      '${top == null ? '—' : '${chars[top.nodeKey]} chars (${top.nodeKey})'}'
-      ' · $over100k over 100k');
+  stdout.writeln(
+    'biggest chapter   '
+    '${top == null ? '—' : '${chars[top.nodeKey]} chars (${top.nodeKey})'}'
+    ' · $over100k over 100k',
+  );
 }
 
 /// Page counts for [_watchedSubtrees].
@@ -422,9 +461,11 @@ bool _printRedirects(SitePlan plan, Set<String> folded) {
   }
 
   if (stranded.isNotEmpty) {
-    stderr.writeln('${stranded.length} folded leaves resolve to their own URL, '
-        'so no page serves them: ${stranded.take(_maxOffendersShown).join(', ')}'
-        '${stranded.length > _maxOffendersShown ? ', …' : ''}');
+    stderr.writeln(
+      '${stranded.length} folded leaves resolve to their own URL, '
+      'so no page serves them: ${stranded.take(_maxOffendersShown).join(', ')}'
+      '${stranded.length > _maxOffendersShown ? ', …' : ''}',
+    );
     return false;
   }
 
@@ -435,9 +476,11 @@ bool _printRedirects(SitePlan plan, Set<String> folded) {
   // point of it is that a reader lands somewhere, and a missing row is a leaf
   // that lands nowhere. Counting is free where re-deriving the set is not.
   if (emitted != folded.length) {
-    stderr.writeln('${folded.length} folded leaves, but only $emitted rows: '
-        '${folded.length - emitted} of them sit on no page at all. '
-        'Run --check before trusting this file.');
+    stderr.writeln(
+      '${folded.length} folded leaves, but only $emitted rows: '
+      '${folded.length - emitted} of them sit on no page at all. '
+      'Run --check before trusting this file.',
+    );
     return false;
   }
 
@@ -478,7 +521,8 @@ void _printMisaligned(
   const shapes = {
     SliceMisalignment.trailingColophon: (
       tag: 'colophon',
-      note: "the leaf's own name, printed after the text it names — "
+      note:
+          "the leaf's own name, printed after the text it names — "
           'the page below it is the next leaf',
     ),
     SliceMisalignment.strayDivider: (
@@ -487,32 +531,41 @@ void _printMisaligned(
     ),
     SliceMisalignment.strandedLeadingNumber: (
       tag: 'stranded',
-      note: "the leaf's own leading number left at the foot of its slice — "
+      note:
+          "the leaf's own leading number left at the foot of its slice — "
           'the page above it is the previous leaf',
     ),
     SliceMisalignment.headingOnlyLeaf: (
       tag: 'heading',
-      note: 'NOT a defect — the leaf is where it should be and the book has '
+      note:
+          'NOT a defect — the leaf is where it should be and the book has '
           'no body under that heading',
     ),
   };
-  final tagWidth =
-      shapes.values.map((s) => s.tag.length).reduce((a, b) => a > b ? a : b);
+  final tagWidth = shapes.values
+      .map((s) => s.tag.length)
+      .reduce((a, b) => a > b ? a : b);
 
   // The two totals are printed apart because they mean different things. The
   // first is a bug count and should read 0; the second is a fact about the
   // book, and reading 0 would only mean upstream had changed.
   final defects = misaligned.values.where(SliceAlignment.isDefect).length;
-  stdout.writeln('misaligned leaves  ${defects.toString().padLeft(4)}   '
-      'slices not holding the text the leaf is named for — expect 0');
-  stdout.writeln('heading-only       '
-      '${(misaligned.length - defects).toString().padLeft(4)}   '
-      'correct, and carrying no body because the book prints none');
+  stdout.writeln(
+    'misaligned leaves  ${defects.toString().padLeft(4)}   '
+    'slices not holding the text the leaf is named for — expect 0',
+  );
+  stdout.writeln(
+    'heading-only       '
+    '${(misaligned.length - defects).toString().padLeft(4)}   '
+    'correct, and carrying no body because the book prints none',
+  );
   stdout.writeln('');
   for (final shape in SliceMisalignment.values) {
     final count = misaligned.values.where((v) => v == shape).length;
-    stdout.writeln('  ${shapes[shape]!.tag.padRight(tagWidth)}  '
-        '${count.toString().padLeft(4)}   ${shapes[shape]!.note}');
+    stdout.writeln(
+      '  ${shapes[shape]!.tag.padRight(tagWidth)}  '
+      '${count.toString().padLeft(4)}   ${shapes[shape]!.note}',
+    );
   }
   if (misaligned.isEmpty) return;
 
@@ -527,9 +580,11 @@ void _printMisaligned(
     stdout.writeln('');
     stdout.writeln('${entry.key}   ${entry.value.length}');
     for (final key in entry.value) {
-      stdout.writeln('  ${key.padRight(22)} '
-          '${shapes[misaligned[key]]!.tag.padRight(tagWidth)}  '
-          '${plan.urlFor(key)}');
+      stdout.writeln(
+        '  ${key.padRight(22)} '
+        '${shapes[misaligned[key]]!.tag.padRight(tagWidth)}  '
+        '${plan.urlFor(key)}',
+      );
     }
   }
 }
@@ -559,8 +614,10 @@ List<String> _integrity(
     if (offenders.isEmpty) return;
     final shown = offenders.take(_maxOffendersShown).join(', ');
     final rest = offenders.length - _maxOffendersShown;
-    violations.add('$what: ${offenders.length} '
-        '($shown${rest > 0 ? ', +$rest more' : ''})');
+    violations.add(
+      '$what: ${offenders.length} '
+      '($shown${rest > 0 ? ', +$rest more' : ''})',
+    );
   }
 
   // 1. Every folded key still names a leaf. A key that vanished, or that grew
@@ -609,10 +666,14 @@ List<String> _integrity(
       splitParents.add(parentKey);
     }
   }
-  report('containers of folded leaves that now hold a sub-container',
-      hybridParents);
   report(
-      'containers of folded leaves that now span content files', splitParents);
+    'containers of folded leaves that now hold a sub-container',
+    hybridParents,
+  );
+  report(
+    'containers of folded leaves that now span content files',
+    splitParents,
+  );
 
   // 3. The index-0 invariant `SitePlan.build` reconstructs from: a first child
   //    folds only when the whole container folds. A run starting at the first
@@ -627,8 +688,10 @@ List<String> _integrity(
       hybridPages.add(parentKey);
     }
   }
-  report('containers whose first leaf folds beside an unfolded sibling',
-      hybridPages);
+  report(
+    'containers whose first leaf folds beside an unfolded sibling',
+    hybridPages,
+  );
 
   // 4. Every text-bearing key still names a container. A key that vanished, or
   //    that is now a leaf, would put a page in the reading chain that the walk
@@ -664,9 +727,9 @@ List<String> _integrity(
 /// [_writeSnapshot], because the mode that freezes verdicts must not be the one
 /// mode that stays quiet about it.
 List<String> _orphanContainers(TipitakaTree tree) => [
-      for (final node in tree.allNodes)
-        if (!node.isLeaf && node.contentFileId == null) node.nodeKey,
-    ];
+  for (final node in tree.allNodes)
+    if (!node.isLeaf && node.contentFileId == null) node.nodeKey,
+];
 
 /// Offending keys printed per violation before the count stands in for them.
 const int _maxOffendersShown = 5;
@@ -685,14 +748,15 @@ const int _maxOffendersShown = 5;
 /// the freeze, which is exactly the drift freezing exists to absorb: the page
 /// contents move, the URL does not.
 void _reportAdvice(Set<String> folded, Set<String> ruleSays) => _printAdvice(
-      label: 'advisor',
-      frozen: folded,
-      ruleSays: ruleSays,
-      proposals: 'leaves the rule would now fold (they own a page today)',
-      disagreements: 'folded leaves the rule would now explode (snapshot wins)',
-      footer: 'Neither is acted on. Moving a URL is `--write-snapshot` plus a '
-          'review of its diff.',
-    );
+  label: 'advisor',
+  frozen: folded,
+  ruleSays: ruleSays,
+  proposals: 'leaves the rule would now fold (they own a page today)',
+  disagreements: 'folded leaves the rule would now explode (snapshot wins)',
+  footer:
+      'Neither is acted on. Moving a URL is `--write-snapshot` plus a '
+      'review of its diff.',
+);
 
 /// The preamble rule's opinion against its frozen set.
 ///
@@ -709,7 +773,8 @@ void _reportPreambleAdvice(Set<String> bearing, Set<String> ruleSays) =>
       proposals:
           'containers now carrying running text (served as navigation today)',
       disagreements: 'frozen containers whose text is gone (snapshot wins)',
-      footer: 'Neither is acted on. `--write-snapshot` regenerates both sets; '
+      footer:
+          'Neither is acted on. `--write-snapshot` regenerates both sets; '
           'no URL moves.',
     );
 
@@ -735,14 +800,13 @@ void _printAdvice({
   stdout.writeln('  proposals       ${proposed.length}   $proposals');
   stdout.writeln('  disagreements   ${disagreed.length}   $disagreements');
   if (proposed.isEmpty && disagreed.isEmpty) {
-    stdout.writeln('  nothing to review — the frozen set is what the rule '
-        'says today.');
+    stdout.writeln(
+      '  nothing to review — the frozen set is what the rule '
+      'says today.',
+    );
     return;
   }
-  for (final entry in [
-    ('  + ', proposed),
-    ('  − ', disagreed),
-  ]) {
+  for (final entry in [('  + ', proposed), ('  − ', disagreed)]) {
     for (final key in entry.$2.take(_maxOffendersShown)) {
       stdout.writeln('${entry.$1}$key');
     }
@@ -795,8 +859,10 @@ List<String>? _orderedForWriting(
   // Only reachable if a key sits outside every root, which the tree's own
   // parent check already rules out. Loud rather than silently short.
   if (ordered.length != keys.length) {
-    stderr.writeln('${keys.length - ordered.length} $noun key(s) are not '
-        'reachable from any root. Refusing to write a partial snapshot.');
+    stderr.writeln(
+      '${keys.length - ordered.length} $noun key(s) are not '
+      'reachable from any root. Refusing to write a partial snapshot.',
+    );
     exitCode = 1;
     return null;
   }
@@ -808,10 +874,14 @@ List<String>? _orderedForWriting(
   // absorbing re-syncs is the whole reason these files exist.
   final unsafe = ordered.where((key) => !_dartSafeKey.hasMatch(key)).toList();
   if (unsafe.isNotEmpty) {
-    stderr.writeln('${unsafe.length} nodeKey(s) cannot be written as a Dart '
-        'literal: ${unsafe.take(_maxOffendersShown).join(', ')}');
-    stderr.writeln('Refusing to write a file that would break every package '
-        'importing it. Add escaping here first.');
+    stderr.writeln(
+      '${unsafe.length} nodeKey(s) cannot be written as a Dart '
+      'literal: ${unsafe.take(_maxOffendersShown).join(', ')}',
+    );
+    stderr.writeln(
+      'Refusing to write a file that would break every package '
+      'importing it. Add escaping here first.',
+    );
     exitCode = 1;
     return null;
   }
@@ -828,7 +898,9 @@ List<String>? _orderedForWriting(
 /// checked against anything, where one that also says it moved off
 /// `පඨමසික්ඛාපදං.` and onto `8. 1. 1.` can be read straight.
 void _writeAlignmentSnapshot(
-    String path, List<CoordinateCorrection> corrections) {
+  String path,
+  List<CoordinateCorrection> corrections,
+) {
   final buffer = StringBuffer('''
 // GENERATED by `dart run static_site_generator/tool/plan_corpus.dart
 // --write-alignment`. Change the rule
@@ -894,10 +966,13 @@ void _writeAlignmentSnapshot(
 const Map<String, ({int page, int entry})> correctedTreeCoordinates = {
 ''');
   for (final c in corrections) {
-    buffer.writeln('  // was (page: ${c.from.page}, entry: ${c.from.entry}), '
-        'now opens on "${c.openingRow}"');
     buffer.writeln(
-        "  '${c.nodeKey}': (page: ${c.to.page}, entry: ${c.to.entry}),");
+      '  // was (page: ${c.from.page}, entry: ${c.from.entry}), '
+      'now opens on "${c.openingRow}"',
+    );
+    buffer.writeln(
+      "  '${c.nodeKey}': (page: ${c.to.page}, entry: ${c.to.entry}),",
+    );
   }
   buffer.writeln('};');
 
@@ -907,7 +982,8 @@ const Map<String, ({int page, int entry})> correctedTreeCoordinates = {
 }
 
 /// Where the frozen coordinate corrections live, beside the tree they correct.
-String _alignmentSnapshotPath(CorpusReader reader) => '${_repoRoot(reader)}'
+String _alignmentSnapshotPath(CorpusReader reader) =>
+    '${_repoRoot(reader)}'
     '/packages/wisdom_shared/lib/src/tree/tree_coordinate_corrections.dart';
 
 /// Writes one snapshot: [header], then [ordered] one key per line, then `};`.
@@ -934,9 +1010,7 @@ void _writeSnapshot(
   List<String> ordered,
   int readable,
 ) {
-  _writeKeys(
-      path,
-      '''
+  _writeKeys(path, '''
 // GENERATED by `dart run static_site_generator/tool/plan_corpus.dart
 // --write-snapshot`. Hand-editing it moves URLs with no review behind them —
 // change the rule (`static_site_generator/lib/domain/grouping_policy.dart`)
@@ -965,8 +1039,7 @@ void _writeSnapshot(
 ///
 /// See `docs/decisions/reading-units-and-grouping.md` — Part 2.
 const Set<String> foldedLeafKeys = {
-''',
-      ordered);
+''', ordered);
 
   // What this run was *compiled* against, which is the committed file's
   // contents — Dart resolved the import before any of this ran, so reading the
@@ -977,14 +1050,20 @@ const Set<String> foldedLeafKeys = {
   final removed = before.difference(now).length;
   stdout.writeln('wrote             $path');
   stdout.writeln('folded leaves     ${ordered.length}');
-  stdout.writeln('diff              +$added / −$removed against the set this '
-      'run was compiled with');
+  stdout.writeln(
+    'diff              +$added / −$removed against the set this '
+    'run was compiled with',
+  );
   if (added != 0 || removed != 0) {
     stdout.writeln('');
-    stdout.writeln('That is ${added + removed} URL(s) moving. Review '
-        '`git diff` on the snapshot, and update');
-    stdout.writeln('docs/decisions/reading-units-and-grouping.md in '
-        'the same commit.');
+    stdout.writeln(
+      'That is ${added + removed} URL(s) moving. Review '
+      '`git diff` on the snapshot, and update',
+    );
+    stdout.writeln(
+      'docs/decisions/reading-units-and-grouping.md in '
+      'the same commit.',
+    );
   }
 
   // The integrity question that is about the tree rather than the snapshot, and
@@ -995,12 +1074,18 @@ const Set<String> foldedLeafKeys = {
   final orphans = _orphanContainers(tree);
   if (orphans.isNotEmpty) {
     stdout.writeln('');
-    stdout.writeln('WARNING: ${orphans.length} container(s) have no content '
-        'file (${orphans.take(_maxOffendersShown).join(', ')}).');
-    stdout.writeln('Their leaves were just frozen, but the site cannot render '
-        'a page whose text it');
-    stdout.writeln("cannot find — this is the sync workflow's stop-the-line "
-        'moment. Sort the tree');
+    stdout.writeln(
+      'WARNING: ${orphans.length} container(s) have no content '
+      'file (${orphans.take(_maxOffendersShown).join(', ')}).',
+    );
+    stdout.writeln(
+      'Their leaves were just frozen, but the site cannot render '
+      'a page whose text it',
+    );
+    stdout.writeln(
+      "cannot find — this is the sync workflow's stop-the-line "
+      'moment. Sort the tree',
+    );
     stdout.writeln('out before committing this file.');
   }
 }
@@ -1018,9 +1103,7 @@ const Set<String> foldedLeafKeys = {
 /// Written together all the same, from one command and one validation pass —
 /// see [_orderedForWriting].
 void _writePreambleSnapshot(String path, List<String> ordered) {
-  _writeKeys(
-      path,
-      '''
+  _writeKeys(path, '''
 // GENERATED by `dart run static_site_generator/tool/plan_corpus.dart
 // --write-snapshot`. Change the rule
 // (`static_site_generator/lib/domain/preamble_planner.dart`) and regenerate
@@ -1063,8 +1146,7 @@ void _writePreambleSnapshot(String path, List<String> ordered) {
 ///
 /// See `docs/decisions/reading-units-and-grouping.md`.
 const Set<String> textBearingContainerKeys = {
-''',
-      ordered);
+''', ordered);
 
   const before = textBearingContainerKeys;
   final now = ordered.toSet();
@@ -1072,12 +1154,16 @@ const Set<String> textBearingContainerKeys = {
   final removed = before.difference(now).length;
   stdout.writeln('wrote             $path');
   stdout.writeln('text-bearing      ${ordered.length} containers');
-  stdout.writeln('diff              +$added / −$removed against the set this '
-      'run was compiled with');
+  stdout.writeln(
+    'diff              +$added / −$removed against the set this '
+    'run was compiled with',
+  );
   if (added != 0 || removed != 0) {
     stdout.writeln('');
-    stdout.writeln('That is ${added + removed} container page(s) entering or '
-        'leaving the reading chain.');
+    stdout.writeln(
+      'That is ${added + removed} container page(s) entering or '
+      'leaving the reading chain.',
+    );
     stdout.writeln('No URL moves. Review `git diff` on the snapshot.');
   }
 }
@@ -1120,10 +1206,14 @@ void _writeFigures(
     }
   }
   stdout.writeln('');
-  stdout.writeln('Review `git diff` on the file. Nothing fails when these '
-      'move — new upstream');
-  stdout.writeln('content should move them — but a comment citing a figure '
-      'that is no longer');
+  stdout.writeln(
+    'Review `git diff` on the file. Nothing fails when these '
+    'move — new upstream',
+  );
+  stdout.writeln(
+    'content should move them — but a comment citing a figure '
+    'that is no longer',
+  );
   stdout.writeln('listed is a citation to fix.');
 }
 
@@ -1289,15 +1379,21 @@ void _writeUpstreamReport(
   stdout.writeln('wrote             $path');
   stdout.writeln('');
   final serving = formulas.values.where((f) => f.servesAPage).length;
-  stdout.writeln('formula containers    ${formulas.length}   '
-      '($serving serve a page today)');
+  stdout.writeln(
+    'formula containers    ${formulas.length}   '
+    '($serving serve a page today)',
+  );
   stdout.writeln('distinct lines        ${wanted.length}');
-  stdout.writeln('typed two ways        $inconsistent   '
-      '(verbatim matches only — §3 is where a formula that varies by a word '
-      'shows up)');
-  stdout.writeln('wrong coordinates     ${defects.length}   '
-      '(§5, in ${defectKeysByFile.length} files — corrected on read, still '
-      'wrong for anything reading tree.json directly)');
+  stdout.writeln(
+    'typed two ways        $inconsistent   '
+    '(verbatim matches only — §3 is where a formula that varies by a word '
+    'shows up)',
+  );
+  stdout.writeln(
+    'wrong coordinates     ${defects.length}   '
+    '(§5, in ${defectKeysByFile.length} files — corrected on read, still '
+    'wrong for anything reading tree.json directly)',
+  );
 }
 
 String _renderUpstreamReport(
@@ -1314,7 +1410,8 @@ String _renderUpstreamReport(
   String cell(String text) =>
       text.replaceAll('|', r'\|').replaceAll('\n', ' / ');
 
-  final out = StringBuffer()..write('''
+  final out = StringBuffer()
+    ..write('''
 <!-- GENERATED by `dart run static_site_generator/tool/plan_corpus.dart --write-upstream`.
      Do not hand-edit — regenerate and review the diff. -->
 
@@ -1361,18 +1458,24 @@ or from `CORPUS_FIGURES.md`, never by hand.
   for (final key in ordered) {
     final formula = formulas[key]!;
     out
-      ..writeln('### `$key` — ${formatCount(formula.chars)} characters'
-          '${formula.servesAPage ? '' : ' (folded into a chapter; inert)'}')
+      ..writeln(
+        '### `$key` — ${formatCount(formula.chars)} characters'
+        '${formula.servesAPage ? '' : ' (folded into a chapter; inert)'}',
+      )
       ..writeln('')
-      ..writeln('${tipitakaUrl(key)} · `assets/text/${formula.fileId}.json` '
-          'page ${formula.page}, entry ${formula.entry}')
+      ..writeln(
+        '${tipitakaUrl(key)} · `assets/text/${formula.fileId}.json` '
+        'page ${formula.page}, entry ${formula.entry}',
+      )
       ..writeln('')
       ..writeln('| side | type | text |')
       ..writeln('|---|---|---|');
     for (final c in formula.cells) {
       final body = PreamblePlanner.runningTextTypes.contains(c.type);
-      out.writeln('| ${c.side} | ${body ? '**${c.type}**' : c.type} '
-          '| ${cell(c.text)} |');
+      out.writeln(
+        '| ${c.side} | ${body ? '**${c.type}**' : c.type} '
+        '| ${cell(c.text)} |',
+      );
     }
     out.writeln('');
   }
@@ -1427,8 +1530,9 @@ here as a column with an outlier in it.
       if (size == null) continue;
       final flagged = formulas.containsKey(child.nodeKey);
       out.writeln(
-          '| ${flagged ? '**`${child.nodeKey}`**' : '`${child.nodeKey}`'}'
-          ' | ${formatCount(size)} |');
+        '| ${flagged ? '**`${child.nodeKey}`**' : '`${child.nodeKey}`'}'
+        ' | ${formatCount(size)} |',
+      );
     }
     out.writeln('');
   }
@@ -1508,26 +1612,34 @@ a skip whose two sides are worded differently does not appear.
           flatten(filed.sinhalaName) == flatten(child.sinhalaName)) {
         continue;
       }
-      rows.add('| `${child.nodeKey}` | ${cell(child.paliName)} | '
-          '`$filedUnder` — ${cell(filed?.paliName ?? 'no such node')}'
-          ' | `${canonChildren[i].nodeKey}` |');
+      rows.add(
+        '| `${child.nodeKey}` | ${cell(child.paliName)} | '
+        '`$filedUnder` — ${cell(filed?.paliName ?? 'no such node')}'
+        ' | `${canonChildren[i].nodeKey}` |',
+      );
     }
     if (rows.isEmpty) continue;
     driftOut
-      ..writeln('### `${container.nodeKey}` — '
-          '${canonChildren.length} suttas, '
-          '${commentaryChildren.length} vaṇṇanā')
+      ..writeln(
+        '### `${container.nodeKey}` — '
+        '${canonChildren.length} suttas, '
+        '${commentaryChildren.length} vaṇṇanā',
+      )
       ..writeln('')
-      ..writeln('| commentary node | its title | its key points at |'
-          ' but that title is |')
+      ..writeln(
+        '| commentary node | its title | its key points at |'
+        ' but that title is |',
+      )
       ..writeln('|---|---|---|---|')
       ..writeln(rows.join('\n'))
       ..writeln('');
   }
-  out.write(driftOut.isEmpty
-      ? 'None: every commentary node whose title repeats a canon sutta name '
-          'sits at that sutta\'s own index.\n'
-      : driftOut.toString());
+  out.write(
+    driftOut.isEmpty
+        ? 'None: every commentary node whose title repeats a canon sutta name '
+              'sits at that sutta\'s own index.\n'
+        : driftOut.toString(),
+  );
 
   final files = {for (final defect in defects) defect.fileId};
   out.write('''
@@ -1573,11 +1685,13 @@ without loading anything.
       ..writeln('| leaf | from | printed there | to | printed there |')
       ..writeln('|---|---|---|---|---|');
     for (final defect in defects.where((d) => d.fileId == fileId)) {
-      out.writeln('| `${defect.nodeKey}` '
-          '| ${defect.from.page}, ${defect.from.entry} '
-          '| ${cell(defect.fromText)} '
-          '| ${defect.to.page}, ${defect.to.entry} '
-          '| ${cell(defect.toText)} |');
+      out.writeln(
+        '| `${defect.nodeKey}` '
+        '| ${defect.from.page}, ${defect.from.entry} '
+        '| ${cell(defect.fromText)} '
+        '| ${defect.to.page}, ${defect.to.entry} '
+        '| ${cell(defect.toText)} |',
+      );
     }
     out.writeln('');
   }
@@ -1609,11 +1723,13 @@ String _figuresPath(CorpusReader reader) =>
     '${_repoRoot(reader)}/static_site_generator/CORPUS_FIGURES.md';
 
 /// Where the frozen grouping verdicts live.
-String _snapshotPath(CorpusReader reader) => '${_repoRoot(reader)}'
+String _snapshotPath(CorpusReader reader) =>
+    '${_repoRoot(reader)}'
     '/packages/wisdom_shared/lib/src/grouping/grouping_snapshot.dart';
 
 /// Where the frozen preamble verdicts live, beside the grouping ones.
-String _preambleSnapshotPath(CorpusReader reader) => '${_repoRoot(reader)}'
+String _preambleSnapshotPath(CorpusReader reader) =>
+    '${_repoRoot(reader)}'
     '/packages/wisdom_shared/lib/src/grouping/preamble_snapshot.dart';
 
 /// Combined raw characters each page renders, preamble included.

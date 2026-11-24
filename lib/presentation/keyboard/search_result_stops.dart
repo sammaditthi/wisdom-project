@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 /// result rows, See all, Show more), so the arrow keys skip nothing; the
 /// recent-search rows; or the whole panel's node.
 List<FocusNode> searchResultStops(FocusNode within) => [
-      ...ReadingOrderTraversalPolicy.sort([
-        for (final node in within.traversalDescendants)
-          if (node is! FocusScopeNode && node.context != null) node,
-      ]),
-    ];
+  ...ReadingOrderTraversalPolicy.sort([
+    for (final node in within.traversalDescendants)
+      if (node is! FocusScopeNode && node.context != null) node,
+  ]),
+];

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+
 import '../constants/constants.dart';
 import 'app_fonts.dart';
 
@@ -496,31 +497,49 @@ class AppTypography extends ThemeExtension<AppTypography> {
       badgeLabel: TextStyle.lerp(badgeLabel, other.badgeLabel, t)!,
       sectionHeader: TextStyle.lerp(sectionHeader, other.sectionHeader, t)!,
       sectionHeaderCaseless: TextStyle.lerp(
-          sectionHeaderCaseless, other.sectionHeaderCaseless, t)!,
+        sectionHeaderCaseless,
+        other.sectionHeaderCaseless,
+        t,
+      )!,
       countBadge: TextStyle.lerp(countBadge, other.countBadge, t)!,
       chipLabel: TextStyle.lerp(chipLabel, other.chipLabel, t)!,
       resultTitle: TextStyle.lerp(resultTitle, other.resultTitle, t)!,
       resultSubtitle: TextStyle.lerp(resultSubtitle, other.resultSubtitle, t)!,
-      resultMatchedText:
-          TextStyle.lerp(resultMatchedText, other.resultMatchedText, t)!,
+      resultMatchedText: TextStyle.lerp(
+        resultMatchedText,
+        other.resultMatchedText,
+        t,
+      )!,
       listRowTitle: TextStyle.lerp(listRowTitle, other.listRowTitle, t)!,
       actionLabel: TextStyle.lerp(actionLabel, other.actionLabel, t)!,
       linkLabel: TextStyle.lerp(linkLabel, other.linkLabel, t)!,
       definitionBody: TextStyle.lerp(definitionBody, other.definitionBody, t)!,
       tabLabelActive: TextStyle.lerp(tabLabelActive, other.tabLabelActive, t)!,
-      tabLabelInactive:
-          TextStyle.lerp(tabLabelInactive, other.tabLabelInactive, t)!,
+      tabLabelInactive: TextStyle.lerp(
+        tabLabelInactive,
+        other.tabLabelInactive,
+        t,
+      )!,
       treeNodeLabel: TextStyle.lerp(treeNodeLabel, other.treeNodeLabel, t)!,
       treeNodeLabelSelected: TextStyle.lerp(
-          treeNodeLabelSelected, other.treeNodeLabelSelected, t)!,
+        treeNodeLabelSelected,
+        other.treeNodeLabelSelected,
+        t,
+      )!,
       dialogTitle: TextStyle.lerp(dialogTitle, other.dialogTitle, t)!,
-      menuSectionLabel:
-          TextStyle.lerp(menuSectionLabel, other.menuSectionLabel, t)!,
+      menuSectionLabel: TextStyle.lerp(
+        menuSectionLabel,
+        other.menuSectionLabel,
+        t,
+      )!,
       layoutGlyph: TextStyle.lerp(layoutGlyph, other.layoutGlyph, t)!,
       searchHint: TextStyle.lerp(searchHint, other.searchHint, t)!,
       searchInput: TextStyle.lerp(searchInput, other.searchInput, t)!,
-      emptyStateMessage:
-          TextStyle.lerp(emptyStateMessage, other.emptyStateMessage, t)!,
+      emptyStateMessage: TextStyle.lerp(
+        emptyStateMessage,
+        other.emptyStateMessage,
+        t,
+      )!,
       errorMessage: TextStyle.lerp(errorMessage, other.errorMessage, t)!,
       pageNumber: TextStyle.lerp(pageNumber, other.pageNumber, t)!,
     );

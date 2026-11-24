@@ -14,10 +14,10 @@ class EntryKeyRegistry {
   /// Returns the GlobalKey for the entry at (absolutePageIndex, entryIndex).
   /// Creates a new key on first access; returns the cached key thereafter.
   GlobalKey keyFor(int absolutePageIndex, int entryIndex) {
-    return _keys.putIfAbsent(
-      (absolutePageIndex, entryIndex),
-      () => GlobalKey(debugLabel: 'entry_${absolutePageIndex}_$entryIndex'),
-    );
+    return _keys.putIfAbsent((
+      absolutePageIndex,
+      entryIndex,
+    ), () => GlobalKey(debugLabel: 'entry_${absolutePageIndex}_$entryIndex'));
   }
 
   /// Finds the entry closest to the current viewport top.
@@ -49,8 +49,9 @@ class EntryKeyRegistry {
 
       // getOffsetToReveal returns the scroll offset that would place this
       // entry at the top of the viewport (alignment 0.0)
-      final revealedOffset =
-          viewport.getOffsetToReveal(renderObject, 0.0).offset;
+      final revealedOffset = viewport
+          .getOffsetToReveal(renderObject, 0.0)
+          .offset;
 
       // diff > 0: entry top is ABOVE viewport (scrolled past by diff px)
       // diff < 0: entry top is BELOW viewport (by -diff px)

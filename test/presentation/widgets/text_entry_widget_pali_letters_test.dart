@@ -93,10 +93,10 @@ void main() {
   // Step 3 — assert the widget now renders the special-ligated form, not the
   //           stale touching form from step 1.
   group('Cache invalidation on Pali-letter switch flip -', () {
-    testWidgets(
-        'starts with the default touching form, '
-        'then re-renders the special-ligated form after S2 is enabled',
-        (tester) async {
+    testWidgets('starts with the default touching form, '
+        'then re-renders the special-ligated form after S2 is enabled', (
+      tester,
+    ) async {
       // ARRANGE — pump with the default options (specialConjuncts = false).
       // Default S3+S1 on, S2 off: ද්ධ is NOT in the special list, so it falls
       // through to the S1 touching pass → ZWJ before hal → 'බුද‍්ධ'.
@@ -114,12 +114,18 @@ void main() {
 
       // ASSERT — The default touching form is rendered. The RichText that
       // Text.rich produces has a toPlainText() equal to the display string.
-      expect(find.text(touchingForm), findsOneWidget,
-          reason: 'Default options (S2 off) must render the touching form');
+      expect(
+        find.text(touchingForm),
+        findsOneWidget,
+        reason: 'Default options (S2 off) must render the touching form',
+      );
 
       // Confirm the ligated form is NOT present yet.
-      expect(find.text(ligatedForm), findsNothing,
-          reason: 'Special-ligated form must not appear before S2 is enabled');
+      expect(
+        find.text(ligatedForm),
+        findsNothing,
+        reason: 'Special-ligated form must not appear before S2 is enabled',
+      );
 
       // ACT (step 2) — flip specialConjuncts to true.
       await container.read(specialConjunctsProvider.notifier).set(true);
@@ -129,16 +135,20 @@ void main() {
 
       // ASSERT — The cache was busted. The widget now renders the special-ligated
       // form, proving the stale cached string was discarded.
-      expect(find.text(ligatedForm), findsOneWidget,
-          reason:
-              'After S2 enabled, the special-ligated form must be rendered');
+      expect(
+        find.text(ligatedForm),
+        findsOneWidget,
+        reason: 'After S2 enabled, the special-ligated form must be rendered',
+      );
 
-      expect(find.text(touchingForm), findsNothing,
-          reason: 'The stale touching form must not persist after cache bust');
+      expect(
+        find.text(touchingForm),
+        findsNothing,
+        reason: 'The stale touching form must not persist after cache bust',
+      );
     });
 
-    testWidgets(
-        'toggling S2 back off restores the touching form '
+    testWidgets('toggling S2 back off restores the touching form '
         '(round-trip cache invalidation)', (tester) async {
       const paliWord = 'බුද්ධ';
       const touchingForm = 'බුද‍්ධ';
@@ -156,34 +166,41 @@ void main() {
       await container.read(specialConjunctsProvider.notifier).set(false);
       await tester.pump();
 
-      expect(find.text(touchingForm), findsOneWidget,
-          reason: 'Disabling S2 must revert to the touching form');
+      expect(
+        find.text(touchingForm),
+        findsOneWidget,
+        reason: 'Disabling S2 must revert to the touching form',
+      );
       expect(find.text(ligatedForm), findsNothing);
     });
 
     testWidgets(
-        'disabling S1 (touching) removes ZWJ entirely — all-off baseline',
-        (tester) async {
-      const paliWord = 'බුද්ධ';
-      const bare = 'බුද්ධ'; // no ZWJ at all
-      const touchingForm = 'බුද‍්ධ';
+      'disabling S1 (touching) removes ZWJ entirely — all-off baseline',
+      (tester) async {
+        const paliWord = 'බුද්ධ';
+        const bare = 'බුද්ධ'; // no ZWJ at all
+        const touchingForm = 'බුද‍්ධ';
 
-      final container = await pumpTextEntry(tester, text: paliWord);
-      await tester.pump();
+        final container = await pumpTextEntry(tester, text: paliWord);
+        await tester.pump();
 
-      // Confirm default touching form is present.
-      expect(find.text(touchingForm), findsOneWidget);
+        // Confirm default touching form is present.
+        expect(find.text(touchingForm), findsOneWidget);
 
-      // Disable S3 (standard ligatures) and S1 (touching) — S2 already off.
-      await container.read(standardLigaturesProvider.notifier).set(false);
-      await container.read(touchingProvider.notifier).set(false);
-      await tester.pump();
+        // Disable S3 (standard ligatures) and S1 (touching) — S2 already off.
+        await container.read(standardLigaturesProvider.notifier).set(false);
+        await container.read(touchingProvider.notifier).set(false);
+        await tester.pump();
 
-      // With all switches off the transformer only strips existing ZWJ.
-      // Input has none, so output == input.
-      expect(find.text(bare), findsOneWidget,
-          reason: 'All switches off must render bare text with no ZWJ');
-      expect(find.text(touchingForm), findsNothing);
-    });
+        // With all switches off the transformer only strips existing ZWJ.
+        // Input has none, so output == input.
+        expect(
+          find.text(bare),
+          findsOneWidget,
+          reason: 'All switches off must render bare text with no ZWJ',
+        );
+        expect(find.text(touchingForm), findsNothing);
+      },
+    );
   });
 }

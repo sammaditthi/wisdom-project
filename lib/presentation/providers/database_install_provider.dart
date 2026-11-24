@@ -34,5 +34,5 @@ class DatabaseInstallNotifier extends StateNotifier<DatabaseInstallStatus> {
 /// reading it is what starts the install.
 final databaseInstallProvider =
     StateNotifierProvider<DatabaseInstallNotifier, DatabaseInstallStatus>(
-  (ref) => DatabaseInstallNotifier(const DatabaseInstallation()),
-);
+      (ref) => DatabaseInstallNotifier(const DatabaseInstallation()),
+    );

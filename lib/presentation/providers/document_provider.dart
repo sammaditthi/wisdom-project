@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/datasources/bjt_content_datasource.dart';
 import '../../data/datasources/bjt_content_local_datasource.dart';
 import '../../data/datasources/bjt_document_datasource.dart';
@@ -66,21 +67,20 @@ DocumentRequest requestForPage(String fileId, int pageIndex) =>
 // keepAlive() caches successful loads; failed loads can be retried.
 final bjtDocumentProvider = FutureProvider.autoDispose
     .family<BJTDocument, DocumentRequest>((ref, request) async {
-  final useCase = ref.watch(loadBJTDocumentUseCaseProvider);
-  final result = await useCase.execute(
-    request.fileId,
-    firstPage: request.firstPage,
-    lastPage: request.lastPage,
-  );
+      final useCase = ref.watch(loadBJTDocumentUseCaseProvider);
+      final result = await useCase.execute(
+        request.fileId,
+        firstPage: request.firstPage,
+        lastPage: request.lastPage,
+      );
 
-  return result.fold(
-    (failure) => throw Exception(failure.userMessage),
-    (document) {
-      ref.keepAlive(); // Cache successful loads
-      return document;
-    },
-  );
-});
+      return result.fold((failure) => throw Exception(failure.userMessage), (
+        document,
+      ) {
+        ref.keepAlive(); // Cache successful loads
+        return document;
+      });
+    });
 
 // ============================================================================
 // CONTENT STATE
@@ -150,8 +150,9 @@ final activeDocumentSliceProvider = Provider<DocumentSlice?>((ref) {
 
 /// The active tab's anchor row — where scroll offset 0 sits — or null for
 /// the unit's top.
-final activeAnchorProvider =
-    Provider<(int, int)?>((ref) => ref.watch(activeTabProvider)?.anchor);
+final activeAnchorProvider = Provider<(int, int)?>(
+  (ref) => ref.watch(activeTabProvider)?.anchor,
+);
 
 // Note: Reader layout is now per-tab, stored in ReaderTab.layout
 // Access via activeReaderLayoutProvider in tab_provider.dart
@@ -187,13 +188,15 @@ final availableLayersProvider = Provider<List<Map<String, String>>>((ref) {
   final layers = ref.watch(currentTextLayersProvider);
 
   return layers
-      .map((layer) => {
-            'layerId': layer.layerId,
-            'displayName': layer.displayName,
-            'editionId': layer.editionId,
-            'languageCode': layer.languageCode,
-            'scriptCode': layer.scriptCode,
-            'segmentCount': layer.segmentCount.toString(),
-          })
+      .map(
+        (layer) => {
+          'layerId': layer.layerId,
+          'displayName': layer.displayName,
+          'editionId': layer.editionId,
+          'languageCode': layer.languageCode,
+          'scriptCode': layer.scriptCode,
+          'segmentCount': layer.segmentCount.toString(),
+        },
+      )
       .toList();
 });

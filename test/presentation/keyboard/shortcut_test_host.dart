@@ -50,7 +50,8 @@ Future<void> pressKeys(
   bool shift = false,
   PhysicalKeyboardKey? physicalKey,
 }) async {
-  final apple = defaultTargetPlatform == TargetPlatform.macOS ||
+  final apple =
+      defaultTargetPlatform == TargetPlatform.macOS ||
       defaultTargetPlatform == TargetPlatform.iOS;
   final modifiers = <(LogicalKeyboardKey, PhysicalKeyboardKey)>[
     if (primary)

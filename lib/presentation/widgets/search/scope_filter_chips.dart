@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../domain/entities/search/scope_operations.dart';
 import '../../../domain/entities/search/search_scope_chip.dart';
@@ -31,10 +32,12 @@ class ScopeFilterChips extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final scope = ref.watch(searchStateProvider.select((s) => s.scope));
-    final searchInPali =
-        ref.watch(searchStateProvider.select((s) => s.searchInPali));
-    final searchInSinhala =
-        ref.watch(searchStateProvider.select((s) => s.searchInSinhala));
+    final searchInPali = ref.watch(
+      searchStateProvider.select((s) => s.searchInPali),
+    );
+    final searchInSinhala = ref.watch(
+      searchStateProvider.select((s) => s.searchInSinhala),
+    );
 
     // Check if scope contains custom selections (not covered by predefined chips)
     // This is true only when the refine dialog was used to select sub-nodes

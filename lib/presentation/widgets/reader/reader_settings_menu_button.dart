@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../core/localization/l10n/app_localizations.dart';
 import '../../../core/theme/app_fonts.dart';
 import '../../../core/theme/app_typography.dart';
@@ -81,10 +82,7 @@ class _MenuSectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Text(
-      selector(l10n),
-      style: context.typography.menuSectionLabel,
-    );
+    return Text(selector(l10n), style: context.typography.menuSectionLabel);
   }
 }
 
@@ -125,10 +123,12 @@ class _FontSizeSelector extends ConsumerWidget {
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
                   trackHeight: 3,
-                  thumbShape:
-                      const RoundSliderThumbShape(enabledThumbRadius: 7),
-                  overlayShape:
-                      const RoundSliderOverlayShape(overlayRadius: 14),
+                  thumbShape: const RoundSliderThumbShape(
+                    enabledThumbRadius: 7,
+                  ),
+                  overlayShape: const RoundSliderOverlayShape(
+                    overlayRadius: 14,
+                  ),
                 ),
                 child: Slider(
                   value: scale.clamp(

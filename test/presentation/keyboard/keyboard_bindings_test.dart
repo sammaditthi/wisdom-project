@@ -17,7 +17,8 @@ void main() {
     expect(activators().any((a) => a.control), isFalse);
     expect(
       activators().any(
-          (a) => a.trigger == LogicalKeyboardKey.keyF && a.meta && !a.shift),
+        (a) => a.trigger == LogicalKeyboardKey.keyF && a.meta && !a.shift,
+      ),
       isTrue,
     );
   }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
@@ -26,7 +27,8 @@ void main() {
     expect(activators().any((a) => a.meta), isFalse);
     expect(
       activators().any(
-          (a) => a.trigger == LogicalKeyboardKey.keyF && a.control && !a.shift),
+        (a) => a.trigger == LogicalKeyboardKey.keyF && a.control && !a.shift,
+      ),
       isTrue,
     );
   }, variant: TargetPlatformVariant.only(TargetPlatform.windows));

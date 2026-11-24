@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'citation.dart';
 
 part 'chat_message.freezed.dart';

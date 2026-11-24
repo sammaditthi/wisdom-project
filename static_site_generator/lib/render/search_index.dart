@@ -106,9 +106,7 @@ String buildSearchIndex({required SitePlan plan}) {
     }
   }
 
-  final position = {
-    for (var i = 0; i < nodes.length; i++) nodes[i].nodeKey: i,
-  };
+  final position = {for (var i = 0; i < nodes.length; i++) nodes[i].nodeKey: i};
 
   // Which chapter file each node's text is inside, for the nodes that have no
   // file of their own. Built from the same walk rather than by re-deriving an

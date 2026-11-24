@@ -12,5 +12,6 @@ enum AppSection { home, reader, research, notes }
 /// Defaults to the reader so a fresh launch lands exactly where the app
 /// landed before the shell existed. Deliberately not persisted for now —
 /// restarting always opens the reader.
-final selectedAppSectionProvider =
-    StateProvider<AppSection>((ref) => AppSection.reader);
+final selectedAppSectionProvider = StateProvider<AppSection>(
+  (ref) => AppSection.reader,
+);

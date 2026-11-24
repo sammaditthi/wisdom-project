@@ -32,8 +32,11 @@ class ScopeFilterSql {
     if (keys.isEmpty) return null;
 
     final conditions = keys
-        .map((_) => '($tableAlias.$columnName = ? '
-            'OR $tableAlias.$columnName LIKE ?)')
+        .map(
+          (_) =>
+              '($tableAlias.$columnName = ? '
+              'OR $tableAlias.$columnName LIKE ?)',
+        )
         .join(' OR ');
 
     return '($conditions)';
@@ -51,11 +54,8 @@ class ScopeFilterSql {
   /// // Returns: ['dn', 'dn-%']
   /// ```
   static List<String> getWhereParams(Set<String> scope) => [
-        for (final key in ScopePatterns.getKeysForScope(scope)) ...[
-          key,
-          '$key-%',
-        ],
-      ];
+    for (final key in ScopePatterns.getKeysForScope(scope)) ...[key, '$key-%'],
+  ];
 
   /// Builds the SQL WHERE clause fragment for the language filter (the
   /// පාළි / සිංහල search toggle), or `null` when [language] is null

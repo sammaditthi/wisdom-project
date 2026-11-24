@@ -93,38 +93,58 @@ void main() {
 
       // Without this the test passes vacuously on a stylesheet that emits no
       // layout rules at all — which is itself the failure being guarded.
-      expect(selected, isNotEmpty,
-          reason: 'The layout CSS emitted no #L- selectors. The engine cannot '
-              'be wired if nothing selects on it.');
-      expect(selected.difference(declared), isEmpty,
-          reason:
-              'The stylesheet selects on a layout id that does not exist in '
-              'readingLayouts. Those rules match nothing and the layout they '
-              'belong to is dead — silently, because an unmatched CSS rule is '
-              'not an error anywhere in the toolchain.');
+      expect(
+        selected,
+        isNotEmpty,
+        reason:
+            'The layout CSS emitted no #L- selectors. The engine cannot '
+            'be wired if nothing selects on it.',
+      );
+      expect(
+        selected.difference(declared),
+        isEmpty,
+        reason:
+            'The stylesheet selects on a layout id that does not exist in '
+            'readingLayouts. Those rules match nothing and the layout they '
+            'belong to is dead — silently, because an unmatched CSS rule is '
+            'not an error anywhere in the toolchain.',
+      );
     });
 
     test('every layout has both an <input id> and a <label for>', () {
       final html = _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()});
 
       for (final layout in readingLayouts) {
-        expect(html, contains('id="${layout.id}"'),
-            reason: '${layout.id} is in readingLayouts but no radio carries it '
-                '— the layout is unreachable.');
-        expect(html, contains('for="${layout.id}"'),
-            reason: '${layout.id} has a radio but no button bound to it — the '
-                'layout exists and cannot be chosen.');
+        expect(
+          html,
+          contains('id="${layout.id}"'),
+          reason:
+              '${layout.id} is in readingLayouts but no radio carries it '
+              '— the layout is unreachable.',
+        );
+        expect(
+          html,
+          contains('for="${layout.id}"'),
+          reason:
+              '${layout.id} has a radio but no button bound to it — the '
+              'layout exists and cannot be chosen.',
+        );
       }
     });
 
     test('exactly one radio is checked, and it is the default', () {
       final html = _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()});
-      final checked =
-          RegExp(r'<input[^>]*\bchecked\b[^>]*>').allMatches(html).toList();
+      final checked = RegExp(r'<input[^>]*\bchecked\b[^>]*>')
+          .allMatches(html)
+          .toList();
 
-      expect(checked, hasLength(1),
-          reason: 'Two defaults or none. With none, the page opens in the base '
-              'single-column state no button is lit for.');
+      expect(
+        checked,
+        hasLength(1),
+        reason:
+            'Two defaults or none. With none, the page opens in the base '
+            'single-column state no button is lit for.',
+      );
       expect(checked.single.group(0), contains('id="$defaultLayoutId"'));
     });
 
@@ -140,10 +160,14 @@ void main() {
       // Ids: duplicates are invalid HTML and every label binds to the first.
       // Tokens: `layoutScript` resolves `?layout=` by matching on `token`, so a
       // repeat would make one layout unreachable from a shared link.
-      expect(readingLayouts.map((layout) => layout.id).toSet(),
-          hasLength(readingLayouts.length));
-      expect(readingLayouts.map((layout) => layout.token).toSet(),
-          hasLength(readingLayouts.length));
+      expect(
+        readingLayouts.map((layout) => layout.id).toSet(),
+        hasLength(readingLayouts.length),
+      );
+      expect(
+        readingLayouts.map((layout) => layout.token).toSet(),
+        hasLength(readingLayouts.length),
+      );
     });
 
     test('every class the layout CSS acts on is emitted by the template', () {
@@ -156,20 +180,28 @@ void main() {
       // Scoping to the rules that mention a radio is what makes this check mean
       // what its name says.
       final selectors = _rulesSelectingOn(css, '#L-');
-      expect(selectors, isNotEmpty,
-          reason: 'No CSS rule selects on a layout radio at all. The engine is '
-              'unwired and the assertions below would pass vacuously.');
+      expect(
+        selectors,
+        isNotEmpty,
+        reason:
+            'No CSS rule selects on a layout radio at all. The engine is '
+            'unwired and the assertions below would pass vacuously.',
+      );
 
       // A layout can have a radio, a label and no rule that acts on the text —
       // reachable, lit, and inert. Every one of the four must reach `.content`.
       for (final layout in readingLayouts) {
         expect(
-            selectors.any((selector) =>
+          selectors.any(
+            (selector) =>
                 selector.contains('#${layout.id}:checked') &&
-                selector.contains('.content')),
-            isTrue,
-            reason: '${layout.id} has a radio and a button but no rule that '
-                'acts on the text. Choosing it would change nothing.');
+                selector.contains('.content'),
+          ),
+          isTrue,
+          reason:
+              '${layout.id} has a radio and a button but no rule that '
+              'acts on the text. Choosing it would change nothing.',
+        );
       }
 
       final acted = <String>{
@@ -191,35 +223,51 @@ void main() {
       // `:checked` selector to reach, from a Pali-only sutta page. Worth
       // keeping both in scope rather than exempting them, since a class the
       // template stopped emitting would make its guard silently inert.
-      final emitted = _classNamesIn(_render(
-        _chapterPage,
-        slices: {
-          'sp-grp-1': _slice('sp-grp-1', [
-            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
-            _row(pali: _entry('පාළි පමණයි'), at: 1),
-            _row(pali: _entry('6. 1. 2.'), sinhala: _entry('6. 1. 2.'), at: 2),
-          ]),
-          'sp-grp-2': _slice('sp-grp-2', [
-            _row(sinhala: _entry('සිංහල පමණයි'), at: 2),
-          ]),
-        },
-      ))
-        ..addAll(_classNamesIn(_render(_tocPage)))
-        ..addAll(_classNamesIn(_render(
-          _suttaPage,
-          slices: {
-            'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි පමණයි'))]),
-          },
-        )));
+      final emitted =
+          _classNamesIn(
+              _render(
+                _chapterPage,
+                slices: {
+                  'sp-grp-1': _slice('sp-grp-1', [
+                    _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+                    _row(pali: _entry('පාළි පමණයි'), at: 1),
+                    _row(
+                      pali: _entry('6. 1. 2.'),
+                      sinhala: _entry('6. 1. 2.'),
+                      at: 2,
+                    ),
+                  ]),
+                  'sp-grp-2': _slice('sp-grp-2', [
+                    _row(sinhala: _entry('සිංහල පමණයි'), at: 2),
+                  ]),
+                },
+              ),
+            )
+            ..addAll(_classNamesIn(_render(_tocPage)))
+            ..addAll(
+              _classNamesIn(
+                _render(
+                  _suttaPage,
+                  slices: {
+                    'sp-toc-1': _slice('sp-toc-1', [
+                      _row(pali: _entry('පාළි පමණයි')),
+                    ]),
+                  },
+                ),
+              ),
+            );
 
-      expect(emitted, containsAll(acted),
-          reason: 'The layout CSS acts on ${acted.difference(emitted)}, which '
-              'the template does not emit. Those rules match nothing — a dead '
-              'rule, not an error, anywhere in the toolchain.');
+      expect(
+        emitted,
+        containsAll(acted),
+        reason:
+            'The layout CSS acts on ${acted.difference(emitted)}, which '
+            'the template does not emit. Those rules match nothing — a dead '
+            'rule, not an error, anywhere in the toolchain.',
+      );
     });
 
-    test('the grouped-chapter filter selects on classes the template emits',
-        () {
+    test('the grouped-chapter filter selects on classes the template emits', () {
       // The zero-JS single-sutta view: `.chapter:has(.sutta:target, .sutta
       // :target)` hides every sibling `.sutta`, and `.chapter-bar` is the way
       // back to the whole run. No radio appears in those rules, so the
@@ -229,9 +277,13 @@ void main() {
       // a chapter showing its whole run: HTTP 200, valid markup, no URL
       // changed, nothing red.
       final selectors = _rulesSelectingOn(css, ':target');
-      expect(selectors, isNotEmpty,
-          reason: 'Nothing in the stylesheet reacts to a URL fragment. The '
-              'single-sutta view is gone.');
+      expect(
+        selectors,
+        isNotEmpty,
+        reason:
+            'Nothing in the stylesheet reacts to a URL fragment. The '
+            'single-sutta view is gone.',
+      );
 
       final acted = <String>{
         for (final selector in selectors)
@@ -239,23 +291,41 @@ void main() {
               .allMatches(selector)
               .map((match) => match.group(1)!),
       };
-      expect(acted, containsAll(['chapter', 'chapter-bar', 'sutta']),
-          reason: 'The filter no longer names all three of .chapter, '
-              '.chapter-bar and .sutta: $acted.');
+      expect(
+        acted,
+        containsAll(['chapter', 'chapter-bar', 'sutta']),
+        reason:
+            'The filter no longer names all three of .chapter, '
+            '.chapter-bar and .sutta: $acted.',
+      );
 
       // Both chapter shapes, because the `:target` rules now span both: the
       // canon side carries the filter and the bar, the commentary side the
       // origin markers a merged vaṇṇanā returns through.
-      final emitted = _classNamesIn(_render(_chapterPage, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      }))
-        ..addAll(_classNamesIn(_render(_commentaryChapterPage, slices: {
-          'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1'),
-        })));
-      expect(emitted, containsAll(acted),
-          reason: 'The filter acts on ${acted.difference(emitted)}, which no '
-              'chapter page emits.');
+      final emitted =
+          _classNamesIn(
+            _render(
+              _chapterPage,
+              slices: {
+                'sp-grp-1': _bothLanguages('sp-grp-1'),
+                'sp-grp-2': _bothLanguages('sp-grp-2'),
+              },
+            ),
+          )..addAll(
+            _classNamesIn(
+              _render(
+                _commentaryChapterPage,
+                slices: {'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1')},
+              ),
+            ),
+          );
+      expect(
+        emitted,
+        containsAll(acted),
+        reason:
+            'The filter acts on ${acted.difference(emitted)}, which no '
+            'chapter page emits.',
+      );
     });
 
     test('a shared vaṇṇanā answers at the marker its canon links aim at', () {
@@ -263,13 +333,17 @@ void main() {
       // while the link is broken: a canon href naming an id nothing emits lands
       // on an unfiltered page, and a marker nothing aims at is dead weight.
       // Neither shows up as a 404 — the page exists and returns 200.
-      final canon = _render(_chapterPage, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      });
-      final commentary = _render(_commentaryChapterPage, slices: {
-        'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1'),
-      });
+      final canon = _render(
+        _chapterPage,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+      );
+      final commentary = _render(
+        _commentaryChapterPage,
+        slices: {'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1')},
+      );
 
       // `sp-grp-2` is a follower: its own key names no vaṇṇanā, so the only
       // thing that can say it was the door is the marker.
@@ -284,9 +358,11 @@ void main() {
       // And so it gets no marker: with nothing aiming at it, the span could
       // never be `:target` and its return link could never be shown — one dead
       // element pair per merged run, saying what `.back-default` already says.
-      expect(commentary,
-          isNot(contains('<span class="origin" id="via_sp-grp-1">')),
-          reason: 'a marker no link aims at is markup nothing can reach');
+      expect(
+        commentary,
+        isNot(contains('<span class="origin" id="via_sp-grp-1">')),
+        reason: 'a marker no link aims at is markup nothing can reach',
+      );
     });
 
     test('the default return link comes after every marked one', () {
@@ -295,12 +371,15 @@ void main() {
       // written first the default needs a `:has()` gate instead — and a browser
       // without `:has()` drops the gate while still honouring
       // `.origin:target + .origin-link`, showing both links at once.
-      final html = _render(_commentaryChapterPage, slices: {
-        'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1'),
-      });
-      expect(html.indexOf('back-default'),
-          greaterThan(html.lastIndexOf('origin-link')),
-          reason: 'the default is no longer last, so `~` cannot reach it');
+      final html = _render(
+        _commentaryChapterPage,
+        slices: {'atta-sp-grp-1': _bothLanguages('atta-sp-grp-1')},
+      );
+      expect(
+        html.indexOf('back-default'),
+        greaterThan(html.lastIndexOf('origin-link')),
+        reason: 'the default is no longer last, so `~` cannot reach it',
+      );
     });
 
     test('the marker replaces the section fragment, never appends to it', () {
@@ -319,12 +398,14 @@ void main() {
           strings: _strings,
         ),
       );
-      final html = template.render(_chapterPage,
-          slices: {
-            'sp-grp-1': _bothLanguages('sp-grp-1'),
-            'sp-grp-2': _bothLanguages('sp-grp-2'),
-          },
-          sourceFile: 'an-1');
+      final html = template.render(
+        _chapterPage,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+        sourceFile: 'an-1',
+      );
       expect(html, contains('href="/tipitaka/atta-sp-grp#via_sp-grp-2">'));
       expect(html, isNot(contains('#atta-sp-grp-1#')));
     });
@@ -336,10 +417,13 @@ void main() {
       // nodeKey, every one of those deep links lands on the chapter head
       // instead of the sutta — and still returns 200, so no link checker sees
       // it.
-      final html = _render(_chapterPage, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      });
+      final html = _render(
+        _chapterPage,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+      );
 
       expect(html, contains('<section class="sutta" id="sp-grp-1">'));
       expect(html, contains('<section class="sutta" id="sp-grp-2">'));
@@ -356,10 +440,13 @@ void main() {
       );
       expect(page.anchorsRunOnLeaf, isTrue);
 
-      final html = _render(page, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      });
+      final html = _render(
+        page,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+      );
 
       expect(html, contains('<section class="sutta" id="sp-grp-1">'));
       expect(html, contains('<section class="sutta" id="sp-grp-2">'));
@@ -373,19 +460,27 @@ void main() {
       // addressable at all. The rules that hide each one are asserted by
       // `the grouped-chapter filter selects on classes the template emits`,
       // which fails if either class stops being emitted.
-      final html = _render(_chapterPage, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      });
+      final html = _render(
+        _chapterPage,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+      );
 
-      expect(html, contains('<div class="run-link">'),
-          reason: 'the whole-run view has no cross-link of its own');
+      expect(
+        html,
+        contains('<div class="run-link">'),
+        reason: 'the whole-run view has no cross-link of its own',
+      );
       // Inside `.chapter`, because the rule that hides it is scoped there —
       // `:has()` may not be nested, so a run-link above `.chapter` could not be
       // reached from the filter at all and would show in both views.
-      expect(html.indexOf('<div class="chapter">'),
-          lessThan(html.indexOf('<div class="run-link">')),
-          reason: 'the run-link sits outside the element the filter gates on');
+      expect(
+        html.indexOf('<div class="chapter">'),
+        lessThan(html.indexOf('<div class="run-link">')),
+        reason: 'the run-link sits outside the element the filter gates on',
+      );
       // One wrapper per section that has a link, and the section links still
       // name the sutta rather than the run.
       expect('section-links'.allMatches(html), hasLength(2));
@@ -410,13 +505,19 @@ void main() {
       );
       expect(page.anchorsRunOnLeaf, isTrue);
 
-      final html = _render(page, slices: {
-        'sp-grp-1': _bothLanguages('sp-grp-1'),
-        'sp-grp-2': _bothLanguages('sp-grp-2'),
-      });
+      final html = _render(
+        page,
+        slices: {
+          'sp-grp-1': _bothLanguages('sp-grp-1'),
+          'sp-grp-2': _bothLanguages('sp-grp-2'),
+        },
+      );
 
-      expect(html, isNot(contains('run-link')),
-          reason: 'sutta one is speaking for a run it does not name');
+      expect(
+        html,
+        isNot(contains('run-link')),
+        reason: 'sutta one is speaking for a run it does not name',
+      );
       // Bare, not wrapped: with no run-link above them these must not be
       // hidden in the unfiltered view, and `.section-links` is what hides them.
       expect(html, isNot(contains('section-links')));
@@ -450,15 +551,27 @@ void main() {
       // on the current node and so names it too, deliberately. That segment is
       // chrome in a different landmark, and letting it into the count would
       // make this guard fail on a change it has no opinion about.
-      expect(_countOf(_mainOf(html), weldTitle(vagga.paliName)), 1,
-          reason: 'The vagga name renders twice: once as the <h1> and once as '
-              'the preamble heading the <h1> was meant to replace.');
-      expect(html, contains(vagga.sinhalaName),
-          reason: 'The Sinhala name went with the Pali one — the exact P1 '
-              'regression this guards.');
-      expect(_classNamesIn(html), contains('no-pali'),
-          reason: 'The surviving row must be marked no-pali so paliOnly can '
-              'skip it rather than print an empty gap.');
+      expect(
+        _countOf(_mainOf(html), weldTitle(vagga.paliName)),
+        1,
+        reason:
+            'The vagga name renders twice: once as the <h1> and once as '
+            'the preamble heading the <h1> was meant to replace.',
+      );
+      expect(
+        html,
+        contains(vagga.sinhalaName),
+        reason:
+            'The Sinhala name went with the Pali one — the exact P1 '
+            'regression this guards.',
+      );
+      expect(
+        _classNamesIn(html),
+        contains('no-pali'),
+        reason:
+            'The surviving row must be marked no-pali so paliOnly can '
+            'skip it rather than print an empty gap.',
+      );
       // D8: the suppressed row is named in the provenance comment, because the
       // coordinate range above it still counts the row.
       expect(html, contains('title-repeat suppressed'));
@@ -483,149 +596,182 @@ void main() {
     });
 
     test('a printed page is labelled once, above its first row', () {
-      final html = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [
-          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
-          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), at: 1),
-          // Page 1 is Pali-only, as Paṭṭhāna's pages are.
-          _row(
+      final html = _render(
+        _suttaPage,
+        slices: {
+          'sp-toc-1': _slice('sp-toc-1', [
+            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), at: 1),
+            // Page 1 is Pali-only, as Paṭṭhāna's pages are.
+            _row(
               pali: _entry('ධම්මං'),
               at: 2,
               page: 1,
-              printed: (pali: 3, sinhala: null)),
-          _row(
+              printed: (pali: 3, sinhala: null),
+            ),
+            _row(
               pali: _entry('ධම්මං'),
               at: 3,
               page: 1,
-              printed: (pali: 3, sinhala: null)),
-        ]),
-      });
-      final main = _mainOf(html);
-
-      expect(
-          RegExp(r'<div class="(pg|row)[^"]*">')
-              .allMatches(main)
-              .map((match) => match.group(1)),
-          ['pg', 'row', 'row', 'pg', 'row', 'row'],
-          reason: 'One label per printed page, directly above its first row.');
-      expect(
-          main,
-          contains('<div class="pg"><div class="pali">1</div>'
-              '<div class="si">2</div></div>'),
-          reason: 'Each side shows its own printed page.');
-      expect(main, contains('<div class="pg"><div class="pali">3</div></div>'),
-          reason: 'A page with no Sinhala number writes no .si cell.');
-    });
-
-    test("a chapter section repeats its page's label, except the preamble's",
-        () {
-      final html = _render(
-        _chapterPage,
-        preamble: _slice('sp-grp', [
-          // A paragraph, so the title-repeat logic stays out of the way.
-          _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
-        ]),
-        slices: {
-          'sp-grp-1': _slice('sp-grp-1', [
-            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
-            _row(
-                pali: _entry('ධම්මං'),
-                sinhala: _entry('ධර්මය'),
-                at: 1,
-                page: 1),
-          ]),
-          'sp-grp-2': _slice('sp-grp-2', [
-            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), page: 1),
+              printed: (pali: 3, sinhala: null),
+            ),
           ]),
         },
       );
+      final main = _mainOf(html);
 
       expect(
+        RegExp(r'<div class="(pg|row)[^"]*">')
+            .allMatches(main)
+            .map((match) => match.group(1)),
+        ['pg', 'row', 'row', 'pg', 'row', 'row'],
+        reason: 'One label per printed page, directly above its first row.',
+      );
+      expect(
+        main,
+        contains(
+          '<div class="pg"><div class="pali">1</div>'
+          '<div class="si">2</div></div>',
+        ),
+        reason: 'Each side shows its own printed page.',
+      );
+      expect(
+        main,
+        contains('<div class="pg"><div class="pali">3</div></div>'),
+        reason: 'A page with no Sinhala number writes no .si cell.',
+      );
+    });
+
+    test(
+      "a chapter section repeats its page's label, except the preamble's",
+      () {
+        final html = _render(
+          _chapterPage,
+          preamble: _slice('sp-grp', [
+            // A paragraph, so the title-repeat logic stays out of the way.
+            _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+          ]),
+          slices: {
+            'sp-grp-1': _slice('sp-grp-1', [
+              _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
+              _row(
+                pali: _entry('ධම්මං'),
+                sinhala: _entry('ධර්මය'),
+                at: 1,
+                page: 1,
+              ),
+            ]),
+            'sp-grp-2': _slice('sp-grp-2', [
+              _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'), page: 1),
+            ]),
+          },
+        );
+
+        expect(
           RegExp(r'<div class="(pg[^"]*)">')
               .allMatches(_mainOf(html))
               .map((match) => match.group(1)),
           ['pg', 'pg', 'pg pg-repeat'],
-          reason: "The preamble's label; none where section 1 starts on the "
+          reason:
+              "The preamble's label; none where section 1 starts on the "
               "preamble's page; a plain one on page 1; a repeat where "
-              'section 2 starts on the page already labelled.');
-    });
+              'section 2 starts on the page already labelled.',
+        );
+      },
+    );
 
     test('a nav-only TOC has no page labels, a readable one does', () {
       final navOnly = _render(_tocPage, preamble: _bothLanguages('sp-toc'));
-      final readable =
-          _render(_readableTocPage, preamble: _bothLanguages('sp-toc'));
+      final readable = _render(
+        _readableTocPage,
+        preamble: _bothLanguages('sp-toc'),
+      );
 
       // The readable half is the control: without it the nav-only check would
       // pass on a template that never writes a label.
-      expect(_countOf(readable, 'class="pg'), 1,
-          reason: 'A readable TOC labels its preamble.');
-      expect(navOnly, isNot(contains('class="pg')),
-          reason: 'A nav-only TOC has no running text to label.');
+      expect(
+        _countOf(readable, 'class="pg'),
+        1,
+        reason: 'A readable TOC labels its preamble.',
+      );
+      expect(
+        navOnly,
+        isNot(contains('class="pg')),
+        reason: 'A nav-only TOC has no running text to label.',
+      );
     });
 
     test('row classes track the cells actually emitted', () {
-      final html = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [
-          _row(pali: _entry('දෙකම'), sinhala: _entry('දෙපැත්ත')),
-          _row(pali: _entry('පාළි පමණයි'), at: 1),
-          _row(sinhala: _entry('සිංහල පමණයි'), at: 2),
-          // DocRow.isEmpty — the only shape dropped outright. One row in the
-          // whole corpus looks like this.
-          _row(pali: _entry(''), sinhala: _entry(''), at: 3),
-          // Stacked shows a sutta number once, and only a sutta number: a Pali
-          // phrase the Sinhala side repeats, a number the two sides disagree
-          // on, and a dash rule all keep both cells. A stray space on one side,
-          // which the source has a few of, is still the same number.
-          _row(pali: _entry('6. 1. 2.'), sinhala: _entry('6. 1. 2.'), at: 4),
-          _row(pali: _entry('නිදානකථා'), sinhala: _entry('නිදානකථා'), at: 5),
-          _row(pali: _entry('4. 4. 5.'), sinhala: _entry('4. 5. 4.'), at: 6),
-          _row(pali: _entry('------'), sinhala: _entry('------'), at: 7),
-          _row(pali: _entry('4. 2. 6.'), sinhala: _entry('4. 2 .6.'), at: 8),
-        ]),
-      });
+      final html = _render(
+        _suttaPage,
+        slices: {
+          'sp-toc-1': _slice('sp-toc-1', [
+            _row(pali: _entry('දෙකම'), sinhala: _entry('දෙපැත්ත')),
+            _row(pali: _entry('පාළි පමණයි'), at: 1),
+            _row(sinhala: _entry('සිංහල පමණයි'), at: 2),
+            // DocRow.isEmpty — the only shape dropped outright. One row in the
+            // whole corpus looks like this.
+            _row(pali: _entry(''), sinhala: _entry(''), at: 3),
+            // Stacked shows a sutta number once, and only a sutta number: a Pali
+            // phrase the Sinhala side repeats, a number the two sides disagree
+            // on, and a dash rule all keep both cells. A stray space on one side,
+            // which the source has a few of, is still the same number.
+            _row(pali: _entry('6. 1. 2.'), sinhala: _entry('6. 1. 2.'), at: 4),
+            _row(pali: _entry('නිදානකථා'), sinhala: _entry('නිදානකථා'), at: 5),
+            _row(pali: _entry('4. 4. 5.'), sinhala: _entry('4. 5. 4.'), at: 6),
+            _row(pali: _entry('------'), sinhala: _entry('------'), at: 7),
+            _row(pali: _entry('4. 2. 6.'), sinhala: _entry('4. 2 .6.'), at: 8),
+          ]),
+        },
+      );
 
       // Every `.row` is a text row: there is no caption row to skip.
       expect(
-          _rowClassesIn(html),
-          [
-            '',
-            'no-si',
-            'no-pali',
-            'repeated-number',
-            '',
-            '',
-            '',
-            'repeated-number'
-          ],
-          reason: 'A row with one side missing must render with the class that '
-              'lets a single-language layout skip it; only a both-sides-empty '
-              'row is dropped. Only the same sutta number on both sides, '
-              'spacing aside, is marked repeated-number.');
+        _rowClassesIn(html),
+        [
+          '',
+          'no-si',
+          'no-pali',
+          'repeated-number',
+          '',
+          '',
+          '',
+          'repeated-number',
+        ],
+        reason:
+            'A row with one side missing must render with the class that '
+            'lets a single-language layout skip it; only a both-sides-empty '
+            'row is dropped. Only the same sutta number on both sides, '
+            'spacing aside, is marked repeated-number.',
+      );
     });
 
     test('heading depths are contiguous from h2 and rank both languages', () {
       // Source `level` is a typographic *size*, not an outline depth. Mapping
       // it arithmetically gave every page an h1 → h4 → h6 outline with h2, h3
       // and h5 missing. Fixed twice already.
-      final html = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [
-          _row(
-            pali: _entry('විශාල', type: 'heading', level: 5),
-            sinhala: _entry('විශාල', type: 'heading', level: 5),
-          ),
-          _row(
-            pali: _entry('මධ්‍යම', type: 'heading', level: 3),
-            sinhala: _entry('මධ්‍යම', type: 'heading', level: 3),
-            at: 1,
-          ),
-          // Sinhala-only. The load-bearing row: if _headingDepths scanned the
-          // Pali side alone, level 1 would never enter the ranking, this
-          // heading would fall through to the <h2> default, and the skipped
-          // level would reopen.
-          _row(sinhala: _entry('කුඩා', type: 'heading', level: 1), at: 2),
-          _row(pali: _entry('පෙළ'), sinhala: _entry('පෙළ'), at: 3),
-        ]),
-      });
+      final html = _render(
+        _suttaPage,
+        slices: {
+          'sp-toc-1': _slice('sp-toc-1', [
+            _row(
+              pali: _entry('විශාල', type: 'heading', level: 5),
+              sinhala: _entry('විශාල', type: 'heading', level: 5),
+            ),
+            _row(
+              pali: _entry('මධ්‍යම', type: 'heading', level: 3),
+              sinhala: _entry('මධ්‍යම', type: 'heading', level: 3),
+              at: 1,
+            ),
+            // Sinhala-only. The load-bearing row: if _headingDepths scanned the
+            // Pali side alone, level 1 would never enter the ranking, this
+            // heading would fall through to the <h2> default, and the skipped
+            // level would reopen.
+            _row(sinhala: _entry('කුඩා', type: 'heading', level: 1), at: 2),
+            _row(pali: _entry('පෙළ'), sinhala: _entry('පෙළ'), at: 3),
+          ]),
+        },
+      );
 
       // Largest source size first: 5 → h2, 3 → h3, 1 → h4. The l<n> class still
       // carries the source level, which is what the stylesheet sizes on.
@@ -637,9 +783,13 @@ void main() {
           .allMatches(html)
           .map((match) => int.parse(match.group(1)!))
           .toSet();
-      expect(depths, {1, 2, 3, 4},
-          reason: 'The outline skips a level: $depths. A crawler reads that as '
-              'nesting the page does not have.');
+      expect(
+        depths,
+        {1, 2, 3, 4},
+        reason:
+            'The outline skips a level: $depths. A crawler reads that as '
+            'nesting the page does not have.',
+      );
     });
 
     test('the Sinhala cell never carries a touching ZWJ', () {
@@ -647,11 +797,14 @@ void main() {
       // text must never go through the transform — it would bind consonants
       // that Sinhala orthography keeps apart.
       const text = 'ධම්මං';
-      final html = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [
-          _row(pali: _entry(text), sinhala: _entry(text)),
-        ]),
-      });
+      final html = _render(
+        _suttaPage,
+        slices: {
+          'sp-toc-1': _slice('sp-toc-1', [
+            _row(pali: _entry(text), sinhala: _entry(text)),
+          ]),
+        },
+      );
 
       // Touching is ZWJ *before* the hal. The ligature form (hal + ZWJ) is
       // ordinary Sinhala spelling — රකාරාංශය and යංශය, in
@@ -661,55 +814,83 @@ void main() {
 
       // Asserted in both directions: without the first expectation the second
       // would pass against a build where the transform is off everywhere.
-      expect(_cell(html, 'pali').contains(touching), isTrue,
-          reason: 'The Pali cell is not welding at all, so the Sinhala check '
-              'below proves nothing.');
-      expect(_cell(html, 'si').contains(touching), isFalse,
-          reason: 'The conjunct transform leaked into the translation.');
+      expect(
+        _cell(html, 'pali').contains(touching),
+        isTrue,
+        reason:
+            'The Pali cell is not welding at all, so the Sinhala check '
+            'below proves nothing.',
+      );
+      expect(
+        _cell(html, 'si').contains(touching),
+        isFalse,
+        reason: 'The conjunct transform leaked into the translation.',
+      );
     });
 
     test('machine-read names keep ligatures and drop the touching ZWJ', () {
       // D2, spelled as tipitaka.lk's tab spells it: welded, then the touching
       // ZWJ taken back out. Raw names almost never carry a ZWJ, so skipping
       // the weld printed බ්ර with a bare hal in the tab.
-      final html = _render(_vaggaSuttaPage,
-          slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')});
+      final html = _render(
+        _vaggaSuttaPage,
+        slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')},
+      );
       final surfaces = {
         '<title>': _firstCapture(html, r'<title>([^<]*)</title>'),
         'og:title': _firstCapture(
-            html, r'<meta property="og:title" content="([^"]*)">'),
+          html,
+          r'<meta property="og:title" content="([^"]*)">',
+        ),
         // Past `/`, whose label is an app string rather than a node name.
         'JSON-LD': _breadcrumbNames(html).skip(1).join(' — '),
       };
 
       surfaces.forEach((surface, text) {
         // Rakaransaya in the sutta's name, a common pair in the vagga's.
-        expect(text, contains('බ\u0DCA\u200Dර'),
-            reason: '$surface lost the rakaransaya ligature: "$text".');
-        expect(text, contains('න\u0DCA\u200Dධ'),
-            reason: '$surface lost the න + ධ ligature: "$text".');
+        expect(
+          text,
+          contains('බ\u0DCA\u200Dර'),
+          reason: '$surface lost the rakaransaya ligature: "$text".',
+        );
+        expect(
+          text,
+          contains('න\u0DCA\u200Dධ'),
+          reason: '$surface lost the න + ධ ligature: "$text".',
+        );
         // Not vacuous: the ligatures above prove the weld ran, and it welds
         // සුත්ත and ලක්ඛ touching.
-        expect(text, isNot(contains('\u200D\u0DCA')),
-            reason: '$surface kept a touching ZWJ: "$text".');
+        expect(
+          text,
+          isNot(contains('\u200D\u0DCA')),
+          reason: '$surface kept a touching ZWJ: "$text".',
+        );
       });
     });
 
-    test('the <title> stops at the vagga; the description adds the collection',
-        () {
-      // Decided 2026-10-18: name and vagga tell nearly every same-named sutta
-      // apart, and the collection made the tab long for little gain.
-      final html = _render(_vaggaSuttaPage,
-          slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')});
-      final sutta = unweldTitle(_tree['sp-toc-v-1']!.paliName);
-      final vagga = unweldTitle(_tree['sp-toc-v']!.paliName);
-      final collection = unweldTitle(_tree['sp-toc']!.paliName);
+    test(
+      'the <title> stops at the vagga; the description adds the collection',
+      () {
+        // Decided 2026-10-18: name and vagga tell nearly every same-named sutta
+        // apart, and the collection made the tab long for little gain.
+        final html = _render(
+          _vaggaSuttaPage,
+          slices: {'sp-toc-v-1': _bothLanguages('sp-toc-v-1')},
+        );
+        final sutta = unweldTitle(_tree['sp-toc-v-1']!.paliName);
+        final vagga = unweldTitle(_tree['sp-toc-v']!.paliName);
+        final collection = unweldTitle(_tree['sp-toc']!.paliName);
 
-      expect(_firstCapture(html, r'<title>([^<]*)</title>'), '$sutta — $vagga');
-      expect(
+        expect(
+          _firstCapture(html, r'<title>([^<]*)</title>'),
+          '$sutta — $vagga',
+        );
+        expect(
           _firstCapture(html, r'<meta name="description" content="([^"]*)">'),
-          startsWith('$sutta — $vagga — $collection. '));
-    });
+          startsWith('$sutta — $vagga — $collection. '),
+        );
+      },
+    );
 
     test('the toolbar is on every page; the radios only on readable ones', () {
       // Every page carries the bar: a page without one has no way home, and no
@@ -717,25 +898,35 @@ void main() {
       // which is what frame 03 specifies and `site_chrome.dart` documents.
       final pages = {
         'sutta': _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()}),
-        'chapter': _render(_chapterPage,
-            slices: {'sp-grp-1': _bothLanguages('sp-grp-1')}),
+        'chapter': _render(
+          _chapterPage,
+          slices: {'sp-grp-1': _bothLanguages('sp-grp-1')},
+        ),
         'toc': _render(_tocPage),
         'landing': LandingPage(roots: _tree.roots, build: _build).render(),
       };
 
       pages.forEach((kind, html) {
-        expect(_countOf(html, 'class="toolbar"'), 1,
-            reason: 'The $kind page must carry exactly one toolbar — zero is a '
-                'page with no way home, two is a duplicate id.');
+        expect(
+          _countOf(html, 'class="toolbar"'),
+          1,
+          reason:
+              'The $kind page must carry exactly one toolbar — zero is a '
+              'page with no way home, two is a duplicate id.',
+        );
       });
 
       // Readable pages get the four radios; a TOC and `/` have no reading
       // layout to choose, and the absence needs no CSS: with nothing checked,
       // no `#L-x:checked ~` rule matches and a .row keeps its single column.
-      expect(_countOf(pages['sutta']!, 'class="layout-input"'),
-          readingLayouts.length);
-      expect(_countOf(pages['chapter']!, 'class="layout-input"'),
-          readingLayouts.length);
+      expect(
+        _countOf(pages['sutta']!, 'class="layout-input"'),
+        readingLayouts.length,
+      );
+      expect(
+        _countOf(pages['chapter']!, 'class="layout-input"'),
+        readingLayouts.length,
+      );
       expect(_countOf(pages['toc']!, 'class="layout-input"'), 0);
       expect(_countOf(pages['landing']!, 'class="layout-input"'), 0);
     });
@@ -749,8 +940,10 @@ void main() {
       final reading = [
         (
           '/tipitaka/sp-grp',
-          _render(_chapterPage,
-              slices: {'sp-grp-1': _bothLanguages('sp-grp-1')}),
+          _render(
+            _chapterPage,
+            slices: {'sp-grp-1': _bothLanguages('sp-grp-1')},
+          ),
         ),
         (
           '/tipitaka/sp-toc',
@@ -763,9 +956,12 @@ void main() {
         // One language: no layout buttons, but still a page to read.
         (
           '/tipitaka/sp-toc-1',
-          _render(_suttaPage, slices: {
-            'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි'))]),
-          }),
+          _render(
+            _suttaPage,
+            slices: {
+              'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි'))]),
+            },
+          ),
         ),
       ];
 
@@ -773,8 +969,11 @@ void main() {
         final hrefs = _hrefsOfClass(html, jsClass);
         // The pill and the ⋮ menu's copy: the stylesheet shows one per width,
         // so site.js has to find both.
-        expect(hrefs, hasLength(2),
-            reason: '$path needs both copies of the link, found by site.js.');
+        expect(
+          hrefs,
+          hasLength(2),
+          reason: '$path needs both copies of the link, found by site.js.',
+        );
         // The same path on the app's host, with no `#`: site.js adds that.
         expect(hrefs, everyElement('$_appOrigin$path'));
       }
@@ -783,8 +982,11 @@ void main() {
         _render(_tocPage),
         LandingPage(roots: _tree.roots, build: _build).render(),
       ]) {
-        expect(_hrefsOfClass(html, jsClass), isEmpty,
-            reason: 'Only a page with text to read links to the app.');
+        expect(
+          _hrefsOfClass(html, jsClass),
+          isEmpty,
+          reason: 'Only a page with text to read links to the app.',
+        );
       }
     });
 
@@ -801,8 +1003,11 @@ void main() {
         expect(_countOf(html, 'class="layout-input"'), readingLayouts.length);
         final menu = _moreMenuOf(html);
         for (final layout in readingLayouts) {
-          expect(menu, contains('for="${layout.id}"'),
-              reason: 'The ⋮ menu has no button for ${layout.id}.');
+          expect(
+            menu,
+            contains('for="${layout.id}"'),
+            reason: 'The ⋮ menu has no button for ${layout.id}.',
+          );
         }
       }
     });
@@ -811,21 +1016,31 @@ void main() {
       // A label whose radio is not on the page is a button that does nothing.
       // The trap is a page in one language: no radios, but still a ⋮, for the
       // link to the app.
-      final html = _render(_suttaPage, slices: {
-        'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි'))]),
-      });
-      expect(_attributeValues(html, 'id'),
-          containsAll(_attributeValues(html, 'for')));
+      final html = _render(
+        _suttaPage,
+        slices: {
+          'sp-toc-1': _slice('sp-toc-1', [_row(pali: _entry('පාළි'))]),
+        },
+      );
+      expect(
+        _attributeValues(html, 'id'),
+        containsAll(_attributeValues(html, 'for')),
+      );
     });
 
     test('the app link and ⋮ rules select on classes the template emits', () {
       // The pill and the ⋮ swap by width by these rules, and on a phone the ⋮
       // shows its copy of the layout buttons. A class renamed on one side only
       // breaks that at one width, with nothing red.
-      final selectors =
-          _rulesSelectingOn(css, RegExp(r'\.(app-|more|new-tab-)'));
-      expect(selectors, isNotEmpty,
-          reason: 'No CSS rule styles the app link or the ⋮ at all.');
+      final selectors = _rulesSelectingOn(
+        css,
+        RegExp(r'\.(app-|more|new-tab-)'),
+      );
+      expect(
+        selectors,
+        isNotEmpty,
+        reason: 'No CSS rule styles the app link or the ⋮ at all.',
+      );
 
       final acted = <String>{
         for (final selector in selectors)
@@ -834,10 +1049,15 @@ void main() {
               .map((match) => match.group(1)!),
       };
       final emitted = _classNamesIn(
-          _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()}));
-      expect(emitted, containsAll(acted),
-          reason: 'These rules act on ${acted.difference(emitted)}, which a '
-              'reading page does not emit.');
+        _render(_suttaPage, slices: {'sp-toc-1': _bothLanguages()}),
+      );
+      expect(
+        emitted,
+        containsAll(acted),
+        reason:
+            'These rules act on ${acted.difference(emitted)}, which a '
+            'reading page does not emit.',
+      );
     });
 
     test('every icon a page emits has a mask in the stylesheet, and back', () {
@@ -852,27 +1072,40 @@ void main() {
       final masked = _classesOfRulesDeclaring(css, '--icon: url("data:');
       final painted = _classesOfRulesDeclaring(css, 'mask: var(--icon)');
       expect(masked, isNotEmpty, reason: 'No icon has a mask at all.');
-      expect(painted, containsAll(masked),
-          reason: 'Masks with no rule to paint them: '
-              '${masked.difference(painted)}.');
+      expect(
+        painted,
+        containsAll(masked),
+        reason:
+            'Masks with no rule to paint them: '
+            '${masked.difference(painted)}.',
+      );
 
       final emitted = <String>{};
       for (final html in pages) {
-        expect(html, isNot(contains('<svg')),
-            reason: 'An icon went back to inline SVG on every page.');
-        for (final match
-            in RegExp(r'<span class="([^"]*-icon[^"]*)"([^>]*)>(.*?)</span>')
-                .allMatches(html)) {
+        expect(
+          html,
+          isNot(contains('<svg')),
+          reason: 'An icon went back to inline SVG on every page.',
+        );
+        for (final match in RegExp(
+          r'<span class="([^"]*-icon[^"]*)"([^>]*)>(.*?)</span>',
+        ).allMatches(html)) {
           final classes = match.group(1)!.split(' ').toSet();
-          expect(classes.intersection(masked), isNotEmpty,
-              reason: '<span class="${match.group(1)}"> has no mask.');
+          expect(
+            classes.intersection(masked),
+            isNotEmpty,
+            reason: '<span class="${match.group(1)}"> has no mask.',
+          );
           expect(match.group(2), ' aria-hidden="true"');
           expect(match.group(3), isEmpty);
           emitted.addAll(classes);
         }
       }
-      expect(emitted, containsAll(masked),
-          reason: 'Masks no page uses: ${masked.difference(emitted)}.');
+      expect(
+        emitted,
+        containsAll(masked),
+        reason: 'Masks no page uses: ${masked.difference(emitted)}.',
+      );
     });
 
     test('the home link is named by its title and holds only its icon', () {
@@ -885,16 +1118,24 @@ void main() {
         'landing': LandingPage(roots: _tree.roots, build: _build).render(),
       };
       pages.forEach((kind, html) {
-        final links =
-            RegExp(r'<a class="home"([^>]*)>(.*?)</a>').allMatches(html);
-        expect(links, hasLength(1),
-            reason: 'The $kind page should have exactly one home link.');
+        final links = RegExp(r'<a class="home"([^>]*)>(.*?)</a>')
+            .allMatches(html);
+        expect(
+          links,
+          hasLength(1),
+          reason: 'The $kind page should have exactly one home link.',
+        );
         final attributes = links.single.group(1)!;
         expect(attributes, contains(' href="/"'));
-        expect(attributes, contains(' title="$label"'),
-            reason: 'The $kind page\'s home link has no name.');
-        expect(links.single.group(2),
-            '<span class="home-icon" aria-hidden="true"></span>');
+        expect(
+          attributes,
+          contains(' title="$label"'),
+          reason: 'The $kind page\'s home link has no name.',
+        );
+        expect(
+          links.single.group(2),
+          '<span class="home-icon" aria-hidden="true"></span>',
+        );
       });
     });
   });
@@ -915,9 +1156,9 @@ void main() {
     final parent = columns['PARENT']!;
     final marked = columns['MARKED']!;
 
-    final rows =
-        (jsonDecode(buildSearchIndex(plan: _planFixture)) as List<dynamic>)
-            .cast<List<dynamic>>();
+    final rows = (jsonDecode(
+      buildSearchIndex(plan: _planFixture),
+    ) as List<dynamic>).cast<List<dynamic>>();
     final keys = [for (final row in rows) row[key] as String];
 
     test('a row has one cell per name site.js reads it by', () {
@@ -925,9 +1166,9 @@ void main() {
       // one side only, which shifts every column after it. Comparing lengths
       // only says that while the offsets are 0..n — a skipped one would keep
       // the count and turn the next test into a RangeError.
-      expect(
-          columns.values.toSet(), {for (var i = 0; i < columns.length; i++) i},
-          reason: 'site.js no longer numbers its columns 0..n');
+      expect(columns.values.toSet(), {
+        for (var i = 0; i < columns.length; i++) i,
+      }, reason: 'site.js no longer numbers its columns 0..n');
       for (final row in rows) {
         expect(row.length, columns.length);
       }
@@ -951,9 +1192,13 @@ void main() {
       // of its `suttas`, and used to arrive as two rows — the second winning
       // `position`, which is what ranks a hit.
       expect(keys.toSet(), _planTree.allNodes.map((n) => n.nodeKey).toSet());
-      expect(keys.length, keys.toSet().length,
-          reason: 'a key is indexed twice: '
-              '${keys.where((k) => keys.where((o) => o == k).length > 1).toSet()}');
+      expect(
+        keys.length,
+        keys.toSet().length,
+        reason:
+            'a key is indexed twice: '
+            '${keys.where((k) => keys.where((o) => o == k).length > 1).toSet()}',
+      );
     });
 
     test('an index of this row is an index of this array', () {
@@ -974,8 +1219,10 @@ void main() {
       for (final row in rows) {
         final parentKey = _planTree[row[key] as String]!.parentNodeKey;
         final pointer = row[parent] as int;
-        expect(pointer < 0 ? null : keys[pointer],
-            parentKey == null ? null : _planTree[parentKey]?.nodeKey);
+        expect(
+          pointer < 0 ? null : keys[pointer],
+          parentKey == null ? null : _planTree[parentKey]?.nodeKey,
+        );
       }
     });
 
@@ -990,8 +1237,11 @@ void main() {
       };
       for (final row in rows) {
         final nodeKey = row[key] as String;
-        expect(row[marked], expected[nodeKey] ?? 0,
-            reason: 'the commentary marker is wrong on $nodeKey');
+        expect(
+          row[marked],
+          expected[nodeKey] ?? 0,
+          reason: 'the commentary marker is wrong on $nodeKey',
+        );
       }
     });
 
@@ -1003,7 +1253,8 @@ void main() {
         _readJsHrefFor(),
         "if (row[CHAPTER] < 0) return BASE + row[KEY]; "
         "return BASE + rows[row[CHAPTER]][KEY] + '#' + row[KEY];",
-        reason: 'hrefFor changed shape, so the Dart copy below is now a '
+        reason:
+            'hrefFor changed shape, so the Dart copy below is now a '
             'snapshot of a script that no longer says this. Update both.',
       );
     });
@@ -1025,8 +1276,11 @@ void main() {
       }
 
       for (final row in rows) {
-        expect(hrefFor(row), _planFixture.urlFor(row[key] as String),
-            reason: 'search sends ${row[key]} somewhere the site does not');
+        expect(
+          hrefFor(row),
+          _planFixture.urlFor(row[key] as String),
+          reason: 'search sends ${row[key]} somewhere the site does not',
+        );
       }
     });
 
@@ -1062,9 +1316,13 @@ void main() {
       // leave this passing against a broken site.js.
       expect('මඞ්ග\u200Bල'.replaceAll(zeroWidth, ''), 'මඞ්ගල');
       for (final char in const ['\u200B', '\u200C', '\u200D', '\uFEFF']) {
-        expect(char.replaceAll(zeroWidth, ''), isEmpty,
-            reason: 'site.js no longer strips '
-                'U+${char.codeUnitAt(0).toRadixString(16).toUpperCase()}');
+        expect(
+          char.replaceAll(zeroWidth, ''),
+          isEmpty,
+          reason:
+              'site.js no longer strips '
+              'U+${char.codeUnitAt(0).toRadixString(16).toUpperCase()}',
+        );
       }
     });
   });
@@ -1082,8 +1340,10 @@ void main() {
 
       // The same check on that exact hazard, so it cannot pass by never
       // seeing an overlap.
-      final hazard = parseHeaderRules('/assets/*\n  Cache-Control: a\n\n'
-          '/assets/og-card.png\n  Cache-Control: b\n');
+      final hazard = parseHeaderRules(
+        '/assets/*\n  Cache-Control: a\n\n'
+        '/assets/og-card.png\n  Cache-Control: b\n',
+      );
       expect(_headerConflicts(hazard), isNotEmpty);
     });
 
@@ -1094,14 +1354,13 @@ void main() {
         String searchIndex = '[]',
         List<int> ogCard = const [2],
         List<int> favicon = const [3],
-      }) =>
-          SiteAssets.forContent(
-            css: css,
-            script: script,
-            searchIndex: searchIndex,
-            ogCard: ogCard,
-            favicon: favicon,
-          );
+      }) => SiteAssets.forContent(
+        css: css,
+        script: script,
+        searchIndex: searchIndex,
+        ogCard: ogCard,
+        favicon: favicon,
+      );
       final before = assetUrls(assetsWith());
       Set<String> moved(SiteAssets after) {
         final urls = assetUrls(after);
@@ -1111,9 +1370,13 @@ void main() {
         };
       }
 
-      expect(moved(assetsWith()), isEmpty,
-          reason: 'Same bytes must give the same URLs, or every deploy '
-              're-uploads every page.');
+      expect(
+        moved(assetsWith()),
+        isEmpty,
+        reason:
+            'Same bytes must give the same URLs, or every deploy '
+            're-uploads every page.',
+      );
       expect(moved(assetsWith(css: 'b{}')), {'stylesheet'});
       // site.js reads index rows by position: the two move together or a
       // fresh script can pair with a cached index.
@@ -1141,25 +1404,29 @@ void main() {
         [2],
       ];
       expect(
-          fontsVersion(faces),
-          fontsVersion(const [
-            [1],
-            [2],
-          ]));
+        fontsVersion(faces),
+        fontsVersion(const [
+          [1],
+          [2],
+        ]),
+      );
       expect(
-          fontsVersion(const [
-            [1],
-            [3],
-          ]),
-          isNot(fontsVersion(faces)),
-          reason: 'A re-subset face keeps its file name, so only the token '
-              'can tell a reader it changed.');
+        fontsVersion(const [
+          [1],
+          [3],
+        ]),
+        isNot(fontsVersion(faces)),
+        reason:
+            'A re-subset face keeps its file name, so only the token '
+            'can tell a reader it changed.',
+      );
       expect(
-          fontsVersion(const [
-            [1],
-          ]),
-          isNot(fontsVersion(faces)),
-          reason: 'A build missing a face is not the same fonts.');
+        fontsVersion(const [
+          [1],
+        ]),
+        isNot(fontsVersion(faces)),
+        reason: 'A build missing a face is not the same fonts.',
+      );
     });
   });
 }
@@ -1181,7 +1448,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     7,
     [0, 0],
     'root',
-    'an-1'
+    'an-1',
   ],
   // A container that stays exploded: its children get their own pages.
   'sp-toc': [
@@ -1190,7 +1457,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     6,
     [0, 1],
     'sp',
-    'an-1'
+    'an-1',
   ],
   'sp-toc-1': [
     'පඨමසුත්තං',
@@ -1198,7 +1465,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 2],
     'sp-toc',
-    'an-1'
+    'an-1',
   ],
   'sp-toc-2': [
     'දුතියසුත්තං',
@@ -1206,7 +1473,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 5],
     'sp-toc',
-    'an-1'
+    'an-1',
   ],
   // A vagga inside the collection, so its sutta has a parent that is not its
   // collection — the one shape where `<title>` and description differ. Real
@@ -1218,7 +1485,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     5,
     [0, 6],
     'sp-toc',
-    'an-1'
+    'an-1',
   ],
   'sp-toc-v-1': [
     'බ්රහ්මජාලසුත්තං',
@@ -1226,7 +1493,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 7],
     'sp-toc-v',
-    'an-1'
+    'an-1',
   ],
   // A container that groups: its children live inside one chapter file.
   'sp-grp': [
@@ -1235,7 +1502,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     5,
     [0, 8],
     'sp',
-    'an-1'
+    'an-1',
   ],
   'sp-grp-1': [
     'පඨමං',
@@ -1243,7 +1510,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 9],
     'sp-grp',
-    'an-1'
+    'an-1',
   ],
   'sp-grp-2': [
     'දුතියං',
@@ -1251,7 +1518,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 11],
     'sp-grp',
-    'an-1'
+    'an-1',
   ],
   // A commentary side, so the cross-link has somewhere to point. The one
   // vaṇṇanā declares `1-2.`, so it answers for BOTH canon suttas — the merged
@@ -1262,7 +1529,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     6,
     [0, 0],
     null,
-    'atta-an-1'
+    'atta-an-1',
   ],
   'atta-sp-grp': [
     'චිත්තපරියාදානවග්ගවණ්ණනා',
@@ -1270,7 +1537,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     5,
     [0, 1],
     'atta-sp',
-    'atta-an-1'
+    'atta-an-1',
   ],
   'atta-sp-grp-1': [
     '1-2. පඨමාදිවණ්ණනා',
@@ -1278,7 +1545,7 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
     1,
     [0, 2],
     'atta-sp-grp',
-    'atta-an-1'
+    'atta-an-1',
   ],
 });
 
@@ -1292,24 +1559,22 @@ DocRow _row({
   int page = 0,
   // A canon page by default, so every fixture page is labelled.
   PrintedPages? printed = (pali: 1, sinhala: 2),
-}) =>
-    DocRow(
-      pageIndex: page,
-      pageNum: 1,
-      printed: printed,
-      entryIndex: at,
-      pali: pali,
-      sinhala: sinhala,
-    );
+}) => DocRow(
+  pageIndex: page,
+  pageNum: 1,
+  printed: printed,
+  entryIndex: at,
+  pali: pali,
+  sinhala: sinhala,
+);
 
 NodeSlice _slice(String nodeKey, List<DocRow> rows) =>
     NodeSlice(nodeKey: nodeKey, rows: rows, startIndex: 0);
 
 /// One row carrying both languages — the default shape most tests only need to
 /// be non-empty.
-NodeSlice _bothLanguages([String nodeKey = 'sp-toc-1']) => _slice(nodeKey, [
-      _row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය')),
-    ]);
+NodeSlice _bothLanguages([String nodeKey = 'sp-toc-1']) =>
+    _slice(nodeKey, [_row(pali: _entry('ධම්මං'), sinhala: _entry('ධර්මය'))]);
 
 /// The per-build values, as one fixture — see [SiteBuild].
 final SiteBuild _build = SiteBuild(
@@ -1370,43 +1635,43 @@ const SiteAssets _assets = SiteAssets(
 );
 
 SitePage get _suttaPage => SitePage(
-      kind: PageKind.sutta,
-      node: _tree['sp-toc-1']!,
-      suttas: [_tree['sp-toc-1']!],
-    );
+  kind: PageKind.sutta,
+  node: _tree['sp-toc-1']!,
+  suttas: [_tree['sp-toc-1']!],
+);
 
 /// The sutta under [_tree]'s vagga — the only page whose location has three
 /// distinct parts.
 SitePage get _vaggaSuttaPage => SitePage(
-      kind: PageKind.sutta,
-      node: _tree['sp-toc-v-1']!,
-      suttas: [_tree['sp-toc-v-1']!],
-    );
+  kind: PageKind.sutta,
+  node: _tree['sp-toc-v-1']!,
+  suttas: [_tree['sp-toc-v-1']!],
+);
 
 SitePage get _chapterPage => SitePage(
-      kind: PageKind.chapter,
-      node: _tree['sp-grp']!,
-      suttas: [_tree['sp-grp-1']!, _tree['sp-grp-2']!],
-    );
+  kind: PageKind.chapter,
+  node: _tree['sp-grp']!,
+  suttas: [_tree['sp-grp-1']!, _tree['sp-grp-2']!],
+);
 
 /// The merged vaṇṇanā, whose section carries one origin marker per canon sutta
 /// it answers for. The only fixture that emits `.origin` / `.back-default`.
 SitePage get _commentaryChapterPage => SitePage(
-      kind: PageKind.chapter,
-      node: _tree['atta-sp-grp']!,
-      suttas: [_tree['atta-sp-grp-1']!],
-    );
+  kind: PageKind.chapter,
+  node: _tree['atta-sp-grp']!,
+  suttas: [_tree['atta-sp-grp-1']!],
+);
 
 SitePage get _tocPage =>
     SitePage(kind: PageKind.toc, node: _tree['sp-toc']!, suttas: const []);
 
 /// A TOC whose preamble is an introduction, which makes it a reading page.
 SitePage get _readableTocPage => SitePage(
-      kind: PageKind.toc,
-      node: _tree['sp-toc']!,
-      suttas: const [],
-      ownsRunningText: true,
-    );
+  kind: PageKind.toc,
+  node: _tree['sp-toc']!,
+  suttas: const [],
+  ownsRunningText: true,
+);
 
 /// A second tree, for the search index alone — deliberately not [_tree], which
 /// builds its [SitePage]s by hand and so has no run starting below a container.
@@ -1448,58 +1713,58 @@ final TipitakaTree _planTree = TipitakaTree.fromJson({
 final SitePlan _planFixture = SitePlan.build(
   tree: _planTree,
   rootKeys: const ['sp', 'atta-sp'],
-  foldedLeafKeys: const {
-    'sp-whole-1',
-    'sp-whole-2',
-    'sp-mid-3',
-    'atta-sp-1',
-  },
+  foldedLeafKeys: const {'sp-whole-1', 'sp-whole-2', 'sp-mid-3', 'atta-sp-1'},
   textBearingContainerKeys: const {},
 );
 
 /// One `tree.json` row for [_planTree]. The name is a placeholder except on the
 /// `atta-*` nodes, where [carriesCommentaryMarker] reads it.
 List<dynamic> _planRow(String? parent, {String pali = 'pali'}) => [
-      pali,
-      'sinh',
-      1,
-      const <int>[0, 0],
-      parent ?? 'root',
-      'f'
-    ];
+  pali,
+  'sinh',
+  1,
+  const <int>[0, 0],
+  parent ?? 'root',
+  'f',
+];
 
 String _render(
   SitePage page, {
   Map<String, NodeSlice> slices = const {},
   NodeSlice? preamble,
-}) =>
-    _template.render(
-      page,
-      slices: slices,
-      preamble: preamble,
-      sourceFile: 'an-1',
-    );
+}) => _template.render(
+  page,
+  slices: slices,
+  preamble: preamble,
+  sourceFile: 'an-1',
+);
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
 ThemeTokens _readThemeTokens() {
   final file = File('assets/theme_tokens.json');
   if (!file.existsSync()) {
-    fail('assets/theme_tokens.json not found. Run `dart test` from the '
-        'static_site_generator/ package root — the path is relative to it.');
+    fail(
+      'assets/theme_tokens.json not found. Run `dart test` from the '
+      'static_site_generator/ package root — the path is relative to it.',
+    );
   }
   return ThemeTokens(
-      jsonDecode(file.readAsStringSync()) as Map<String, dynamic>);
+    jsonDecode(file.readAsStringSync()) as Map<String, dynamic>,
+  );
 }
 
 AppStrings _readAppStrings() {
   final file = File('../lib/core/localization/l10n/app_si.arb');
   if (!file.existsSync()) {
-    fail('app_si.arb not found. Run `dart test` from the '
-        'static_site_generator/ package root — the path is relative to it.');
+    fail(
+      'app_si.arb not found. Run `dart test` from the '
+      'static_site_generator/ package root — the path is relative to it.',
+    );
   }
   return AppStrings(
-      jsonDecode(file.readAsStringSync()) as Map<String, dynamic>);
+    jsonDecode(file.readAsStringSync()) as Map<String, dynamic>,
+  );
 }
 
 /// The row offsets `site.js` reads a search result by, taken from the script
@@ -1511,15 +1776,19 @@ AppStrings _readAppStrings() {
 Map<String, int> _readJsRowColumns() {
   final file = File('assets/site.js');
   if (!file.existsSync()) {
-    fail('assets/site.js not found. Run `dart test` from the '
-        'static_site_generator/ package root — the path is relative to it.');
+    fail(
+      'assets/site.js not found. Run `dart test` from the '
+      'static_site_generator/ package root — the path is relative to it.',
+    );
   }
   final line = file.readAsLinesSync().firstWhere(
-        (line) => line.contains('var KEY ='),
-        orElse: () => fail('site.js no longer declares its row offsets as '
-            '`var KEY = 0, …`. Whatever replaced it is now the contract, and '
-            'this helper has to read that instead.'),
-      );
+    (line) => line.contains('var KEY ='),
+    orElse: () => fail(
+      'site.js no longer declares its row offsets as '
+      '`var KEY = 0, …`. Whatever replaced it is now the contract, and '
+      'this helper has to read that instead.',
+    ),
+  );
   return {
     for (final match in RegExp(r'(\w+)\s*=\s*(\d+)').allMatches(line))
       match.group(1)!: int.parse(match.group(2)!),
@@ -1578,22 +1847,25 @@ String _readJsHrefFor() {
 
 /// The class `site.js` finds the "read in the app" links by: `a.app-link`.
 String _readJsAppLinkClass() {
-  final match =
-      RegExp(r"var appLinks = document\.querySelectorAll\('a\.([\w-]+)'\);")
-          .firstMatch(File('assets/site.js').readAsStringSync());
+  final match = RegExp(
+    r"var appLinks = document\.querySelectorAll\('a\.([\w-]+)'\);",
+  ).firstMatch(File('assets/site.js').readAsStringSync());
   if (match == null) {
-    fail("site.js no longer declares "
-        "`var appLinks = document.querySelectorAll('a.…');`.");
+    fail(
+      "site.js no longer declares "
+      "`var appLinks = document.querySelectorAll('a.…');`.",
+    );
   }
   return match.group(1)!;
 }
 
 /// The href of every `<a>` in [html] whose class list holds [cssClass].
 List<String> _hrefsOfClass(String html, String cssClass) => [
-      for (final match
-          in RegExp(r'<a class="([^"]*)" href="([^"]*)"').allMatches(html))
-        if (match.group(1)!.split(' ').contains(cssClass)) match.group(2)!,
-    ];
+  for (final match in RegExp(
+    r'<a class="([^"]*)" href="([^"]*)"',
+  ).allMatches(html))
+    if (match.group(1)!.split(' ').contains(cssClass)) match.group(2)!,
+];
 
 /// The ⋮ menu's contents, up to the `</details>` that closes it.
 String _moreMenuOf(String html) {
@@ -1606,9 +1878,9 @@ String _moreMenuOf(String html) {
 
 /// Every value [name] takes on the page — every `id`, every `for`.
 Set<String> _attributeValues(String html, String name) => {
-      for (final match in RegExp('\\s$name="([^"]*)"').allMatches(html))
-        match.group(1)!,
-    };
+  for (final match in RegExp('\\s$name="([^"]*)"').allMatches(html))
+    match.group(1)!,
+};
 
 /// Every individual class name the markup uses.
 ///
@@ -1619,7 +1891,8 @@ Set<String> _classNamesIn(String html) {
   final names = <String>{};
   for (final match in RegExp(r'class="([^"]*)"').allMatches(html)) {
     names.addAll(
-        match.group(1)!.split(RegExp(r'\s+')).where((name) => name.isNotEmpty));
+      match.group(1)!.split(RegExp(r'\s+')).where((name) => name.isNotEmpty),
+    );
   }
   return names;
 }
@@ -1668,29 +1941,32 @@ List<String> _rulesSelectingOn(String css, Pattern marker) {
 /// Exact here for the same reasons as [_rulesSelectingOn]: comments are
 /// stripped, and no rule's body holds a brace.
 Set<String> _classesOfRulesDeclaring(String css, String declaration) => {
-      for (final rule in RegExp(r'([^{}]*)\{([^{}]*)\}')
-          .allMatches(css.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')))
-        if (rule.group(2)!.contains(declaration))
-          ...RegExp(r'\.([\w-]+)')
-              .allMatches(rule.group(1)!)
-              .map((match) => match.group(1)!),
-    };
+  for (final rule in RegExp(
+    r'([^{}]*)\{([^{}]*)\}',
+  ).allMatches(css.replaceAll(RegExp(r'/\*.*?\*/', dotAll: true), '')))
+    if (rule.group(2)!.contains(declaration))
+      ...RegExp(r'\.([\w-]+)')
+          .allMatches(rule.group(1)!)
+          .map((match) => match.group(1)!),
+};
 
 /// The class list of each `.row`, in document order, with the leading `row`
 /// stripped — `['', 'no-si']`.
-List<String> _rowClassesIn(String html) => RegExp(r'<div class="row([^"]*)"')
-    .allMatches(html)
-    .map((match) => match.group(1)!.trim())
-    .toList();
+List<String> _rowClassesIn(String html) =>
+    RegExp(r'<div class="row([^"]*)"')
+        .allMatches(html)
+        .map((match) => match.group(1)!.trim())
+        .toList();
 
 /// The inner HTML of the first `.pali` or `.si` cell.
 ///
 /// Non-greedy is safe here because a language cell's children are `<p>` and
 /// `<h*>` elements — no nested `<div>` to close early.
 String _cell(String html, String cssClass) {
-  final match =
-      RegExp('<div class="$cssClass" lang="[^"]*">(.*?)</div>', dotAll: true)
-          .firstMatch(html);
+  final match = RegExp(
+    '<div class="$cssClass" lang="[^"]*">(.*?)</div>',
+    dotAll: true,
+  ).firstMatch(html);
   if (match == null) fail('No .$cssClass cell in the rendered page.');
   return match.group(1)!;
 }
@@ -1704,9 +1980,9 @@ String _firstCapture(String html, String pattern) {
 
 /// The JSON-LD breadcrumb's names, `/` first.
 List<String> _breadcrumbNames(String html) {
-  final json = jsonDecode(_firstCapture(
-          html, r'<script type="application/ld\+json">(.*?)</script>'))
-      as Map<String, dynamic>;
+  final json = jsonDecode(
+    _firstCapture(html, r'<script type="application/ld\+json">(.*?)</script>'),
+  ) as Map<String, dynamic>;
   return [
     for (final item in json['itemListElement'] as List)
       (item as Map<String, dynamic>)['name'] as String,
@@ -1730,13 +2006,13 @@ String _mainOf(String html) => html.split('<main class="content').last;
 /// One line per pair of [rules] that can match the same URL and set the same
 /// header to different values.
 List<String> _headerConflicts(List<HeaderRule> rules) => [
-      for (var i = 0; i < rules.length; i++)
-        for (var j = i + 1; j < rules.length; j++)
-          if (_patternsOverlap(rules[i].pattern, rules[j].pattern))
-            for (final MapEntry(key: name, :value) in rules[i].headers.entries)
-              if (rules[j].headers[name] case final other? when other != value)
-                '${rules[i].pattern} and ${rules[j].pattern} both set $name',
-    ];
+  for (var i = 0; i < rules.length; i++)
+    for (var j = i + 1; j < rules.length; j++)
+      if (_patternsOverlap(rules[i].pattern, rules[j].pattern))
+        for (final MapEntry(key: name, :value) in rules[i].headers.entries)
+          if (rules[j].headers[name] case final other? when other != value)
+            '${rules[i].pattern} and ${rules[j].pattern} both set $name',
+];
 
 /// Whether one URL can match both `_headers` patterns.
 ///
@@ -1746,12 +2022,15 @@ bool _patternsOverlap(String a, String b) {
   final first = _parsePattern(a);
   final second = _parsePattern(b);
   if (first.host != null && second.host != null && first.host != second.host) {
-    fail('Two different host patterns ($a, $b): teach _patternsOverlap '
-        'whether they can match one host.');
+    fail(
+      'Two different host patterns ($a, $b): teach _patternsOverlap '
+      'whether they can match one host.',
+    );
   }
   return switch ((first.splat, second.splat)) {
-    (true, true) => first.prefix.startsWith(second.prefix) ||
-        second.prefix.startsWith(first.prefix),
+    (true, true) =>
+      first.prefix.startsWith(second.prefix) ||
+          second.prefix.startsWith(first.prefix),
     (true, false) => second.prefix.startsWith(first.prefix),
     (false, true) => first.prefix.startsWith(second.prefix),
     (false, false) => first.prefix == second.prefix,

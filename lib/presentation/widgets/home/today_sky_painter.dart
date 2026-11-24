@@ -83,7 +83,9 @@ class TodaySkyPainter extends CustomPainter {
       ),
     );
     canvas.saveLayer(
-        bounds, Paint()..color = Color.fromRGBO(0, 0, 0, strength));
+      bounds,
+      Paint()..color = Color.fromRGBO(0, 0, 0, strength),
+    );
 
     canvas.drawRect(
       bounds,
@@ -95,10 +97,18 @@ class TodaySkyPainter extends CustomPainter {
           const [0, _midStop, 1],
         ),
     );
-    _glow(canvas, at(look.bloomAt.dx, look.bloomAt.dy), look.bloomRadii,
-        look.bloom);
     _glow(
-        canvas, Offset(marker.dx, h + marker.dy), look.sunRadii, look.sunGlow);
+      canvas,
+      at(look.bloomAt.dx, look.bloomAt.dy),
+      look.bloomRadii,
+      look.bloom,
+    );
+    _glow(
+      canvas,
+      Offset(marker.dx, h + marker.dy),
+      look.sunRadii,
+      look.sunGlow,
+    );
     final moon = this.moon;
     if (moon != null) {
       _glow(

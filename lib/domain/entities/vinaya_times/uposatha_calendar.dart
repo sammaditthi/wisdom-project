@@ -40,7 +40,7 @@ class UposathaCalendar {
   static List<UposathaDay> _build() {
     final days = <UposathaDay>[];
     var date = _seed;
-    for (var year = _firstYear;; year++) {
+    for (var year = _firstYear; ; year++) {
       for (final season in _Season.values) {
         final isGimhana = season == _Season.gimhana;
         final extraMonth = isGimhana && _extraMonthYears.contains(year);

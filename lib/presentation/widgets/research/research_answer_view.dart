@@ -36,8 +36,10 @@ class ResearchAnswerView extends StatelessWidget {
   /// from [_citeUid] so the two can't drift; bold is listed before italic so
   /// `**x**` matches the bold arm, not two italics. Groups: 1=uid, 2=bold,
   /// 3=italic.
-  static final RegExp _inline =
-      RegExp('${_citeUid.pattern}' r'|\*\*(.+?)\*\*|\*(.+?)\*');
+  static final RegExp _inline = RegExp(
+    '${_citeUid.pattern}'
+    r'|\*\*(.+?)\*\*|\*(.+?)\*',
+  );
 
   /// A leading list bullet (`- ` or `* `) at the start of a line.
   static final RegExp _bullet = RegExp(r'^\s*[-*]\s+');
@@ -53,8 +55,9 @@ class ResearchAnswerView extends StatelessWidget {
         .map((m) => m.group(1))
         .whereType<String>()
         .toSet();
-    final otherSources =
-        citations.where((c) => !inlineUids.contains(c.uid)).toList();
+    final otherSources = citations
+        .where((c) => !inlineUids.contains(c.uid))
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,9 +93,7 @@ class ResearchAnswerView extends StatelessWidget {
         Wrap(
           spacing: 6,
           runSpacing: 6,
-          children: [
-            for (final c in sources) _CitationChip(citation: c),
-          ],
+          children: [for (final c in sources) _CitationChip(citation: c)],
         ),
       ],
     );
@@ -182,23 +183,29 @@ class ResearchAnswerView extends StatelessWidget {
         // uid is in `citations`): drop the chip rather than render a dead one.
         final citation = citationsByUid[uid];
         if (citation != null) {
-          spans.add(WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: _CitationChip(citation: citation),
-          ));
+          spans.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: _CitationChip(citation: citation),
+            ),
+          );
         }
       } else if (bold != null) {
         // Recurse into the run so a `[[cite:uid]]` inside `**…**` still becomes
         // a chip; the children inherit this span's bold style.
-        spans.add(TextSpan(
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          children: _inlineSpans(bold, citationsByUid),
-        ));
+        spans.add(
+          TextSpan(
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            children: _inlineSpans(bold, citationsByUid),
+          ),
+        );
       } else if (italic != null) {
-        spans.add(TextSpan(
-          style: const TextStyle(fontStyle: FontStyle.italic),
-          children: _inlineSpans(italic, citationsByUid),
-        ));
+        spans.add(
+          TextSpan(
+            style: const TextStyle(fontStyle: FontStyle.italic),
+            children: _inlineSpans(italic, citationsByUid),
+          ),
+        );
       }
 
       last = m.end;
@@ -238,8 +245,11 @@ class _CitationChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.menu_book,
-                    size: 13, color: colors.onPrimaryContainer),
+                Icon(
+                  Icons.menu_book,
+                  size: 13,
+                  color: colors.onPrimaryContainer,
+                ),
                 const SizedBox(width: 3),
                 Text(
                   citation.ref,

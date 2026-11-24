@@ -94,8 +94,10 @@ class DictionarySheetConstants {
   static ({double min, double mid, double max}) adaptiveSnaps(
     double availableHeight,
   ) {
-    final min = (minPixelHeight / availableHeight)
-        .clamp(minFractionFloor, minFractionCeiling);
+    final min = (minPixelHeight / availableHeight).clamp(
+      minFractionFloor,
+      minFractionCeiling,
+    );
     final mid = ((min + maxChildSize) / 2).clamp(0.55, 0.8);
     return (min: min, mid: mid, max: maxChildSize);
   }

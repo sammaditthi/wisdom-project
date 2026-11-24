@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../core/constants/constants.dart';
 import '../../core/storage/key_value_store.dart';
 import '../../core/storage/key_value_store_provider.dart';
@@ -79,21 +80,14 @@ class TabsNotifier extends StateNotifier<List<ReaderTab>> {
   /// Removes a tab at the specified index
   void removeTab(int index) {
     if (index >= 0 && index < state.length) {
-      state = [
-        ...state.sublist(0, index),
-        ...state.sublist(index + 1),
-      ];
+      state = [...state.sublist(0, index), ...state.sublist(index + 1)];
     }
   }
 
   /// Updates a tab at the specified index
   void updateTab(int index, ReaderTab tab) {
     if (index >= 0 && index < state.length) {
-      state = [
-        ...state.sublist(0, index),
-        tab,
-        ...state.sublist(index + 1),
-      ];
+      state = [...state.sublist(0, index), tab, ...state.sublist(index + 1)];
     }
   }
 
@@ -110,8 +104,11 @@ class TabsNotifier extends StateNotifier<List<ReaderTab>> {
   /// Moves the tab's anchor row to [anchor] (null: the unit's top) and its
   /// offset to [scrollOffset], which is measured from that row. One update,
   /// so the two never disagree.
-  void setTabAnchor(int tabIndex, (int, int)? anchor,
-      {double scrollOffset = 0}) {
+  void setTabAnchor(
+    int tabIndex,
+    (int, int)? anchor, {
+    double scrollOffset = 0,
+  }) {
     if (tabIndex < 0 || tabIndex >= state.length) return;
     final tab = state[tabIndex];
     if (tab.anchor == anchor && tab.scrollOffset == scrollOffset) return;
@@ -159,8 +156,9 @@ class TabsNotifier extends StateNotifier<List<ReaderTab>> {
 /// replaced. `watch` would otherwise rebuild the entire [TabsNotifier]
 /// (rehydrating from disk and dropping any pending debounced writes) if
 /// the override ever changed.
-final tabsProvider =
-    StateNotifierProvider<TabsNotifier, List<ReaderTab>>((ref) {
+final tabsProvider = StateNotifierProvider<TabsNotifier, List<ReaderTab>>((
+  ref,
+) {
   return TabsNotifier(ref.read(keyValueStoreProvider));
 });
 
@@ -226,18 +224,21 @@ final activeTabProvider = Provider<ReaderTab?>((ref) {
 /// The tab's whole identity: `activeReaderUnitProvider` turns it into the
 /// content file and the row span the reader renders.
 /// Returns null if no tab is selected or the tab has no node.
-final activeNodeKeyProvider =
-    Provider<String?>((ref) => ref.watch(activeTabProvider)?.nodeKey);
+final activeNodeKeyProvider = Provider<String?>(
+  (ref) => ref.watch(activeTabProvider)?.nodeKey,
+);
 
 /// Derived provider for active tab's reader layout mode
 /// Returns paliOnly if no tab is selected (default for portrait mode)
 final activeReaderLayoutProvider = Provider<ReaderLayout>(
-    (ref) => ref.watch(activeTabProvider)?.layout ?? ReaderLayout.paliOnly);
+  (ref) => ref.watch(activeTabProvider)?.layout ?? ReaderLayout.paliOnly,
+);
 
 /// Provider to update the reader layout of the active tab
 /// Used when user changes layout in settings menu
-final updateActiveTabLayoutProvider =
-    Provider<void Function(ReaderLayout)>((ref) {
+final updateActiveTabLayoutProvider = Provider<void Function(ReaderLayout)>((
+  ref,
+) {
   return (ReaderLayout layout) {
     final activeIndex = ref.read(activeTabIndexProvider);
     final tabs = ref.read(tabsProvider);
@@ -253,14 +254,17 @@ final updateActiveTabLayoutProvider =
 
 /// Derived provider for active tab's split ratio (for side-by-side layout)
 /// Returns default ratio (0.5) if no tab is selected
-final activeSplitRatioProvider = Provider<double>((ref) =>
-    ref.watch(activeTabProvider)?.splitRatio ??
-    PaneWidthConstants.readerSplitDefault);
+final activeSplitRatioProvider = Provider<double>(
+  (ref) =>
+      ref.watch(activeTabProvider)?.splitRatio ??
+      PaneWidthConstants.readerSplitDefault,
+);
 
 /// Provider to update the split ratio of the active tab
 /// Used when user drags the resizable divider in side-by-side layout
-final updateActiveTabSplitRatioProvider =
-    Provider<void Function(double)>((ref) {
+final updateActiveTabSplitRatioProvider = Provider<void Function(double)>((
+  ref,
+) {
   return (double ratio) {
     final activeIndex = ref.read(activeTabIndexProvider);
     final tabs = ref.read(tabsProvider);
@@ -314,42 +318,42 @@ final switchTabProvider = Provider<void Function(int)>((ref) {
 /// highlight would then be set.
 final openTabFromSearchResultProvider =
     Provider<Future<int> Function(SearchResult, {bool isPortraitMode})>((ref) {
-  return (SearchResult result, {bool isPortraitMode = false}) async {
-    // Seed the new tab's layout from the user's last selection, falling back to
-    // the orientation default (see [resolveSeedLayout]). We no longer pick a
-    // single-language mode based on result.language — both orientation defaults
-    // show the matched language alongside its translation.
-    final layout = resolveSeedLayout(ref, isPortraitMode: isPortraitMode);
+      return (SearchResult result, {bool isPortraitMode = false}) async {
+        // Seed the new tab's layout from the user's last selection, falling back to
+        // the orientation default (see [resolveSeedLayout]). We no longer pick a
+        // single-language mode based on result.language — both orientation defaults
+        // show the matched language alongside its translation.
+        final layout = resolveSeedLayout(ref, isPortraitMode: isPortraitMode);
 
-    final resolver = await _resolver(ref);
-    final hitKey = result.unitKey(resolver);
-    final node = ref.read(nodeByKeyProvider(hitKey));
-    final newIndex = _openTab(
-      ref,
-      ReaderTab.fromNode(
-        nodeKey: hitKey,
-        // Seed both names from the tree node so the tab label can follow the
-        // Content Language setting (just like tree-opened tabs). Fall back to
-        // the result's matched title only when the node isn't in the tree.
-        paliName: (node != null && node.paliName.isNotEmpty)
-            ? node.paliName
-            : result.title,
-        sinhalaName: (node != null && node.sinhalaName.isNotEmpty)
-            ? node.sinhalaName
-            : result.title,
-        // Anchored at the matched row: it opens there, and nothing above it is
-        // built until the reader scrolls up.
-        anchorPageIndex: result.pageIndex,
-        anchorEntryIndex: result.entryIndex,
-        layout: layout,
-      ),
-    );
+        final resolver = await _resolver(ref);
+        final hitKey = result.unitKey(resolver);
+        final node = ref.read(nodeByKeyProvider(hitKey));
+        final newIndex = _openTab(
+          ref,
+          ReaderTab.fromNode(
+            nodeKey: hitKey,
+            // Seed both names from the tree node so the tab label can follow the
+            // Content Language setting (just like tree-opened tabs). Fall back to
+            // the result's matched title only when the node isn't in the tree.
+            paliName: (node != null && node.paliName.isNotEmpty)
+                ? node.paliName
+                : result.title,
+            sinhalaName: (node != null && node.sinhalaName.isNotEmpty)
+                ? node.sinhalaName
+                : result.title,
+            // Anchored at the matched row: it opens there, and nothing above it is
+            // built until the reader scrolls up.
+            anchorPageIndex: result.pageIndex,
+            anchorEntryIndex: result.entryIndex,
+            layout: layout,
+          ),
+        );
 
-    // Sync navigator to the new active tab. A refusal leaves the tree alone.
-    if (newIndex >= 0) ref.read(syncNavigatorToActiveTabProvider)();
-    return newIndex;
-  };
-});
+        // Sync navigator to the new active tab. A refusal leaves the tree alone.
+        if (newIndex >= 0) ref.read(syncNavigatorToActiveTabProvider)();
+        return newIndex;
+      };
+    });
 
 /// Opens a new tab for the given tree node key.
 ///
@@ -368,33 +372,43 @@ final openTabFromSearchResultProvider =
 /// **Side effects NOT included** (caller-specific, and skipped on -1):
 /// - Tree navigator: `selectNodeProvider`, then closes nav on mobile
 /// - Breadcrumb, parallel text, deep links: `syncNavigatorToActiveTabProvider`
-final openTabFromNodeKeyProvider = Provider<
-    int Function(String nodeKey,
-        {bool isPortraitMode, int? pageIndex, int? entryStart})>((ref) {
-  return (String nodeKey,
-      {bool isPortraitMode = false, int? pageIndex, int? entryStart}) {
-    final node = ref.read(nodeByKeyProvider(nodeKey));
-    if (node == null) return -1;
+final openTabFromNodeKeyProvider =
+    Provider<
+      int Function(
+        String nodeKey, {
+        bool isPortraitMode,
+        int? pageIndex,
+        int? entryStart,
+      })
+    >((ref) {
+      return (
+        String nodeKey, {
+        bool isPortraitMode = false,
+        int? pageIndex,
+        int? entryStart,
+      }) {
+        final node = ref.read(nodeByKeyProvider(nodeKey));
+        if (node == null) return -1;
 
-    // Seed from the user's last layout choice, falling back to the orientation
-    // default (see [resolveSeedLayout]).
-    final layout = resolveSeedLayout(ref, isPortraitMode: isPortraitMode);
+        // Seed from the user's last layout choice, falling back to the orientation
+        // default (see [resolveSeedLayout]).
+        final layout = resolveSeedLayout(ref, isPortraitMode: isPortraitMode);
 
-    return _openTab(
-      ref,
-      ReaderTab.fromNode(
-        nodeKey: nodeKey,
-        paliName: node.paliName,
-        sinhalaName: node.sinhalaName,
-        anchorPageIndex: pageIndex,
-        // A page override with no entry means "start of that page" — never
-        // the node's own entry, which pairs with the node's page.
-        anchorEntryIndex: pageIndex == null ? null : (entryStart ?? 0),
-        layout: layout,
-      ),
-    );
-  };
-});
+        return _openTab(
+          ref,
+          ReaderTab.fromNode(
+            nodeKey: nodeKey,
+            paliName: node.paliName,
+            sinhalaName: node.sinhalaName,
+            anchorPageIndex: pageIndex,
+            // A page override with no entry means "start of that page" — never
+            // the node's own entry, which pairs with the node's page.
+            anchorEntryIndex: pageIndex == null ? null : (entryStart ?? 0),
+            layout: layout,
+          ),
+        );
+      };
+    });
 
 /// The unit resolver, or null when it will not load.
 ///

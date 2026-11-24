@@ -173,8 +173,9 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
                     const SizedBox(height: 10),
                     Text(
                       l10n.researchMatchedPassage,
-                      style: textTheme.labelSmall
-                          ?.copyWith(color: colors.onSurfaceVariant),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     SelectableText.rich(
@@ -183,7 +184,9 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
                         // so both scale with the slider the column is
                         // measured against.
                         style: context.typography.definitionBody.copyWith(
-                            color: colors.onSurfaceVariant, height: 1.5),
+                          color: colors.onSurfaceVariant,
+                          height: 1.5,
+                        ),
                         children: _boldSpans(citation.snippet!),
                       ),
                     ),
@@ -217,8 +220,9 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
             Text(
               l10n.researchCitationNotLinked,
               textAlign: TextAlign.center,
-              style: context.typography.definitionBody
-                  .copyWith(color: colors.onSurfaceVariant),
+              style: context.typography.definitionBody.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
         ],
       ),
@@ -237,10 +241,12 @@ List<InlineSpan> _boldSpans(String text) {
     if (m.start > last) {
       spans.add(TextSpan(text: text.substring(last, m.start)));
     }
-    spans.add(TextSpan(
-      text: m.group(1),
-      style: const TextStyle(fontWeight: FontWeight.bold),
-    ));
+    spans.add(
+      TextSpan(
+        text: m.group(1),
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    );
     last = m.end;
   }
   if (last < text.length) spans.add(TextSpan(text: text.substring(last)));
@@ -267,9 +273,11 @@ class _SinhalaSourcePreview extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     // Just the page the preview quotes from, not the whole file.
-    final docAsync = ref.watch(bjtDocumentProvider(
-      requestForPage(node.contentFileId!, node.entryPageIndex),
-    ));
+    final docAsync = ref.watch(
+      bjtDocumentProvider(
+        requestForPage(node.contentFileId!, node.entryPageIndex),
+      ),
+    );
 
     return docAsync.when(
       loading: () => const Padding(
@@ -288,7 +296,9 @@ class _SinhalaSourcePreview extends ConsumerWidget {
 
         final start = node.entryIndexInPage.clamp(0, entries.length);
         final preview = entries.sublist(
-            start, (start + _maxEntries).clamp(0, entries.length));
+          start,
+          (start + _maxEntries).clamp(0, entries.length),
+        );
         // A sutta starting at the last entry slices to nothing — don't render a
         // lone title with no body.
         if (preview.isEmpty) return const SizedBox.shrink();

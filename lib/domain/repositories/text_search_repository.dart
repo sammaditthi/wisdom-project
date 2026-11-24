@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+
 import '../entities/failure.dart';
 import '../entities/search/grouped_search_result.dart';
 import '../entities/search/search_result_type.dart';

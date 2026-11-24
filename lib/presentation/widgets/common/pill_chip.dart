@@ -40,21 +40,21 @@ class PillChip extends StatelessWidget {
     final typography = context.typography;
     final (background, foreground, border) = switch ((refine, selected)) {
       (false, false) => (
-          colors.surfaceContainerLow,
-          colors.onSurfaceVariant,
-          colors.outline,
-        ),
+        colors.surfaceContainerLow,
+        colors.onSurfaceVariant,
+        colors.outline,
+      ),
       (false, true) => (colors.secondary, colors.onSecondary, colors.secondary),
       (true, false) => (
-          colors.surfaceContainerLowest,
-          colors.onSurfaceVariant,
-          colors.outline,
-        ),
+        colors.surfaceContainerLowest,
+        colors.onSurfaceVariant,
+        colors.outline,
+      ),
       (true, true) => (
-          colors.primaryContainer,
-          colors.onPrimaryContainer,
-          colors.primary,
-        ),
+        colors.primaryContainer,
+        colors.onPrimaryContainer,
+        colors.primary,
+      ),
     };
     return TextButton.styleFrom(
       backgroundColor: background,

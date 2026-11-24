@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../data/cache/cache_config.dart';
 import '../../data/datasources/fts_datasource.dart';
 import '../../data/datasources/fts_local_datasource.dart';
@@ -17,7 +18,8 @@ import 'search_state.dart';
 /// Must be overridden in ProviderScope with AsyncValue from SharedPreferences.getInstance()
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
   throw UnimplementedError(
-      'SharedPreferences must be overridden at app startup');
+    'SharedPreferences must be overridden at app startup',
+  );
 });
 
 /// Provider for the FTS data source
@@ -39,8 +41,9 @@ const bool kEnableSearchCache = true;
 ///
 /// PERF SCAFFOLDING — once cache effectiveness is verified, this provider can
 /// be folded back into [textSearchRepositoryProvider].
-final cachingSearchRepositoryProvider =
-    Provider<CachingTextSearchRepository?>((ref) {
+final cachingSearchRepositoryProvider = Provider<CachingTextSearchRepository?>((
+  ref,
+) {
   if (!kEnableSearchCache) return null;
   final base = TextSearchRepositoryImpl(
     ref.watch(ftsDataSourceProvider),
@@ -48,10 +51,7 @@ final cachingSearchRepositoryProvider =
     dictionaryRepository: ref.watch(dictionaryRepositoryProvider),
     contentDataSource: ref.watch(bjtContentDataSourceProvider),
   );
-  return CachingTextSearchRepository(
-    base,
-    config: CacheConfig.forPlatform(),
-  );
+  return CachingTextSearchRepository(base, config: CacheConfig.forPlatform());
 });
 
 /// Provider for the text search repository.
@@ -70,16 +70,17 @@ final textSearchRepositoryProvider = Provider<TextSearchRepository>((ref) {
 });
 
 /// Provider for recent searches repository
-final recentSearchesRepositoryProvider =
-    Provider<RecentSearchesRepository>((ref) {
+final recentSearchesRepositoryProvider = Provider<RecentSearchesRepository>((
+  ref,
+) {
   return RecentSearchesRepositoryImpl(ref.watch(sharedPreferencesProvider));
 });
 
 /// Provider for search state management
 final searchStateProvider =
     StateNotifierProvider<SearchStateNotifier, SearchState>((ref) {
-  return SearchStateNotifier(
-    ref.watch(textSearchRepositoryProvider),
-    ref.watch(recentSearchesRepositoryProvider),
-  );
-});
+      return SearchStateNotifier(
+        ref.watch(textSearchRepositoryProvider),
+        ref.watch(recentSearchesRepositoryProvider),
+      );
+    });

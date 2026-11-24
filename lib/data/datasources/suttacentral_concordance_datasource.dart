@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+
 import 'package:flutter/services.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
 
@@ -28,8 +29,12 @@ class SuttaCentralConcordanceDataSourceImpl
       // Non-fatal: without it there is no reference jump and no SuttaCentral
       // link; FTS is unaffected. Rethrown so the FutureProvider surfaces an
       // error state, which its readers treat as "no resolver".
-      developer.log('Failed to load SC↔BJT concordance',
-          name: 'SCConcordance', error: e, stackTrace: stack);
+      developer.log(
+        'Failed to load SC↔BJT concordance',
+        name: 'SCConcordance',
+        error: e,
+        stackTrace: stack,
+      );
       rethrow;
     }
   }

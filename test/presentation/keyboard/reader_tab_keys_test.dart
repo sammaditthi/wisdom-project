@@ -37,11 +37,15 @@ void main() {
       ('dn-2', 'සාමඤ්ඤඵල සුත්ත', 'සාමඤ්ඤඵල සූත්‍රය'),
     ];
     for (final (key, pali, sinhala) in suttas.take(count)) {
-      c.read(tabsProvider.notifier).addTab(ReaderTab.fromNode(
-            nodeKey: key,
-            paliName: pali,
-            sinhalaName: sinhala,
-          ));
+      c
+          .read(tabsProvider.notifier)
+          .addTab(
+            ReaderTab.fromNode(
+              nodeKey: key,
+              paliName: pali,
+              sinhalaName: sinhala,
+            ),
+          );
     }
     c.read(activeTabIndexProvider.notifier).state = 0;
     await tester.pump();
@@ -56,14 +60,26 @@ void main() {
   testWidgets('⌥⌘] and ⌥⌘[ move between tabs and wrap', (tester) async {
     final c = await pumpWithTabs(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 1);
-    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 0);
-    await pressKeys(tester, LogicalKeyboardKey.bracketLeft,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketLeft,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 1);
     await flushTabSaves(tester);
   }, variant: mac);
@@ -71,8 +87,12 @@ void main() {
   testWidgets('one tab: ⌥⌘] does nothing', (tester) async {
     final c = await pumpWithTabs(tester, count: 1);
 
-    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 0);
     await flushTabSaves(tester);
   }, variant: mac);
@@ -80,8 +100,12 @@ void main() {
   testWidgets('⌥⌘3 sets side by side and remembers it', (tester) async {
     final c = await pumpWithTabs(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.digit3,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.digit3,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeReaderLayoutProvider), ReaderLayout.sideBySide);
     expect(c.read(lastReaderLayoutProvider), ReaderLayout.sideBySide);
     await flushTabSaves(tester);
@@ -90,8 +114,12 @@ void main() {
   testWidgets('the keypad 3 works as the top-row 3', (tester) async {
     final c = await pumpWithTabs(tester);
 
-    await pressKeys(tester, LogicalKeyboardKey.numpad3,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.numpad3,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeReaderLayoutProvider), ReaderLayout.sideBySide);
     await flushTabSaves(tester);
   }, variant: mac);
@@ -103,8 +131,12 @@ void main() {
     );
     await tester.pump();
 
-    await pressKeys(tester, LogicalKeyboardKey.digit3,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.digit3,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeReaderLayoutProvider), ReaderLayout.paliOnly);
     await flushTabSaves(tester);
   }, variant: windows);
@@ -124,36 +156,46 @@ void main() {
   testWidgets('⌥⌘] still works with the dictionary sheet open', (tester) async {
     // Clicking a word opens the sheet; the reader keys must not go dead.
     final c = await pumpWithTabs(tester);
-    c.read(overlayStackProvider.notifier).push(
+    c
+        .read(overlayStackProvider.notifier)
+        .push(
           DismissibleOverlay(
             id: OverlayStackSync.dictionaryOverlayId,
             dismiss: () {},
           ),
         );
 
-    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 1);
     await flushTabSaves(tester);
   }, variant: mac);
 
   testWidgets('⌥⌘] behind Settings does nothing', (tester) async {
     final c = await pumpWithTabs(tester);
-    c.read(overlayStackProvider.notifier).push(
-          DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}),
-        );
+    c
+        .read(overlayStackProvider.notifier)
+        .push(DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}));
 
-    await pressKeys(tester, LogicalKeyboardKey.bracketRight,
-        primary: true, alt: true);
+    await pressKeys(
+      tester,
+      LogicalKeyboardKey.bracketRight,
+      primary: true,
+      alt: true,
+    );
     expect(c.read(activeTabIndexProvider), 0);
     await flushTabSaves(tester);
   }, variant: mac);
 
   testWidgets('⌥⌘W behind Settings keeps the tab', (tester) async {
     final c = await pumpWithTabs(tester);
-    c.read(overlayStackProvider.notifier).push(
-          DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}),
-        );
+    c
+        .read(overlayStackProvider.notifier)
+        .push(DismissibleOverlay(id: SettingsDialog.overlayId, dismiss: () {}));
 
     await pressKeys(tester, LogicalKeyboardKey.keyW, primary: true, alt: true);
     expect(c.read(tabsProvider), hasLength(2));

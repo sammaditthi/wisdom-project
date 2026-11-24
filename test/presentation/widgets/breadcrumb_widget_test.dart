@@ -51,51 +51,66 @@ void main() {
 
   // What shows: the scroll view's box. The trail: the whole text, mostly
   // off screen.
-  Rect window(WidgetTester tester) => tester.getRect(find.descendant(
-        of: find.byType(BreadcrumbWidget),
-        matching: find.byType(Scrollable),
-      ));
+  Rect window(WidgetTester tester) => tester.getRect(
+    find.descendant(
+      of: find.byType(BreadcrumbWidget),
+      matching: find.byType(Scrollable),
+    ),
+  );
   Finder trailText() => find.descendant(
-        of: find.byType(BreadcrumbWidget),
-        matching: find.byType(RichText),
-      );
+    of: find.byType(BreadcrumbWidget),
+    matching: find.byType(RichText),
+  );
   Rect trail(WidgetTester tester) => tester.getRect(trailText());
 
   // Drags from the middle of what shows: the trail's own middle is off screen.
   Future<void> drag(
-      WidgetTester tester, double dx, PointerDeviceKind kind) async {
-    await tester.dragFrom(
-      window(tester).center,
-      Offset(dx, 0),
-      kind: kind,
-    );
+    WidgetTester tester,
+    double dx,
+    PointerDeviceKind kind,
+  ) async {
+    await tester.dragFrom(window(tester).center, Offset(dx, 0), kind: kind);
     await tester.pumpAndSettle();
   }
 
   void expectAtEnd(WidgetTester tester, String step) {
-    expect(trail(tester).right, moreOrLessEquals(window(tester).right),
-        reason: '$step: the sutta name shows');
-    expect(trail(tester).left, lessThan(window(tester).left),
-        reason: '$step: the first parents are cut');
+    expect(
+      trail(tester).right,
+      moreOrLessEquals(window(tester).right),
+      reason: '$step: the sutta name shows',
+    );
+    expect(
+      trail(tester).left,
+      lessThan(window(tester).left),
+      reason: '$step: the first parents are cut',
+    );
   }
 
   void expectAtStart(WidgetTester tester, String step) {
-    expect(trail(tester).left, moreOrLessEquals(window(tester).left),
-        reason: '$step: the first parent shows');
+    expect(
+      trail(tester).left,
+      moreOrLessEquals(window(tester).left),
+      reason: '$step: the first parent shows',
+    );
   }
 
-  testWidgets('a long trail stays on one line and opens at its end',
-      (tester) async {
+  testWidgets('a long trail stays on one line and opens at its end', (
+    tester,
+  ) async {
     await pumpBreadcrumb(tester);
 
-    expect(trail(tester).width, greaterThan(window(tester).width),
-        reason: 'one line: wrapped, it would fit its window');
+    expect(
+      trail(tester).width,
+      greaterThan(window(tester).width),
+      reason: 'one line: wrapped, it would fit its window',
+    );
 
     expectAtEnd(tester, 'opened');
   });
 
-  testWidgets('a mouse drag and a touch drag reach the first parent',
-      (tester) async {
+  testWidgets('a mouse drag and a touch drag reach the first parent', (
+    tester,
+  ) async {
     await pumpBreadcrumb(tester);
     final overflow = trail(tester).width;
 
@@ -109,8 +124,9 @@ void main() {
     expectAtStart(tester, 'touch drag');
   });
 
-  testWidgets('opening another sutta opens its trail at the end again',
-      (tester) async {
+  testWidgets('opening another sutta opens its trail at the end again', (
+    tester,
+  ) async {
     final container = await pumpBreadcrumb(tester);
     await drag(tester, trail(tester).width, PointerDeviceKind.touch);
     expectAtStart(tester, 'scrolled to the start');
@@ -118,8 +134,10 @@ void main() {
     container.read(trailProvider.notifier).state = _mulapariyaya;
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('මූලපරියායසුත්තං', findRichText: true),
-        findsOneWidget);
+    expect(
+      find.textContaining('මූලපරියායසුත්තං', findRichText: true),
+      findsOneWidget,
+    );
     expectAtEnd(tester, 'another sutta');
   });
 }

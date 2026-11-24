@@ -11,8 +11,7 @@ import '../../../helpers/pump_app.dart';
 void main() {
   final cases = (jsonDecode(
     File('test/fixtures/research_answer_paragraphs.json').readAsStringSync(),
-  ) as List)
-      .cast<Map<String, dynamic>>();
+  ) as List).cast<Map<String, dynamic>>();
 
   group('ResearchAnswerView paragraphs', () {
     for (final c in cases) {

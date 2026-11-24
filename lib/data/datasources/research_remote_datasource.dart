@@ -17,7 +17,7 @@ import 'research_datasource.dart';
 class ResearchRemoteDataSourceImpl implements ResearchDataSource {
   final ApiClient _client;
 
-  ResearchRemoteDataSourceImpl({required ApiClient client}) : _client = client;
+  ResearchRemoteDataSourceImpl({required this._client});
 
   /// How long to wait, per mode. The two differ by a lot: Fast answers in ~10s,
   /// while Thinking legitimately reasons for minutes (one measured run took 289s
@@ -40,9 +40,9 @@ class ResearchRemoteDataSourceImpl implements ResearchDataSource {
   /// `config.THINKING_LEVEL`, which is precisely when you are experimenting and
   /// least want to lose the result you just paid for.
   static Duration _timeoutFor(ResearchMode mode) => switch (mode) {
-        ResearchMode.fast => const Duration(seconds: 60),
-        ResearchMode.thinking => const Duration(minutes: 5),
-      };
+    ResearchMode.fast => const Duration(seconds: 60),
+    ResearchMode.thinking => const Duration(minutes: 5),
+  };
 
   @override
   Future<ResearchAnswer> research(
@@ -51,18 +51,15 @@ class ResearchRemoteDataSourceImpl implements ResearchDataSource {
     ResearchFilters? filters,
     ResearchMode mode = ResearchMode.fast,
   }) async {
-    final json = await _client.postJson(
-        '/research',
-        {
-          'question': question,
-          // §7: history carries role + content only.
-          'history': history.map((m) => m.toHistoryJson()).toList(),
-          if (filters != null) 'filters': filters.toJson(),
-          // "fast" | "thinking" — the backend maps it to a model tier. Always sent;
-          // an older backend that doesn't know the field just ignores it.
-          'mode': mode.wire,
-        },
-        timeout: _timeoutFor(mode));
+    final json = await _client.postJson('/research', {
+      'question': question,
+      // §7: history carries role + content only.
+      'history': history.map((m) => m.toHistoryJson()).toList(),
+      if (filters != null) 'filters': filters.toJson(),
+      // "fast" | "thinking" — the backend maps it to a model tier. Always sent;
+      // an older backend that doesn't know the field just ignores it.
+      'mode': mode.wire,
+    }, timeout: _timeoutFor(mode));
     return ResearchAnswer.fromJson(json);
   }
 }

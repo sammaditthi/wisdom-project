@@ -58,8 +58,10 @@ void main(List<String> args) {
 
     final unknown = rootKeys.where((key) => tree[key] == null).toList();
     if (unknown.isNotEmpty) {
-      stderr.writeln('Unknown nodeKey${unknown.length > 1 ? 's' : ''} '
-          '"${unknown.join('", "')}".');
+      stderr.writeln(
+        'Unknown nodeKey${unknown.length > 1 ? 's' : ''} '
+        '"${unknown.join('", "')}".',
+      );
       stderr.writeln('Roots: ${tree.rootKeys.join(', ')}  (or "all")');
       exitCode = 2;
       return;
@@ -72,8 +74,9 @@ void main(List<String> args) {
       reader: reader,
       tree: tree,
       tokens: _readThemeTokens('$packageAssetsPath/theme_tokens.json'),
-      strings:
-          _readAppStrings('$appRoot/lib/core/localization/l10n/app_si.arb'),
+      strings: _readAppStrings(
+        '$appRoot/lib/core/localization/l10n/app_si.arb',
+      ),
       outputDir: outputDir,
       origin: options.origin,
       appOrigin: options.appOrigin,
@@ -116,13 +119,19 @@ void main(List<String> args) {
   if (report.misalignedSlices > 0) {
     final n = report.misalignedSlices;
     stdout.writeln('');
-    stdout.writeln('WARNING  $n rendered ${n == 1 ? 'leaf' : 'leaves'} '
-        '${n == 1 ? 'has a slice' : 'have slices'} not holding the text '
-        '${n == 1 ? 'it is' : 'they are'} named for.');
-    stdout.writeln('         Upstream coordinates, not a build decision. '
-        'List them with:');
-    stdout.writeln('           dart run '
-        'static_site_generator/tool/plan_corpus.dart --misaligned');
+    stdout.writeln(
+      'WARNING  $n rendered ${n == 1 ? 'leaf' : 'leaves'} '
+      '${n == 1 ? 'has a slice' : 'have slices'} not holding the text '
+      '${n == 1 ? 'it is' : 'they are'} named for.',
+    );
+    stdout.writeln(
+      '         Upstream coordinates, not a build decision. '
+      'List them with:',
+    );
+    stdout.writeln(
+      '           dart run '
+      'static_site_generator/tool/plan_corpus.dart --misaligned',
+    );
   }
 }
 
@@ -251,10 +260,14 @@ class _Options {
       values[name] = value;
     }
 
-    final origin =
-        _parseOrigin('--origin', values['--origin'] ?? _defaultOrigin);
+    final origin = _parseOrigin(
+      '--origin',
+      values['--origin'] ?? _defaultOrigin,
+    );
     final appOrigin = _parseOrigin(
-        '--app-origin', values['--app-origin'] ?? _defaultAppOrigin);
+      '--app-origin',
+      values['--app-origin'] ?? _defaultAppOrigin,
+    );
 
     // Defaults to the whole corpus. The old default was `an-1`, which built a
     // one-book fragment whose අට්ඨකථා links mostly pointed outside it — fine to
@@ -274,9 +287,7 @@ class _Options {
       );
     }
 
-    final rootKeys = [
-      for (final key in raw.split(',')) key.trim(),
-    ];
+    final rootKeys = [for (final key in raw.split(',')) key.trim()];
     if (rootKeys.any((key) => key.isEmpty)) {
       throw FormatException('--root has an empty entry: "$raw".');
     }
@@ -309,24 +320,30 @@ class _Options {
   static String _parseOrigin(String flag, String raw) {
     final uri = Uri.tryParse(raw);
     if (uri == null || !uri.hasScheme || uri.host.isEmpty) {
-      throw FormatException('$flag must be an absolute URL like '
-          '"https://example.org", not "$raw".');
+      throw FormatException(
+        '$flag must be an absolute URL like '
+        '"https://example.org", not "$raw".',
+      );
     }
     if (uri.scheme != 'http' && uri.scheme != 'https') {
       throw FormatException(
-          '$flag must be http or https, not "${uri.scheme}".');
+        '$flag must be http or https, not "${uri.scheme}".',
+      );
     }
     if (uri.userInfo.isNotEmpty) {
       throw FormatException('$flag must carry no credentials: "$raw".');
     }
     if (uri.hasQuery || uri.hasFragment) {
       throw FormatException(
-          '$flag is a scheme and a host, with no query or fragment: '
-          '"$raw".');
+        '$flag is a scheme and a host, with no query or fragment: '
+        '"$raw".',
+      );
     }
     if (uri.path.isNotEmpty && uri.path != '/') {
-      throw FormatException('$flag must name a host root — the site is '
-          'served from "/" — so "${uri.path}" cannot be part of it.');
+      throw FormatException(
+        '$flag must name a host root — the site is '
+        'served from "/" — so "${uri.path}" cannot be part of it.',
+      );
     }
     return '${uri.scheme}://${uri.authority}';
   }

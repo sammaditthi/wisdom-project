@@ -34,8 +34,9 @@ Future<void> _pumpScreen(
 
 void main() {
   group('DatabaseInstallScreen', () {
-    testWidgets('asks for a moment at once, under the loader\'s running bar',
-        (tester) async {
+    testWidgets('asks for a moment at once, under the loader\'s running bar', (
+      tester,
+    ) async {
       await _pumpScreen(
         tester,
         const DatabaseInstallStatus(phase: DatabaseInstallPhase.checking),
@@ -54,28 +55,30 @@ void main() {
     });
 
     testWidgets(
-        'shows the download at once, with the overall percentage and megabytes',
-        (tester) async {
-      await _pumpScreen(
-        tester,
-        const DatabaseInstallStatus(
-          phase: DatabaseInstallPhase.installing,
-          received: 42000000,
-          total: 351035392,
-        ),
-      );
+      'shows the download at once, with the overall percentage and megabytes',
+      (tester) async {
+        await _pumpScreen(
+          tester,
+          const DatabaseInstallStatus(
+            phase: DatabaseInstallPhase.installing,
+            received: 42000000,
+            total: 351035392,
+          ),
+        );
 
-      expect(find.text('Downloading the texts'), findsOneWidget);
-      expect(find.text('11% · 42 MB of 351 MB'), findsOneWidget);
+        expect(find.text('Downloading the texts'), findsOneWidget);
+        expect(find.text('11% · 42 MB of 351 MB'), findsOneWidget);
 
-      final bar = tester.widget<LinearProgressIndicator>(
-        find.byType(LinearProgressIndicator),
-      );
-      expect(bar.value, closeTo(42000000 / 351035392, 0.0001));
-    });
+        final bar = tester.widget<LinearProgressIndicator>(
+          find.byType(LinearProgressIndicator),
+        );
+        expect(bar.value, closeTo(42000000 / 351035392, 0.0001));
+      },
+    );
 
-    testWidgets('leaves the bar indeterminate until the size is known',
-        (tester) async {
+    testWidgets('leaves the bar indeterminate until the size is known', (
+      tester,
+    ) async {
       await _pumpScreen(
         tester,
         const DatabaseInstallStatus(phase: DatabaseInstallPhase.installing),
@@ -89,70 +92,73 @@ void main() {
       expect(find.textContaining('MB of'), findsNothing);
     });
 
-    testWidgets('a stopped download offers to try again, and says what failed',
-        (tester) async {
-      var retries = 0;
-      await _pumpScreen(
-        tester,
-        const DatabaseInstallStatus(
-          phase: DatabaseInstallPhase.failed,
-          failure: DatabaseInstallFailure(
-            DatabaseInstallFailureKind.download,
-            'GET bjt.db returned 404 Not Found',
+    testWidgets(
+      'a stopped download offers to try again, and says what failed',
+      (tester) async {
+        var retries = 0;
+        await _pumpScreen(
+          tester,
+          const DatabaseInstallStatus(
+            phase: DatabaseInstallPhase.failed,
+            failure: DatabaseInstallFailure(
+              DatabaseInstallFailureKind.download,
+              'GET bjt.db returned 404 Not Found',
+            ),
           ),
-        ),
-        onRetry: () => retries++,
-      );
+          onRetry: () => retries++,
+        );
 
-      expect(find.text('The download did not finish'), findsOneWidget);
-      expect(
-        find.text('Check your connection and try again. To reset, open '
-            "Chrome's site settings → Delete data."),
-        findsOneWidget,
-      );
-      expect(find.text('GET bjt.db returned 404 Not Found'), findsOneWidget);
+        expect(find.text('The download did not finish'), findsOneWidget);
+        expect(
+          find.text(
+            'Check your connection and try again. To reset, open '
+            "Chrome's site settings → Delete data.",
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('GET bjt.db returned 404 Not Found'), findsOneWidget);
 
-      await tester.tap(find.text('Try again'));
-      expect(retries, 1);
-    });
+        await tester.tap(find.text('Try again'));
+        expect(retries, 1);
+      },
+    );
 
     testWidgets(
-        'an unsupported browser can be tried again, and shows no detail',
-        (tester) async {
-      var retries = 0;
-      await _pumpScreen(
-        tester,
-        const DatabaseInstallStatus(
-          phase: DatabaseInstallPhase.failed,
-          failure: DatabaseInstallFailure(
-            DatabaseInstallFailureKind.unsupportedBrowser,
-            'This browser is missing OPFS with synchronous locks.',
+      'an unsupported browser can be tried again, and shows no detail',
+      (tester) async {
+        var retries = 0;
+        await _pumpScreen(
+          tester,
+          const DatabaseInstallStatus(
+            phase: DatabaseInstallPhase.failed,
+            failure: DatabaseInstallFailure(
+              DatabaseInstallFailureKind.unsupportedBrowser,
+              'This browser is missing OPFS with synchronous locks.',
+            ),
           ),
-        ),
-        onRetry: () => retries++,
-      );
+          onRetry: () => retries++,
+        );
 
-      expect(
-        find.text('The texts could not be saved here'),
-        findsOneWidget,
-      );
-      expect(
-        find.text("If trying again doesn't help, use Google Chrome."),
-        findsOneWidget,
-      );
-      expect(
-        find.text('This browser is missing OPFS with synchronous locks.'),
-        findsNothing,
-      );
+        expect(find.text('The texts could not be saved here'), findsOneWidget);
+        expect(
+          find.text("If trying again doesn't help, use Google Chrome."),
+          findsOneWidget,
+        );
+        expect(
+          find.text('This browser is missing OPFS with synchronous locks.'),
+          findsNothing,
+        );
 
-      // drift's storage test can fail once in Chrome, e.g. just after its
-      // site data was deleted, so a second try can succeed.
-      await tester.tap(find.text('Try again'));
-      expect(retries, 1);
-    });
+        // drift's storage test can fail once in Chrome, e.g. just after its
+        // site data was deleted, so a second try can succeed.
+        await tester.tap(find.text('Try again'));
+        expect(retries, 1);
+      },
+    );
 
-    testWidgets('a full device says so, and can be tried again',
-        (tester) async {
+    testWidgets('a full device says so, and can be tried again', (
+      tester,
+    ) async {
       await _pumpScreen(
         tester,
         const DatabaseInstallStatus(
@@ -170,18 +176,19 @@ void main() {
   });
 
   group('DatabaseInstallGate', () {
-    testWidgets('shows the app when the databases are ready — native always is',
-        (tester) async {
-      await tester.pumpApp(
-        const DatabaseInstallGate(child: Text('the app')),
-      );
+    testWidgets(
+      'shows the app when the databases are ready — native always is',
+      (tester) async {
+        await tester.pumpApp(const DatabaseInstallGate(child: Text('the app')));
 
-      expect(find.text('the app'), findsOneWidget);
-      expect(find.byType(DatabaseInstallScreen), findsNothing);
-    });
+        expect(find.text('the app'), findsOneWidget);
+        expect(find.byType(DatabaseInstallScreen), findsNothing);
+      },
+    );
 
-    testWidgets('covers the app while the databases install, and lifts',
-        (tester) async {
+    testWidgets('covers the app while the databases install, and lifts', (
+      tester,
+    ) async {
       final notifier = _FakeInstallNotifier();
       await tester.pumpApp(
         const DatabaseInstallGate(child: Text('the app')),

@@ -128,9 +128,9 @@ String addRakaransaya(String t) =>
 
 /// Switch 3 · repaya — `ර ්` (ර first) → `ර ් ‍` (ligated, ZWJ after hal).
 String addRepaya(String t) => t.replaceAllMapped(
-      _repayaPattern,
-      (m) => '$_rayanna$_hal$_zwj${m.group(1)}',
-    );
+  _repayaPattern,
+  (m) => '$_rayanna$_hal$_zwj${m.group(1)}',
+);
 
 /// Ligates each `[first, second]` pair: `X ් Y` → `X ් ‍ Y` (ZWJ after the
 /// hal). Shared by the common (Switch 3) and special (Switch 2) tiers, which
@@ -157,9 +157,9 @@ String addSpecialConjuncts(String t) => _ligatePairs(t, _specialConjunctPairs);
 /// a consonant is shared between two overlapping matches).
 String addTouchingConjuncts(String t) {
   String join(String s) => s.replaceAllMapped(
-        _touchingPattern,
-        (m) => '${m.group(1)}$_zwj$_hal${m.group(2)}',
-      );
+    _touchingPattern,
+    (m) => '${m.group(1)}$_zwj$_hal${m.group(2)}',
+  );
   return join(join(t));
 }
 

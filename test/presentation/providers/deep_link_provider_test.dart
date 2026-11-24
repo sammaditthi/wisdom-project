@@ -37,30 +37,39 @@ void main() {
       expect(opened.nodeKey, 'dl-mid-1');
     });
 
-    test('an origin marker opens the vaṇṇanā, not the chapter carrying it',
-        () async {
-      // The URL `_commentaryLink` writes for the *second* sutta of a merged
-      // run. `atta-dl-mid-2` is a folded leaf, so the path can only name the
-      // chapter — the fragment is the sole part of the URL that says which of
-      // the three suttas the reader left, and dropping it lands them on a run
-      // of commentaries instead of the one they clicked.
-      final opened = _Opened();
-      final container = _containerFor(opened);
-      container.read(selectedAppSectionProvider.notifier).state =
-          AppSection.research;
+    test(
+      'an origin marker opens the vaṇṇanā, not the chapter carrying it',
+      () async {
+        // The URL `_commentaryLink` writes for the *second* sutta of a merged
+        // run. `atta-dl-mid-2` is a folded leaf, so the path can only name the
+        // chapter — the fragment is the sole part of the URL that says which of
+        // the three suttas the reader left, and dropping it lands them on a run
+        // of commentaries instead of the one they clicked.
+        final opened = _Opened();
+        final container = _containerFor(opened);
+        container.read(selectedAppSectionProvider.notifier).state =
+            AppSection.research;
 
-      final link =
-          TipitakaLink.tryParse('$_base/tipitaka/atta-dl-mid#via_dl-mid-3')!;
-      expect(link.originKey, 'dl-mid-3', reason: 'the door, not the room');
+        final link = TipitakaLink.tryParse(
+          '$_base/tipitaka/atta-dl-mid#via_dl-mid-3',
+        )!;
+        expect(link.originKey, 'dl-mid-3', reason: 'the door, not the room');
 
-      final didOpen = await container.read(openTipitakaLinkProvider)(link);
+        final didOpen = await container.read(openTipitakaLinkProvider)(link);
 
-      expect(didOpen, isTrue);
-      expect(opened.nodeKey, 'atta-dl-mid-2',
-          reason: 'without the origin branch this is the chapter, atta-dl-mid');
-      expect(container.read(selectedAppSectionProvider), AppSection.reader,
-          reason: 'a link opened from Research still shows the reader');
-    });
+        expect(didOpen, isTrue);
+        expect(
+          opened.nodeKey,
+          'atta-dl-mid-2',
+          reason: 'without the origin branch this is the chapter, atta-dl-mid',
+        );
+        expect(
+          container.read(selectedAppSectionProvider),
+          AppSection.reader,
+          reason: 'a link opened from Research still shows the reader',
+        );
+      },
+    );
 
     test('a fragment the page really serves opens the leaf', () async {
       // `dl-mid-3` is folded onto the run anchored at `dl-mid-2`, so this is
@@ -87,43 +96,53 @@ void main() {
         TipitakaLink.tryParse('$_base/tipitaka/dl-mid-2#dl-mid-1')!,
       );
 
-      expect(opened.nodeKey, 'dl-mid-2',
-          reason: 'a real node is not the same question as a served node');
-    });
-
-    test('a page override with no entry is handed on as exactly that',
-        () async {
-      // What "a page and no entry" *means* — the top of that page, never the
-      // node's own entry — is `openTabFromNodeKeyProvider`'s rule, and it is
-      // pinned there. This half is that the link's own coordinates reach it
-      // untouched: an absent entry must stay absent, because a 0 substituted
-      // here is indistinguishable from an entry the URL really named.
-      final opened = _Opened();
-      final container = _containerFor(opened);
-
-      await container.read(openTipitakaLinkProvider)(
-        TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1?e=3')!,
+      expect(
+        opened.nodeKey,
+        'dl-mid-2',
+        reason: 'a real node is not the same question as a served node',
       );
-
-      expect(opened.pageIndex, 3);
-      expect(opened.entryStart, isNull);
     });
 
-    test('an entry override is passed through, and no override stays null',
-        () async {
-      final opened = _Opened();
-      final container = _containerFor(opened);
-      final open = container.read(openTipitakaLinkProvider);
+    test(
+      'a page override with no entry is handed on as exactly that',
+      () async {
+        // What "a page and no entry" *means* — the top of that page, never the
+        // node's own entry — is `openTabFromNodeKeyProvider`'s rule, and it is
+        // pinned there. This half is that the link's own coordinates reach it
+        // untouched: an absent entry must stay absent, because a 0 substituted
+        // here is indistinguishable from an entry the URL really named.
+        final opened = _Opened();
+        final container = _containerFor(opened);
 
-      await open(TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1?e=3.2')!);
-      expect(opened.pageIndex, 3);
-      expect(opened.entryStart, 2);
+        await container.read(openTipitakaLinkProvider)(
+          TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1?e=3')!,
+        );
 
-      await open(TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1')!);
-      expect(opened.pageIndex, isNull);
-      expect(opened.entryStart, isNull,
-          reason: 'no page override means the node own coordinates stand');
-    });
+        expect(opened.pageIndex, 3);
+        expect(opened.entryStart, isNull);
+      },
+    );
+
+    test(
+      'an entry override is passed through, and no override stays null',
+      () async {
+        final opened = _Opened();
+        final container = _containerFor(opened);
+        final open = container.read(openTipitakaLinkProvider);
+
+        await open(TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1?e=3.2')!);
+        expect(opened.pageIndex, 3);
+        expect(opened.entryStart, 2);
+
+        await open(TipitakaLink.tryParse('$_base/tipitaka/dl-mid-1')!);
+        expect(opened.pageIndex, isNull);
+        expect(
+          opened.entryStart,
+          isNull,
+          reason: 'no page override means the node own coordinates stand',
+        );
+      },
+    );
   });
 
   group('building a shareable URL -', () {
@@ -171,12 +190,14 @@ void main() {
       final uri = await container.read(tipitakaLinkUrlBuilderProvider)(
         const TipitakaLink(nodeKey: 'dl-mid-3'),
       );
-      expect(uri.toString(), '$_base/tipitaka/dl-mid-3',
-          reason: 'the answer the app gave before the plan existed');
+      expect(
+        uri.toString(),
+        '$_base/tipitaka/dl-mid-3',
+        reason: 'the answer the app gave before the plan existed',
+      );
     });
 
-    test('the plan failing still opens the page a stale fragment sits on',
-        () async {
+    test('the plan failing still opens the page a stale fragment sits on', () async {
       // The fallback's other arm. `dl-mid-9` names nothing the app holds — a
       // link kept from before a re-sync moved the key — so the fragment cannot
       // be the answer and the path it sits on is what is left. With the plan
@@ -190,8 +211,11 @@ void main() {
       );
 
       expect(didOpen, isTrue);
-      expect(opened.nodeKey, 'dl-mid-2',
-          reason: 'the fragment names no node, so the path is what is left');
+      expect(
+        opened.nodeKey,
+        'dl-mid-2',
+        reason: 'the fragment names no node, so the path is what is left',
+      );
     });
   });
 
@@ -214,8 +238,11 @@ void main() {
 
       expect(didOpen, isFalse);
       expect(opened.nodeKey, isNull, reason: 'no tab was ever asked for');
-      expect(container.read(selectedAppSectionProvider), AppSection.research,
-          reason: 'an empty Reader is worse than staying where the tap was');
+      expect(
+        container.read(selectedAppSectionProvider),
+        AppSection.research,
+        reason: 'an empty Reader is worse than staying where the tap was',
+      );
     });
 
     test('a tree that will not load opens nothing at all', () async {
@@ -246,9 +273,7 @@ void main() {
 
       expect(
         container.read(nodeIndexProvider).keys.toSet(),
-        (await container.read(sitePlanProvider.future))
-            .tree
-            .allNodes
+        (await container.read(sitePlanProvider.future)).tree.allNodes
             .map((n) => n.nodeKey)
             .toSet(),
       );
@@ -275,23 +300,27 @@ ProviderContainer _containerFor(
   bool treeFails = false,
   bool planFails = false,
 }) {
-  final container = ProviderContainer(overrides: [
-    // The host a link was parsed from says nothing about the host it is
-    // written back out as — that one is a build-time define, and pinning it
-    // here is what keeps these expectations about URL *shape*.
-    linkBaseUrlProvider.overrideWithValue(_base),
-    navigationTreeProvider.overrideWith(
-      (_) async => treeFails ? throw StateError('no tree') : _appNodes,
-    ),
-    // No `sharedTreeProvider` override: the plan carries its own tree, so the
-    // resolver has one load, not two.
-    sitePlanProvider.overrideWith(
-      (_) async => planFails ? throw StateError('no plan') : _plan,
-    ),
-    syncNavigatorToActiveTabProvider.overrideWithValue(() {}),
-    openTabFromNodeKeyProvider.overrideWithValue(
-      (String nodeKey,
-          {bool isPortraitMode = false, int? pageIndex, int? entryStart}) {
+  final container = ProviderContainer(
+    overrides: [
+      // The host a link was parsed from says nothing about the host it is
+      // written back out as — that one is a build-time define, and pinning it
+      // here is what keeps these expectations about URL *shape*.
+      linkBaseUrlProvider.overrideWithValue(_base),
+      navigationTreeProvider.overrideWith(
+        (_) async => treeFails ? throw StateError('no tree') : _appNodes,
+      ),
+      // No `sharedTreeProvider` override: the plan carries its own tree, so the
+      // resolver has one load, not two.
+      sitePlanProvider.overrideWith(
+        (_) async => planFails ? throw StateError('no plan') : _plan,
+      ),
+      syncNavigatorToActiveTabProvider.overrideWithValue(() {}),
+      openTabFromNodeKeyProvider.overrideWithValue((
+        String nodeKey, {
+        bool isPortraitMode = false,
+        int? pageIndex,
+        int? entryStart,
+      }) {
         // -1 for a key that names nothing, exactly as the real one answers
         // when `nodeByKeyProvider` comes back null. Recording *after* that
         // check is what lets a test say no tab was ever asked for.
@@ -301,9 +330,9 @@ ProviderContainer _containerFor(
           ..pageIndex = pageIndex
           ..entryStart = entryStart;
         return 0; // any index >= 0 means a tab opened
-      },
-    ),
-  ]);
+      }),
+    ],
+  );
   addTearDown(container.dispose);
   return container;
 }
@@ -342,13 +371,13 @@ final TipitakaTree _tree = TipitakaTree.fromJson({
 /// title on both language sides — the Pali one is the authority the declared
 /// range is read from.
 List<Object?> _row(String? parent, String title) => [
-      title,
-      title,
-      1,
-      const <int>[0, 0],
-      parent ?? 'root',
-      'f'
-    ];
+  title,
+  title,
+  1,
+  const <int>[0, 0],
+  parent ?? 'root',
+  'f',
+];
 
 /// Hand-made, never the shipped snapshot: these keys are not in the corpus, and
 /// a test reading the real set would measure the corpus instead of the rule.
@@ -368,30 +397,40 @@ final SitePlan _plan = SitePlan.build(
 /// `openTabFromNodeKey` is stubbed — but it has to agree with [_tree], or the
 /// fallback tests would pass against a shape the plan tests never saw.
 final List<TipitakaTreeNode> _appNodes = [
-  _appNode('dl', children: [
-    _appNode('dl-mid', children: [
-      _appNode('dl-mid-1'),
-      _appNode('dl-mid-2'),
-      _appNode('dl-mid-3'),
-      _appNode('dl-mid-4'),
-    ]),
-  ]),
-  _appNode('atta-dl', children: [
-    _appNode('atta-dl-mid', children: [
-      _appNode('atta-dl-mid-1'),
-      _appNode('atta-dl-mid-2'),
-    ]),
-  ]),
+  _appNode(
+    'dl',
+    children: [
+      _appNode(
+        'dl-mid',
+        children: [
+          _appNode('dl-mid-1'),
+          _appNode('dl-mid-2'),
+          _appNode('dl-mid-3'),
+          _appNode('dl-mid-4'),
+        ],
+      ),
+    ],
+  ),
+  _appNode(
+    'atta-dl',
+    children: [
+      _appNode(
+        'atta-dl-mid',
+        children: [_appNode('atta-dl-mid-1'), _appNode('atta-dl-mid-2')],
+      ),
+    ],
+  ),
 ];
 
-TipitakaTreeNode _appNode(String key,
-        {List<TipitakaTreeNode> children = const []}) =>
-    TipitakaTreeNode(
-      nodeKey: key,
-      paliName: key,
-      sinhalaName: key,
-      hierarchyLevel: 1,
-      entryPageIndex: 0,
-      entryIndexInPage: 0,
-      childNodes: children,
-    );
+TipitakaTreeNode _appNode(
+  String key, {
+  List<TipitakaTreeNode> children = const [],
+}) => TipitakaTreeNode(
+  nodeKey: key,
+  paliName: key,
+  sinhalaName: key,
+  hierarchyLevel: 1,
+  entryPageIndex: 0,
+  entryIndexInPage: 0,
+  childNodes: children,
+);

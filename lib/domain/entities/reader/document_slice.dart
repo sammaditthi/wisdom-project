@@ -56,8 +56,10 @@ class DocumentSlice {
     if (lastPage < firstPage) return empty;
 
     return DocumentSlice._(
-      document.pages
-          .sublist(firstPage - firstLoaded, lastPage - firstLoaded + 1),
+      document.pages.sublist(
+        firstPage - firstLoaded,
+        lastPage - firstLoaded + 1,
+      ),
       firstPage,
       range.start.entryIndex,
       endEntry,

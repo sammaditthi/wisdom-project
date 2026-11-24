@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+
 import '../../domain/entities/bjt/bjt_document.dart';
 import 'bjt_content_datasource.dart';
 import 'bjt_content_local_datasource.dart';
@@ -11,13 +12,16 @@ class BJTDocumentLocalDataSourceImpl implements BJTDocumentDataSource {
   final BJTContentDataSource _contentDataSource;
 
   BJTDocumentLocalDataSourceImpl({BJTContentDataSource? contentDataSource})
-      : _contentDataSource =
-            contentDataSource ?? BJTContentLocalDataSourceImpl();
+    : _contentDataSource = contentDataSource ?? BJTContentLocalDataSourceImpl();
 
   // Mirrors DictionaryDataSourceImpl._log. No-op in release builds.
   void _log(String message, {Object? error, StackTrace? stack}) {
-    developer.log(message,
-        name: 'BJTDataSource', error: error, stackTrace: stack);
+    developer.log(
+      message,
+      name: 'BJTDataSource',
+      error: error,
+      stackTrace: stack,
+    );
   }
 
   @override
@@ -35,11 +39,9 @@ class BJTDocumentLocalDataSourceImpl implements BJTDocumentDataSource {
 
       // The rows are shaped like the JSON's `pages` list, so the parser reads
       // them unchanged.
-      return BJTDocumentParser.parseDocument(
-        fileId,
-        {'pages': pages},
-        firstPageIndex: firstPage,
-      );
+      return BJTDocumentParser.parseDocument(fileId, {
+        'pages': pages,
+      }, firstPageIndex: firstPage);
     } catch (e, stack) {
       // rethrow preserves the original exception (StateError for a missing
       // row, FormatException for a corrupt one) so the repository can pass it

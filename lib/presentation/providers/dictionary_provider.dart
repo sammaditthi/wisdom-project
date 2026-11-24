@@ -34,8 +34,9 @@ final hasActiveSelectionProvider = StateProvider<bool>((ref) => false);
 /// Empty set = all dictionaries (same convention as search).
 /// Intentionally persists across word taps and sheet close/reopen so the
 /// user's filter preference is retained during a reading session.
-final bottomSheetDictionaryFilterProvider =
-    StateProvider<Set<String>>((ref) => {});
+final bottomSheetDictionaryFilterProvider = StateProvider<Set<String>>(
+  (ref) => {},
+);
 
 /// Exact match toggle for the dictionary bottom sheet.
 /// When true, only exact word matches are returned (no prefix matching).
@@ -66,39 +67,39 @@ final dictionaryRepositoryProvider = Provider<DictionaryRepository>((ref) {
 /// Uses autoDispose to clean up when no listeners remain (prevents memory leaks).
 final dictionaryLookupProvider = FutureProvider.autoDispose
     .family<List<DictionaryEntry>, DictionaryLookupParams>((ref, params) async {
-  final repository = ref.watch(dictionaryRepositoryProvider);
+      final repository = ref.watch(dictionaryRepositoryProvider);
 
-  final result = await repository.lookupWord(
-    params.word,
-    exactMatch: params.exactMatch,
-    dictionaryIds: params.dictionaryIds,
-    limit: params.limit,
-  );
+      final result = await repository.lookupWord(
+        params.word,
+        exactMatch: params.exactMatch,
+        dictionaryIds: params.dictionaryIds,
+        limit: params.limit,
+      );
 
-  return result.fold(
-    (failure) => throw Exception(failure.userMessage),
-    (entries) => entries,
-  );
-});
+      return result.fold(
+        (failure) => throw Exception(failure.userMessage),
+        (entries) => entries,
+      );
+    });
 
 /// Count lookup results for a word (for bottom sheet "Viewing X of Y" footer).
 /// Reuses countDefinitions since lookupWord and searchDefinitions share the
 /// same SQL WHERE clause (the word match with optional dictionary filter).
 final dictionaryLookupCountProvider = FutureProvider.autoDispose
     .family<int, DictionaryLookupParams>((ref, params) async {
-  final repository = ref.watch(dictionaryRepositoryProvider);
+      final repository = ref.watch(dictionaryRepositoryProvider);
 
-  final result = await repository.countDefinitions(
-    params.word,
-    isExactMatch: params.exactMatch,
-    dictionaryIds: params.dictionaryIds,
-  );
+      final result = await repository.countDefinitions(
+        params.word,
+        isExactMatch: params.exactMatch,
+        dictionaryIds: params.dictionaryIds,
+      );
 
-  return result.fold(
-    (failure) => throw Exception(failure.userMessage),
-    (count) => count,
-  );
-});
+      return result.fold(
+        (failure) => throw Exception(failure.userMessage),
+        (count) => count,
+      );
+    });
 
 // ============================================================================
 // SEARCH PROVIDERS (for search tab integration)
@@ -108,35 +109,35 @@ final dictionaryLookupCountProvider = FutureProvider.autoDispose
 /// Uses autoDispose to clean up when no listeners remain (prevents memory leaks).
 final dictionarySearchProvider = FutureProvider.autoDispose
     .family<List<DictionaryEntry>, DictionarySearchParams>((ref, params) async {
-  final repository = ref.watch(dictionaryRepositoryProvider);
+      final repository = ref.watch(dictionaryRepositoryProvider);
 
-  final result = await repository.searchDefinitions(
-    params.query,
-    isExactMatch: params.isExactMatch,
-    dictionaryIds: params.dictionaryIds,
-    limit: params.limit,
-  );
+      final result = await repository.searchDefinitions(
+        params.query,
+        isExactMatch: params.isExactMatch,
+        dictionaryIds: params.dictionaryIds,
+        limit: params.limit,
+      );
 
-  return result.fold(
-    (failure) => throw Exception(failure.userMessage),
-    (entries) => entries,
-  );
-});
+      return result.fold(
+        (failure) => throw Exception(failure.userMessage),
+        (entries) => entries,
+      );
+    });
 
 /// Count definitions for a query (for tab badge)
 /// Uses autoDispose to clean up when no listeners remain (prevents memory leaks).
 final dictionaryCountProvider = FutureProvider.autoDispose
     .family<int, DictionarySearchParams>((ref, params) async {
-  final repository = ref.watch(dictionaryRepositoryProvider);
+      final repository = ref.watch(dictionaryRepositoryProvider);
 
-  final result = await repository.countDefinitions(
-    params.query,
-    isExactMatch: params.isExactMatch,
-    dictionaryIds: params.dictionaryIds,
-  );
+      final result = await repository.countDefinitions(
+        params.query,
+        isExactMatch: params.isExactMatch,
+        dictionaryIds: params.dictionaryIds,
+      );
 
-  return result.fold(
-    (failure) => throw Exception(failure.userMessage),
-    (count) => count,
-  );
-});
+      return result.fold(
+        (failure) => throw Exception(failure.userMessage),
+        (count) => count,
+      );
+    });

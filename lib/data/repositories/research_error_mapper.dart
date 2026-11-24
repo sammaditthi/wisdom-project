@@ -105,22 +105,18 @@ String? _errorCode(String body) {
 /// English fallback copy — matches the 7-variant table in the plan (§2). The
 /// dialog shows the ARB-localised version keyed on the same [ApiErrorType].
 String _fallbackMessage(ApiErrorType type) => switch (type) {
-      ApiErrorType.offline =>
-        "Couldn't connect. Check your internet and try again.",
-      ApiErrorType.timeout =>
-        'This is taking longer than usual. Please try again.',
-      // English fallback only; the UI uses the mode-aware localised copy and
-      // adds the "switch to Fast mode" hint in Thinking mode.
-      ApiErrorType.rateLimited =>
-        'Research has had a lot of questions just now. Please try again in a few minutes.',
-      ApiErrorType.serviceBusy =>
-        'Research is busy right now. Please try again in a moment.',
-      ApiErrorType.notAuthorised =>
-        "Research isn't available right now. Please try again later.",
-      ApiErrorType.cannotAnswer =>
-        "I couldn't find an answer to that in the canon. Try rephrasing, or ask about a specific teaching.",
-      ApiErrorType.serverError =>
-        'Something went wrong on our end. Please try again.',
-      ApiErrorType.resourceLimit =>
-        'That answer took too much to finish. Please try again — a simpler question may help.',
-    };
+  ApiErrorType.offline =>
+    "Couldn't connect. Check your internet and try again.",
+  ApiErrorType.timeout => 'This is taking longer than usual. Please try again.',
+  // English fallback only; the UI uses the mode-aware localised copy and
+  // adds the "switch to Fast mode" hint in Thinking mode.
+  ApiErrorType.rateLimited => 'Research has had a lot of questions just now. Please try again in a few minutes.',
+  ApiErrorType.serviceBusy =>
+    'Research is busy right now. Please try again in a moment.',
+  ApiErrorType.notAuthorised =>
+    "Research isn't available right now. Please try again later.",
+  ApiErrorType.cannotAnswer => "I couldn't find an answer to that in the canon. Try rephrasing, or ask about a specific teaching.",
+  ApiErrorType.serverError =>
+    'Something went wrong on our end. Please try again.',
+  ApiErrorType.resourceLimit => 'That answer took too much to finish. Please try again — a simpler question may help.',
+};

@@ -80,17 +80,13 @@ void main() {
       final mockRepository = MockDictionaryRepository();
       // Use a completer that never completes to show loading state
       final completer = Completer<Either<Failure, List<DictionaryEntry>>>();
-      when(mockRepository.lookupWord(
-        testWord,
-        exactMatch: false,
-        limit: 50,
-      )).thenAnswer((_) => completer.future);
+      when(mockRepository.lookupWord(testWord, exactMatch: false, limit: 50))
+          .thenAnswer((_) => completer.future);
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        mockRepository: mockRepository,
-        selectedWord: testWord,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(mockRepository: mockRepository, selectedWord: testWord),
+      );
       await tester.pump(); // Let initial build complete
 
       // Assert
@@ -104,17 +100,13 @@ void main() {
     testWidgets('renders entries when loaded', (tester) async {
       // Arrange
       final mockRepository = MockDictionaryRepository();
-      when(mockRepository.lookupWord(
-        testWord,
-        exactMatch: false,
-        limit: 50,
-      )).thenAnswer((_) async => Right(testEntries));
+      when(mockRepository.lookupWord(testWord, exactMatch: false, limit: 50))
+          .thenAnswer((_) async => Right(testEntries));
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        mockRepository: mockRepository,
-        selectedWord: testWord,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(mockRepository: mockRepository, selectedWord: testWord),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -127,17 +119,13 @@ void main() {
     testWidgets('renders empty state when no definitions', (tester) async {
       // Arrange
       final mockRepository = MockDictionaryRepository();
-      when(mockRepository.lookupWord(
-        testWord,
-        exactMatch: false,
-        limit: 50,
-      )).thenAnswer((_) async => const Right([]));
+      when(mockRepository.lookupWord(testWord, exactMatch: false, limit: 50))
+          .thenAnswer((_) async => const Right([]));
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        mockRepository: mockRepository,
-        selectedWord: testWord,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(mockRepository: mockRepository, selectedWord: testWord),
+      );
       await tester.pumpAndSettle();
 
       // Assert
@@ -145,23 +133,23 @@ void main() {
       expect(find.text('No definitions found'), findsOneWidget);
     });
 
-    testWidgets('closes and clears highlight on close button tap',
-        (tester) async {
+    testWidgets('closes and clears highlight on close button tap', (
+      tester,
+    ) async {
       // Arrange
       final mockRepository = MockDictionaryRepository();
       var closeCallbackCalled = false;
-      when(mockRepository.lookupWord(
-        testWord,
-        exactMatch: false,
-        limit: 50,
-      )).thenAnswer((_) async => Right(testEntries));
+      when(mockRepository.lookupWord(testWord, exactMatch: false, limit: 50))
+          .thenAnswer((_) async => Right(testEntries));
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        mockRepository: mockRepository,
-        selectedWord: testWord,
-        onClose: () => closeCallbackCalled = true,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(
+          mockRepository: mockRepository,
+          selectedWord: testWord,
+          onClose: () => closeCallbackCalled = true,
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Find and tap close button
@@ -178,17 +166,13 @@ void main() {
       // Arrange
       final mockRepository = MockDictionaryRepository();
       const failure = Failure.dataLoadFailure(message: 'Database error');
-      when(mockRepository.lookupWord(
-        testWord,
-        exactMatch: false,
-        limit: 50,
-      )).thenAnswer((_) async => const Left(failure));
+      when(mockRepository.lookupWord(testWord, exactMatch: false, limit: 50))
+          .thenAnswer((_) async => const Left(failure));
 
       // Act
-      await tester.pumpWidget(buildTestWidget(
-        mockRepository: mockRepository,
-        selectedWord: testWord,
-      ));
+      await tester.pumpWidget(
+        buildTestWidget(mockRepository: mockRepository, selectedWord: testWord),
+      );
       await tester.pumpAndSettle();
 
       // Assert

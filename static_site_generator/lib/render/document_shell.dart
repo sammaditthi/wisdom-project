@@ -99,22 +99,26 @@ String htmlDocument({
   // wrong is debugged by reading this file.
   final meta = StringBuffer('<title>${escapeHtml(title)}</title>');
   if (description != null) {
-    meta.write('\n<meta name="description" '
-        'content="${escapeHtml(description.snippet)}">');
+    meta.write(
+      '\n<meta name="description" '
+      'content="${escapeHtml(description.snippet)}">',
+    );
   }
   if (canonical != null) {
     final url = build.absolute(canonical);
     meta.write('\n<link rel="canonical" href="$url">');
-    meta.write(_openGraph(
-      title: title,
-      // The card's form, not the snippet's: `og:title` is written one line
-      // above and a subtitle repeating it verbatim is the failure the two
-      // forms exist to avoid. See [PageDescription].
-      subtitle: description?.subtitle,
-      url: url,
-      imageUrl: build.absolute(assets.ogCard),
-      isFrontDoor: isFrontDoor,
-    ));
+    meta.write(
+      _openGraph(
+        title: title,
+        // The card's form, not the snippet's: `og:title` is written one line
+        // above and a subtitle repeating it verbatim is the failure the two
+        // forms exist to avoid. See [PageDescription].
+        subtitle: description?.subtitle,
+        url: url,
+        imageUrl: build.absolute(assets.ogCard),
+        isFrontDoor: isFrontDoor,
+      ),
+    );
   }
 
   return '''
@@ -183,19 +187,24 @@ String _openGraph({
   required bool isFrontDoor,
 }) {
   final tags = StringBuffer();
-  tags.write('\n<meta property="og:type" content="'
-      // `website` is the whole site; `article` is a document within it. `/`
-      // is the only page here that is the former.
-      '${isFrontDoor ? 'website' : 'article'}">');
+  tags.write(
+    '\n<meta property="og:type" content="'
+    // `website` is the whole site; `article` is a document within it. `/`
+    // is the only page here that is the former.
+    '${isFrontDoor ? 'website' : 'article'}">',
+  );
   tags.write('\n<meta property="og:title" content="${escapeHtml(title)}">');
   if (subtitle != null) {
-    tags.write('\n<meta property="og:description" '
-        'content="${escapeHtml(subtitle)}">');
+    tags.write(
+      '\n<meta property="og:description" '
+      'content="${escapeHtml(subtitle)}">',
+    );
   }
   tags.write('\n<meta property="og:url" content="$url">');
   tags.write('\n<meta property="og:image" content="$imageUrl">');
   tags.write(
-      '\n<meta property="og:site_name" content="${escapeHtml(siteName)}">');
+    '\n<meta property="og:site_name" content="${escapeHtml(siteName)}">',
+  );
   // Sinhala as written in Sri Lanka. The `<html lang>` above says `si`, which
   // is the language; Open Graph's locale is a language *and* a territory, and
   // there is only one that prints this canon.

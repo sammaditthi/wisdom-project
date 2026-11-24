@@ -19,10 +19,7 @@ void main() {
 
   /// Opens the sheet for [citation] as an answer's chip does. Returns the node
   /// keys "Open in reader" asks for.
-  Future<List<String>> showSheet(
-    WidgetTester tester,
-    Citation citation,
-  ) async {
+  Future<List<String>> showSheet(WidgetTester tester, Citation citation) async {
     final opened = <String>[];
     await tester.pumpApp(
       Builder(
@@ -35,12 +32,13 @@ void main() {
         suttaCentralRefResolverProvider.overrideWith((ref) => resolver),
         // No tree: the Sinhala preview stays empty and loads no page.
         nodeIndexProvider.overrideWithValue(const {}),
-        openTipitakaLinkProvider.overrideWithValue(
-          (TipitakaLink link, {bool isPortraitMode = false}) async {
-            opened.add(link.nodeKey);
-            return true;
-          },
-        ),
+        openTipitakaLinkProvider.overrideWithValue((
+          TipitakaLink link, {
+          bool isPortraitMode = false,
+        }) async {
+          opened.add(link.nodeKey);
+          return true;
+        }),
       ],
     );
     await tester.tap(find.text('chip'));
@@ -48,8 +46,9 @@ void main() {
     return opened;
   }
 
-  testWidgets('"AN 1.1" from the answer opens AN 1.1-10, and names it',
-      (tester) async {
+  testWidgets('"AN 1.1" from the answer opens AN 1.1-10, and names it', (
+    tester,
+  ) async {
     // The model wrote "AN 1.1"; SuttaCentral has only the range.
     final opened = await showSheet(
       tester,
@@ -62,8 +61,9 @@ void main() {
     expect(opened, ['an-1-1']);
   });
 
-  testWidgets('a citation with its own uid keeps the ref as sent',
-      (tester) async {
+  testWidgets('a citation with its own uid keeps the ref as sent', (
+    tester,
+  ) async {
     // Upper case as the Worker sent it, so a rewrite would show.
     final opened = await showSheet(
       tester,
@@ -76,8 +76,9 @@ void main() {
     expect(opened, ['kn-dhp-1']);
   });
 
-  testWidgets('a uid with no BJT text says so, and offers nothing to open',
-      (tester) async {
+  testWidgets('a uid with no BJT text says so, and offers nothing to open', (
+    tester,
+  ) async {
     await showSheet(
       tester,
       const Citation(uid: 'pli-tv-bu-pm', ref: 'pli-tv-bu-pm'),

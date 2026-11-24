@@ -17,6 +17,6 @@ extension SearchResultUnitKey on SearchResult {
   /// A null [resolver] is a tree that has not loaded; the stored key stands in.
   String unitKey(ReaderUnitResolver? resolver) =>
       resultType == SearchResultType.fullText
-          ? resolver?.keyAt(contentFileId, pageIndex, entryIndex) ?? nodeKey
-          : nodeKey;
+      ? resolver?.keyAt(contentFileId, pageIndex, entryIndex) ?? nodeKey
+      : nodeKey;
 }

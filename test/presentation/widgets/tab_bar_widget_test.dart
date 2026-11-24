@@ -59,8 +59,8 @@ void main() {
   // Ten tabs, "Tab Number 0" to "Tab Number 9": more than the bar fits, so
   // it scrolls.
   Future<void> pumpTenTabs(WidgetTester tester) => pumpTabBar(tester, [
-        for (var i = 0; i < 10; i++) createTab(label: 'Tab Number $i'),
-      ]);
+    for (var i = 0; i < 10; i++) createTab(label: 'Tab Number $i'),
+  ]);
 
   // ============================================================
   // Empty State Tests
@@ -116,30 +116,33 @@ void main() {
     // A tab whose Pali and Sinhala names differ, and whose Pali name carries a
     // consonant cluster (ධම්ම) so the conjunct transform visibly changes it.
     ReaderTab bilingualTab() => const ReaderTab(
-          label: 'fallback-label',
-          fullName: 'Dhamma / Sinhala name',
-          nodeKey: 'node-bilingual',
-          paliName: 'ධම්ම',
-          sinhalaName: 'දම් නම',
-        );
+      label: 'fallback-label',
+      fullName: 'Dhamma / Sinhala name',
+      nodeKey: 'node-bilingual',
+      paliName: 'ධම්ම',
+      sinhalaName: 'දම් නම',
+    );
 
-    testWidgets('Sinhala (default) → shows the raw sinhalaName, no conjuncts',
-        (tester) async {
+    testWidgets('Sinhala (default) → shows the raw sinhalaName, no conjuncts', (
+      tester,
+    ) async {
       await pumpTabBar(tester, [bilingualTab()]);
 
       // Default Content Language is Sinhala → the sinhalaName is shown verbatim.
       expect(find.text('දම් නම'), findsOneWidget);
     });
 
-    testWidgets('Pali → shows paliName with conjunct ligatures applied',
-        (tester) async {
+    testWidgets('Pali → shows paliName with conjunct ligatures applied', (
+      tester,
+    ) async {
       await pumpTabBar(
         tester,
         [bilingualTab()],
         overrides: [
           // Pin the reading language to Pali for this tab bar.
-          effectiveContentLanguageProvider
-              .overrideWithValue(ContentLanguage.pali),
+          effectiveContentLanguageProvider.overrideWithValue(
+            ContentLanguage.pali,
+          ),
         ],
       );
 
@@ -175,8 +178,9 @@ void main() {
   // Tab Interaction Tests
   // ============================================================
   group('Tab interactions', () {
-    testWidgets('should render tab structure with close button and tooltip',
-        (tester) async {
+    testWidgets('should render tab structure with close button and tooltip', (
+      tester,
+    ) async {
       // ARRANGE
       final tab = createTab(label: 'Tab');
 
@@ -209,8 +213,9 @@ void main() {
       return animatedOpacity.opacity;
     }
 
-    testWidgets('should not show chevrons when all tabs fit on screen',
-        (tester) async {
+    testWidgets('should not show chevrons when all tabs fit on screen', (
+      tester,
+    ) async {
       // ARRANGE - Just 2 tabs that will fit
       final tab1 = createTab(label: 'Tab 1');
       final tab2 = createTab(label: 'Tab 2');
@@ -234,8 +239,9 @@ void main() {
       expect(chevronOpacity(tester, Icons.chevron_left), 0.0);
     });
 
-    testWidgets('should show left chevron after scrolling right',
-        (tester) async {
+    testWidgets('should show left chevron after scrolling right', (
+      tester,
+    ) async {
       // ARRANGE - Many tabs that will overflow
       await pumpTenTabs(tester);
 
@@ -330,8 +336,9 @@ void main() {
 
     Future<void> activate(WidgetTester tester, int index) async {
       ProviderScope.containerOf(tester.element(find.byType(TabBarWidget)))
-          .read(activeTabIndexProvider.notifier)
-          .state = index;
+              .read(activeTabIndexProvider.notifier)
+              .state =
+          index;
       await tester.pumpAndSettle();
     }
 
@@ -352,8 +359,9 @@ void main() {
       expect(stripPosition(tester).pixels, 0);
     });
 
-    testWidgets('a tab far off-screen after the strip was scrolled away',
-        (tester) async {
+    testWidgets('a tab far off-screen after the strip was scrolled away', (
+      tester,
+    ) async {
       await pumpTenTabs(tester);
       stripPosition(tester).jumpTo(stripPosition(tester).maxScrollExtent);
       await tester.pumpAndSettle();
@@ -364,13 +372,14 @@ void main() {
     });
 
     // The chevrons float over the strip's ends, 28 px wide each.
-    testWidgets('a tab brought in mid-strip stops clear of the chevron',
-        (tester) async {
+    testWidgets('a tab brought in mid-strip stops clear of the chevron', (
+      tester,
+    ) async {
       Rect tabRect(String label) => tester.getRect(
-            find
-                .ancestor(of: find.text(label), matching: find.byType(Material))
-                .first,
-          );
+        find
+            .ancestor(of: find.text(label), matching: find.byType(Material))
+            .first,
+      );
       await pumpTenTabs(tester);
       final view = tester.getRect(strip);
 

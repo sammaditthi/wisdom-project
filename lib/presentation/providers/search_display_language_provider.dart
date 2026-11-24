@@ -25,8 +25,9 @@ final effectiveSearchDisplayLanguageProvider = Provider<ContentLanguage>((ref) {
   // `.select` so this only recomputes when the two flags change, not on every
   // keystroke / result update in the search state.
   final pali = ref.watch(searchStateProvider.select((s) => s.searchInPali));
-  final sinhala =
-      ref.watch(searchStateProvider.select((s) => s.searchInSinhala));
+  final sinhala = ref.watch(
+    searchStateProvider.select((s) => s.searchInSinhala),
+  );
 
   // Same derived scope the repo uses, so labels and search can't disagree.
   final scope = SearchLanguageScope.fromFlags(

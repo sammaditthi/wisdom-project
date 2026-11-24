@@ -21,8 +21,9 @@ import '../../helpers/pump_app.dart';
 // PATH, the dictionary fallback, and live reactivity to a language change.
 
 // A StateProvider we can flip at runtime to prove the labels re-render live.
-final _testLang =
-    StateProvider<ContentLanguage>((ref) => ContentLanguage.sinhala);
+final _testLang = StateProvider<ContentLanguage>(
+  (ref) => ContentLanguage.sinhala,
+);
 
 void main() {
   // root (sp) → parent (dn) → leaf (dn-1). All Pali names carry a consonant
@@ -98,57 +99,63 @@ void main() {
 
   group('searchResultLabels (2.2) -', () {
     testWidgets(
-        'Sinhala: title + breadcrumb path use the nodes\' Sinhala names',
-        (tester) async {
-      await pumpProbe(
-        tester,
-        result(nodeKey: 'dn-1'),
-        languageOverrides: [
-          effectiveSearchDisplayLanguageProvider
-              .overrideWithValue(ContentLanguage.sinhala),
-        ],
-      );
-      await tester.pumpAndSettle();
+      'Sinhala: title + breadcrumb path use the nodes\' Sinhala names',
+      (tester) async {
+        await pumpProbe(
+          tester,
+          result(nodeKey: 'dn-1'),
+          languageOverrides: [
+            effectiveSearchDisplayLanguageProvider.overrideWithValue(
+              ContentLanguage.sinhala,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
 
-      // Title = leaf's Sinhala name (unchanged).
-      expect(find.text('දම් පෙළ'), findsOneWidget);
-      // Path = ancestors root→parent, joined ' > ', EXCLUDING the leaf itself.
-      expect(find.text('සුත් පෙළ > සංයුත් සඟිය'), findsOneWidget);
-    });
+        // Title = leaf's Sinhala name (unchanged).
+        expect(find.text('දම් පෙළ'), findsOneWidget);
+        // Path = ancestors root→parent, joined ' > ', EXCLUDING the leaf itself.
+        expect(find.text('සුත් පෙළ > සංයුත් සඟිය'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'Pali: every breadcrumb path segment carries conjunct ligatures',
-        (tester) async {
-      await pumpProbe(
-        tester,
-        result(nodeKey: 'dn-1'),
-        languageOverrides: [
-          effectiveSearchDisplayLanguageProvider
-              .overrideWithValue(ContentLanguage.pali),
-        ],
-      );
-      await tester.pumpAndSettle();
+      'Pali: every breadcrumb path segment carries conjunct ligatures',
+      (tester) async {
+        await pumpProbe(
+          tester,
+          result(nodeKey: 'dn-1'),
+          languageOverrides: [
+            effectiveSearchDisplayLanguageProvider.overrideWithValue(
+              ContentLanguage.pali,
+            ),
+          ],
+        );
+        await tester.pumpAndSettle();
 
-      // Path is this test's unique target: prove the function applies the
-      // formatter to each ancestor segment on the Pali branch. The title's
-      // two-language rendering is owned by the seam (1.1) + the Sinhala case
-      // above, so we don't re-assert the transformed title here.
-      final expectedPath =
-          '${beautifyPaliText('සුත්ත', PaliLetterOptions.defaults)} > '
-          '${beautifyPaliText('සංයුත්ත', PaliLetterOptions.defaults)}';
-      expect(find.text(expectedPath), findsOneWidget);
-    });
+        // Path is this test's unique target: prove the function applies the
+        // formatter to each ancestor segment on the Pali branch. The title's
+        // two-language rendering is owned by the seam (1.1) + the Sinhala case
+        // above, so we don't re-assert the transformed title here.
+        final expectedPath =
+            '${beautifyPaliText('සුත්ත', PaliLetterOptions.defaults)} > '
+            '${beautifyPaliText('සංයුත්ත', PaliLetterOptions.defaults)}';
+        expect(find.text(expectedPath), findsOneWidget);
+      },
+    );
 
-    testWidgets('dictionary fallback: unknown nodeKey keeps the repo strings',
-        (tester) async {
+    testWidgets('dictionary fallback: unknown nodeKey keeps the repo strings', (
+      tester,
+    ) async {
       // A dictionary result carries an empty nodeKey → no tree node, so the
       // function returns the repo-built title/subtitle verbatim.
       await pumpProbe(
         tester,
         result(nodeKey: '', title: 'Dictionary Word', subtitle: 'අර්ථ පථය'),
         languageOverrides: [
-          effectiveSearchDisplayLanguageProvider
-              .overrideWithValue(ContentLanguage.pali),
+          effectiveSearchDisplayLanguageProvider.overrideWithValue(
+            ContentLanguage.pali,
+          ),
         ],
       );
       await tester.pumpAndSettle();
@@ -157,15 +164,17 @@ void main() {
       expect(find.text('අර්ථ පථය'), findsOneWidget);
     });
 
-    testWidgets('live switch: flipping the language re-renders the same tile',
-        (tester) async {
+    testWidgets('live switch: flipping the language re-renders the same tile', (
+      tester,
+    ) async {
       await pumpProbe(
         tester,
         result(nodeKey: 'dn-1'),
         languageOverrides: [
           // Follow the runtime-flippable test provider.
-          effectiveSearchDisplayLanguageProvider
-              .overrideWith((ref) => ref.watch(_testLang)),
+          effectiveSearchDisplayLanguageProvider.overrideWith(
+            (ref) => ref.watch(_testLang),
+          ),
         ],
       );
       await tester.pumpAndSettle();
@@ -174,8 +183,9 @@ void main() {
       expect(find.text('දම් පෙළ'), findsOneWidget);
 
       // Flip to Pali — the watching tile must rebuild with conjuncts.
-      final container =
-          ProviderScope.containerOf(tester.element(find.byType(_LabelProbe)));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(_LabelProbe)),
+      );
       container.read(_testLang.notifier).state = ContentLanguage.pali;
       await tester.pumpAndSettle();
 
@@ -197,11 +207,6 @@ class _LabelProbe extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final labels = searchResultLabels(ref, result);
-    return Column(
-      children: [
-        Text(labels.title),
-        Text(labels.path),
-      ],
-    );
+    return Column(children: [Text(labels.title), Text(labels.path)]);
   }
 }

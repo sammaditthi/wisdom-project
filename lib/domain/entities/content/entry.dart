@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:wisdom_shared/wisdom_shared.dart';
+
 import 'entry_type.dart';
 
 part 'entry.freezed.dart';

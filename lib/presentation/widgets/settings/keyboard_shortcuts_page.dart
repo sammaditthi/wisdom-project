@@ -28,8 +28,13 @@ class KeyboardShortcutsPage extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(settingsGutter, 0, settingsGutter, 28),
       children: [
         for (final group in groups)
-          _section(l10n, platform, group, _rows(l10n, listed, group),
-              isFirst: group == groups.first),
+          _section(
+            l10n,
+            platform,
+            group,
+            _rows(l10n, listed, group),
+            isFirst: group == groups.first,
+          ),
       ],
     );
   }

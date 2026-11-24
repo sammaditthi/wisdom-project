@@ -69,8 +69,9 @@ class WebDatabaseInstaller {
   final StreamController<DatabaseInstallStatus> _changes =
       StreamController<DatabaseInstallStatus>.broadcast();
 
-  DatabaseInstallStatus _status =
-      const DatabaseInstallStatus(phase: DatabaseInstallPhase.checking);
+  DatabaseInstallStatus _status = const DatabaseInstallStatus(
+    phase: DatabaseInstallPhase.checking,
+  );
 
   /// Both kept after a failure, so a query that follows one fails at once
   /// instead of starting the downloads again. Only [retry] clears them.
@@ -156,10 +157,12 @@ class WebDatabaseInstaller {
     } catch (error, stack) {
       final failure = _asFailure(error, 'Installing the databases failed');
       debugPrint('[db] $failure\n$stack');
-      _emit(DatabaseInstallStatus(
-        phase: DatabaseInstallPhase.failed,
-        failure: failure,
-      ));
+      _emit(
+        DatabaseInstallStatus(
+          phase: DatabaseInstallPhase.failed,
+          failure: failure,
+        ),
+      );
     }
   }
 
@@ -228,8 +231,9 @@ class WebDatabaseInstaller {
     // Naming the storage mode also stops drift falling back to IndexedDB with
     // the whole library in it.
     final missing = <String>[
-      if (!probe.availableStorages
-          .contains(WasmStorageImplementation.opfsLocks))
+      if (!probe.availableStorages.contains(
+        WasmStorageImplementation.opfsLocks,
+      ))
         'OPFS with synchronous locks',
       if (!_supportsCreateWritable()) 'writable file streams',
     ];
@@ -331,9 +335,12 @@ class WebDatabaseInstaller {
               }).toJS,
             )
             .toDart
-            .then((_) {}, onError: (Object _) {
-          if (!granted.isCompleted) granted.complete();
-        }),
+            .then(
+              (_) {},
+              onError: (Object _) {
+                if (!granted.isCompleted) granted.complete();
+              },
+            ),
       );
       await granted.future;
     }
@@ -388,9 +395,9 @@ class WebDatabaseInstaller {
 
   /// The databases not yet installed at the version this build wants.
   Future<List<String>> _missing() async => [
-        for (final dbName in databases)
-          if (!await _isInstalled(dbName)) dbName,
-      ];
+    for (final dbName in databases)
+      if (!await _isInstalled(dbName)) dbName,
+  ];
 
   /// Whether [dbName] is already installed at the version this build wants.
   ///
@@ -403,8 +410,9 @@ class WebDatabaseInstaller {
       final drift = await _driftRoot();
       // Not `create: true`: a missing folder is the answer here, not something
       // to make.
-      final folder =
-          await drift.getDirectoryHandle(_opfsName(dbName, sha256)).toDart;
+      final folder = await drift
+          .getDirectoryHandle(_opfsName(dbName, sha256))
+          .toDart;
       return await _readStamp(folder) == sha256;
     } catch (_) {
       return false;
@@ -421,8 +429,10 @@ class WebDatabaseInstaller {
     final missing = await _missing();
     // Only what this start downloads, so a new dictionary on its own counts up
     // to its own size.
-    final total =
-        missing.fold(0, (sum, dbName) => sum + _manifest[dbName]!.bytes);
+    final total = missing.fold(
+      0,
+      (sum, dbName) => sum + _manifest[dbName]!.bytes,
+    );
     var done = 0;
     for (final dbName in missing) {
       final entry = _manifest[dbName]!;
@@ -575,7 +585,9 @@ class WebDatabaseInstaller {
     final drift = await _driftRoot();
     return drift
         .getDirectoryHandle(
-            name, web.FileSystemGetDirectoryOptions(create: true))
+          name,
+          web.FileSystemGetDirectoryOptions(create: true),
+        )
         .toDart;
   }
 
@@ -651,8 +663,7 @@ class WebDatabaseInstaller {
                 error = thrown;
                 stack = thrownStack;
               }
-            }()
-                .toJS;
+            }().toJS;
           }).toJS,
         )
         .toDart;
@@ -673,11 +684,13 @@ class WebDatabaseInstaller {
   // Status
   // ---------------------------------------------------------------------------
 
-  void _emitProgress(int received, int total) => _emit(DatabaseInstallStatus(
-        phase: DatabaseInstallPhase.installing,
-        received: received,
-        total: total,
-      ));
+  void _emitProgress(int received, int total) => _emit(
+    DatabaseInstallStatus(
+      phase: DatabaseInstallPhase.installing,
+      received: received,
+      total: total,
+    ),
+  );
 
   void _emit(DatabaseInstallStatus status) {
     _status = status;

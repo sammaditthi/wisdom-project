@@ -74,14 +74,14 @@ class SliceRange {
     return switch (end) {
       null => SlicePageSpan(firstPage: start.pageIndex),
       SliceCoordinate(entryIndex: 0) => SlicePageSpan(
-          firstPage: start.pageIndex,
-          lastPage: end.pageIndex - 1,
-        ),
+        firstPage: start.pageIndex,
+        lastPage: end.pageIndex - 1,
+      ),
       _ => SlicePageSpan(
-          firstPage: start.pageIndex,
-          lastPage: end.pageIndex,
-          endEntry: end.entryIndex,
-        ),
+        firstPage: start.pageIndex,
+        lastPage: end.pageIndex,
+        endEntry: end.entryIndex,
+      ),
     };
   }
 }
@@ -161,12 +161,7 @@ class SliceIndex {
 
   final Map<String, SliceCoordinate> _startOf;
 
-  SliceIndex._(
-    this.fileId,
-    this._boundaries,
-    this._ownerOf,
-    this._startOf,
-  );
+  SliceIndex._(this.fileId, this._boundaries, this._ownerOf, this._startOf);
 
   /// Builds the index for [fileId] from every tree node whose text lives in it.
   ///
@@ -197,8 +192,9 @@ class SliceIndex {
     // order wins for want of anything better to say.
     void closeRun() {
       final parents = {for (final node in sharing) node.parentNodeKey};
-      final deepest =
-          sharing.where((node) => !parents.contains(node.nodeKey)).toList();
+      final deepest = sharing
+          .where((node) => !parents.contains(node.nodeKey))
+          .toList();
       ownerOf.add((deepest.isEmpty ? sharing : deepest).last.nodeKey);
     }
 
@@ -241,9 +237,9 @@ class SliceIndex {
 
   /// One index per content file, for the whole tree.
   static Map<String, SliceIndex> forTree(TipitakaTree tree) => {
-        for (final entry in nodesByFile(tree).entries)
-          entry.key: SliceIndex.forFile(entry.key, entry.value),
-      };
+    for (final entry in nodesByFile(tree).entries)
+      entry.key: SliceIndex.forFile(entry.key, entry.value),
+  };
 
   /// Every node in the tree, grouped by the content file its text lives in and
   /// sorted into reading order within each group.

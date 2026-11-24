@@ -19,14 +19,14 @@ enum ContentLanguage {
 
   /// ISO 639-1 code — used to match against `Edition.availableLanguages`.
   String get isoCode => switch (this) {
-        ContentLanguage.pali => 'pi',
-        ContentLanguage.sinhala => 'si',
-      };
+    ContentLanguage.pali => 'pi',
+    ContentLanguage.sinhala => 'si',
+  };
 
   /// Maps an ISO 639-1 code to a [ContentLanguage], or null if unsupported.
   static ContentLanguage? fromIso(String code) => switch (code) {
-        'pi' => ContentLanguage.pali,
-        'si' => ContentLanguage.sinhala,
-        _ => null,
-      };
+    'pi' => ContentLanguage.pali,
+    'si' => ContentLanguage.sinhala,
+    _ => null,
+  };
 }

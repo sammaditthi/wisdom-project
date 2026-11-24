@@ -68,8 +68,9 @@ void main() {
       expect(badgeFinder, findsWidgets);
     });
 
-    testWidgets('"Show more" shows a meaning cut at two lines in full',
-        (tester) async {
+    testWidgets('"Show more" shows a meaning cut at two lines in full', (
+      tester,
+    ) async {
       // Three lines of meaning, so two lines cut it short.
       final notifier = await pumpTile(
         tester,
@@ -90,26 +91,33 @@ void main() {
 
     // The same text start places the label and sets the width measured for
     // "Show more". Desktop's compact density narrows ListTile's gap.
-    testWidgets('"Show more" lines up with the meaning', (tester) async {
-      await pumpTile(
-        tester,
-        testResult.copyWith(matchedText: 'first<br>second<br>third'),
-      );
+    testWidgets(
+      '"Show more" lines up with the meaning',
+      (tester) async {
+        await pumpTile(
+          tester,
+          testResult.copyWith(matchedText: 'first<br>second<br>third'),
+        );
 
-      expect(
-        tester.getTopLeft(find.text('Show more')).dx,
-        tester.getTopLeft(find.textContaining('third')).dx,
-      );
-    },
-        variant: const TargetPlatformVariant(
-            {TargetPlatform.android, TargetPlatform.macOS}));
+        expect(
+          tester.getTopLeft(find.text('Show more')).dx,
+          tester.getTopLeft(find.textContaining('third')).dx,
+        );
+      },
+      variant: const TargetPlatformVariant({
+        TargetPlatform.android,
+        TargetPlatform.macOS,
+      }),
+    );
 
-    testWidgets('a DPD entry links to dpdict.net, not "Read more"',
-        (tester) async {
+    testWidgets('a DPD entry links to dpdict.net, not "Read more"', (
+      tester,
+    ) async {
       await pumpTile(
         tester,
         testResult.copyWith(
-          matchedText: 'awakened<br>'
+          matchedText:
+              'awakened<br>'
               '<a href="https://www.dpdict.net/?q=buddha">Read more</a>',
         ),
       );

@@ -34,21 +34,28 @@ Future<void> main(List<String> args) async {
 
   final rootPath = normalizeDir(options['--build'] ?? '$packageRoot/build');
   if (!Directory(rootPath).existsSync()) {
-    stderr.writeln('no build directory at $rootPath. Generate one first, or '
-        'pass --build <dir>.');
+    stderr.writeln(
+      'no build directory at $rootPath. Generate one first, or '
+      'pass --build <dir>.',
+    );
     exitCode = 1;
     return;
   }
   stdout.writeln('build   $rootPath');
 
-  final files = Directory(rootPath)
-      .listSync(recursive: true)
-      .whereType<File>()
-      .map((f) => f.path.substring(rootPath.length + 1))
-      .where((p) =>
-          p.endsWith('.html') || p.endsWith('.json') || p.endsWith('.xml'))
-      .toList()
-    ..sort();
+  final files =
+      Directory(rootPath)
+          .listSync(recursive: true)
+          .whereType<File>()
+          .map((f) => f.path.substring(rootPath.length + 1))
+          .where(
+            (p) =>
+                p.endsWith('.html') ||
+                p.endsWith('.json') ||
+                p.endsWith('.xml'),
+          )
+          .toList()
+        ..sort();
   final pages = files.where((p) => p.endsWith('.html')).toList();
 
   // A stride rather than a random draw: the same build samples the same pages
@@ -59,11 +66,14 @@ Future<void> main(List<String> args) async {
   final phrases = <_Phrase>[];
   final stride = (pages.length / sampleSize).ceil().clamp(1, pages.length);
   for (var slot = 0; slot < sampleSize; slot++) {
-    for (var i = slot * stride;
-        i < (slot + 1) * stride && i < pages.length;
-        i++) {
-      final text =
-          _longestRun(File('$rootPath/${pages[i]}').readAsStringSync());
+    for (
+      var i = slot * stride;
+      i < (slot + 1) * stride && i < pages.length;
+      i++
+    ) {
+      final text = _longestRun(
+        File('$rootPath/${pages[i]}').readAsStringSync(),
+      );
       if (text != null) {
         phrases.add(_Phrase(pages[i], text));
         break;
@@ -71,8 +81,10 @@ Future<void> main(List<String> args) async {
     }
   }
   if (phrases.isEmpty) {
-    stdout.writeln('\nFAIL — sampled no body text at all, so nothing was '
-        'checked. Treated as a failure.');
+    stdout.writeln(
+      '\nFAIL — sampled no body text at all, so nothing was '
+      'checked. Treated as a failure.',
+    );
     exitCode = 1;
     return;
   }
@@ -84,8 +96,10 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  stdout.writeln('sample  ${phrases.length} phrases, '
-      'one per page, scanned against ${files.length} files');
+  stdout.writeln(
+    'sample  ${phrases.length} phrases, '
+    'one per page, scanned against ${files.length} files',
+  );
 
   final failures = <String>[];
   final shared = <_Phrase>[];
@@ -100,8 +114,10 @@ Future<void> main(List<String> args) async {
     }
     final related = elsewhere.where((f) => _sameLine(phrase.page, f)).toList();
     if (related.isNotEmpty) {
-      failures.add('${phrase.page}: same text on its own '
-          'ancestor/descendant ${related.join(', ')}');
+      failures.add(
+        '${phrase.page}: same text on its own '
+        'ancestor/descendant ${related.join(', ')}',
+      );
       continue;
     }
     shared.add(phrase);
@@ -111,8 +127,10 @@ Future<void> main(List<String> args) async {
     final others = phrase.found.where((f) => f != phrase.page).toList();
     final named = others.take(2).join(', ');
     final rest = others.length > 2 ? ' and ${others.length - 2} more' : '';
-    stdout.writeln('note    ${phrase.page}: wording also on $named$rest — '
-        'unrelated pages, so the canon repeating itself, not the build');
+    stdout.writeln(
+      'note    ${phrase.page}: wording also on $named$rest — '
+      'unrelated pages, so the canon repeating itself, not the build',
+    );
   }
 
   if (failures.isEmpty) {

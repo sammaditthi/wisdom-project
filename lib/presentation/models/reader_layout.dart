@@ -22,17 +22,17 @@ enum ReaderLayout {
   /// Displayed as text for [paliOnly] and [sinhalaOnly]; [sideBySide] and
   /// [stacked] use icons instead but labels are kept for completeness.
   String get shortLabel => switch (this) {
-        ReaderLayout.paliOnly => 'P',
-        ReaderLayout.sideBySide => 'P|S',
-        ReaderLayout.stacked => 'P/S',
-        ReaderLayout.sinhalaOnly => 'S',
-      };
+    ReaderLayout.paliOnly => 'P',
+    ReaderLayout.sideBySide => 'P|S',
+    ReaderLayout.stacked => 'P/S',
+    ReaderLayout.sinhalaOnly => 'S',
+  };
 
   /// The layout's localized name, as the toolbar's Layout menu shows it.
   String label(AppLocalizations l10n) => switch (this) {
-        ReaderLayout.paliOnly => l10n.layoutPaliOnly,
-        ReaderLayout.sideBySide => l10n.layoutSideBySide,
-        ReaderLayout.stacked => l10n.layoutStacked,
-        ReaderLayout.sinhalaOnly => l10n.layoutSinhalaOnly,
-      };
+    ReaderLayout.paliOnly => l10n.layoutPaliOnly,
+    ReaderLayout.sideBySide => l10n.layoutSideBySide,
+    ReaderLayout.stacked => l10n.layoutStacked,
+    ReaderLayout.sinhalaOnly => l10n.layoutSinhalaOnly,
+  };
 }

@@ -16,10 +16,10 @@ import 'research_screen.dart';
 /// waits on [kEnableHome] and Notes is hidden for the beta; both stay in
 /// [AppSection] so nothing else has to change to bring them back.
 List<AppSection> get _navSections => [
-      if (kEnableHome) AppSection.home,
-      AppSection.reader,
-      AppSection.research,
-    ];
+  if (kEnableHome) AppSection.home,
+  AppSection.reader,
+  AppSection.research,
+];
 
 /// The app's top-level shell: an icon-only [NavigationRail] on tablet/desktop
 /// and a labelled bottom [NavigationBar] on mobile, switching between the
@@ -50,25 +50,25 @@ class AppShell extends ConsumerWidget {
       for (final s in _navSections)
         switch (s) {
           AppSection.home => (
-              icon: Icons.home_outlined,
-              selectedIcon: Icons.home,
-              label: l10n.navHome,
-            ),
+            icon: Icons.home_outlined,
+            selectedIcon: Icons.home,
+            label: l10n.navHome,
+          ),
           AppSection.reader => (
-              icon: Icons.menu_book_outlined,
-              selectedIcon: Icons.menu_book,
-              label: l10n.navReader,
-            ),
+            icon: Icons.menu_book_outlined,
+            selectedIcon: Icons.menu_book,
+            label: l10n.navReader,
+          ),
           AppSection.research => (
-              icon: Icons.auto_awesome_outlined,
-              selectedIcon: Icons.auto_awesome,
-              label: l10n.navResearch,
-            ),
+            icon: Icons.auto_awesome_outlined,
+            selectedIcon: Icons.auto_awesome,
+            label: l10n.navResearch,
+          ),
           AppSection.notes => (
-              icon: Icons.edit_note_outlined,
-              selectedIcon: Icons.edit_note,
-              label: l10n.navNotes,
-            ),
+            icon: Icons.edit_note_outlined,
+            selectedIcon: Icons.edit_note,
+            label: l10n.navNotes,
+          ),
         },
     ];
 
@@ -136,9 +136,10 @@ class AppShell extends ConsumerWidget {
                   switch (s) {
                     // Off, Home is not built at all, so its clock and sun
                     // maths do not run behind the other sections.
-                    AppSection.home => kEnableHome
-                        ? const HomeScreen()
-                        : const SizedBox.shrink(),
+                    AppSection.home =>
+                      kEnableHome
+                          ? const HomeScreen()
+                          : const SizedBox.shrink(),
                     AppSection.reader => const ReaderScreen(),
                     AppSection.research => const ResearchScreen(),
                     AppSection.notes => const NotesScreen(),

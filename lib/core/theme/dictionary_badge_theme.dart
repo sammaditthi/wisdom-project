@@ -56,32 +56,32 @@ class DictionaryBadgeColors extends ThemeExtension<DictionaryBadgeColors> {
 
   /// The shared badge palette used by every theme.
   factory DictionaryBadgeColors.standard() => const DictionaryBadgeColors(
-        dpd: _dictDpd,
-        pts: _dictPts,
-        buddhadatta: _dictBuddhadatta,
-        sumangala: _dictSumangala,
-        vri: _dictVri,
-        critical: _dictCritical,
-        dpdc: _dictDpdc,
-        nyanatiloka: _dictNyanatiloka,
-        properNames: _dictProperNames,
-      );
+    dpd: _dictDpd,
+    pts: _dictPts,
+    buddhadatta: _dictBuddhadatta,
+    sumangala: _dictSumangala,
+    vri: _dictVri,
+    critical: _dictCritical,
+    dpdc: _dictDpdc,
+    nyanatiloka: _dictNyanatiloka,
+    properNames: _dictProperNames,
+  );
 
   /// Maps a dictionary id to its badge colour. [fallback] (the caller's
   /// theme-aware default, e.g. `colorScheme.primary`) is returned for any
   /// unknown id — mirroring the old `DictionaryInfo.getColor` fallback.
   Color colorFor(String dictId, Color fallback) => switch (dictId) {
-        'DPD' => dpd,
-        'PTS' => pts,
-        'BUS' || 'BUE' => buddhadatta,
-        'MS' => sumangala,
-        'VRI' => vri,
-        'CR' => critical,
-        'DPDC' => dpdc,
-        'ND' => nyanatiloka,
-        'PN' => properNames,
-        _ => fallback,
-      };
+    'DPD' => dpd,
+    'PTS' => pts,
+    'BUS' || 'BUE' => buddhadatta,
+    'MS' => sumangala,
+    'VRI' => vri,
+    'CR' => critical,
+    'DPDC' => dpdc,
+    'ND' => nyanatiloka,
+    'PN' => properNames,
+    _ => fallback,
+  };
 
   @override
   DictionaryBadgeColors copyWith({
@@ -94,18 +94,17 @@ class DictionaryBadgeColors extends ThemeExtension<DictionaryBadgeColors> {
     Color? dpdc,
     Color? nyanatiloka,
     Color? properNames,
-  }) =>
-      DictionaryBadgeColors(
-        dpd: dpd ?? this.dpd,
-        pts: pts ?? this.pts,
-        buddhadatta: buddhadatta ?? this.buddhadatta,
-        sumangala: sumangala ?? this.sumangala,
-        vri: vri ?? this.vri,
-        critical: critical ?? this.critical,
-        dpdc: dpdc ?? this.dpdc,
-        nyanatiloka: nyanatiloka ?? this.nyanatiloka,
-        properNames: properNames ?? this.properNames,
-      );
+  }) => DictionaryBadgeColors(
+    dpd: dpd ?? this.dpd,
+    pts: pts ?? this.pts,
+    buddhadatta: buddhadatta ?? this.buddhadatta,
+    sumangala: sumangala ?? this.sumangala,
+    vri: vri ?? this.vri,
+    critical: critical ?? this.critical,
+    dpdc: dpdc ?? this.dpdc,
+    nyanatiloka: nyanatiloka ?? this.nyanatiloka,
+    properNames: properNames ?? this.properNames,
+  );
 
   @override
   DictionaryBadgeColors lerp(

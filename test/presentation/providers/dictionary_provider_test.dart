@@ -38,12 +38,14 @@ void main() {
       // Arrange
       final mockRepository = MockDictionaryRepository();
       const params = DictionarySearchParams(query: testQuery);
-      when(mockRepository.searchDefinitions(
-        testQuery,
-        isExactMatch: false,
-        dictionaryIds: const {},
-        limit: 50,
-      )).thenAnswer((_) async => Right(testEntries));
+      when(
+        mockRepository.searchDefinitions(
+          testQuery,
+          isExactMatch: false,
+          dictionaryIds: const {},
+          limit: 50,
+        ),
+      ).thenAnswer((_) async => Right(testEntries));
 
       final container = ProviderContainer(
         overrides: [
@@ -53,17 +55,20 @@ void main() {
       addTearDown(container.dispose);
 
       // Act
-      final result =
-          await container.read(dictionarySearchProvider(params).future);
+      final result = await container.read(
+        dictionarySearchProvider(params).future,
+      );
 
       // Assert
       expect(result, equals(testEntries));
-      verify(mockRepository.searchDefinitions(
-        testQuery,
-        isExactMatch: false,
-        dictionaryIds: const {},
-        limit: 50,
-      )).called(1);
+      verify(
+        mockRepository.searchDefinitions(
+          testQuery,
+          isExactMatch: false,
+          dictionaryIds: const {},
+          limit: 50,
+        ),
+      ).called(1);
     });
   });
 }

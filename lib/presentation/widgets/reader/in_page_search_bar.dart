@@ -88,8 +88,9 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
   @override
   Widget build(BuildContext context) {
     final searchState = ref.watch(activeInPageSearchStateProvider);
-    final singlishPreview =
-        ref.watch(singlishPreviewProvider(searchState.rawQuery));
+    final singlishPreview = ref.watch(
+      singlishPreviewProvider(searchState.rawQuery),
+    );
     final colorScheme = Theme.of(context).colorScheme;
     final typography = context.typography;
     final l10n = AppLocalizations.of(context);
@@ -102,8 +103,9 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color:
-              _focusNode.hasFocus ? colorScheme.primary : colorScheme.outline,
+          color: _focusNode.hasFocus
+              ? colorScheme.primary
+              : colorScheme.outline,
         ),
       ),
       child: Padding(
@@ -192,8 +194,8 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               onPressed: searchState.hasMatches
                   ? () => ref
-                      .read(inPageSearchStatesProvider.notifier)
-                      .previousMatch()
+                        .read(inPageSearchStatesProvider.notifier)
+                        .previousMatch()
                   : null,
               tooltip: l10n.previousMatch,
             ),
@@ -204,8 +206,9 @@ class _InPageSearchBarState extends ConsumerState<InPageSearchBar> {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               onPressed: searchState.hasMatches
-                  ? () =>
-                      ref.read(inPageSearchStatesProvider.notifier).nextMatch()
+                  ? () => ref
+                        .read(inPageSearchStatesProvider.notifier)
+                        .nextMatch()
                   : null,
               tooltip: l10n.nextMatch,
             ),

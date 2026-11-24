@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/data/repositories/recent_searches_repository_impl.dart';
@@ -21,27 +22,31 @@ void main() {
         expect(result, isEmpty);
       });
 
-      test('should return searches ordered by timestamp (newest first)',
-          () async {
-        final now = DateTime.now();
-        final searches = [
-          RecentSearch(
+      test(
+        'should return searches ordered by timestamp (newest first)',
+        () async {
+          final now = DateTime.now();
+          final searches = [
+            RecentSearch(
               queryText: 'oldest',
-              timestamp: now.subtract(const Duration(hours: 2))),
-          RecentSearch(
+              timestamp: now.subtract(const Duration(hours: 2)),
+            ),
+            RecentSearch(
               queryText: 'middle',
-              timestamp: now.subtract(const Duration(hours: 1))),
-          RecentSearch(queryText: 'newest', timestamp: now),
-        ];
-        final jsonList = searches.reversed.map((s) => s.toJson()).toList();
-        await prefs.setString('recent_searches', jsonEncode(jsonList));
-        repository = RecentSearchesRepositoryImpl(prefs);
+              timestamp: now.subtract(const Duration(hours: 1)),
+            ),
+            RecentSearch(queryText: 'newest', timestamp: now),
+          ];
+          final jsonList = searches.reversed.map((s) => s.toJson()).toList();
+          await prefs.setString('recent_searches', jsonEncode(jsonList));
+          repository = RecentSearchesRepositoryImpl(prefs);
 
-        final result = await repository.getRecentSearches();
+          final result = await repository.getRecentSearches();
 
-        expect(result.length, equals(3));
-        expect(result[0].queryText, equals('newest'));
-      });
+          expect(result.length, equals(3));
+          expect(result[0].queryText, equals('newest'));
+        },
+      );
 
       // The overlay shows five and opens the rest, so a read is never capped.
       test('should return every stored search', () async {
@@ -59,8 +64,10 @@ void main() {
 
         final result = await repository.getRecentSearches();
 
-        expect(result.map((s) => s.queryText),
-            equals([for (var i = 0; i < 10; i++) 'search$i']));
+        expect(
+          result.map((s) => s.queryText),
+          equals([for (var i = 0; i < 10; i++) 'search$i']),
+        );
       });
 
       test('should handle corrupted data gracefully', () async {
@@ -141,7 +148,9 @@ void main() {
 
         expect(result.length, equals(2));
         expect(
-            result.map((s) => s.queryText), containsAll(['sangha', 'dhamma']));
+          result.map((s) => s.queryText),
+          containsAll(['sangha', 'dhamma']),
+        );
         expect(result.map((s) => s.queryText), isNot(contains('buddha')));
       });
 

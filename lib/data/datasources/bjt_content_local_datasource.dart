@@ -37,7 +37,7 @@ class BJTContentLocalDataSourceImpl implements BJTContentDataSource {
     final byPage = <int, Map<String, dynamic>>{};
     for (final row in rows) {
       final page = byPage[row['pageIndex'] as int] ??= {
-        'pageNum': row['pageNum'] as int
+        'pageNum': row['pageNum'] as int,
       };
       page[row['language'] as String] = _decode(row, fileId);
     }
@@ -60,8 +60,9 @@ class BJTContentLocalDataSourceImpl implements BJTContentDataSource {
     // of step, which DocumentSlice clamps rather than refuses — so the tail is
     // allowed to be missing while a hole inside the span still throws.
     final lastPresent = byPage.keys.last;
-    final last =
-        lastPage == null || lastPage > lastPresent ? lastPresent : lastPage;
+    final last = lastPage == null || lastPage > lastPresent
+        ? lastPresent
+        : lastPage;
     return [
       for (var pageIndex = firstPage; pageIndex <= last; pageIndex++)
         _whole(byPage[pageIndex], fileId, pageIndex),
@@ -133,8 +134,10 @@ class BJTContentLocalDataSourceImpl implements BJTContentDataSource {
   /// `Error` such as `RangeError` included — becomes one error naming the row.
   static Map<String, dynamic> _decode(Map<String, dynamic> row, String fileId) {
     try {
-      final bytes = const ZLibDecoder()
-          .decodeBytes(row['blob'] as List<int>, verify: true);
+      final bytes = const ZLibDecoder().decodeBytes(
+        row['blob'] as List<int>,
+        verify: true,
+      );
       if (bytes.isEmpty) throw const FormatException('empty blob');
       return json.decode(utf8.decode(bytes)) as Map<String, dynamic>;
     } catch (error) {

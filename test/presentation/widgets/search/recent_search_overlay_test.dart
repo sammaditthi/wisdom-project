@@ -16,15 +16,18 @@ void main() {
 
   /// Pumps the overlay with [stored] as the recent searches.
   Future<void> pumpOverlay(WidgetTester tester, List<String> stored) async {
-    final state = SearchState(recentSearches: [
-      for (final query in stored)
-        RecentSearch(queryText: query, timestamp: DateTime(2026, 11, 3)),
-    ]);
+    final state = SearchState(
+      recentSearches: [
+        for (final query in stored)
+          RecentSearch(queryText: query, timestamp: DateTime(2026, 11, 3)),
+      ],
+    );
     await tester.pumpApp(
       RecentSearchOverlay(onDismiss: () {}),
       overrides: [
-        searchStateProvider
-            .overrideWith((ref) => FakeSearchStateNotifier(state)),
+        searchStateProvider.overrideWith(
+          (ref) => FakeSearchStateNotifier(state),
+        ),
       ],
     );
   }
@@ -37,23 +40,26 @@ void main() {
   }
 
   group('RecentSearchOverlay', () {
-    testWidgets('"Show more" opens the older searches, "Show less" folds them',
-        (tester) async {
-      await pumpOverlay(tester, queries);
-      expect(rows, findsNWidgets(5));
-      expect(find.text('සමාධි'), findsNothing);
+    testWidgets(
+      '"Show more" opens the older searches, "Show less" folds them',
+      (tester) async {
+        await pumpOverlay(tester, queries);
+        expect(rows, findsNWidgets(5));
+        expect(find.text('සමාධි'), findsNothing);
 
-      await tapLink(tester, 'Show more');
-      expect(rows, findsNWidgets(6));
-      expect(find.text('සමාධි'), findsOneWidget);
+        await tapLink(tester, 'Show more');
+        expect(rows, findsNWidgets(6));
+        expect(find.text('සමාධි'), findsOneWidget);
 
-      await tapLink(tester, 'Show less');
-      expect(rows, findsNWidgets(5));
-      expect(find.text('සමාධි'), findsNothing);
-    });
+        await tapLink(tester, 'Show less');
+        expect(rows, findsNWidgets(5));
+        expect(find.text('සමාධි'), findsNothing);
+      },
+    );
 
-    testWidgets('five or fewer: no "Show more", "Clear all" still shown',
-        (tester) async {
+    testWidgets('five or fewer: no "Show more", "Clear all" still shown', (
+      tester,
+    ) async {
       await pumpOverlay(tester, queries.take(5).toList());
 
       expect(rows, findsNWidgets(5));

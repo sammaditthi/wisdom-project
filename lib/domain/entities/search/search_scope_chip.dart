@@ -17,10 +17,7 @@ class SearchScopeChip {
   /// Tree node keys this chip selects (e.g., {'sp'} for Sutta Pitaka)
   final Set<String> nodeKeys;
 
-  const SearchScopeChip({
-    required this.id,
-    required this.nodeKeys,
-  });
+  const SearchScopeChip({required this.id, required this.nodeKeys});
 }
 
 /// Predefined search scope chips for the search UI.

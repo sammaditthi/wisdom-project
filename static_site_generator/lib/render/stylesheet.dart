@@ -28,10 +28,12 @@ String buildStylesheet(ThemeTokens tokens, {required String fontVersion}) {
   final css = StringBuffer();
 
   css.writeln(
-      '/* GENERATED from static_site_generator/assets/theme_tokens.json');
+    '/* GENERATED from static_site_generator/assets/theme_tokens.json',
+  );
   css.writeln('   Mirrors the app\'s TextEntryTheme. Do not hand-edit: run');
   css.writeln(
-      '   `flutter test tools/dump_theme_tokens.dart`, then rebuild. */');
+    '   `flutter test tools/dump_theme_tokens.dart`, then rebuild. */',
+  );
   css.writeln();
 
   _writeFontFaces(css, tokens, fontVersion);
@@ -263,8 +265,10 @@ void _writeFontFaces(StringBuffer css, ThemeTokens tokens, String fontVersion) {
     css.writeln('@font-face {');
     css.writeln('  font-family: "${face.family}";');
     // Relative, so it resolves against `/assets/site.css` to `/fonts/…`.
-    css.writeln('  src: url("../$fontsOutputDir/${face.relativePath}'
-        '?v=$fontVersion") format("woff2");');
+    css.writeln(
+      '  src: url("../$fontsOutputDir/${face.relativePath}'
+      '?v=$fontVersion") format("woff2");',
+    );
     css.writeln('  font-weight: ${face.weight};');
     css.writeln('  font-style: normal;');
     // Text first, webfont when it lands. A blank page is worse than a
@@ -281,24 +285,31 @@ void _writeRootVariables(StringBuffer css, ThemeTokens tokens) {
   for (final color in tokens.lightColors.entries) {
     css.writeln('  --c-${_kebab(color.key)}: ${color.value};');
   }
-  css.writeln('  --font-reader: "${tokens.readerFont}", '
-      '${_fallbackStack(tokens.readerFallback)};');
-  css.writeln('  --font-ui: "${tokens.uiFont}", '
-      '${_fallbackStack(tokens.uiFallback)};');
+  css.writeln(
+    '  --font-reader: "${tokens.readerFont}", '
+    '${_fallbackStack(tokens.readerFallback)};',
+  );
+  css.writeln(
+    '  --font-ui: "${tokens.uiFont}", '
+    '${_fallbackStack(tokens.uiFallback)};',
+  );
   // `paragraphIndentEm` is in the token file and not read here — it has no
   // consumer in the app either (see above).
   css.writeln('  --entry-gap: ${_px(tokens.spacing('entryGapPx'))};');
   css.writeln('  --page-gap: ${_px(tokens.spacing('pageGapPx'))};');
   css.writeln(
-      '  --page-number-gap: ${_px(tokens.spacing('pageNumberGapPx'))};');
+    '  --page-number-gap: ${_px(tokens.spacing('pageNumberGapPx'))};',
+  );
   css.writeln('  --gatha-indent: ${_num(tokens.spacing('gathaIndentEm'))}em;');
   css.writeln(
-      '  --gatha-indent-2: ${_num(tokens.spacing('gathaLevel2IndentEm'))}em;');
+    '  --gatha-indent-2: ${_num(tokens.spacing('gathaLevel2IndentEm'))}em;',
+  );
   // The stacked layout's two-part rhythm, from the same constants
   // `stacked_pane.dart` lays out with.
   css.writeln('  --pair-gap: ${_px(tokens.spacing('stackedPairGapPx'))};');
   css.writeln(
-      '  --pair-bottom-gap: ${_px(tokens.spacing('stackedPairBottomGapPx'))};');
+    '  --pair-bottom-gap: ${_px(tokens.spacing('stackedPairBottomGapPx'))};',
+  );
   css.writeln('  --toolbar-height: $_toolbarHeight;');
   css.writeln('}');
   css.writeln();
@@ -375,8 +386,10 @@ void _writePageChrome(StringBuffer css, ThemeTokens tokens) {
   css.writeln('}');
   css.writeln('.pager a:hover { background: var(--c-surface-container-low); }');
   css.writeln('.pager .next { text-align: right; }');
-  css.writeln('.pager .label { display: block; '
-      'color: var(--c-on-surface-variant); font-size: 0.85em; }');
+  css.writeln(
+    '.pager .label { display: block; '
+    'color: var(--c-on-surface-variant); font-size: 0.85em; }',
+  );
   // `.spacer` needs no rule of its own — it is an empty grid item holding the
   // first or last column open when a page has no prev/next.
   css.writeln();
@@ -453,16 +466,22 @@ void _writeEntryStyles(StringBuffer css, ThemeTokens tokens) {
   /// page that never sets the variable is byte-for-byte what P1 shipped.
   /// Headings and centered entries keep a literal weight, exactly as
   /// `ReaderEntryBuilder.buildEntry` refuses to override them.
-  void writeStyle(String selector, EntryStyle style,
-      {String? extra, bool bodyType = false}) {
+  void writeStyle(
+    String selector,
+    EntryStyle style, {
+    String? extra,
+    bool bodyType = false,
+  }) {
     css.writeln('$selector {');
     // Every entry style in the token file names the reader family, so the
     // variable says the same thing and keeps the fallback stack with it.
     css.writeln('  font-family: var(--font-reader);');
     css.writeln('  font-size: ${_num(style.fontSizeEm)}em;');
-    css.writeln(bodyType
-        ? '  font-weight: var(--body-weight, ${style.fontWeight});'
-        : '  font-weight: ${style.fontWeight};');
+    css.writeln(
+      bodyType
+          ? '  font-weight: var(--body-weight, ${style.fontWeight});'
+          : '  font-weight: ${style.fontWeight};',
+    );
     if (style.fontStyle != 'normal') {
       // NotoSerifSinhala ships no italic face, so this is a synthesised
       // oblique in the browser. Left faithful to the token rather than
@@ -493,7 +512,8 @@ void _writeEntryStyles(StringBuffer css, ThemeTokens tokens) {
   writeStyle(
     '.e-gatha',
     tokens.entryStyle('gatha'),
-    extra: '  text-align: left;\n'
+    extra:
+        '  text-align: left;\n'
         '  padding-left: var(--gatha-indent);\n'
         // `gatha` is the one type whose source text carries newlines — the app
         // gets line breaks free from Flutter's Text; CSS needs telling.
@@ -620,8 +640,10 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('  color: var(--c-on-surface-variant);');
   css.writeln('  cursor: pointer;');
   css.writeln('}');
-  css.writeln('.layouts label + label '
-      '{ border-left: 1px solid var(--c-outline); }');
+  css.writeln(
+    '.layouts label + label '
+    '{ border-left: 1px solid var(--c-outline); }',
+  );
   css.writeln();
 
   // Which button is lit. Every layout lights its own button — except the
@@ -672,9 +694,11 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // thing on screen — without it a keyboard reader tabbing through the group
   // has no idea where they are.
   for (final layout in readingLayouts) {
-    css.writeln('#${layout.id}:focus-visible ~ .toolbar '
-        'label[for="${layout.id}"] '
-        '{ ${_focusRing()} }');
+    css.writeln(
+      '#${layout.id}:focus-visible ~ .toolbar '
+      'label[for="${layout.id}"] '
+      '{ ${_focusRing()} }',
+    );
   }
   css.writeln();
 
@@ -684,11 +708,14 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // those are, decided at build time rather than with a `:has()` test.
   css.writeln('#$paliOnlyLayoutId:checked ~ .content .si { display: none; }');
   css.writeln(
-      '#$paliOnlyLayoutId:checked ~ .content .row.no-pali { display: none; }');
+    '#$paliOnlyLayoutId:checked ~ .content .row.no-pali { display: none; }',
+  );
   css.writeln(
-      '#$sinhalaOnlyLayoutId:checked ~ .content .pali { display: none; }');
+    '#$sinhalaOnlyLayoutId:checked ~ .content .pali { display: none; }',
+  );
   css.writeln(
-      '#$sinhalaOnlyLayoutId:checked ~ .content .row.no-si { display: none; }');
+    '#$sinhalaOnlyLayoutId:checked ~ .content .row.no-si { display: none; }',
+  );
   // Nothing is paired when one language is showing, so rows fall back to the
   // app's plain single-column entry gap.
   //
@@ -706,15 +733,18 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // Stacked is the base `.row` state; stated anyway so the declaration exists
   // to read, and so a future change to the base cannot silently redefine what
   // "stacked" means.
-  css.writeln('#$stackedLayoutId:checked ~ .content .row '
-      '{ grid-template-columns: 1fr; }');
+  css.writeln(
+    '#$stackedLayoutId:checked ~ .content .row '
+    '{ grid-template-columns: 1fr; }',
+  );
   // A sutta number the same on both sides shows once wherever the two share a
   // column: stacked, and side-by-side below the breakpoint (handed back in the
   // two-column query below).
   css.writeln('#$stackedLayoutId:checked ~ .content .row.repeated-number .si,');
   css.writeln(
-      '#$sideBySideLayoutId:checked ~ .content .row.repeated-number .si '
-      '{ display: none; }');
+    '#$sideBySideLayoutId:checked ~ .content .row.repeated-number .si '
+    '{ display: none; }',
+  );
   css.writeln();
 
   // Printed page labels, as `reader_entry_builder.dart`'s `buildPageNumber`.
@@ -738,8 +768,10 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('}');
   // `\2013` is the en dash, escaped so the sheet's charset cannot mangle it.
   css.writeln(r'.pg .si::before { content: "\2013"; }');
-  css.writeln('#$sinhalaOnlyLayoutId:checked ~ .content .pg .si::before '
-      '{ content: none; }');
+  css.writeln(
+    '#$sinhalaOnlyLayoutId:checked ~ .content .pg .si::before '
+    '{ content: none; }',
+  );
   css.writeln();
 
   // Side by side, but only where two columns of text still read. Below the
@@ -753,13 +785,17 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // absolutely positioned box `.layout-input` makes of it either way.
   css.writeln('  #$defaultLayoutId { display: block; }');
   css.writeln('  .layouts label[for="$defaultLayoutId"] { display: flex; }');
-  css.writeln('  #$defaultLayoutId:checked ~ .toolbar '
-      'label[for="$narrowFallbackLayoutId"] '
-      '{ background: none; color: var(--c-on-surface-variant); }');
-  css.writeln('  #$defaultLayoutId:checked ~ .toolbar '
-      'label[for="$defaultLayoutId"] '
-      '{ background: var(--c-primary-container); '
-      'color: var(--c-on-primary-container); }');
+  css.writeln(
+    '  #$defaultLayoutId:checked ~ .toolbar '
+    'label[for="$narrowFallbackLayoutId"] '
+    '{ background: none; color: var(--c-on-surface-variant); }',
+  );
+  css.writeln(
+    '  #$defaultLayoutId:checked ~ .toolbar '
+    'label[for="$defaultLayoutId"] '
+    '{ background: var(--c-primary-container); '
+    'color: var(--c-on-primary-container); }',
+  );
   // The text column widens — and only the text column. Adding `~ .toolbar` here
   // so the chrome keeps up is what this rule used to say, and what slid the
   // emblem and the layout group 144px apart on every layout switch.
@@ -772,8 +808,10 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // itself. The sibling rules below need no such guard: a readable container
   // page has `.row`, `.pali` and `.si`, and splitting its preamble into two
   // columns is what side-by-side is for.
-  css.writeln('  #$sideBySideLayoutId:checked ~ .content:not(.nav) '
-      '{ max-width: ${_num(_wideColumnRem(tokens))}rem; }');
+  css.writeln(
+    '  #$sideBySideLayoutId:checked ~ .content:not(.nav) '
+    '{ max-width: ${_num(_wideColumnRem(tokens))}rem; }',
+  );
   css.writeln('  #$sideBySideLayoutId:checked ~ .content .row {');
   css.writeln('    grid-template-columns: 1fr 1fr;');
   // Top-align: 18.9% of paired entries are a Pali gatha against a Sinhala
@@ -785,18 +823,24 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // Explicit columns so a row missing one language still puts the language it
   // has on its own side, instead of sliding into column 1.
   css.writeln(
-      '  #$sideBySideLayoutId:checked ~ .content .pali { grid-column: 1; }');
+    '  #$sideBySideLayoutId:checked ~ .content .pali { grid-column: 1; }',
+  );
   css.writeln(
-      '  #$sideBySideLayoutId:checked ~ .content .si { grid-column: 2; }');
-  css.writeln('  #$sideBySideLayoutId:checked ~ .content .row.repeated-number '
-      '.si { display: block; }');
+    '  #$sideBySideLayoutId:checked ~ .content .si { grid-column: 2; }',
+  );
+  css.writeln(
+    '  #$sideBySideLayoutId:checked ~ .content .row.repeated-number '
+    '.si { display: block; }',
+  );
   // Each column labelled with its own page, `14 | 15`, aligned with the text.
   css.writeln('  #$sideBySideLayoutId:checked ~ .content .pg {');
   css.writeln('    grid-template-columns: 1fr 1fr;');
   css.writeln('    column-gap: ${_num(_columnGapRem)}rem;');
   css.writeln('  }');
-  css.writeln('  #$sideBySideLayoutId:checked ~ .content .pg .si::before '
-      '{ content: none; }');
+  css.writeln(
+    '  #$sideBySideLayoutId:checked ~ .content .pg .si::before '
+    '{ content: none; }',
+  );
   css.writeln('}');
   css.writeln();
 
@@ -812,8 +856,10 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   // `var(--body-weight, …)`. One declaration instead of one per entry type.
   final paliWeight = tokens.paneWeight('paliStacked');
   final bodyWeight = tokens.paneWeight('body');
-  css.writeln('/* Pali heavier than its translation wherever they share a '
-      'column. */');
+  css.writeln(
+    '/* Pali heavier than its translation wherever they share a '
+    'column. */',
+  );
   css.writeln('.pali { --body-weight: $paliWeight; }');
   // ...except when only one language is on the page, where there is nothing to
   // distinguish it from and the bump would just be heavy type. `.content.solo`
@@ -824,8 +870,10 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
   css.writeln('#$sinhalaOnlyLayoutId:checked ~ .content .pali,');
   css.writeln('.content.solo .pali { --body-weight: $bodyWeight; }');
   css.writeln('@media (min-width: $_twoColumnMinWidth) {');
-  css.writeln('  #$sideBySideLayoutId:checked ~ .content .pali '
-      '{ --body-weight: $bodyWeight; }');
+  css.writeln(
+    '  #$sideBySideLayoutId:checked ~ .content .pali '
+    '{ --body-weight: $bodyWeight; }',
+  );
   css.writeln('}');
   css.writeln();
 }
@@ -837,7 +885,8 @@ void _writeLayouts(StringBuffer css, ThemeTokens tokens) {
 /// background differently from an SVG; the last four declarations undo that.
 void _writeIcons(StringBuffer css) {
   css.writeln(
-      '/* Icons: a mask each, in the text colour (site_icons.dart). */');
+    '/* Icons: a mask each, in the text colour (site_icons.dart). */',
+  );
   css.writeln('${siteIcons.map((icon) => '.${icon.maskClass}').join(', ')} {');
   css.writeln('  display: inline-block;');
   css.writeln('  flex: none;');
@@ -855,8 +904,10 @@ void _writeIcons(StringBuffer css) {
   css.writeln('  print-color-adjust: exact;');
   css.writeln('}');
   for (final icon in siteIcons) {
-    css.writeln('.${icon.maskClass} { width: ${icon.size}px; '
-        'height: ${icon.size}px; --icon: url("${icon.maskUrl}"); }');
+    css.writeln(
+      '.${icon.maskClass} { width: ${icon.size}px; '
+      'height: ${icon.size}px; --icon: url("${icon.maskUrl}"); }',
+    );
   }
   css.writeln();
 }
@@ -954,13 +1005,17 @@ void _writeToolbarNav(StringBuffer css) {
   // The page you are on, brighter than the links above it — the app draws the
   // same distinction, leaf in `resultMatchedText` and parents dimmed to
   // `onSurfaceVariant`.
-  css.writeln('.breadcrumb .leaf { flex: 0 1 auto; '
-      'color: var(--c-on-surface); }');
+  css.writeln(
+    '.breadcrumb .leaf { flex: 0 1 auto; '
+    'color: var(--c-on-surface); }',
+  );
   css.writeln();
   // The padding makes the tap target 36px tall, as tall as `.up`. Height
   // only: a wider link would move the trail's breakpoints.
-  css.writeln('.home { display: flex; flex: none; align-items: center; '
-      'padding: 4px 0; }');
+  css.writeln(
+    '.home { display: flex; flex: none; align-items: center; '
+    'padding: 4px 0; }',
+  );
   // In the leaf's colour, not the dimmed links': the way home should stand out.
   // `.breadcrumb a` sets `color: inherit`, so this needs its specificity.
   css.writeln('.breadcrumb .home { color: var(--c-on-surface); }');
@@ -968,8 +1023,10 @@ void _writeToolbarNav(StringBuffer css) {
   // is a real link, so `:focus-visible` lands on the element itself. Inset,
   // because an outset ring on the first segment would be drawn outside
   // `.breadcrumb`'s padding box and clipped by its `overflow: hidden`.
-  css.writeln('.home:focus-visible '
-      '{ ${_focusRing()} border-radius: 8px; }');
+  css.writeln(
+    '.home:focus-visible '
+    '{ ${_focusRing()} border-radius: 8px; }',
+  );
   css.writeln();
   // Where compressing stops paying and dropping starts. Derivation and the
   // measurements behind each width are on [_trailKeepThree] and its two
@@ -992,8 +1049,10 @@ void _writeToolbarNav(StringBuffer css) {
   ]) {
     final position = step.$2 == null ? '' : ':nth-last-of-type(${step.$2})';
     css.writeln('@media (max-width: ${step.$1}) {');
-    css.writeln('  .breadcrumb a:not(.home)$position '
-        '{ width: 0; padding-left: 0; }');
+    css.writeln(
+      '  .breadcrumb a:not(.home)$position '
+      '{ width: 0; padding-left: 0; }',
+    );
     css.writeln('}');
   }
   css.writeln();
@@ -1043,10 +1102,14 @@ void _writeToolbarNav(StringBuffer css) {
   css.writeln('  text-decoration: none;');
   css.writeln('  cursor: pointer;');
   css.writeln('}');
-  css.writeln('.up:hover, .search-trigger:hover, .more-trigger:hover '
-      '{ background: var(--c-surface-container-low); }');
-  css.writeln('.up:focus-visible, .search-trigger:focus-visible, '
-      '.more-trigger:focus-visible { ${_focusRing()} }');
+  css.writeln(
+    '.up:hover, .search-trigger:hover, .more-trigger:hover '
+    '{ background: var(--c-surface-container-low); }',
+  );
+  css.writeln(
+    '.up:focus-visible, .search-trigger:focus-visible, '
+    '.more-trigger:focus-visible { ${_focusRing()} }',
+  );
   // `[hidden]` needs saying, and saying *after* the shared rule: its UA
   // `display: none` loses to the `display: flex` above on specificity, and
   // without this the search button shows for every reader with JS off — the
@@ -1103,8 +1166,10 @@ void _writeToolbarApp(StringBuffer css) {
   css.writeln('.more { position: relative; flex: none; }');
   css.writeln('.more-trigger { list-style: none; }');
   css.writeln('.more-trigger::-webkit-details-marker { display: none; }');
-  css.writeln('.more[open] .more-trigger '
-      '{ background: var(--c-surface-container-low); }');
+  css.writeln(
+    '.more[open] .more-trigger '
+    '{ background: var(--c-surface-container-low); }',
+  );
   css.writeln('.more-menu {');
   css.writeln('  display: flex;');
   css.writeln('  flex-direction: column;');
@@ -1124,8 +1189,10 @@ void _writeToolbarApp(StringBuffer css) {
   css.writeln('  border-radius: 6px;');
   css.writeln('  color: var(--c-on-surface);');
   css.writeln('}');
-  css.writeln('.more-menu .app-link:hover '
-      '{ background: var(--c-surface-container-low); }');
+  css.writeln(
+    '.more-menu .app-link:hover '
+    '{ background: var(--c-surface-container-low); }',
+  );
   css.writeln('.more-menu .app-link:focus-visible { ${_focusRing()} }');
   // The menu's copy of the layout group, full width, for phones only.
   css.writeln('.more-menu .layouts { display: none; }');
@@ -1242,8 +1309,10 @@ void _writeSearch(StringBuffer css) {
   css.writeln('  color: var(--c-on-surface-variant);');
   css.writeln('  cursor: pointer;');
   css.writeln('}');
-  css.writeln('.search-close:hover '
-      '{ background: var(--c-surface-container-low); }');
+  css.writeln(
+    '.search-close:hover '
+    '{ background: var(--c-surface-container-low); }',
+  );
   css.writeln('.search-close:focus-visible { ${_focusRing()} }');
   css.writeln();
 
@@ -1312,9 +1381,11 @@ void _writeSearch(StringBuffer css) {
   // Inherited on the hovered row, where `--c-on-surface-variant` against
   // `--c-primary-container` is the one pairing on this sheet that is not a
   // theme pair at all — the token is defined against `surface`.
-  css.writeln('.search-results a:hover .search-path, '
-      '.search-results a:focus-visible .search-path '
-      '{ color: inherit; opacity: 0.75; }');
+  css.writeln(
+    '.search-results a:hover .search-path, '
+    '.search-results a:focus-visible .search-path '
+    '{ color: inherit; opacity: 0.75; }',
+  );
   css.writeln();
 }
 
@@ -1437,9 +1508,9 @@ void _writeGroupedChapter(StringBuffer css) {
 }
 
 String _kebab(String camel) => camel.replaceAllMapped(
-      RegExp('[A-Z]'),
-      (match) => '-${match[0]!.toLowerCase()}',
-    );
+  RegExp('[A-Z]'),
+  (match) => '-${match[0]!.toLowerCase()}',
+);
 
 /// Quotes a font family name only when CSS requires it.
 String _quoteFamily(String family) =>

@@ -28,8 +28,9 @@ void main() {
 
   group('ScopeFilterChips -', () {
     group('Default state', () {
-      testWidgets('should render all chips with "All" selected by default',
-          (tester) async {
+      testWidgets('should render all chips with "All" selected by default', (
+        tester,
+      ) async {
         // ARRANGE & ACT
         await tester.pumpApp(
           const ScopeFilterChips(),
@@ -37,7 +38,8 @@ void main() {
             TestProviderOverrides.sharedPreferences(prefs),
             TestProviderOverrides.textSearchRepository(mockSearchRepository),
             TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
+              mockRecentSearchesRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -57,8 +59,46 @@ void main() {
 
     group('Scope selection behavior', () {
       testWidgets(
-          'tapping a specific scope should deselect "All" and select that scope',
-          (tester) async {
+        'tapping a specific scope should deselect "All" and select that scope',
+        (tester) async {
+          // ARRANGE
+          SearchState? capturedState;
+
+          await tester.pumpApp(
+            ProviderTestWidget(
+              onBuild: (ref) {
+                capturedState = ref.watch(searchStateProvider);
+              },
+              child: const ScopeFilterChips(),
+            ),
+            overrides: [
+              TestProviderOverrides.sharedPreferences(prefs),
+              TestProviderOverrides.textSearchRepository(mockSearchRepository),
+              TestProviderOverrides.recentSearchesRepository(
+                mockRecentSearchesRepository,
+              ),
+            ],
+          );
+          await tester.pumpAndSettle();
+
+          // Verify initial state - "All" is selected (empty scope)
+          expect(capturedState?.scope, isEmpty);
+          expect(capturedState?.isAllSelected, isTrue);
+
+          // ACT - Tap on "Sutta" chip
+          await tester.tap(find.text('Sutta'));
+          await tester.pumpAndSettle();
+
+          // ASSERT - Sutta should be selected, "All" should be deselected
+          expect(capturedState?.scope, contains(TipitakaNodeKeys.suttaPitaka));
+          expect(capturedState?.scope.length, equals(1));
+          expect(capturedState?.isAllSelected, isFalse);
+        },
+      );
+
+      testWidgets('tapping multiple scopes should enable multi-select', (
+        tester,
+      ) async {
         // ARRANGE
         SearchState? capturedState;
 
@@ -73,42 +113,8 @@ void main() {
             TestProviderOverrides.sharedPreferences(prefs),
             TestProviderOverrides.textSearchRepository(mockSearchRepository),
             TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
-          ],
-        );
-        await tester.pumpAndSettle();
-
-        // Verify initial state - "All" is selected (empty scope)
-        expect(capturedState?.scope, isEmpty);
-        expect(capturedState?.isAllSelected, isTrue);
-
-        // ACT - Tap on "Sutta" chip
-        await tester.tap(find.text('Sutta'));
-        await tester.pumpAndSettle();
-
-        // ASSERT - Sutta should be selected, "All" should be deselected
-        expect(capturedState?.scope, contains(TipitakaNodeKeys.suttaPitaka));
-        expect(capturedState?.scope.length, equals(1));
-        expect(capturedState?.isAllSelected, isFalse);
-      });
-
-      testWidgets('tapping multiple scopes should enable multi-select',
-          (tester) async {
-        // ARRANGE
-        SearchState? capturedState;
-
-        await tester.pumpApp(
-          ProviderTestWidget(
-            onBuild: (ref) {
-              capturedState = ref.watch(searchStateProvider);
-            },
-            child: const ScopeFilterChips(),
-          ),
-          overrides: [
-            TestProviderOverrides.sharedPreferences(prefs),
-            TestProviderOverrides.textSearchRepository(mockSearchRepository),
-            TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
+              mockRecentSearchesRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -125,8 +131,9 @@ void main() {
         expect(capturedState?.scope.length, equals(2));
       });
 
-      testWidgets('tapping a selected scope should deselect it',
-          (tester) async {
+      testWidgets('tapping a selected scope should deselect it', (
+        tester,
+      ) async {
         // ARRANGE
         SearchState? capturedState;
 
@@ -141,7 +148,8 @@ void main() {
             TestProviderOverrides.sharedPreferences(prefs),
             TestProviderOverrides.textSearchRepository(mockSearchRepository),
             TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
+              mockRecentSearchesRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -160,8 +168,9 @@ void main() {
         expect(capturedState?.isAllSelected, isTrue);
       });
 
-      testWidgets('tapping "All" should clear all specific selections',
-          (tester) async {
+      testWidgets('tapping "All" should clear all specific selections', (
+        tester,
+      ) async {
         // ARRANGE
         SearchState? capturedState;
 
@@ -176,7 +185,8 @@ void main() {
             TestProviderOverrides.sharedPreferences(prefs),
             TestProviderOverrides.textSearchRepository(mockSearchRepository),
             TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
+              mockRecentSearchesRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();
@@ -215,7 +225,8 @@ void main() {
             TestProviderOverrides.sharedPreferences(prefs),
             TestProviderOverrides.textSearchRepository(mockSearchRepository),
             TestProviderOverrides.recentSearchesRepository(
-                mockRecentSearchesRepository),
+              mockRecentSearchesRepository,
+            ),
           ],
         );
         await tester.pumpAndSettle();

@@ -26,12 +26,7 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
     final tomorrow = today.add(const Duration(days: 1));
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        settingsGutter,
-        0,
-        settingsGutter,
-        24,
-      ),
+      padding: const EdgeInsets.fromLTRB(settingsGutter, 0, settingsGutter, 24),
       children: [
         // The tab is named just "Time", which could read as a clock setting.
         Padding(
@@ -71,8 +66,9 @@ class VinayaTimesSettingsPage extends ConsumerWidget {
                 onTap: () =>
                     ref.read(dawnMethodProvider.notifier).choose(option),
                 trailing: _Choice(
-                  value:
-                      clockTime(sunTimes.sunDay(tomorrow, city, option).dawn),
+                  value: clockTime(
+                    sunTimes.sunDay(tomorrow, city, option).dawn,
+                  ),
                   selected: option == method,
                 ),
                 showDivider: option != DawnMethod.values.last,

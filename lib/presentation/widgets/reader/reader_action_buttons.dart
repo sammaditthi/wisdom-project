@@ -58,10 +58,10 @@ class ReaderActionToolbar extends ConsumerWidget {
     final onScrollToBeginning = this.onScrollToBeginning;
 
     Widget step(ReaderStepTarget target, IconData icon) => _ToolbarButton.icon(
-          icon,
-          tooltip: l10n.goToSutta(target.name),
-          onTap: target.onTap,
-        );
+      icon,
+      tooltip: l10n.goToSutta(target.name),
+      onTap: target.onTap,
+    );
 
     // This page, another sutta, outside the app, with a divider between two
     // groups. The middle group can be empty.
@@ -94,8 +94,9 @@ class ReaderActionToolbar extends ConsumerWidget {
             weight: 500,
             tooltip: isCommentary ? l10n.rootText : l10n.commentary,
             onTap: () => ref.read(openParallelTextProvider)(
-              isPortraitMode:
-                  ResponsiveUtils.shouldDefaultToSingleColumn(context),
+              isPortraitMode: ResponsiveUtils.shouldDefaultToSingleColumn(
+                context,
+              ),
             ),
           ),
         if (previous != null) step(previous, Icons.skip_previous),
@@ -277,13 +278,12 @@ class _ToolbarButton extends StatelessWidget {
     FocusNode? focusNode,
     double? weight,
   }) : this(
-          tooltip: tooltip,
-          onTap: onTap,
-          menuOpen: menuOpen,
-          focusNode: focusNode,
-          content: (color) =>
-              Icon(icon, size: 20, weight: weight, color: color),
-        );
+         tooltip: tooltip,
+         onTap: onTap,
+         menuOpen: menuOpen,
+         focusNode: focusNode,
+         content: (color) => Icon(icon, size: 20, weight: weight, color: color),
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -295,8 +295,9 @@ class _ToolbarButton extends StatelessWidget {
       child: Tooltip(
         message: tooltip,
         child: Material(
-          color:
-              highlighted ? colorScheme.secondaryContainer : Colors.transparent,
+          color: highlighted
+              ? colorScheme.secondaryContainer
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(22),
           child: InkWell(
             focusNode: focusNode,

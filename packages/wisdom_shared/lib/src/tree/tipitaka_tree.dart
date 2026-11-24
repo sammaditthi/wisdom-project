@@ -93,7 +93,8 @@ class TipitakaNode {
   bool get isCommentary => nodeKey.startsWith(TipitakaNodeKeys.commentary);
 
   @override
-  String toString() => 'TipitakaNode($nodeKey, "$paliName", '
+  String toString() =>
+      'TipitakaNode($nodeKey, "$paliName", '
       'level $hierarchyLevel, ${childKeys.length} children)';
 }
 
@@ -244,8 +245,9 @@ class TipitakaTree {
 
     final resolved = <String, TipitakaNode>{
       for (final entry in nodes.entries)
-        entry.key:
-            entry.value.freeze(childrenOf[entry.key] ?? const <String>[]),
+        entry.key: entry.value.freeze(
+          childrenOf[entry.key] ?? const <String>[],
+        ),
     };
 
     return TipitakaTree._(Map.unmodifiable(resolved), List.unmodifiable(roots));
@@ -414,14 +416,14 @@ class _MutableNode {
   });
 
   TipitakaNode freeze(List<String> childKeys) => TipitakaNode(
-        nodeKey: nodeKey,
-        paliName: paliName,
-        sinhalaName: sinhalaName,
-        hierarchyLevel: hierarchyLevel,
-        entryPageIndex: entryPageIndex,
-        entryIndexInPage: entryIndexInPage,
-        parentNodeKey: parentNodeKey,
-        contentFileId: contentFileId,
-        childKeys: List.unmodifiable(childKeys),
-      );
+    nodeKey: nodeKey,
+    paliName: paliName,
+    sinhalaName: sinhalaName,
+    hierarchyLevel: hierarchyLevel,
+    entryPageIndex: entryPageIndex,
+    entryIndexInPage: entryIndexInPage,
+    parentNodeKey: parentNodeKey,
+    contentFileId: contentFileId,
+    childKeys: List.unmodifiable(childKeys),
+  );
 }

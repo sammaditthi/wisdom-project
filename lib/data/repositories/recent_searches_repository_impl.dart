@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../domain/entities/search/recent_search.dart';
 import '../../domain/repositories/recent_searches_repository.dart';
 
@@ -51,10 +53,7 @@ class RecentSearchesRepositoryImpl implements RecentSearchesRepository {
     // Add new search at the beginning (LIFO)
     existing.insert(
       0,
-      RecentSearch(
-        queryText: trimmed,
-        timestamp: DateTime.now(),
-      ),
+      RecentSearch(queryText: trimmed, timestamp: DateTime.now()),
     );
 
     // Limit the list size
