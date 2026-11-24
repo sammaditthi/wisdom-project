@@ -1,9 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.3.0 - 2026-11-24
 ### New
-- Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next text, change the font size and more
-- Copy path in the reader's More options menu copies where the text sits in the Tipiṭaka
+- Keyboard shortcuts on desktop and the web, listed in Settings: switch and close tabs, change the layout, step to the next text, move through search results, change the font size and more
+- The reader's Share menu is now More options, and its new Copy path copies where the text sits in the Tipiṭaka
 
 ## 1.2.0 - 2026-11-08
 ### New
