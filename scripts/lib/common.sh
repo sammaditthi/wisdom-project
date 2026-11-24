@@ -87,11 +87,11 @@ else
 fi
 
 # `run_step NAME COMMAND...` — runs one step of a test.sh in a subshell (a `cd`
-# inside stays inside), records PASS/FAIL and its time, and never exits, so one
-# red step still lets the rest run — under `set -e` too, since the step runs as
-# an `if` condition. That also turns `set -e` off inside the step, so a step's
-# status is its last command's: chain its commands with `&&`. `step_summary`
-# prints them all.
+# inside stays inside), records PASS/FAIL and its time, and returns the step's
+# status without exiting: a bare call lets the rest run, `|| exit` stops there.
+# The step runs as an `if` condition, which turns `set -e` off inside it, so a
+# step's status is its last command's: chain its commands with `&&`.
+# `step_summary` prints them all.
 _STEP_LINES=()
 _STEP_FAILS=0
 run_step() {
@@ -107,6 +107,7 @@ run_step() {
     _STEP_LINES+=("$(printf '%-28s %sFAIL%s  %4ss' "$name" "$RED" "$NC" $((SECONDS - start)))")
     _STEP_FAILS=$((_STEP_FAILS + 1))
   fi
+  return $status
 }
 
 # `step_summary TITLE` — the table of every run_step so far, then a one-line

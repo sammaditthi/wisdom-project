@@ -11,9 +11,10 @@
 # it the corpus step reads assets/text (committed) and must run — a missing
 # corpus is a FAIL, not a skip.
 #
-# Runs every step even after one fails, then prints a summary and exits 0 or 1.
-# Called first by ./scripts/static_site/deploy.sh. Link checking is not here:
-# it checks a build, and building is the deploy's job.
+# A red format or unit test step stops the run there: they are quick, the
+# corpus slow. Any other red step lets the rest run. Ends with a summary and
+# exits 0 or 1. Called first by ./scripts/static_site/deploy.sh. Link checking
+# is not here: it checks a build, and building is the deploy's job.
 # END-USAGE
 
 . "$(dirname "$0")/../lib/common.sh"
@@ -67,17 +68,16 @@ corpus() {
   cd static_site_generator && dart test -t corpus
 }
 
+TITLE=static_site
+[ "$QUICK" = true ] && TITLE="static_site (--quick)"
+
 run_step "dependencies" dependencies
-run_step "format" format
+run_step "format" format || { step_summary "$TITLE"; exit 1; }
 run_step "analyze" analyze
-run_step "wisdom_shared tests" shared_tests
-run_step "wiring contract" wiring_contract
+run_step "wisdom_shared tests" shared_tests || { step_summary "$TITLE"; exit 1; }
+run_step "wiring contract" wiring_contract || { step_summary "$TITLE"; exit 1; }
 if [ "$QUICK" = false ]; then
   run_step "corpus" corpus
 fi
 
-if [ "$QUICK" = true ]; then
-  step_summary "static_site (--quick)"
-else
-  step_summary "static_site"
-fi
+step_summary "$TITLE"
