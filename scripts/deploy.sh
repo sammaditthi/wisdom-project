@@ -137,7 +137,10 @@ if [ -n "${UPOSATHA_YEAR-}" ]; then
   echo ""
 fi
 if [ "$ASSUME_YES" = false ]; then
-  confirm_release "Release $RELEASE_TAG to PRODUCTION: ${PRODUCTS[*]}?"
+  # ${PRODUCTS[*]} joins with spaces only; build a ", " list for the prompt.
+  printf -v product_list '%s, ' "${PRODUCTS[@]}"
+  product_list=${product_list%, }
+  confirm_release "Release $RELEASE_TAG to PRODUCTION: $product_list?"
 fi
 
 if [ "$TAGGED" = false ]; then
