@@ -85,8 +85,6 @@ dependencies:
   url_launcher: ^6.2.0
 
   # Icons
-  cupertino_icons: ^1.0.8
-  flutter_gen: ^5.12.0
   material_symbols_icons: ^4.2906.0
   app_links: ^7.2.0
 
