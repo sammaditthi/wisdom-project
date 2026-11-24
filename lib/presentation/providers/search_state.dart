@@ -24,7 +24,7 @@ part 'search_state.freezed.dart';
 /// 4. Focus search bar again → Panel reopens with previous results
 /// 5. Clear search bar completely → Panel closes
 @freezed
-class SearchState with _$SearchState {
+abstract class SearchState with _$SearchState {
   const SearchState._();
 
   const factory SearchState({

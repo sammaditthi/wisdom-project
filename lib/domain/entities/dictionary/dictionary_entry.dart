@@ -4,7 +4,7 @@ part 'dictionary_entry.freezed.dart';
 
 /// Represents a single dictionary entry with word and meaning
 @freezed
-class DictionaryEntry with _$DictionaryEntry {
+abstract class DictionaryEntry with _$DictionaryEntry {
   const factory DictionaryEntry({
     /// Database row ID
     required int id,

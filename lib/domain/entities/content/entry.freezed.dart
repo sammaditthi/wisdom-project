@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'entry.dart';
@@ -9,103 +9,74 @@ part of 'entry.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$Entry {
   /// The type of this entry (paragraph, heading, centered, etc.)
-  EntryType get entryType => throw _privateConstructorUsedError;
+  EntryType get entryType;
 
   /// The raw text with formatting markers
   /// Examples of markers: **bold**, __underline__, {footnote}
-  String get rawText => throw _privateConstructorUsedError;
+  String get rawText;
 
   /// Unique segment identifier for cross-edition alignment
   /// Generated at runtime for BJT (e.g., "dn-1:bjt:0")
   /// Loaded from JSON for SuttaCentral (e.g., "dn1:1.1")
-  String? get segmentId => throw _privateConstructorUsedError;
+  String? get segmentId;
 
   /// Optional reference to a footnote
-  String? get footnoteReference => throw _privateConstructorUsedError;
+  String? get footnoteReference;
 
   /// Hierarchy level for this entry (1-5 for heading/centered, 1-2 for gatha)
   /// Higher numbers = higher in hierarchy (level 5 = book title, level 1 = sub-section)
-  int? get level => throw _privateConstructorUsedError;
+  int? get level;
 
   /// Create a copy of Entry
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $EntryCopyWith<Entry> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $EntryCopyWith<$Res> {
-  factory $EntryCopyWith(Entry value, $Res Function(Entry) then) =
-      _$EntryCopyWithImpl<$Res, Entry>;
-  @useResult
-  $Res call(
-      {EntryType entryType,
-      String rawText,
-      String? segmentId,
-      String? footnoteReference,
-      int? level});
-}
-
-/// @nodoc
-class _$EntryCopyWithImpl<$Res, $Val extends Entry>
-    implements $EntryCopyWith<$Res> {
-  _$EntryCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Entry
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $EntryCopyWith<Entry> get copyWith =>
+      _$EntryCopyWithImpl<Entry>(this as Entry, _$identity);
+
   @override
-  $Res call({
-    Object? entryType = null,
-    Object? rawText = null,
-    Object? segmentId = freezed,
-    Object? footnoteReference = freezed,
-    Object? level = freezed,
-  }) {
-    return _then(_value.copyWith(
-      entryType: null == entryType
-          ? _value.entryType
-          : entryType // ignore: cast_nullable_to_non_nullable
-              as EntryType,
-      rawText: null == rawText
-          ? _value.rawText
-          : rawText // ignore: cast_nullable_to_non_nullable
-              as String,
-      segmentId: freezed == segmentId
-          ? _value.segmentId
-          : segmentId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      footnoteReference: freezed == footnoteReference
-          ? _value.footnoteReference
-          : footnoteReference // ignore: cast_nullable_to_non_nullable
-              as String?,
-      level: freezed == level
-          ? _value.level
-          : level // ignore: cast_nullable_to_non_nullable
-              as int?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as Entry;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Entry &&
+            (identical(other.entryType, _this.entryType) ||
+                other.entryType == _this.entryType) &&
+            (identical(other.rawText, _this.rawText) ||
+                other.rawText == _this.rawText) &&
+            (identical(other.segmentId, _this.segmentId) ||
+                other.segmentId == _this.segmentId) &&
+            (identical(other.footnoteReference, _this.footnoteReference) ||
+                other.footnoteReference == _this.footnoteReference) &&
+            (identical(other.level, _this.level) ||
+                other.level == _this.level));
+  }
+
+  @override
+  int get hashCode {
+    final _this = this as Entry;
+    return Object.hash(runtimeType, _this.entryType, _this.rawText,
+        _this.segmentId, _this.footnoteReference, _this.level);
+  }
+
+  @override
+  String toString() {
+    final _this = this as Entry;
+    return 'Entry(entryType: ${_this.entryType}, rawText: ${_this.rawText}, segmentId: ${_this.segmentId}, footnoteReference: ${_this.footnoteReference}, level: ${_this.level})';
   }
 }
 
 /// @nodoc
-abstract class _$$EntryImplCopyWith<$Res> implements $EntryCopyWith<$Res> {
-  factory _$$EntryImplCopyWith(
-          _$EntryImpl value, $Res Function(_$EntryImpl) then) =
-      __$$EntryImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $EntryCopyWith<$Res> {
+  factory $EntryCopyWith(Entry value, $Res Function(Entry) _then) =
+      _$EntryCopyWithImpl;
   @useResult
   $Res call(
       {EntryType entryType,
@@ -116,12 +87,11 @@ abstract class _$$EntryImplCopyWith<$Res> implements $EntryCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$EntryImplCopyWithImpl<$Res>
-    extends _$EntryCopyWithImpl<$Res, _$EntryImpl>
-    implements _$$EntryImplCopyWith<$Res> {
-  __$$EntryImplCopyWithImpl(
-      _$EntryImpl _value, $Res Function(_$EntryImpl) _then)
-      : super(_value, _then);
+class _$EntryCopyWithImpl<$Res> implements $EntryCopyWith<$Res> {
+  _$EntryCopyWithImpl(this._self, this._then);
+
+  final Entry _self;
+  final $Res Function(Entry) _then;
 
   /// Create a copy of Entry
   /// with the given fields replaced by the non-null parameter values.
@@ -134,35 +104,201 @@ class __$$EntryImplCopyWithImpl<$Res>
     Object? footnoteReference = freezed,
     Object? level = freezed,
   }) {
-    return _then(_$EntryImpl(
+    return _then(Entry(
       entryType: null == entryType
-          ? _value.entryType
+          ? _self.entryType
           : entryType // ignore: cast_nullable_to_non_nullable
               as EntryType,
       rawText: null == rawText
-          ? _value.rawText
+          ? _self.rawText
           : rawText // ignore: cast_nullable_to_non_nullable
               as String,
       segmentId: freezed == segmentId
-          ? _value.segmentId
+          ? _self.segmentId
           : segmentId // ignore: cast_nullable_to_non_nullable
               as String?,
       footnoteReference: freezed == footnoteReference
-          ? _value.footnoteReference
+          ? _self.footnoteReference
           : footnoteReference // ignore: cast_nullable_to_non_nullable
               as String?,
       level: freezed == level
-          ? _value.level
+          ? _self.level
           : level // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [Entry].
+extension EntryPatterns on Entry {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Entry value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Entry() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Entry value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Entry():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Entry value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Entry() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(EntryType entryType, String rawText, String? segmentId,
+            String? footnoteReference, int? level)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Entry() when $default != null:
+        return $default(_that.entryType, _that.rawText, _that.segmentId,
+            _that.footnoteReference, _that.level);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(EntryType entryType, String rawText, String? segmentId,
+            String? footnoteReference, int? level)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Entry():
+        return $default(_that.entryType, _that.rawText, _that.segmentId,
+            _that.footnoteReference, _that.level);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(EntryType entryType, String rawText, String? segmentId,
+            String? footnoteReference, int? level)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Entry() when $default != null:
+        return $default(_that.entryType, _that.rawText, _that.segmentId,
+            _that.footnoteReference, _that.level);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$EntryImpl extends _Entry {
-  const _$EntryImpl(
+class _Entry extends Entry {
+  const _Entry(
       {required this.entryType,
       required this.rawText,
       this.segmentId,
@@ -194,16 +330,19 @@ class _$EntryImpl extends _Entry {
   @override
   final int? level;
 
+  /// Create a copy of Entry
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'Entry(entryType: $entryType, rawText: $rawText, segmentId: $segmentId, footnoteReference: $footnoteReference, level: $level)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$EntryCopyWith<_Entry> get copyWith =>
+      __$EntryCopyWithImpl<_Entry>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$EntryImpl &&
+            other is _Entry &&
             (identical(other.entryType, entryType) ||
                 other.entryType == entryType) &&
             (identical(other.rawText, rawText) || other.rawText == rawText) &&
@@ -215,55 +354,72 @@ class _$EntryImpl extends _Entry {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, entryType, rawText, segmentId, footnoteReference, level);
+  int get hashCode {
+    return Object.hash(
+        runtimeType, entryType, rawText, segmentId, footnoteReference, level);
+  }
+
+  @override
+  String toString() {
+    return 'Entry(entryType: $entryType, rawText: $rawText, segmentId: $segmentId, footnoteReference: $footnoteReference, level: $level)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$EntryCopyWith<$Res> implements $EntryCopyWith<$Res> {
+  factory _$EntryCopyWith(_Entry value, $Res Function(_Entry) _then) =
+      __$EntryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {EntryType entryType,
+      String rawText,
+      String? segmentId,
+      String? footnoteReference,
+      int? level});
+}
+
+/// @nodoc
+class __$EntryCopyWithImpl<$Res> implements _$EntryCopyWith<$Res> {
+  __$EntryCopyWithImpl(this._self, this._then);
+
+  final _Entry _self;
+  final $Res Function(_Entry) _then;
 
   /// Create a copy of Entry
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$EntryImplCopyWith<_$EntryImpl> get copyWith =>
-      __$$EntryImplCopyWithImpl<_$EntryImpl>(this, _$identity);
+  $Res call({
+    Object? entryType = null,
+    Object? rawText = null,
+    Object? segmentId = freezed,
+    Object? footnoteReference = freezed,
+    Object? level = freezed,
+  }) {
+    return _then(_Entry(
+      entryType: null == entryType
+          ? _self.entryType
+          : entryType // ignore: cast_nullable_to_non_nullable
+              as EntryType,
+      rawText: null == rawText
+          ? _self.rawText
+          : rawText // ignore: cast_nullable_to_non_nullable
+              as String,
+      segmentId: freezed == segmentId
+          ? _self.segmentId
+          : segmentId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      footnoteReference: freezed == footnoteReference
+          ? _self.footnoteReference
+          : footnoteReference // ignore: cast_nullable_to_non_nullable
+              as String?,
+      level: freezed == level
+          ? _self.level
+          : level // ignore: cast_nullable_to_non_nullable
+              as int?,
+    ));
+  }
 }
 
-abstract class _Entry extends Entry {
-  const factory _Entry(
-      {required final EntryType entryType,
-      required final String rawText,
-      final String? segmentId,
-      final String? footnoteReference,
-      final int? level}) = _$EntryImpl;
-  const _Entry._() : super._();
-
-  /// The type of this entry (paragraph, heading, centered, etc.)
-  @override
-  EntryType get entryType;
-
-  /// The raw text with formatting markers
-  /// Examples of markers: **bold**, __underline__, {footnote}
-  @override
-  String get rawText;
-
-  /// Unique segment identifier for cross-edition alignment
-  /// Generated at runtime for BJT (e.g., "dn-1:bjt:0")
-  /// Loaded from JSON for SuttaCentral (e.g., "dn1:1.1")
-  @override
-  String? get segmentId;
-
-  /// Optional reference to a footnote
-  @override
-  String? get footnoteReference;
-
-  /// Hierarchy level for this entry (1-5 for heading/centered, 1-2 for gatha)
-  /// Higher numbers = higher in hierarchy (level 5 = book title, level 1 = sub-section)
-  @override
-  int? get level;
-
-  /// Create a copy of Entry
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$EntryImplCopyWith<_$EntryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

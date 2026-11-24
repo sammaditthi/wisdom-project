@@ -7,7 +7,7 @@ part 'vinaya_times_state.freezed.dart';
 /// What the Today card shows. Times are UTC instants; the widget shows them
 /// on the device clock.
 @freezed
-class VinayaTimesState with _$VinayaTimesState {
+abstract class VinayaTimesState with _$VinayaTimesState {
   const VinayaTimesState._();
 
   const factory VinayaTimesState({

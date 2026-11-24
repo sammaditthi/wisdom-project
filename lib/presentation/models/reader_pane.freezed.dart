@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'reader_pane.dart';
@@ -9,103 +9,79 @@ part of 'reader_pane.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-ReaderPane _$ReaderPaneFromJson(Map<String, dynamic> json) {
-  return _ReaderPane.fromJson(json);
-}
 
 /// @nodoc
 mixin _$ReaderPane {
   /// Unique identifier for this pane instance
   /// Generated as UUID when creating a new pane
-  String get paneId => throw _privateConstructorUsedError;
+  String get paneId;
 
   /// Reference to the TextLayer being displayed
   /// Format: "{fileId}-{languageCode}-{scriptCode}[-{translator}]"
   /// Examples: 'dn1-pi-sinh', 'dn1-si-sinh', 'mn1-en-latn-sujato'
-  String get layerId => throw _privateConstructorUsedError;
+  String get layerId;
 
   /// Whether this pane is currently visible
   /// Hidden panes preserve their state but don't render
-  bool get isVisible => throw _privateConstructorUsedError;
-
-  /// Serializes this ReaderPane to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  bool get isVisible;
 
   /// Create a copy of ReaderPane
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ReaderPaneCopyWith<ReaderPane> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ReaderPaneCopyWith<$Res> {
-  factory $ReaderPaneCopyWith(
-          ReaderPane value, $Res Function(ReaderPane) then) =
-      _$ReaderPaneCopyWithImpl<$Res, ReaderPane>;
-  @useResult
-  $Res call({String paneId, String layerId, bool isVisible});
-}
-
-/// @nodoc
-class _$ReaderPaneCopyWithImpl<$Res, $Val extends ReaderPane>
-    implements $ReaderPaneCopyWith<$Res> {
-  _$ReaderPaneCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ReaderPane
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $ReaderPaneCopyWith<ReaderPane> get copyWith =>
+      _$ReaderPaneCopyWithImpl<ReaderPane>(this as ReaderPane, _$identity);
+
+  /// Serializes this ReaderPane to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? paneId = null,
-    Object? layerId = null,
-    Object? isVisible = null,
-  }) {
-    return _then(_value.copyWith(
-      paneId: null == paneId
-          ? _value.paneId
-          : paneId // ignore: cast_nullable_to_non_nullable
-              as String,
-      layerId: null == layerId
-          ? _value.layerId
-          : layerId // ignore: cast_nullable_to_non_nullable
-              as String,
-      isVisible: null == isVisible
-          ? _value.isVisible
-          : isVisible // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as ReaderPane;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReaderPane &&
+            (identical(other.paneId, _this.paneId) ||
+                other.paneId == _this.paneId) &&
+            (identical(other.layerId, _this.layerId) ||
+                other.layerId == _this.layerId) &&
+            (identical(other.isVisible, _this.isVisible) ||
+                other.isVisible == _this.isVisible));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode {
+    final _this = this as ReaderPane;
+    return Object.hash(
+        runtimeType, _this.paneId, _this.layerId, _this.isVisible);
+  }
+
+  @override
+  String toString() {
+    final _this = this as ReaderPane;
+    return 'ReaderPane(paneId: ${_this.paneId}, layerId: ${_this.layerId}, isVisible: ${_this.isVisible})';
   }
 }
 
 /// @nodoc
-abstract class _$$ReaderPaneImplCopyWith<$Res>
-    implements $ReaderPaneCopyWith<$Res> {
-  factory _$$ReaderPaneImplCopyWith(
-          _$ReaderPaneImpl value, $Res Function(_$ReaderPaneImpl) then) =
-      __$$ReaderPaneImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ReaderPaneCopyWith<$Res> {
+  factory $ReaderPaneCopyWith(
+          ReaderPane value, $Res Function(ReaderPane) _then) =
+      _$ReaderPaneCopyWithImpl;
   @useResult
   $Res call({String paneId, String layerId, bool isVisible});
 }
 
 /// @nodoc
-class __$$ReaderPaneImplCopyWithImpl<$Res>
-    extends _$ReaderPaneCopyWithImpl<$Res, _$ReaderPaneImpl>
-    implements _$$ReaderPaneImplCopyWith<$Res> {
-  __$$ReaderPaneImplCopyWithImpl(
-      _$ReaderPaneImpl _value, $Res Function(_$ReaderPaneImpl) _then)
-      : super(_value, _then);
+class _$ReaderPaneCopyWithImpl<$Res> implements $ReaderPaneCopyWith<$Res> {
+  _$ReaderPaneCopyWithImpl(this._self, this._then);
+
+  final ReaderPane _self;
+  final $Res Function(ReaderPane) _then;
 
   /// Create a copy of ReaderPane
   /// with the given fields replaced by the non-null parameter values.
@@ -116,31 +92,187 @@ class __$$ReaderPaneImplCopyWithImpl<$Res>
     Object? layerId = null,
     Object? isVisible = null,
   }) {
-    return _then(_$ReaderPaneImpl(
+    return _then(ReaderPane(
       paneId: null == paneId
-          ? _value.paneId
+          ? _self.paneId
           : paneId // ignore: cast_nullable_to_non_nullable
               as String,
       layerId: null == layerId
-          ? _value.layerId
+          ? _self.layerId
           : layerId // ignore: cast_nullable_to_non_nullable
               as String,
       isVisible: null == isVisible
-          ? _value.isVisible
+          ? _self.isVisible
           : isVisible // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [ReaderPane].
+extension ReaderPanePatterns on ReaderPane {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReaderPane value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReaderPane value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReaderPane value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String paneId, String layerId, bool isVisible)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane() when $default != null:
+        return $default(_that.paneId, _that.layerId, _that.isVisible);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String paneId, String layerId, bool isVisible) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane():
+        return $default(_that.paneId, _that.layerId, _that.isVisible);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String paneId, String layerId, bool isVisible)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderPane() when $default != null:
+        return $default(_that.paneId, _that.layerId, _that.isVisible);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$ReaderPaneImpl implements _ReaderPane {
-  const _$ReaderPaneImpl(
+class _ReaderPane implements ReaderPane {
+  const _ReaderPane(
       {required this.paneId, required this.layerId, this.isVisible = true});
-
-  factory _$ReaderPaneImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReaderPaneImplFromJson(json);
+  factory _ReaderPane.fromJson(Map<String, dynamic> json) =>
+      _$ReaderPaneFromJson(json);
 
   /// Unique identifier for this pane instance
   /// Generated as UUID when creating a new pane
@@ -159,16 +291,26 @@ class _$ReaderPaneImpl implements _ReaderPane {
   @JsonKey()
   final bool isVisible;
 
+  /// Create a copy of ReaderPane
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ReaderPane(paneId: $paneId, layerId: $layerId, isVisible: $isVisible)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReaderPaneCopyWith<_ReaderPane> get copyWith =>
+      __$ReaderPaneCopyWithImpl<_ReaderPane>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReaderPaneToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReaderPaneImpl &&
+            other is _ReaderPane &&
             (identical(other.paneId, paneId) || other.paneId == paneId) &&
             (identical(other.layerId, layerId) || other.layerId == layerId) &&
             (identical(other.isVisible, isVisible) ||
@@ -177,53 +319,58 @@ class _$ReaderPaneImpl implements _ReaderPane {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, paneId, layerId, isVisible);
-
-  /// Create a copy of ReaderPane
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ReaderPaneImplCopyWith<_$ReaderPaneImpl> get copyWith =>
-      __$$ReaderPaneImplCopyWithImpl<_$ReaderPaneImpl>(this, _$identity);
+  int get hashCode {
+    return Object.hash(runtimeType, paneId, layerId, isVisible);
+  }
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$$ReaderPaneImplToJson(
-      this,
-    );
+  String toString() {
+    return 'ReaderPane(paneId: $paneId, layerId: $layerId, isVisible: $isVisible)';
   }
 }
 
-abstract class _ReaderPane implements ReaderPane {
-  const factory _ReaderPane(
-      {required final String paneId,
-      required final String layerId,
-      final bool isVisible}) = _$ReaderPaneImpl;
-
-  factory _ReaderPane.fromJson(Map<String, dynamic> json) =
-      _$ReaderPaneImpl.fromJson;
-
-  /// Unique identifier for this pane instance
-  /// Generated as UUID when creating a new pane
+/// @nodoc
+abstract mixin class _$ReaderPaneCopyWith<$Res>
+    implements $ReaderPaneCopyWith<$Res> {
+  factory _$ReaderPaneCopyWith(
+          _ReaderPane value, $Res Function(_ReaderPane) _then) =
+      __$ReaderPaneCopyWithImpl;
   @override
-  String get paneId;
+  @useResult
+  $Res call({String paneId, String layerId, bool isVisible});
+}
 
-  /// Reference to the TextLayer being displayed
-  /// Format: "{fileId}-{languageCode}-{scriptCode}[-{translator}]"
-  /// Examples: 'dn1-pi-sinh', 'dn1-si-sinh', 'mn1-en-latn-sujato'
-  @override
-  String get layerId;
+/// @nodoc
+class __$ReaderPaneCopyWithImpl<$Res> implements _$ReaderPaneCopyWith<$Res> {
+  __$ReaderPaneCopyWithImpl(this._self, this._then);
 
-  /// Whether this pane is currently visible
-  /// Hidden panes preserve their state but don't render
-  @override
-  bool get isVisible;
+  final _ReaderPane _self;
+  final $Res Function(_ReaderPane) _then;
 
   /// Create a copy of ReaderPane
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ReaderPaneImplCopyWith<_$ReaderPaneImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? paneId = null,
+    Object? layerId = null,
+    Object? isVisible = null,
+  }) {
+    return _then(_ReaderPane(
+      paneId: null == paneId
+          ? _self.paneId
+          : paneId // ignore: cast_nullable_to_non_nullable
+              as String,
+      layerId: null == layerId
+          ? _self.layerId
+          : layerId // ignore: cast_nullable_to_non_nullable
+              as String,
+      isVisible: null == isVisible
+          ? _self.isVisible
+          : isVisible // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
+
+// dart format on

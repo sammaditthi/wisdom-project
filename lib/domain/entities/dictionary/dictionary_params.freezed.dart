@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'dictionary_params.dart';
@@ -9,107 +9,79 @@ part of 'dictionary_params.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$DictionaryLookupParams {
   /// The word to look up
-  String get word => throw _privateConstructorUsedError;
+  String get word;
 
   /// Whether to require exact match (no prefix matching)
   /// Default false = prefix matching enabled
-  bool get exactMatch => throw _privateConstructorUsedError;
+  bool get exactMatch;
 
   /// Filter to specific dictionary IDs, empty = all
-  Set<String> get dictionaryIds => throw _privateConstructorUsedError;
+  Set<String> get dictionaryIds;
 
   /// Maximum number of results to return
-  int get limit => throw _privateConstructorUsedError;
+  int get limit;
 
   /// Create a copy of DictionaryLookupParams
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $DictionaryLookupParamsCopyWith<DictionaryLookupParams> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DictionaryLookupParamsCopyWith<$Res> {
-  factory $DictionaryLookupParamsCopyWith(DictionaryLookupParams value,
-          $Res Function(DictionaryLookupParams) then) =
-      _$DictionaryLookupParamsCopyWithImpl<$Res, DictionaryLookupParams>;
-  @useResult
-  $Res call(
-      {String word, bool exactMatch, Set<String> dictionaryIds, int limit});
-}
-
-/// @nodoc
-class _$DictionaryLookupParamsCopyWithImpl<$Res,
-        $Val extends DictionaryLookupParams>
-    implements $DictionaryLookupParamsCopyWith<$Res> {
-  _$DictionaryLookupParamsCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DictionaryLookupParams
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $DictionaryLookupParamsCopyWith<DictionaryLookupParams> get copyWith =>
+      _$DictionaryLookupParamsCopyWithImpl<DictionaryLookupParams>(
+          this as DictionaryLookupParams, _$identity);
+
   @override
-  $Res call({
-    Object? word = null,
-    Object? exactMatch = null,
-    Object? dictionaryIds = null,
-    Object? limit = null,
-  }) {
-    return _then(_value.copyWith(
-      word: null == word
-          ? _value.word
-          : word // ignore: cast_nullable_to_non_nullable
-              as String,
-      exactMatch: null == exactMatch
-          ? _value.exactMatch
-          : exactMatch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      dictionaryIds: null == dictionaryIds
-          ? _value.dictionaryIds
-          : dictionaryIds // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      limit: null == limit
-          ? _value.limit
-          : limit // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as DictionaryLookupParams;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DictionaryLookupParams &&
+            (identical(other.word, _this.word) || other.word == _this.word) &&
+            (identical(other.exactMatch, _this.exactMatch) ||
+                other.exactMatch == _this.exactMatch) &&
+            const DeepCollectionEquality()
+                .equals(other.dictionaryIds, _this.dictionaryIds) &&
+            (identical(other.limit, _this.limit) ||
+                other.limit == _this.limit));
+  }
+
+  @override
+  int get hashCode {
+    final _this = this as DictionaryLookupParams;
+    return Object.hash(runtimeType, _this.word, _this.exactMatch,
+        const DeepCollectionEquality().hash(_this.dictionaryIds), _this.limit);
+  }
+
+  @override
+  String toString() {
+    final _this = this as DictionaryLookupParams;
+    return 'DictionaryLookupParams(word: ${_this.word}, exactMatch: ${_this.exactMatch}, dictionaryIds: ${_this.dictionaryIds}, limit: ${_this.limit})';
   }
 }
 
 /// @nodoc
-abstract class _$$DictionaryLookupParamsImplCopyWith<$Res>
-    implements $DictionaryLookupParamsCopyWith<$Res> {
-  factory _$$DictionaryLookupParamsImplCopyWith(
-          _$DictionaryLookupParamsImpl value,
-          $Res Function(_$DictionaryLookupParamsImpl) then) =
-      __$$DictionaryLookupParamsImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $DictionaryLookupParamsCopyWith<$Res> {
+  factory $DictionaryLookupParamsCopyWith(DictionaryLookupParams value,
+          $Res Function(DictionaryLookupParams) _then) =
+      _$DictionaryLookupParamsCopyWithImpl;
   @useResult
   $Res call(
       {String word, bool exactMatch, Set<String> dictionaryIds, int limit});
 }
 
 /// @nodoc
-class __$$DictionaryLookupParamsImplCopyWithImpl<$Res>
-    extends _$DictionaryLookupParamsCopyWithImpl<$Res,
-        _$DictionaryLookupParamsImpl>
-    implements _$$DictionaryLookupParamsImplCopyWith<$Res> {
-  __$$DictionaryLookupParamsImplCopyWithImpl(
-      _$DictionaryLookupParamsImpl _value,
-      $Res Function(_$DictionaryLookupParamsImpl) _then)
-      : super(_value, _then);
+class _$DictionaryLookupParamsCopyWithImpl<$Res>
+    implements $DictionaryLookupParamsCopyWith<$Res> {
+  _$DictionaryLookupParamsCopyWithImpl(this._self, this._then);
+
+  final DictionaryLookupParams _self;
+  final $Res Function(DictionaryLookupParams) _then;
 
   /// Create a copy of DictionaryLookupParams
   /// with the given fields replaced by the non-null parameter values.
@@ -121,34 +93,200 @@ class __$$DictionaryLookupParamsImplCopyWithImpl<$Res>
     Object? dictionaryIds = null,
     Object? limit = null,
   }) {
-    return _then(_$DictionaryLookupParamsImpl(
+    return _then(DictionaryLookupParams(
       word: null == word
-          ? _value.word
+          ? _self.word
           : word // ignore: cast_nullable_to_non_nullable
               as String,
       exactMatch: null == exactMatch
-          ? _value.exactMatch
+          ? _self.exactMatch
           : exactMatch // ignore: cast_nullable_to_non_nullable
               as bool,
       dictionaryIds: null == dictionaryIds
-          ? _value._dictionaryIds
+          ? _self.dictionaryIds
           : dictionaryIds // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       limit: null == limit
-          ? _value.limit
+          ? _self.limit
           : limit // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [DictionaryLookupParams].
+extension DictionaryLookupParamsPatterns on DictionaryLookupParams {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DictionaryLookupParams value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DictionaryLookupParams value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DictionaryLookupParams value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String word, bool exactMatch, Set<String> dictionaryIds, int limit)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams() when $default != null:
+        return $default(
+            _that.word, _that.exactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String word, bool exactMatch, Set<String> dictionaryIds, int limit)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams():
+        return $default(
+            _that.word, _that.exactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String word, bool exactMatch, Set<String> dictionaryIds, int limit)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionaryLookupParams() when $default != null:
+        return $default(
+            _that.word, _that.exactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$DictionaryLookupParamsImpl implements _DictionaryLookupParams {
-  const _$DictionaryLookupParamsImpl(
+class _DictionaryLookupParams implements DictionaryLookupParams {
+  const _DictionaryLookupParams(
       {required this.word,
       this.exactMatch = false,
-      final Set<String> dictionaryIds = const {},
+      Set<String> dictionaryIds = const {},
       this.limit = 50})
       : _dictionaryIds = dictionaryIds;
 
@@ -179,191 +317,85 @@ class _$DictionaryLookupParamsImpl implements _DictionaryLookupParams {
   @JsonKey()
   final int limit;
 
+  /// Create a copy of DictionaryLookupParams
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DictionaryLookupParams(word: $word, exactMatch: $exactMatch, dictionaryIds: $dictionaryIds, limit: $limit)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DictionaryLookupParamsCopyWith<_DictionaryLookupParams> get copyWith =>
+      __$DictionaryLookupParamsCopyWithImpl<_DictionaryLookupParams>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DictionaryLookupParamsImpl &&
+            other is _DictionaryLookupParams &&
             (identical(other.word, word) || other.word == word) &&
             (identical(other.exactMatch, exactMatch) ||
                 other.exactMatch == exactMatch) &&
             const DeepCollectionEquality()
-                .equals(other._dictionaryIds, _dictionaryIds) &&
+                .equals(other.dictionaryIds, _dictionaryIds) &&
             (identical(other.limit, limit) || other.limit == limit));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, word, exactMatch,
-      const DeepCollectionEquality().hash(_dictionaryIds), limit);
+  int get hashCode {
+    return Object.hash(runtimeType, word, exactMatch,
+        const DeepCollectionEquality().hash(_dictionaryIds), limit);
+  }
 
-  /// Create a copy of DictionaryLookupParams
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$DictionaryLookupParamsImplCopyWith<_$DictionaryLookupParamsImpl>
-      get copyWith => __$$DictionaryLookupParamsImplCopyWithImpl<
-          _$DictionaryLookupParamsImpl>(this, _$identity);
-}
-
-abstract class _DictionaryLookupParams implements DictionaryLookupParams {
-  const factory _DictionaryLookupParams(
-      {required final String word,
-      final bool exactMatch,
-      final Set<String> dictionaryIds,
-      final int limit}) = _$DictionaryLookupParamsImpl;
-
-  /// The word to look up
-  @override
-  String get word;
-
-  /// Whether to require exact match (no prefix matching)
-  /// Default false = prefix matching enabled
-  @override
-  bool get exactMatch;
-
-  /// Filter to specific dictionary IDs, empty = all
-  @override
-  Set<String> get dictionaryIds;
-
-  /// Maximum number of results to return
-  @override
-  int get limit;
-
-  /// Create a copy of DictionaryLookupParams
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DictionaryLookupParamsImplCopyWith<_$DictionaryLookupParamsImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-mixin _$DictionarySearchParams {
-  /// The search query text
-  String get query => throw _privateConstructorUsedError;
-
-  /// Whether to require exact word match (no prefix matching)
-  bool get isExactMatch => throw _privateConstructorUsedError;
-
-  /// Filter to specific dictionary IDs, empty = all
-  Set<String> get dictionaryIds => throw _privateConstructorUsedError;
-
-  /// Maximum number of results to return
-  int get limit => throw _privateConstructorUsedError;
-
-  /// Create a copy of DictionarySearchParams
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $DictionarySearchParamsCopyWith<DictionarySearchParams> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $DictionarySearchParamsCopyWith<$Res> {
-  factory $DictionarySearchParamsCopyWith(DictionarySearchParams value,
-          $Res Function(DictionarySearchParams) then) =
-      _$DictionarySearchParamsCopyWithImpl<$Res, DictionarySearchParams>;
-  @useResult
-  $Res call(
-      {String query, bool isExactMatch, Set<String> dictionaryIds, int limit});
-}
-
-/// @nodoc
-class _$DictionarySearchParamsCopyWithImpl<$Res,
-        $Val extends DictionarySearchParams>
-    implements $DictionarySearchParamsCopyWith<$Res> {
-  _$DictionarySearchParamsCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of DictionarySearchParams
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? query = null,
-    Object? isExactMatch = null,
-    Object? dictionaryIds = null,
-    Object? limit = null,
-  }) {
-    return _then(_value.copyWith(
-      query: null == query
-          ? _value.query
-          : query // ignore: cast_nullable_to_non_nullable
-              as String,
-      isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
-          : isExactMatch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      dictionaryIds: null == dictionaryIds
-          ? _value.dictionaryIds
-          : dictionaryIds // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      limit: null == limit
-          ? _value.limit
-          : limit // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  String toString() {
+    return 'DictionaryLookupParams(word: $word, exactMatch: $exactMatch, dictionaryIds: $dictionaryIds, limit: $limit)';
   }
 }
 
 /// @nodoc
-abstract class _$$DictionarySearchParamsImplCopyWith<$Res>
-    implements $DictionarySearchParamsCopyWith<$Res> {
-  factory _$$DictionarySearchParamsImplCopyWith(
-          _$DictionarySearchParamsImpl value,
-          $Res Function(_$DictionarySearchParamsImpl) then) =
-      __$$DictionarySearchParamsImplCopyWithImpl<$Res>;
+abstract mixin class _$DictionaryLookupParamsCopyWith<$Res>
+    implements $DictionaryLookupParamsCopyWith<$Res> {
+  factory _$DictionaryLookupParamsCopyWith(_DictionaryLookupParams value,
+          $Res Function(_DictionaryLookupParams) _then) =
+      __$DictionaryLookupParamsCopyWithImpl;
   @override
   @useResult
   $Res call(
-      {String query, bool isExactMatch, Set<String> dictionaryIds, int limit});
+      {String word, bool exactMatch, Set<String> dictionaryIds, int limit});
 }
 
 /// @nodoc
-class __$$DictionarySearchParamsImplCopyWithImpl<$Res>
-    extends _$DictionarySearchParamsCopyWithImpl<$Res,
-        _$DictionarySearchParamsImpl>
-    implements _$$DictionarySearchParamsImplCopyWith<$Res> {
-  __$$DictionarySearchParamsImplCopyWithImpl(
-      _$DictionarySearchParamsImpl _value,
-      $Res Function(_$DictionarySearchParamsImpl) _then)
-      : super(_value, _then);
+class __$DictionaryLookupParamsCopyWithImpl<$Res>
+    implements _$DictionaryLookupParamsCopyWith<$Res> {
+  __$DictionaryLookupParamsCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of DictionarySearchParams
+  final _DictionaryLookupParams _self;
+  final $Res Function(_DictionaryLookupParams) _then;
+
+  /// Create a copy of DictionaryLookupParams
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? query = null,
-    Object? isExactMatch = null,
+    Object? word = null,
+    Object? exactMatch = null,
     Object? dictionaryIds = null,
     Object? limit = null,
   }) {
-    return _then(_$DictionarySearchParamsImpl(
-      query: null == query
-          ? _value.query
-          : query // ignore: cast_nullable_to_non_nullable
+    return _then(_DictionaryLookupParams(
+      word: null == word
+          ? _self.word
+          : word // ignore: cast_nullable_to_non_nullable
               as String,
-      isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
-          : isExactMatch // ignore: cast_nullable_to_non_nullable
+      exactMatch: null == exactMatch
+          ? _self.exactMatch
+          : exactMatch // ignore: cast_nullable_to_non_nullable
               as bool,
       dictionaryIds: null == dictionaryIds
-          ? _value._dictionaryIds
+          ? _self._dictionaryIds
           : dictionaryIds // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       limit: null == limit
-          ? _value.limit
+          ? _self.limit
           : limit // ignore: cast_nullable_to_non_nullable
               as int,
     ));
@@ -371,12 +403,279 @@ class __$$DictionarySearchParamsImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
+mixin _$DictionarySearchParams {
+  /// The search query text
+  String get query;
 
-class _$DictionarySearchParamsImpl implements _DictionarySearchParams {
-  const _$DictionarySearchParamsImpl(
+  /// Whether to require exact word match (no prefix matching)
+  bool get isExactMatch;
+
+  /// Filter to specific dictionary IDs, empty = all
+  Set<String> get dictionaryIds;
+
+  /// Maximum number of results to return
+  int get limit;
+
+  /// Create a copy of DictionarySearchParams
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $DictionarySearchParamsCopyWith<DictionarySearchParams> get copyWith =>
+      _$DictionarySearchParamsCopyWithImpl<DictionarySearchParams>(
+          this as DictionarySearchParams, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    final _this = this as DictionarySearchParams;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DictionarySearchParams &&
+            (identical(other.query, _this.query) ||
+                other.query == _this.query) &&
+            (identical(other.isExactMatch, _this.isExactMatch) ||
+                other.isExactMatch == _this.isExactMatch) &&
+            const DeepCollectionEquality()
+                .equals(other.dictionaryIds, _this.dictionaryIds) &&
+            (identical(other.limit, _this.limit) ||
+                other.limit == _this.limit));
+  }
+
+  @override
+  int get hashCode {
+    final _this = this as DictionarySearchParams;
+    return Object.hash(runtimeType, _this.query, _this.isExactMatch,
+        const DeepCollectionEquality().hash(_this.dictionaryIds), _this.limit);
+  }
+
+  @override
+  String toString() {
+    final _this = this as DictionarySearchParams;
+    return 'DictionarySearchParams(query: ${_this.query}, isExactMatch: ${_this.isExactMatch}, dictionaryIds: ${_this.dictionaryIds}, limit: ${_this.limit})';
+  }
+}
+
+/// @nodoc
+abstract mixin class $DictionarySearchParamsCopyWith<$Res> {
+  factory $DictionarySearchParamsCopyWith(DictionarySearchParams value,
+          $Res Function(DictionarySearchParams) _then) =
+      _$DictionarySearchParamsCopyWithImpl;
+  @useResult
+  $Res call(
+      {String query, bool isExactMatch, Set<String> dictionaryIds, int limit});
+}
+
+/// @nodoc
+class _$DictionarySearchParamsCopyWithImpl<$Res>
+    implements $DictionarySearchParamsCopyWith<$Res> {
+  _$DictionarySearchParamsCopyWithImpl(this._self, this._then);
+
+  final DictionarySearchParams _self;
+  final $Res Function(DictionarySearchParams) _then;
+
+  /// Create a copy of DictionarySearchParams
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? query = null,
+    Object? isExactMatch = null,
+    Object? dictionaryIds = null,
+    Object? limit = null,
+  }) {
+    return _then(DictionarySearchParams(
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      isExactMatch: null == isExactMatch
+          ? _self.isExactMatch
+          : isExactMatch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      dictionaryIds: null == dictionaryIds
+          ? _self.dictionaryIds
+          : dictionaryIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [DictionarySearchParams].
+extension DictionarySearchParamsPatterns on DictionarySearchParams {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_DictionarySearchParams value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_DictionarySearchParams value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_DictionarySearchParams value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String query, bool isExactMatch, Set<String> dictionaryIds,
+            int limit)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams() when $default != null:
+        return $default(
+            _that.query, _that.isExactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String query, bool isExactMatch, Set<String> dictionaryIds,
+            int limit)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams():
+        return $default(
+            _that.query, _that.isExactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String query, bool isExactMatch,
+            Set<String> dictionaryIds, int limit)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _DictionarySearchParams() when $default != null:
+        return $default(
+            _that.query, _that.isExactMatch, _that.dictionaryIds, _that.limit);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+
+class _DictionarySearchParams implements DictionarySearchParams {
+  const _DictionarySearchParams(
       {required this.query,
       this.isExactMatch = false,
-      final Set<String> dictionaryIds = const {},
+      Set<String> dictionaryIds = const {},
       this.limit = 50})
       : _dictionaryIds = dictionaryIds;
 
@@ -406,65 +705,89 @@ class _$DictionarySearchParamsImpl implements _DictionarySearchParams {
   @JsonKey()
   final int limit;
 
+  /// Create a copy of DictionarySearchParams
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'DictionarySearchParams(query: $query, isExactMatch: $isExactMatch, dictionaryIds: $dictionaryIds, limit: $limit)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$DictionarySearchParamsCopyWith<_DictionarySearchParams> get copyWith =>
+      __$DictionarySearchParamsCopyWithImpl<_DictionarySearchParams>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$DictionarySearchParamsImpl &&
+            other is _DictionarySearchParams &&
             (identical(other.query, query) || other.query == query) &&
             (identical(other.isExactMatch, isExactMatch) ||
                 other.isExactMatch == isExactMatch) &&
             const DeepCollectionEquality()
-                .equals(other._dictionaryIds, _dictionaryIds) &&
+                .equals(other.dictionaryIds, _dictionaryIds) &&
             (identical(other.limit, limit) || other.limit == limit));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, query, isExactMatch,
-      const DeepCollectionEquality().hash(_dictionaryIds), limit);
+  int get hashCode {
+    return Object.hash(runtimeType, query, isExactMatch,
+        const DeepCollectionEquality().hash(_dictionaryIds), limit);
+  }
+
+  @override
+  String toString() {
+    return 'DictionarySearchParams(query: $query, isExactMatch: $isExactMatch, dictionaryIds: $dictionaryIds, limit: $limit)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$DictionarySearchParamsCopyWith<$Res>
+    implements $DictionarySearchParamsCopyWith<$Res> {
+  factory _$DictionarySearchParamsCopyWith(_DictionarySearchParams value,
+          $Res Function(_DictionarySearchParams) _then) =
+      __$DictionarySearchParamsCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String query, bool isExactMatch, Set<String> dictionaryIds, int limit});
+}
+
+/// @nodoc
+class __$DictionarySearchParamsCopyWithImpl<$Res>
+    implements _$DictionarySearchParamsCopyWith<$Res> {
+  __$DictionarySearchParamsCopyWithImpl(this._self, this._then);
+
+  final _DictionarySearchParams _self;
+  final $Res Function(_DictionarySearchParams) _then;
 
   /// Create a copy of DictionarySearchParams
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$DictionarySearchParamsImplCopyWith<_$DictionarySearchParamsImpl>
-      get copyWith => __$$DictionarySearchParamsImplCopyWithImpl<
-          _$DictionarySearchParamsImpl>(this, _$identity);
+  $Res call({
+    Object? query = null,
+    Object? isExactMatch = null,
+    Object? dictionaryIds = null,
+    Object? limit = null,
+  }) {
+    return _then(_DictionarySearchParams(
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      isExactMatch: null == isExactMatch
+          ? _self.isExactMatch
+          : isExactMatch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      dictionaryIds: null == dictionaryIds
+          ? _self._dictionaryIds
+          : dictionaryIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
 
-abstract class _DictionarySearchParams implements DictionarySearchParams {
-  const factory _DictionarySearchParams(
-      {required final String query,
-      final bool isExactMatch,
-      final Set<String> dictionaryIds,
-      final int limit}) = _$DictionarySearchParamsImpl;
-
-  /// The search query text
-  @override
-  String get query;
-
-  /// Whether to require exact word match (no prefix matching)
-  @override
-  bool get isExactMatch;
-
-  /// Filter to specific dictionary IDs, empty = all
-  @override
-  Set<String> get dictionaryIds;
-
-  /// Maximum number of results to return
-  @override
-  int get limit;
-
-  /// Create a copy of DictionarySearchParams
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$DictionarySearchParamsImplCopyWith<_$DictionarySearchParamsImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
+// dart format on

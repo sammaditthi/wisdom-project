@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'reader_tab.dart';
@@ -9,180 +9,129 @@ part of 'reader_tab.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-ReaderTab _$ReaderTabFromJson(Map<String, dynamic> json) {
-  return _ReaderTab.fromJson(json);
-}
 
 /// @nodoc
 mixin _$ReaderTab {
   /// Short label for tab display (truncated if needed)
-  String get label => throw _privateConstructorUsedError;
+  String get label;
 
   /// Full name for tooltip or expanded view
-  String get fullName => throw _privateConstructorUsedError;
+  String get fullName;
 
   /// The node this tab reads. Its subtree is the unit. Null only for a tab
   /// with no content.
-  String? get nodeKey => throw _privateConstructorUsedError;
+  String? get nodeKey;
 
   /// The row scroll offset 0 sits on, as a document coordinate: what a
   /// search hit or a `?e=` link named, or where the reader re-anchored.
   /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
-  int? get anchorPageIndex => throw _privateConstructorUsedError;
-  int? get anchorEntryIndex => throw _privateConstructorUsedError;
+  int? get anchorPageIndex;
+  int? get anchorEntryIndex;
 
   /// Pali name of the node for reference
-  String? get paliName => throw _privateConstructorUsedError;
+  String? get paliName;
 
   /// Sinhala name of the node for reference
-  String? get sinhalaName => throw _privateConstructorUsedError;
+  String? get sinhalaName;
 
   /// Universal text identifier (e.g., 'dn1', 'mn100', 'sn1-1')
   /// This is edition-agnostic and used for cross-edition alignment
   /// Nullable for backward compatibility - derived from contentFileId if needed
-  String? get textId => throw _privateConstructorUsedError;
+  String? get textId;
 
   /// List of panes to display in this tab
   /// Each pane shows one TextLayer (edition + language + script combination)
   /// Empty list means using legacy dual-pane mode (Pali + Sinhala)
   /// Nullable for backward compatibility
-  List<ReaderPane> get panes => throw _privateConstructorUsedError;
+  List<ReaderPane> get panes;
 
   /// Reader layout mode for this tab (per-tab setting)
   /// Defaults to paliOnly for portrait mode, can be changed by user
-  ReaderLayout get layout => throw _privateConstructorUsedError;
+  ReaderLayout get layout;
 
   /// Split ratio for side-by-side layout (0.0 to 1.0)
   /// Represents the proportion of width for the left (Pali) pane
-  double get splitRatio => throw _privateConstructorUsedError;
+  double get splitRatio;
 
   /// Last known scroll offset in pixels, measured from the anchor row
   /// (negative above it). Persisted so a reload resumes where reading stopped.
-  double get scrollOffset => throw _privateConstructorUsedError;
-
-  /// Serializes this ReaderTab to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  double get scrollOffset;
 
   /// Create a copy of ReaderTab
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $ReaderTabCopyWith<ReaderTab> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ReaderTabCopyWith<$Res> {
-  factory $ReaderTabCopyWith(ReaderTab value, $Res Function(ReaderTab) then) =
-      _$ReaderTabCopyWithImpl<$Res, ReaderTab>;
-  @useResult
-  $Res call(
-      {String label,
-      String fullName,
-      String? nodeKey,
-      int? anchorPageIndex,
-      int? anchorEntryIndex,
-      String? paliName,
-      String? sinhalaName,
-      String? textId,
-      List<ReaderPane> panes,
-      ReaderLayout layout,
-      double splitRatio,
-      double scrollOffset});
-}
-
-/// @nodoc
-class _$ReaderTabCopyWithImpl<$Res, $Val extends ReaderTab>
-    implements $ReaderTabCopyWith<$Res> {
-  _$ReaderTabCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ReaderTab
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $ReaderTabCopyWith<ReaderTab> get copyWith =>
+      _$ReaderTabCopyWithImpl<ReaderTab>(this as ReaderTab, _$identity);
+
+  /// Serializes this ReaderTab to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? label = null,
-    Object? fullName = null,
-    Object? nodeKey = freezed,
-    Object? anchorPageIndex = freezed,
-    Object? anchorEntryIndex = freezed,
-    Object? paliName = freezed,
-    Object? sinhalaName = freezed,
-    Object? textId = freezed,
-    Object? panes = null,
-    Object? layout = null,
-    Object? splitRatio = null,
-    Object? scrollOffset = null,
-  }) {
-    return _then(_value.copyWith(
-      label: null == label
-          ? _value.label
-          : label // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
-              as String,
-      nodeKey: freezed == nodeKey
-          ? _value.nodeKey
-          : nodeKey // ignore: cast_nullable_to_non_nullable
-              as String?,
-      anchorPageIndex: freezed == anchorPageIndex
-          ? _value.anchorPageIndex
-          : anchorPageIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
-      anchorEntryIndex: freezed == anchorEntryIndex
-          ? _value.anchorEntryIndex
-          : anchorEntryIndex // ignore: cast_nullable_to_non_nullable
-              as int?,
-      paliName: freezed == paliName
-          ? _value.paliName
-          : paliName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      sinhalaName: freezed == sinhalaName
-          ? _value.sinhalaName
-          : sinhalaName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      textId: freezed == textId
-          ? _value.textId
-          : textId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      panes: null == panes
-          ? _value.panes
-          : panes // ignore: cast_nullable_to_non_nullable
-              as List<ReaderPane>,
-      layout: null == layout
-          ? _value.layout
-          : layout // ignore: cast_nullable_to_non_nullable
-              as ReaderLayout,
-      splitRatio: null == splitRatio
-          ? _value.splitRatio
-          : splitRatio // ignore: cast_nullable_to_non_nullable
-              as double,
-      scrollOffset: null == scrollOffset
-          ? _value.scrollOffset
-          : scrollOffset // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as ReaderTab;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ReaderTab &&
+            (identical(other.label, _this.label) ||
+                other.label == _this.label) &&
+            (identical(other.fullName, _this.fullName) ||
+                other.fullName == _this.fullName) &&
+            (identical(other.nodeKey, _this.nodeKey) ||
+                other.nodeKey == _this.nodeKey) &&
+            (identical(other.anchorPageIndex, _this.anchorPageIndex) ||
+                other.anchorPageIndex == _this.anchorPageIndex) &&
+            (identical(other.anchorEntryIndex, _this.anchorEntryIndex) ||
+                other.anchorEntryIndex == _this.anchorEntryIndex) &&
+            (identical(other.paliName, _this.paliName) ||
+                other.paliName == _this.paliName) &&
+            (identical(other.sinhalaName, _this.sinhalaName) ||
+                other.sinhalaName == _this.sinhalaName) &&
+            (identical(other.textId, _this.textId) ||
+                other.textId == _this.textId) &&
+            const DeepCollectionEquality().equals(other.panes, _this.panes) &&
+            (identical(other.layout, _this.layout) ||
+                other.layout == _this.layout) &&
+            (identical(other.splitRatio, _this.splitRatio) ||
+                other.splitRatio == _this.splitRatio) &&
+            (identical(other.scrollOffset, _this.scrollOffset) ||
+                other.scrollOffset == _this.scrollOffset));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode {
+    final _this = this as ReaderTab;
+    return Object.hash(
+        runtimeType,
+        _this.label,
+        _this.fullName,
+        _this.nodeKey,
+        _this.anchorPageIndex,
+        _this.anchorEntryIndex,
+        _this.paliName,
+        _this.sinhalaName,
+        _this.textId,
+        const DeepCollectionEquality().hash(_this.panes),
+        _this.layout,
+        _this.splitRatio,
+        _this.scrollOffset);
+  }
+
+  @override
+  String toString() {
+    final _this = this as ReaderTab;
+    return 'ReaderTab(label: ${_this.label}, fullName: ${_this.fullName}, nodeKey: ${_this.nodeKey}, anchorPageIndex: ${_this.anchorPageIndex}, anchorEntryIndex: ${_this.anchorEntryIndex}, paliName: ${_this.paliName}, sinhalaName: ${_this.sinhalaName}, textId: ${_this.textId}, panes: ${_this.panes}, layout: ${_this.layout}, splitRatio: ${_this.splitRatio}, scrollOffset: ${_this.scrollOffset})';
   }
 }
 
 /// @nodoc
-abstract class _$$ReaderTabImplCopyWith<$Res>
-    implements $ReaderTabCopyWith<$Res> {
-  factory _$$ReaderTabImplCopyWith(
-          _$ReaderTabImpl value, $Res Function(_$ReaderTabImpl) then) =
-      __$$ReaderTabImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ReaderTabCopyWith<$Res> {
+  factory $ReaderTabCopyWith(ReaderTab value, $Res Function(ReaderTab) _then) =
+      _$ReaderTabCopyWithImpl;
   @useResult
   $Res call(
       {String label,
@@ -200,12 +149,11 @@ abstract class _$$ReaderTabImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ReaderTabImplCopyWithImpl<$Res>
-    extends _$ReaderTabCopyWithImpl<$Res, _$ReaderTabImpl>
-    implements _$$ReaderTabImplCopyWith<$Res> {
-  __$$ReaderTabImplCopyWithImpl(
-      _$ReaderTabImpl _value, $Res Function(_$ReaderTabImpl) _then)
-      : super(_value, _then);
+class _$ReaderTabCopyWithImpl<$Res> implements $ReaderTabCopyWith<$Res> {
+  _$ReaderTabCopyWithImpl(this._self, this._then);
+
+  final ReaderTab _self;
+  final $Res Function(ReaderTab) _then;
 
   /// Create a copy of ReaderTab
   /// with the given fields replaced by the non-null parameter values.
@@ -225,63 +173,295 @@ class __$$ReaderTabImplCopyWithImpl<$Res>
     Object? splitRatio = null,
     Object? scrollOffset = null,
   }) {
-    return _then(_$ReaderTabImpl(
+    return _then(ReaderTab(
       label: null == label
-          ? _value.label
+          ? _self.label
           : label // ignore: cast_nullable_to_non_nullable
               as String,
       fullName: null == fullName
-          ? _value.fullName
+          ? _self.fullName
           : fullName // ignore: cast_nullable_to_non_nullable
               as String,
       nodeKey: freezed == nodeKey
-          ? _value.nodeKey
+          ? _self.nodeKey
           : nodeKey // ignore: cast_nullable_to_non_nullable
               as String?,
       anchorPageIndex: freezed == anchorPageIndex
-          ? _value.anchorPageIndex
+          ? _self.anchorPageIndex
           : anchorPageIndex // ignore: cast_nullable_to_non_nullable
               as int?,
       anchorEntryIndex: freezed == anchorEntryIndex
-          ? _value.anchorEntryIndex
+          ? _self.anchorEntryIndex
           : anchorEntryIndex // ignore: cast_nullable_to_non_nullable
               as int?,
       paliName: freezed == paliName
-          ? _value.paliName
+          ? _self.paliName
           : paliName // ignore: cast_nullable_to_non_nullable
               as String?,
       sinhalaName: freezed == sinhalaName
-          ? _value.sinhalaName
+          ? _self.sinhalaName
           : sinhalaName // ignore: cast_nullable_to_non_nullable
               as String?,
       textId: freezed == textId
-          ? _value.textId
+          ? _self.textId
           : textId // ignore: cast_nullable_to_non_nullable
               as String?,
       panes: null == panes
-          ? _value._panes
+          ? _self.panes
           : panes // ignore: cast_nullable_to_non_nullable
               as List<ReaderPane>,
       layout: null == layout
-          ? _value.layout
+          ? _self.layout
           : layout // ignore: cast_nullable_to_non_nullable
               as ReaderLayout,
       splitRatio: null == splitRatio
-          ? _value.splitRatio
+          ? _self.splitRatio
           : splitRatio // ignore: cast_nullable_to_non_nullable
               as double,
       scrollOffset: null == scrollOffset
-          ? _value.scrollOffset
+          ? _self.scrollOffset
           : scrollOffset // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [ReaderTab].
+extension ReaderTabPatterns on ReaderTab {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_ReaderTab value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_ReaderTab value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_ReaderTab value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String label,
+            String fullName,
+            String? nodeKey,
+            int? anchorPageIndex,
+            int? anchorEntryIndex,
+            String? paliName,
+            String? sinhalaName,
+            String? textId,
+            List<ReaderPane> panes,
+            ReaderLayout layout,
+            double splitRatio,
+            double scrollOffset)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab() when $default != null:
+        return $default(
+            _that.label,
+            _that.fullName,
+            _that.nodeKey,
+            _that.anchorPageIndex,
+            _that.anchorEntryIndex,
+            _that.paliName,
+            _that.sinhalaName,
+            _that.textId,
+            _that.panes,
+            _that.layout,
+            _that.splitRatio,
+            _that.scrollOffset);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String label,
+            String fullName,
+            String? nodeKey,
+            int? anchorPageIndex,
+            int? anchorEntryIndex,
+            String? paliName,
+            String? sinhalaName,
+            String? textId,
+            List<ReaderPane> panes,
+            ReaderLayout layout,
+            double splitRatio,
+            double scrollOffset)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab():
+        return $default(
+            _that.label,
+            _that.fullName,
+            _that.nodeKey,
+            _that.anchorPageIndex,
+            _that.anchorEntryIndex,
+            _that.paliName,
+            _that.sinhalaName,
+            _that.textId,
+            _that.panes,
+            _that.layout,
+            _that.splitRatio,
+            _that.scrollOffset);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String label,
+            String fullName,
+            String? nodeKey,
+            int? anchorPageIndex,
+            int? anchorEntryIndex,
+            String? paliName,
+            String? sinhalaName,
+            String? textId,
+            List<ReaderPane> panes,
+            ReaderLayout layout,
+            double splitRatio,
+            double scrollOffset)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _ReaderTab() when $default != null:
+        return $default(
+            _that.label,
+            _that.fullName,
+            _that.nodeKey,
+            _that.anchorPageIndex,
+            _that.anchorEntryIndex,
+            _that.paliName,
+            _that.sinhalaName,
+            _that.textId,
+            _that.panes,
+            _that.layout,
+            _that.splitRatio,
+            _that.scrollOffset);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$ReaderTabImpl extends _ReaderTab {
-  const _$ReaderTabImpl(
+class _ReaderTab extends ReaderTab {
+  const _ReaderTab(
       {required this.label,
       required this.fullName,
       this.nodeKey,
@@ -290,7 +470,7 @@ class _$ReaderTabImpl extends _ReaderTab {
       this.paliName,
       this.sinhalaName,
       this.textId,
-      final List<ReaderPane> panes = const [],
+      List<ReaderPane> panes = const [],
       this.layout = ReaderLayout.paliOnly,
       this.splitRatio = 0.5,
       this.scrollOffset = 0.0})
@@ -298,9 +478,8 @@ class _$ReaderTabImpl extends _ReaderTab {
             'splitRatio must be between 0.0 and 1.0'),
         _panes = panes,
         super._();
-
-  factory _$ReaderTabImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ReaderTabImplFromJson(json);
+  factory _ReaderTab.fromJson(Map<String, dynamic> json) =>
+      _$ReaderTabFromJson(json);
 
   /// Short label for tab display (truncated if needed)
   @override
@@ -373,16 +552,26 @@ class _$ReaderTabImpl extends _ReaderTab {
   @JsonKey()
   final double scrollOffset;
 
+  /// Create a copy of ReaderTab
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ReaderTab(label: $label, fullName: $fullName, nodeKey: $nodeKey, anchorPageIndex: $anchorPageIndex, anchorEntryIndex: $anchorEntryIndex, paliName: $paliName, sinhalaName: $sinhalaName, textId: $textId, panes: $panes, layout: $layout, splitRatio: $splitRatio, scrollOffset: $scrollOffset)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ReaderTabCopyWith<_ReaderTab> get copyWith =>
+      __$ReaderTabCopyWithImpl<_ReaderTab>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ReaderTabToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ReaderTabImpl &&
+            other is _ReaderTab &&
             (identical(other.label, label) || other.label == label) &&
             (identical(other.fullName, fullName) ||
                 other.fullName == fullName) &&
@@ -396,7 +585,7 @@ class _$ReaderTabImpl extends _ReaderTab {
             (identical(other.sinhalaName, sinhalaName) ||
                 other.sinhalaName == sinhalaName) &&
             (identical(other.textId, textId) || other.textId == textId) &&
-            const DeepCollectionEquality().equals(other._panes, _panes) &&
+            const DeepCollectionEquality().equals(other.panes, _panes) &&
             (identical(other.layout, layout) || other.layout == layout) &&
             (identical(other.splitRatio, splitRatio) ||
                 other.splitRatio == splitRatio) &&
@@ -406,117 +595,128 @@ class _$ReaderTabImpl extends _ReaderTab {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      label,
-      fullName,
-      nodeKey,
-      anchorPageIndex,
-      anchorEntryIndex,
-      paliName,
-      sinhalaName,
-      textId,
-      const DeepCollectionEquality().hash(_panes),
-      layout,
-      splitRatio,
-      scrollOffset);
-
-  /// Create a copy of ReaderTab
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ReaderTabImplCopyWith<_$ReaderTabImpl> get copyWith =>
-      __$$ReaderTabImplCopyWithImpl<_$ReaderTabImpl>(this, _$identity);
+  int get hashCode {
+    return Object.hash(
+        runtimeType,
+        label,
+        fullName,
+        nodeKey,
+        anchorPageIndex,
+        anchorEntryIndex,
+        paliName,
+        sinhalaName,
+        textId,
+        const DeepCollectionEquality().hash(_panes),
+        layout,
+        splitRatio,
+        scrollOffset);
+  }
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$$ReaderTabImplToJson(
-      this,
-    );
+  String toString() {
+    return 'ReaderTab(label: $label, fullName: $fullName, nodeKey: $nodeKey, anchorPageIndex: $anchorPageIndex, anchorEntryIndex: $anchorEntryIndex, paliName: $paliName, sinhalaName: $sinhalaName, textId: $textId, panes: $panes, layout: $layout, splitRatio: $splitRatio, scrollOffset: $scrollOffset)';
   }
 }
 
-abstract class _ReaderTab extends ReaderTab {
-  const factory _ReaderTab(
-      {required final String label,
-      required final String fullName,
-      final String? nodeKey,
-      final int? anchorPageIndex,
-      final int? anchorEntryIndex,
-      final String? paliName,
-      final String? sinhalaName,
-      final String? textId,
-      final List<ReaderPane> panes,
-      final ReaderLayout layout,
-      final double splitRatio,
-      final double scrollOffset}) = _$ReaderTabImpl;
-  const _ReaderTab._() : super._();
-
-  factory _ReaderTab.fromJson(Map<String, dynamic> json) =
-      _$ReaderTabImpl.fromJson;
-
-  /// Short label for tab display (truncated if needed)
+/// @nodoc
+abstract mixin class _$ReaderTabCopyWith<$Res>
+    implements $ReaderTabCopyWith<$Res> {
+  factory _$ReaderTabCopyWith(
+          _ReaderTab value, $Res Function(_ReaderTab) _then) =
+      __$ReaderTabCopyWithImpl;
   @override
-  String get label;
+  @useResult
+  $Res call(
+      {String label,
+      String fullName,
+      String? nodeKey,
+      int? anchorPageIndex,
+      int? anchorEntryIndex,
+      String? paliName,
+      String? sinhalaName,
+      String? textId,
+      List<ReaderPane> panes,
+      ReaderLayout layout,
+      double splitRatio,
+      double scrollOffset});
+}
 
-  /// Full name for tooltip or expanded view
-  @override
-  String get fullName;
+/// @nodoc
+class __$ReaderTabCopyWithImpl<$Res> implements _$ReaderTabCopyWith<$Res> {
+  __$ReaderTabCopyWithImpl(this._self, this._then);
 
-  /// The node this tab reads. Its subtree is the unit. Null only for a tab
-  /// with no content.
-  @override
-  String? get nodeKey;
-
-  /// The row scroll offset 0 sits on, as a document coordinate: what a
-  /// search hit or a `?e=` link named, or where the reader re-anchored.
-  /// Null is the unit's top. It never moves the unit, which is [nodeKey]'s.
-  @override
-  int? get anchorPageIndex;
-  @override
-  int? get anchorEntryIndex;
-
-  /// Pali name of the node for reference
-  @override
-  String? get paliName;
-
-  /// Sinhala name of the node for reference
-  @override
-  String? get sinhalaName;
-
-  /// Universal text identifier (e.g., 'dn1', 'mn100', 'sn1-1')
-  /// This is edition-agnostic and used for cross-edition alignment
-  /// Nullable for backward compatibility - derived from contentFileId if needed
-  @override
-  String? get textId;
-
-  /// List of panes to display in this tab
-  /// Each pane shows one TextLayer (edition + language + script combination)
-  /// Empty list means using legacy dual-pane mode (Pali + Sinhala)
-  /// Nullable for backward compatibility
-  @override
-  List<ReaderPane> get panes;
-
-  /// Reader layout mode for this tab (per-tab setting)
-  /// Defaults to paliOnly for portrait mode, can be changed by user
-  @override
-  ReaderLayout get layout;
-
-  /// Split ratio for side-by-side layout (0.0 to 1.0)
-  /// Represents the proportion of width for the left (Pali) pane
-  @override
-  double get splitRatio;
-
-  /// Last known scroll offset in pixels, measured from the anchor row
-  /// (negative above it). Persisted so a reload resumes where reading stopped.
-  @override
-  double get scrollOffset;
+  final _ReaderTab _self;
+  final $Res Function(_ReaderTab) _then;
 
   /// Create a copy of ReaderTab
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ReaderTabImplCopyWith<_$ReaderTabImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? label = null,
+    Object? fullName = null,
+    Object? nodeKey = freezed,
+    Object? anchorPageIndex = freezed,
+    Object? anchorEntryIndex = freezed,
+    Object? paliName = freezed,
+    Object? sinhalaName = freezed,
+    Object? textId = freezed,
+    Object? panes = null,
+    Object? layout = null,
+    Object? splitRatio = null,
+    Object? scrollOffset = null,
+  }) {
+    return _then(_ReaderTab(
+      label: null == label
+          ? _self.label
+          : label // ignore: cast_nullable_to_non_nullable
+              as String,
+      fullName: null == fullName
+          ? _self.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+      nodeKey: freezed == nodeKey
+          ? _self.nodeKey
+          : nodeKey // ignore: cast_nullable_to_non_nullable
+              as String?,
+      anchorPageIndex: freezed == anchorPageIndex
+          ? _self.anchorPageIndex
+          : anchorPageIndex // ignore: cast_nullable_to_non_nullable
+              as int?,
+      anchorEntryIndex: freezed == anchorEntryIndex
+          ? _self.anchorEntryIndex
+          : anchorEntryIndex // ignore: cast_nullable_to_non_nullable
+              as int?,
+      paliName: freezed == paliName
+          ? _self.paliName
+          : paliName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      sinhalaName: freezed == sinhalaName
+          ? _self.sinhalaName
+          : sinhalaName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      textId: freezed == textId
+          ? _self.textId
+          : textId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      panes: null == panes
+          ? _self._panes
+          : panes // ignore: cast_nullable_to_non_nullable
+              as List<ReaderPane>,
+      layout: null == layout
+          ? _self.layout
+          : layout // ignore: cast_nullable_to_non_nullable
+              as ReaderLayout,
+      splitRatio: null == splitRatio
+          ? _self.splitRatio
+          : splitRatio // ignore: cast_nullable_to_non_nullable
+              as double,
+      scrollOffset: null == scrollOffset
+          ? _self.scrollOffset
+          : scrollOffset // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
 }
+
+// dart format on

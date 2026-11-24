@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'search_query.dart';
@@ -9,29 +9,28 @@ part of 'search_query.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$SearchQuery {
   /// The search query text
-  String get queryText => throw _privateConstructorUsedError;
+  String get queryText;
 
   /// Whether to require exact word match (no prefix matching)
   /// Default false = prefix matching enabled (e.g., "සති" matches "සතිපට්ඨානය")
-  bool get isExactMatch => throw _privateConstructorUsedError;
+  bool get isExactMatch;
 
   /// Editions to search within (e.g., {'bjt', 'sc'})
   /// If empty, searches all available editions
-  Set<String> get editionIds => throw _privateConstructorUsedError;
+  Set<String> get editionIds;
 
   /// Whether to search in Pali text
-  bool get searchInPali => throw _privateConstructorUsedError;
+  bool get searchInPali;
 
   /// Whether to search in Sinhala text
-  bool get searchInSinhala => throw _privateConstructorUsedError;
+  bool get searchInSinhala;
 
   /// Search scope using tree node keys (e.g., 'sp', 'dn', 'kn-dhp').
   ///
@@ -43,151 +42,104 @@ mixin _$SearchQuery {
   /// - {'sp'} = search only Sutta Pitaka
   /// - {'dn', 'mn'} = search Digha Nikaya OR Majjhima Nikaya
   /// - {'atta-vp', 'atta-sp', 'atta-ap'} = search all Commentaries
-  Set<String> get scope => throw _privateConstructorUsedError;
+  Set<String> get scope;
 
   /// Whether to search as a phrase (consecutive words) or separate words.
   /// - true (DEFAULT) = phrase search (words must be adjacent)
   /// - false = separate-word search (words within proximity distance)
-  bool get isPhraseSearch => throw _privateConstructorUsedError;
+  bool get isPhraseSearch;
 
   /// Whether to ignore proximity and search anywhere in the same text unit.
   /// Only applies when [isPhraseSearch] is false.
   /// - true = search for words anywhere in the text (uses very large proximity)
   /// - false (DEFAULT) = use [proximityDistance] for proximity constraint
-  bool get isAnywhereInText => throw _privateConstructorUsedError;
+  bool get isAnywhereInText;
 
   /// Proximity distance for multi-word separate-word queries.
   /// Only applies when [isPhraseSearch] is false and [isAnywhereInText] is false.
   /// Default 10 = words within 10 tokens (NEAR/10).
   /// Range: 1-100.
-  int get proximityDistance => throw _privateConstructorUsedError;
+  int get proximityDistance;
 
   /// Dictionary IDs to filter definitions by (e.g., {'BUS', 'MS'} for Sinhala).
   /// Empty set = no restriction (search all dictionaries).
-  Set<String> get selectedDictionaryIds => throw _privateConstructorUsedError;
+  Set<String> get selectedDictionaryIds;
 
   /// Maximum number of results to return
-  int get limit => throw _privateConstructorUsedError;
+  int get limit;
 
   /// Offset for pagination
-  int get offset => throw _privateConstructorUsedError;
+  int get offset;
 
   /// Create a copy of SearchQuery
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SearchQueryCopyWith<SearchQuery> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SearchQueryCopyWith<$Res> {
-  factory $SearchQueryCopyWith(
-          SearchQuery value, $Res Function(SearchQuery) then) =
-      _$SearchQueryCopyWithImpl<$Res, SearchQuery>;
-  @useResult
-  $Res call(
-      {String queryText,
-      bool isExactMatch,
-      Set<String> editionIds,
-      bool searchInPali,
-      bool searchInSinhala,
-      Set<String> scope,
-      bool isPhraseSearch,
-      bool isAnywhereInText,
-      int proximityDistance,
-      Set<String> selectedDictionaryIds,
-      int limit,
-      int offset});
-}
-
-/// @nodoc
-class _$SearchQueryCopyWithImpl<$Res, $Val extends SearchQuery>
-    implements $SearchQueryCopyWith<$Res> {
-  _$SearchQueryCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SearchQuery
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $SearchQueryCopyWith<SearchQuery> get copyWith =>
+      _$SearchQueryCopyWithImpl<SearchQuery>(this as SearchQuery, _$identity);
+
   @override
-  $Res call({
-    Object? queryText = null,
-    Object? isExactMatch = null,
-    Object? editionIds = null,
-    Object? searchInPali = null,
-    Object? searchInSinhala = null,
-    Object? scope = null,
-    Object? isPhraseSearch = null,
-    Object? isAnywhereInText = null,
-    Object? proximityDistance = null,
-    Object? selectedDictionaryIds = null,
-    Object? limit = null,
-    Object? offset = null,
-  }) {
-    return _then(_value.copyWith(
-      queryText: null == queryText
-          ? _value.queryText
-          : queryText // ignore: cast_nullable_to_non_nullable
-              as String,
-      isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
-          : isExactMatch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      editionIds: null == editionIds
-          ? _value.editionIds
-          : editionIds // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      searchInPali: null == searchInPali
-          ? _value.searchInPali
-          : searchInPali // ignore: cast_nullable_to_non_nullable
-              as bool,
-      searchInSinhala: null == searchInSinhala
-          ? _value.searchInSinhala
-          : searchInSinhala // ignore: cast_nullable_to_non_nullable
-              as bool,
-      scope: null == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      isPhraseSearch: null == isPhraseSearch
-          ? _value.isPhraseSearch
-          : isPhraseSearch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isAnywhereInText: null == isAnywhereInText
-          ? _value.isAnywhereInText
-          : isAnywhereInText // ignore: cast_nullable_to_non_nullable
-              as bool,
-      proximityDistance: null == proximityDistance
-          ? _value.proximityDistance
-          : proximityDistance // ignore: cast_nullable_to_non_nullable
-              as int,
-      selectedDictionaryIds: null == selectedDictionaryIds
-          ? _value.selectedDictionaryIds
-          : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      limit: null == limit
-          ? _value.limit
-          : limit // ignore: cast_nullable_to_non_nullable
-              as int,
-      offset: null == offset
-          ? _value.offset
-          : offset // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as SearchQuery;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SearchQuery &&
+            (identical(other.queryText, _this.queryText) ||
+                other.queryText == _this.queryText) &&
+            (identical(other.isExactMatch, _this.isExactMatch) ||
+                other.isExactMatch == _this.isExactMatch) &&
+            const DeepCollectionEquality()
+                .equals(other.editionIds, _this.editionIds) &&
+            (identical(other.searchInPali, _this.searchInPali) ||
+                other.searchInPali == _this.searchInPali) &&
+            (identical(other.searchInSinhala, _this.searchInSinhala) ||
+                other.searchInSinhala == _this.searchInSinhala) &&
+            const DeepCollectionEquality().equals(other.scope, _this.scope) &&
+            (identical(other.isPhraseSearch, _this.isPhraseSearch) ||
+                other.isPhraseSearch == _this.isPhraseSearch) &&
+            (identical(other.isAnywhereInText, _this.isAnywhereInText) ||
+                other.isAnywhereInText == _this.isAnywhereInText) &&
+            (identical(other.proximityDistance, _this.proximityDistance) ||
+                other.proximityDistance == _this.proximityDistance) &&
+            const DeepCollectionEquality().equals(
+                other.selectedDictionaryIds, _this.selectedDictionaryIds) &&
+            (identical(other.limit, _this.limit) ||
+                other.limit == _this.limit) &&
+            (identical(other.offset, _this.offset) ||
+                other.offset == _this.offset));
+  }
+
+  @override
+  int get hashCode {
+    final _this = this as SearchQuery;
+    return Object.hash(
+        runtimeType,
+        _this.queryText,
+        _this.isExactMatch,
+        const DeepCollectionEquality().hash(_this.editionIds),
+        _this.searchInPali,
+        _this.searchInSinhala,
+        const DeepCollectionEquality().hash(_this.scope),
+        _this.isPhraseSearch,
+        _this.isAnywhereInText,
+        _this.proximityDistance,
+        const DeepCollectionEquality().hash(_this.selectedDictionaryIds),
+        _this.limit,
+        _this.offset);
+  }
+
+  @override
+  String toString() {
+    final _this = this as SearchQuery;
+    return 'SearchQuery(queryText: ${_this.queryText}, isExactMatch: ${_this.isExactMatch}, editionIds: ${_this.editionIds}, searchInPali: ${_this.searchInPali}, searchInSinhala: ${_this.searchInSinhala}, scope: ${_this.scope}, isPhraseSearch: ${_this.isPhraseSearch}, isAnywhereInText: ${_this.isAnywhereInText}, proximityDistance: ${_this.proximityDistance}, selectedDictionaryIds: ${_this.selectedDictionaryIds}, limit: ${_this.limit}, offset: ${_this.offset})';
   }
 }
 
 /// @nodoc
-abstract class _$$SearchQueryImplCopyWith<$Res>
-    implements $SearchQueryCopyWith<$Res> {
-  factory _$$SearchQueryImplCopyWith(
-          _$SearchQueryImpl value, $Res Function(_$SearchQueryImpl) then) =
-      __$$SearchQueryImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SearchQueryCopyWith<$Res> {
+  factory $SearchQueryCopyWith(
+          SearchQuery value, $Res Function(SearchQuery) _then) =
+      _$SearchQueryCopyWithImpl;
   @useResult
   $Res call(
       {String queryText,
@@ -205,12 +157,11 @@ abstract class _$$SearchQueryImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SearchQueryImplCopyWithImpl<$Res>
-    extends _$SearchQueryCopyWithImpl<$Res, _$SearchQueryImpl>
-    implements _$$SearchQueryImplCopyWith<$Res> {
-  __$$SearchQueryImplCopyWithImpl(
-      _$SearchQueryImpl _value, $Res Function(_$SearchQueryImpl) _then)
-      : super(_value, _then);
+class _$SearchQueryCopyWithImpl<$Res> implements $SearchQueryCopyWith<$Res> {
+  _$SearchQueryCopyWithImpl(this._self, this._then);
+
+  final SearchQuery _self;
+  final $Res Function(SearchQuery) _then;
 
   /// Create a copy of SearchQuery
   /// with the given fields replaced by the non-null parameter values.
@@ -230,73 +181,305 @@ class __$$SearchQueryImplCopyWithImpl<$Res>
     Object? limit = null,
     Object? offset = null,
   }) {
-    return _then(_$SearchQueryImpl(
+    return _then(SearchQuery(
       queryText: null == queryText
-          ? _value.queryText
+          ? _self.queryText
           : queryText // ignore: cast_nullable_to_non_nullable
               as String,
       isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
+          ? _self.isExactMatch
           : isExactMatch // ignore: cast_nullable_to_non_nullable
               as bool,
       editionIds: null == editionIds
-          ? _value._editionIds
+          ? _self.editionIds
           : editionIds // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       searchInPali: null == searchInPali
-          ? _value.searchInPali
+          ? _self.searchInPali
           : searchInPali // ignore: cast_nullable_to_non_nullable
               as bool,
       searchInSinhala: null == searchInSinhala
-          ? _value.searchInSinhala
+          ? _self.searchInSinhala
           : searchInSinhala // ignore: cast_nullable_to_non_nullable
               as bool,
       scope: null == scope
-          ? _value._scope
+          ? _self.scope
           : scope // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       isPhraseSearch: null == isPhraseSearch
-          ? _value.isPhraseSearch
+          ? _self.isPhraseSearch
           : isPhraseSearch // ignore: cast_nullable_to_non_nullable
               as bool,
       isAnywhereInText: null == isAnywhereInText
-          ? _value.isAnywhereInText
+          ? _self.isAnywhereInText
           : isAnywhereInText // ignore: cast_nullable_to_non_nullable
               as bool,
       proximityDistance: null == proximityDistance
-          ? _value.proximityDistance
+          ? _self.proximityDistance
           : proximityDistance // ignore: cast_nullable_to_non_nullable
               as int,
       selectedDictionaryIds: null == selectedDictionaryIds
-          ? _value._selectedDictionaryIds
+          ? _self.selectedDictionaryIds
           : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       limit: null == limit
-          ? _value.limit
+          ? _self.limit
           : limit // ignore: cast_nullable_to_non_nullable
               as int,
       offset: null == offset
-          ? _value.offset
+          ? _self.offset
           : offset // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [SearchQuery].
+extension SearchQueryPatterns on SearchQuery {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SearchQuery value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SearchQuery value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SearchQuery value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String queryText,
+            bool isExactMatch,
+            Set<String> editionIds,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            Set<String> selectedDictionaryIds,
+            int limit,
+            int offset)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery() when $default != null:
+        return $default(
+            _that.queryText,
+            _that.isExactMatch,
+            _that.editionIds,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.selectedDictionaryIds,
+            _that.limit,
+            _that.offset);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String queryText,
+            bool isExactMatch,
+            Set<String> editionIds,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            Set<String> selectedDictionaryIds,
+            int limit,
+            int offset)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery():
+        return $default(
+            _that.queryText,
+            _that.isExactMatch,
+            _that.editionIds,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.selectedDictionaryIds,
+            _that.limit,
+            _that.offset);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String queryText,
+            bool isExactMatch,
+            Set<String> editionIds,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            Set<String> selectedDictionaryIds,
+            int limit,
+            int offset)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchQuery() when $default != null:
+        return $default(
+            _that.queryText,
+            _that.isExactMatch,
+            _that.editionIds,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.selectedDictionaryIds,
+            _that.limit,
+            _that.offset);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$SearchQueryImpl implements _SearchQuery {
-  const _$SearchQueryImpl(
+class _SearchQuery implements SearchQuery {
+  const _SearchQuery(
       {required this.queryText,
       this.isExactMatch = false,
-      final Set<String> editionIds = const {},
+      Set<String> editionIds = const {},
       this.searchInPali = true,
       this.searchInSinhala = true,
-      final Set<String> scope = const {},
+      Set<String> scope = const {},
       this.isPhraseSearch = true,
       this.isAnywhereInText = false,
       this.proximityDistance = 10,
-      final Set<String> selectedDictionaryIds = const {},
+      Set<String> selectedDictionaryIds = const {},
       this.limit = 50,
       this.offset = 0})
       : _editionIds = editionIds,
@@ -415,27 +598,30 @@ class _$SearchQueryImpl implements _SearchQuery {
   @JsonKey()
   final int offset;
 
+  /// Create a copy of SearchQuery
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SearchQuery(queryText: $queryText, isExactMatch: $isExactMatch, editionIds: $editionIds, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, selectedDictionaryIds: $selectedDictionaryIds, limit: $limit, offset: $offset)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SearchQueryCopyWith<_SearchQuery> get copyWith =>
+      __$SearchQueryCopyWithImpl<_SearchQuery>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SearchQueryImpl &&
+            other is _SearchQuery &&
             (identical(other.queryText, queryText) ||
                 other.queryText == queryText) &&
             (identical(other.isExactMatch, isExactMatch) ||
                 other.isExactMatch == isExactMatch) &&
             const DeepCollectionEquality()
-                .equals(other._editionIds, _editionIds) &&
+                .equals(other.editionIds, _editionIds) &&
             (identical(other.searchInPali, searchInPali) ||
                 other.searchInPali == searchInPali) &&
             (identical(other.searchInSinhala, searchInSinhala) ||
                 other.searchInSinhala == searchInSinhala) &&
-            const DeepCollectionEquality().equals(other._scope, _scope) &&
+            const DeepCollectionEquality().equals(other.scope, _scope) &&
             (identical(other.isPhraseSearch, isPhraseSearch) ||
                 other.isPhraseSearch == isPhraseSearch) &&
             (identical(other.isAnywhereInText, isAnywhereInText) ||
@@ -443,123 +629,134 @@ class _$SearchQueryImpl implements _SearchQuery {
             (identical(other.proximityDistance, proximityDistance) ||
                 other.proximityDistance == proximityDistance) &&
             const DeepCollectionEquality()
-                .equals(other._selectedDictionaryIds, _selectedDictionaryIds) &&
+                .equals(other.selectedDictionaryIds, _selectedDictionaryIds) &&
             (identical(other.limit, limit) || other.limit == limit) &&
             (identical(other.offset, offset) || other.offset == offset));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      queryText,
-      isExactMatch,
-      const DeepCollectionEquality().hash(_editionIds),
-      searchInPali,
-      searchInSinhala,
-      const DeepCollectionEquality().hash(_scope),
-      isPhraseSearch,
-      isAnywhereInText,
-      proximityDistance,
-      const DeepCollectionEquality().hash(_selectedDictionaryIds),
-      limit,
-      offset);
+  int get hashCode {
+    return Object.hash(
+        runtimeType,
+        queryText,
+        isExactMatch,
+        const DeepCollectionEquality().hash(_editionIds),
+        searchInPali,
+        searchInSinhala,
+        const DeepCollectionEquality().hash(_scope),
+        isPhraseSearch,
+        isAnywhereInText,
+        proximityDistance,
+        const DeepCollectionEquality().hash(_selectedDictionaryIds),
+        limit,
+        offset);
+  }
+
+  @override
+  String toString() {
+    return 'SearchQuery(queryText: $queryText, isExactMatch: $isExactMatch, editionIds: $editionIds, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, selectedDictionaryIds: $selectedDictionaryIds, limit: $limit, offset: $offset)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SearchQueryCopyWith<$Res>
+    implements $SearchQueryCopyWith<$Res> {
+  factory _$SearchQueryCopyWith(
+          _SearchQuery value, $Res Function(_SearchQuery) _then) =
+      __$SearchQueryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String queryText,
+      bool isExactMatch,
+      Set<String> editionIds,
+      bool searchInPali,
+      bool searchInSinhala,
+      Set<String> scope,
+      bool isPhraseSearch,
+      bool isAnywhereInText,
+      int proximityDistance,
+      Set<String> selectedDictionaryIds,
+      int limit,
+      int offset});
+}
+
+/// @nodoc
+class __$SearchQueryCopyWithImpl<$Res> implements _$SearchQueryCopyWith<$Res> {
+  __$SearchQueryCopyWithImpl(this._self, this._then);
+
+  final _SearchQuery _self;
+  final $Res Function(_SearchQuery) _then;
 
   /// Create a copy of SearchQuery
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$SearchQueryImplCopyWith<_$SearchQueryImpl> get copyWith =>
-      __$$SearchQueryImplCopyWithImpl<_$SearchQueryImpl>(this, _$identity);
+  $Res call({
+    Object? queryText = null,
+    Object? isExactMatch = null,
+    Object? editionIds = null,
+    Object? searchInPali = null,
+    Object? searchInSinhala = null,
+    Object? scope = null,
+    Object? isPhraseSearch = null,
+    Object? isAnywhereInText = null,
+    Object? proximityDistance = null,
+    Object? selectedDictionaryIds = null,
+    Object? limit = null,
+    Object? offset = null,
+  }) {
+    return _then(_SearchQuery(
+      queryText: null == queryText
+          ? _self.queryText
+          : queryText // ignore: cast_nullable_to_non_nullable
+              as String,
+      isExactMatch: null == isExactMatch
+          ? _self.isExactMatch
+          : isExactMatch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      editionIds: null == editionIds
+          ? _self._editionIds
+          : editionIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      searchInPali: null == searchInPali
+          ? _self.searchInPali
+          : searchInPali // ignore: cast_nullable_to_non_nullable
+              as bool,
+      searchInSinhala: null == searchInSinhala
+          ? _self.searchInSinhala
+          : searchInSinhala // ignore: cast_nullable_to_non_nullable
+              as bool,
+      scope: null == scope
+          ? _self._scope
+          : scope // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      isPhraseSearch: null == isPhraseSearch
+          ? _self.isPhraseSearch
+          : isPhraseSearch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isAnywhereInText: null == isAnywhereInText
+          ? _self.isAnywhereInText
+          : isAnywhereInText // ignore: cast_nullable_to_non_nullable
+              as bool,
+      proximityDistance: null == proximityDistance
+          ? _self.proximityDistance
+          : proximityDistance // ignore: cast_nullable_to_non_nullable
+              as int,
+      selectedDictionaryIds: null == selectedDictionaryIds
+          ? _self._selectedDictionaryIds
+          : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      offset: null == offset
+          ? _self.offset
+          : offset // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
 
-abstract class _SearchQuery implements SearchQuery {
-  const factory _SearchQuery(
-      {required final String queryText,
-      final bool isExactMatch,
-      final Set<String> editionIds,
-      final bool searchInPali,
-      final bool searchInSinhala,
-      final Set<String> scope,
-      final bool isPhraseSearch,
-      final bool isAnywhereInText,
-      final int proximityDistance,
-      final Set<String> selectedDictionaryIds,
-      final int limit,
-      final int offset}) = _$SearchQueryImpl;
-
-  /// The search query text
-  @override
-  String get queryText;
-
-  /// Whether to require exact word match (no prefix matching)
-  /// Default false = prefix matching enabled (e.g., "සති" matches "සතිපට්ඨානය")
-  @override
-  bool get isExactMatch;
-
-  /// Editions to search within (e.g., {'bjt', 'sc'})
-  /// If empty, searches all available editions
-  @override
-  Set<String> get editionIds;
-
-  /// Whether to search in Pali text
-  @override
-  bool get searchInPali;
-
-  /// Whether to search in Sinhala text
-  @override
-  bool get searchInSinhala;
-
-  /// Search scope using tree node keys (e.g., 'sp', 'dn', 'kn-dhp').
-  ///
-  /// Empty set = search all content (no scope filter applied).
-  /// Non-empty = search only within the selected scope (OR logic).
-  ///
-  /// Examples:
-  /// - {} = search everything
-  /// - {'sp'} = search only Sutta Pitaka
-  /// - {'dn', 'mn'} = search Digha Nikaya OR Majjhima Nikaya
-  /// - {'atta-vp', 'atta-sp', 'atta-ap'} = search all Commentaries
-  @override
-  Set<String> get scope;
-
-  /// Whether to search as a phrase (consecutive words) or separate words.
-  /// - true (DEFAULT) = phrase search (words must be adjacent)
-  /// - false = separate-word search (words within proximity distance)
-  @override
-  bool get isPhraseSearch;
-
-  /// Whether to ignore proximity and search anywhere in the same text unit.
-  /// Only applies when [isPhraseSearch] is false.
-  /// - true = search for words anywhere in the text (uses very large proximity)
-  /// - false (DEFAULT) = use [proximityDistance] for proximity constraint
-  @override
-  bool get isAnywhereInText;
-
-  /// Proximity distance for multi-word separate-word queries.
-  /// Only applies when [isPhraseSearch] is false and [isAnywhereInText] is false.
-  /// Default 10 = words within 10 tokens (NEAR/10).
-  /// Range: 1-100.
-  @override
-  int get proximityDistance;
-
-  /// Dictionary IDs to filter definitions by (e.g., {'BUS', 'MS'} for Sinhala).
-  /// Empty set = no restriction (search all dictionaries).
-  @override
-  Set<String> get selectedDictionaryIds;
-
-  /// Maximum number of results to return
-  @override
-  int get limit;
-
-  /// Offset for pagination
-  @override
-  int get offset;
-
-  /// Create a copy of SearchQuery
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SearchQueryImplCopyWith<_$SearchQueryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

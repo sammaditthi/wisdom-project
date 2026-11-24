@@ -47,7 +47,7 @@ flutter test
 flutter test --coverage
 
 # Generate mocks (after modifying test/helpers/mocks.dart)
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 ```
 
 ## CI/CD (Future)

@@ -11,7 +11,7 @@ part 'reader_pane.g.dart';
 /// All panes within a tab share the same scroll position, maintaining vertical
 /// alignment like an HTML table (current behavior).
 @freezed
-class ReaderPane with _$ReaderPane {
+abstract class ReaderPane with _$ReaderPane {
   const factory ReaderPane({
     /// Unique identifier for this pane instance
     /// Generated as UUID when creating a new pane

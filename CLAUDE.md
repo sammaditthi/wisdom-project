@@ -11,7 +11,7 @@ The Wisdom Project - a Tipitaka and commentary browsing app with parallel Pali/S
 - `lib/core/` - Localization (ARB), themes, constants
 
 ## Key Patterns
-- **Immutability**: All entities use Freezed → regenerate with `dart run build_runner build --delete-conflicting-outputs`
+- **Immutability**: All entities use Freezed → regenerate with `dart run build_runner build`
 - **Error Handling**: `Either<Failure, T>` return types throughout
 - **Text Formatting**: Markers `**bold**`, `__underline__`, `{footnote}` in content
 - **Multi-Edition**: Architecture supports multiple content sources (BJT, SuttaCentral) - see `docs/decisions/multi_edition_architecture.md`

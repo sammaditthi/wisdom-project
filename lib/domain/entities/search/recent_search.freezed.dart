@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'recent_search.dart';
@@ -9,91 +9,70 @@ part of 'recent_search.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-RecentSearch _$RecentSearchFromJson(Map<String, dynamic> json) {
-  return _RecentSearch.fromJson(json);
-}
 
 /// @nodoc
 mixin _$RecentSearch {
   /// The search query text
-  String get queryText => throw _privateConstructorUsedError;
+  String get queryText;
 
   /// When this search was performed
-  DateTime get timestamp => throw _privateConstructorUsedError;
-
-  /// Serializes this RecentSearch to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  DateTime get timestamp;
 
   /// Create a copy of RecentSearch
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $RecentSearchCopyWith<RecentSearch> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $RecentSearchCopyWith<$Res> {
-  factory $RecentSearchCopyWith(
-          RecentSearch value, $Res Function(RecentSearch) then) =
-      _$RecentSearchCopyWithImpl<$Res, RecentSearch>;
-  @useResult
-  $Res call({String queryText, DateTime timestamp});
-}
-
-/// @nodoc
-class _$RecentSearchCopyWithImpl<$Res, $Val extends RecentSearch>
-    implements $RecentSearchCopyWith<$Res> {
-  _$RecentSearchCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of RecentSearch
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $RecentSearchCopyWith<RecentSearch> get copyWith =>
+      _$RecentSearchCopyWithImpl<RecentSearch>(
+          this as RecentSearch, _$identity);
+
+  /// Serializes this RecentSearch to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? queryText = null,
-    Object? timestamp = null,
-  }) {
-    return _then(_value.copyWith(
-      queryText: null == queryText
-          ? _value.queryText
-          : queryText // ignore: cast_nullable_to_non_nullable
-              as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as RecentSearch;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is RecentSearch &&
+            (identical(other.queryText, _this.queryText) ||
+                other.queryText == _this.queryText) &&
+            (identical(other.timestamp, _this.timestamp) ||
+                other.timestamp == _this.timestamp));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode {
+    final _this = this as RecentSearch;
+    return Object.hash(runtimeType, _this.queryText, _this.timestamp);
+  }
+
+  @override
+  String toString() {
+    final _this = this as RecentSearch;
+    return 'RecentSearch(queryText: ${_this.queryText}, timestamp: ${_this.timestamp})';
   }
 }
 
 /// @nodoc
-abstract class _$$RecentSearchImplCopyWith<$Res>
-    implements $RecentSearchCopyWith<$Res> {
-  factory _$$RecentSearchImplCopyWith(
-          _$RecentSearchImpl value, $Res Function(_$RecentSearchImpl) then) =
-      __$$RecentSearchImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $RecentSearchCopyWith<$Res> {
+  factory $RecentSearchCopyWith(
+          RecentSearch value, $Res Function(RecentSearch) _then) =
+      _$RecentSearchCopyWithImpl;
   @useResult
   $Res call({String queryText, DateTime timestamp});
 }
 
 /// @nodoc
-class __$$RecentSearchImplCopyWithImpl<$Res>
-    extends _$RecentSearchCopyWithImpl<$Res, _$RecentSearchImpl>
-    implements _$$RecentSearchImplCopyWith<$Res> {
-  __$$RecentSearchImplCopyWithImpl(
-      _$RecentSearchImpl _value, $Res Function(_$RecentSearchImpl) _then)
-      : super(_value, _then);
+class _$RecentSearchCopyWithImpl<$Res> implements $RecentSearchCopyWith<$Res> {
+  _$RecentSearchCopyWithImpl(this._self, this._then);
+
+  final RecentSearch _self;
+  final $Res Function(RecentSearch) _then;
 
   /// Create a copy of RecentSearch
   /// with the given fields replaced by the non-null parameter values.
@@ -103,26 +82,182 @@ class __$$RecentSearchImplCopyWithImpl<$Res>
     Object? queryText = null,
     Object? timestamp = null,
   }) {
-    return _then(_$RecentSearchImpl(
+    return _then(RecentSearch(
       queryText: null == queryText
-          ? _value.queryText
+          ? _self.queryText
           : queryText // ignore: cast_nullable_to_non_nullable
               as String,
       timestamp: null == timestamp
-          ? _value.timestamp
+          ? _self.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [RecentSearch].
+extension RecentSearchPatterns on RecentSearch {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_RecentSearch value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_RecentSearch value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_RecentSearch value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String queryText, DateTime timestamp)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch() when $default != null:
+        return $default(_that.queryText, _that.timestamp);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String queryText, DateTime timestamp) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch():
+        return $default(_that.queryText, _that.timestamp);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String queryText, DateTime timestamp)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecentSearch() when $default != null:
+        return $default(_that.queryText, _that.timestamp);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$RecentSearchImpl implements _RecentSearch {
-  const _$RecentSearchImpl({required this.queryText, required this.timestamp});
-
-  factory _$RecentSearchImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RecentSearchImplFromJson(json);
+class _RecentSearch implements RecentSearch {
+  const _RecentSearch({required this.queryText, required this.timestamp});
+  factory _RecentSearch.fromJson(Map<String, dynamic> json) =>
+      _$RecentSearchFromJson(json);
 
   /// The search query text
   @override
@@ -132,16 +267,26 @@ class _$RecentSearchImpl implements _RecentSearch {
   @override
   final DateTime timestamp;
 
+  /// Create a copy of RecentSearch
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'RecentSearch(queryText: $queryText, timestamp: $timestamp)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$RecentSearchCopyWith<_RecentSearch> get copyWith =>
+      __$RecentSearchCopyWithImpl<_RecentSearch>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$RecentSearchToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$RecentSearchImpl &&
+            other is _RecentSearch &&
             (identical(other.queryText, queryText) ||
                 other.queryText == queryText) &&
             (identical(other.timestamp, timestamp) ||
@@ -150,44 +295,54 @@ class _$RecentSearchImpl implements _RecentSearch {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, queryText, timestamp);
-
-  /// Create a copy of RecentSearch
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$RecentSearchImplCopyWith<_$RecentSearchImpl> get copyWith =>
-      __$$RecentSearchImplCopyWithImpl<_$RecentSearchImpl>(this, _$identity);
+  int get hashCode {
+    return Object.hash(runtimeType, queryText, timestamp);
+  }
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$$RecentSearchImplToJson(
-      this,
-    );
+  String toString() {
+    return 'RecentSearch(queryText: $queryText, timestamp: $timestamp)';
   }
 }
 
-abstract class _RecentSearch implements RecentSearch {
-  const factory _RecentSearch(
-      {required final String queryText,
-      required final DateTime timestamp}) = _$RecentSearchImpl;
-
-  factory _RecentSearch.fromJson(Map<String, dynamic> json) =
-      _$RecentSearchImpl.fromJson;
-
-  /// The search query text
+/// @nodoc
+abstract mixin class _$RecentSearchCopyWith<$Res>
+    implements $RecentSearchCopyWith<$Res> {
+  factory _$RecentSearchCopyWith(
+          _RecentSearch value, $Res Function(_RecentSearch) _then) =
+      __$RecentSearchCopyWithImpl;
   @override
-  String get queryText;
+  @useResult
+  $Res call({String queryText, DateTime timestamp});
+}
 
-  /// When this search was performed
-  @override
-  DateTime get timestamp;
+/// @nodoc
+class __$RecentSearchCopyWithImpl<$Res>
+    implements _$RecentSearchCopyWith<$Res> {
+  __$RecentSearchCopyWithImpl(this._self, this._then);
+
+  final _RecentSearch _self;
+  final $Res Function(_RecentSearch) _then;
 
   /// Create a copy of RecentSearch
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$RecentSearchImplCopyWith<_$RecentSearchImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? queryText = null,
+    Object? timestamp = null,
+  }) {
+    return _then(_RecentSearch(
+      queryText: null == queryText
+          ? _self.queryText
+          : queryText // ignore: cast_nullable_to_non_nullable
+              as String,
+      timestamp: null == timestamp
+          ? _self.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
 }
+
+// dart format on

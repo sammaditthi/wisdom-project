@@ -7,7 +7,7 @@ enum MoonPhase { fullMoon, newMoon }
 
 /// One uposatha of the Sangha calendar.
 @freezed
-class UposathaDay with _$UposathaDay {
+abstract class UposathaDay with _$UposathaDay {
   const factory UposathaDay({
     /// The calendar day, as a UTC-midnight date.
     required DateTime date,

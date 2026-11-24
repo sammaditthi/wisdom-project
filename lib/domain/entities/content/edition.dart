@@ -7,7 +7,7 @@ part 'edition.freezed.dart';
 /// An edition is a specific publication or digitization of the Pali Canon.
 /// Different editions may have different texts, translations, pagination, and metadata.
 @freezed
-class Edition with _$Edition {
+abstract class Edition with _$Edition {
   const factory Edition({
     /// Unique identifier for this edition
     /// Examples: 'bjt', 'suttacentral', 'pts'

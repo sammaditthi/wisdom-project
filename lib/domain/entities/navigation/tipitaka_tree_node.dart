@@ -7,7 +7,7 @@ part 'tipitaka_tree_node.freezed.dart';
 /// Represents a single node in the Tipitaka navigation tree
 /// Can be either a container node (folder) or a readable content node (sutta)
 @freezed
-class TipitakaTreeNode with _$TipitakaTreeNode {
+abstract class TipitakaTreeNode with _$TipitakaTreeNode {
   const TipitakaTreeNode._();
 
   const factory TipitakaTreeNode({

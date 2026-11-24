@@ -9,7 +9,7 @@ part 'bjt_page.freezed.dart';
 /// This is specific to the Buddha Jayanti Tripitaka edition, which prints the
 /// Pali on an even left-hand page and its Sinhala on the facing odd page.
 @freezed
-class BJTPage with _$BJTPage {
+abstract class BJTPage with _$BJTPage {
   const BJTPage._();
 
   const factory BJTPage({

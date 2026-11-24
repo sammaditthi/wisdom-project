@@ -6,14 +6,12 @@ part of 'research_filters.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ResearchFiltersImpl _$$ResearchFiltersImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ResearchFiltersImpl(
+_ResearchFilters _$ResearchFiltersFromJson(Map<String, dynamic> json) =>
+    _ResearchFilters(
       basket: json['basket'] as String?,
     );
 
-Map<String, dynamic> _$$ResearchFiltersImplToJson(
-        _$ResearchFiltersImpl instance) =>
+Map<String, dynamic> _$ResearchFiltersToJson(_ResearchFilters instance) =>
     <String, dynamic>{
       'basket': instance.basket,
     };

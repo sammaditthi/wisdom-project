@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'search_state.dart';
@@ -9,50 +9,47 @@ part of 'search_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$SearchState {
   /// Current search query text (raw user input)
-  String get rawQueryText => throw _privateConstructorUsedError;
+  String get rawQueryText;
 
   /// Effective query text (sanitized + converted to Sinhala if Singlish)
   /// This is computed once when query changes and used for:
   /// - Repository searches (via SearchQuery)
   /// - UI highlighting (avoids re-conversion per result row)
-  String get effectiveQueryText => throw _privateConstructorUsedError;
+  String get effectiveQueryText;
 
   /// Recent search history
-  List<RecentSearch> get recentSearches => throw _privateConstructorUsedError;
+  List<RecentSearch> get recentSearches;
 
   /// Currently selected category in results view
-  SearchResultType get selectedResultType => throw _privateConstructorUsedError;
+  SearchResultType get selectedResultType;
 
   /// Categorized results for "Top Results" tab (grouped by category)
   /// null = invalid query (didn't search); an error = the search failed.
   /// Loading is [isLoading], not this.
-  AsyncValue<GroupedSearchResult?> get groupedResults =>
-      throw _privateConstructorUsedError;
+  AsyncValue<GroupedSearchResult?> get groupedResults;
 
   /// Full results for the selected category (async state)
   /// null = invalid query (didn't search), [] = valid query with no results
-  AsyncValue<List<SearchResult>?> get fullResults =>
-      throw _privateConstructorUsedError;
+  AsyncValue<List<SearchResult>?> get fullResults;
 
   /// Whether results are currently loading
-  bool get isLoading => throw _privateConstructorUsedError;
+  bool get isLoading;
 
   /// Selected editions to search (empty = default to BJT)
-  Set<String> get selectedEditions => throw _privateConstructorUsedError;
+  Set<String> get selectedEditions;
 
   /// Whether to search in Pali text
-  bool get searchInPali => throw _privateConstructorUsedError;
+  bool get searchInPali;
 
   /// Whether to search in Sinhala text
-  bool get searchInSinhala => throw _privateConstructorUsedError;
+  bool get searchInSinhala;
 
   /// Search scope using tree node keys (e.g., 'sp', 'dn', 'kn-dhp').
   ///
@@ -62,217 +59,146 @@ mixin _$SearchState {
   /// This is set by:
   /// - Quick filter chips (e.g., clicking "Sutta" sets {'sp'})
   /// - Refine dialog tree selection (e.g., {'dn', 'mn'})
-  Set<String> get scope => throw _privateConstructorUsedError;
+  Set<String> get scope;
 
   /// Whether to search as a phrase (consecutive words) or separate words.
   /// - true (DEFAULT) = phrase search (words must be adjacent)
   /// - false = separate-word search (words within proximity distance)
-  bool get isPhraseSearch => throw _privateConstructorUsedError;
+  bool get isPhraseSearch;
 
   /// Whether to ignore proximity and search anywhere in the same text unit.
   /// Only applies when [isPhraseSearch] is false.
   /// - true = search for words anywhere in the text (uses very large proximity)
   /// - false (DEFAULT) = use [proximityDistance] for proximity constraint
-  bool get isAnywhereInText => throw _privateConstructorUsedError;
+  bool get isAnywhereInText;
 
   /// Proximity distance for multi-word separate-word queries.
   /// Only applies when [isPhraseSearch] is false and [isAnywhereInText] is false.
   /// Default 10 = words within 10 tokens (NEAR/10).
   /// Range: 1-100.
-  int get proximityDistance => throw _privateConstructorUsedError;
+  int get proximityDistance;
 
   /// Whether the panel was dismissed (user clicked result or close button)
   /// Panel reopens when user focuses the search bar again
-  bool get isPanelDismissed => throw _privateConstructorUsedError;
+  bool get isPanelDismissed;
 
   /// Whether exact match is enabled (default: false = prefix matching)
   /// When false: "සති" matches "සතිපට්ඨානය", "සතිපට්ඨාන", etc.
   /// When true: "සති" matches only "සති" exactly
-  bool get isExactMatch => throw _privateConstructorUsedError;
+  bool get isExactMatch;
 
   /// Result counts per category (for tab badges)
   /// Updated independently from categorized results
-  Map<SearchResultType, int> get countByResultType =>
-      throw _privateConstructorUsedError;
+  Map<SearchResultType, int> get countByResultType;
 
   /// Tracks which FTS result groups are expanded (by nodeKey)
   /// Used to show/hide secondary matches in grouped FTS results
-  Set<String> get expandedFTSGroups => throw _privateConstructorUsedError;
+  Set<String> get expandedFTSGroups;
 
   /// Definition results showing their full meaning (by result id)
-  Set<String> get expandedDefinitions => throw _privateConstructorUsedError;
+  Set<String> get expandedDefinitions;
 
   /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
   /// Empty set = "All" (no filter applied).
   ///
   /// Single source of truth for both quick chips and refine dialog,
   /// following the same pattern as [scope] for title/FTS filters.
-  Set<String> get selectedDictionaryIds => throw _privateConstructorUsedError;
+  Set<String> get selectedDictionaryIds;
 
   /// Create a copy of SearchState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SearchStateCopyWith<SearchState> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SearchStateCopyWith<$Res> {
-  factory $SearchStateCopyWith(
-          SearchState value, $Res Function(SearchState) then) =
-      _$SearchStateCopyWithImpl<$Res, SearchState>;
-  @useResult
-  $Res call(
-      {String rawQueryText,
-      String effectiveQueryText,
-      List<RecentSearch> recentSearches,
-      SearchResultType selectedResultType,
-      AsyncValue<GroupedSearchResult?> groupedResults,
-      AsyncValue<List<SearchResult>?> fullResults,
-      bool isLoading,
-      Set<String> selectedEditions,
-      bool searchInPali,
-      bool searchInSinhala,
-      Set<String> scope,
-      bool isPhraseSearch,
-      bool isAnywhereInText,
-      int proximityDistance,
-      bool isPanelDismissed,
-      bool isExactMatch,
-      Map<SearchResultType, int> countByResultType,
-      Set<String> expandedFTSGroups,
-      Set<String> expandedDefinitions,
-      Set<String> selectedDictionaryIds});
-}
-
-/// @nodoc
-class _$SearchStateCopyWithImpl<$Res, $Val extends SearchState>
-    implements $SearchStateCopyWith<$Res> {
-  _$SearchStateCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SearchState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $SearchStateCopyWith<SearchState> get copyWith =>
+      _$SearchStateCopyWithImpl<SearchState>(this as SearchState, _$identity);
+
   @override
-  $Res call({
-    Object? rawQueryText = null,
-    Object? effectiveQueryText = null,
-    Object? recentSearches = null,
-    Object? selectedResultType = null,
-    Object? groupedResults = null,
-    Object? fullResults = null,
-    Object? isLoading = null,
-    Object? selectedEditions = null,
-    Object? searchInPali = null,
-    Object? searchInSinhala = null,
-    Object? scope = null,
-    Object? isPhraseSearch = null,
-    Object? isAnywhereInText = null,
-    Object? proximityDistance = null,
-    Object? isPanelDismissed = null,
-    Object? isExactMatch = null,
-    Object? countByResultType = null,
-    Object? expandedFTSGroups = null,
-    Object? expandedDefinitions = null,
-    Object? selectedDictionaryIds = null,
-  }) {
-    return _then(_value.copyWith(
-      rawQueryText: null == rawQueryText
-          ? _value.rawQueryText
-          : rawQueryText // ignore: cast_nullable_to_non_nullable
-              as String,
-      effectiveQueryText: null == effectiveQueryText
-          ? _value.effectiveQueryText
-          : effectiveQueryText // ignore: cast_nullable_to_non_nullable
-              as String,
-      recentSearches: null == recentSearches
-          ? _value.recentSearches
-          : recentSearches // ignore: cast_nullable_to_non_nullable
-              as List<RecentSearch>,
-      selectedResultType: null == selectedResultType
-          ? _value.selectedResultType
-          : selectedResultType // ignore: cast_nullable_to_non_nullable
-              as SearchResultType,
-      groupedResults: null == groupedResults
-          ? _value.groupedResults
-          : groupedResults // ignore: cast_nullable_to_non_nullable
-              as AsyncValue<GroupedSearchResult?>,
-      fullResults: null == fullResults
-          ? _value.fullResults
-          : fullResults // ignore: cast_nullable_to_non_nullable
-              as AsyncValue<List<SearchResult>?>,
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      selectedEditions: null == selectedEditions
-          ? _value.selectedEditions
-          : selectedEditions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      searchInPali: null == searchInPali
-          ? _value.searchInPali
-          : searchInPali // ignore: cast_nullable_to_non_nullable
-              as bool,
-      searchInSinhala: null == searchInSinhala
-          ? _value.searchInSinhala
-          : searchInSinhala // ignore: cast_nullable_to_non_nullable
-              as bool,
-      scope: null == scope
-          ? _value.scope
-          : scope // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      isPhraseSearch: null == isPhraseSearch
-          ? _value.isPhraseSearch
-          : isPhraseSearch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isAnywhereInText: null == isAnywhereInText
-          ? _value.isAnywhereInText
-          : isAnywhereInText // ignore: cast_nullable_to_non_nullable
-              as bool,
-      proximityDistance: null == proximityDistance
-          ? _value.proximityDistance
-          : proximityDistance // ignore: cast_nullable_to_non_nullable
-              as int,
-      isPanelDismissed: null == isPanelDismissed
-          ? _value.isPanelDismissed
-          : isPanelDismissed // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
-          : isExactMatch // ignore: cast_nullable_to_non_nullable
-              as bool,
-      countByResultType: null == countByResultType
-          ? _value.countByResultType
-          : countByResultType // ignore: cast_nullable_to_non_nullable
-              as Map<SearchResultType, int>,
-      expandedFTSGroups: null == expandedFTSGroups
-          ? _value.expandedFTSGroups
-          : expandedFTSGroups // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      expandedDefinitions: null == expandedDefinitions
-          ? _value.expandedDefinitions
-          : expandedDefinitions // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-      selectedDictionaryIds: null == selectedDictionaryIds
-          ? _value.selectedDictionaryIds
-          : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
-              as Set<String>,
-    ) as $Val);
+  bool operator ==(Object other) {
+    final _this = this as SearchState;
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SearchState &&
+            (identical(other.rawQueryText, _this.rawQueryText) ||
+                other.rawQueryText == _this.rawQueryText) &&
+            (identical(other.effectiveQueryText, _this.effectiveQueryText) ||
+                other.effectiveQueryText == _this.effectiveQueryText) &&
+            const DeepCollectionEquality()
+                .equals(other.recentSearches, _this.recentSearches) &&
+            (identical(other.selectedResultType, _this.selectedResultType) ||
+                other.selectedResultType == _this.selectedResultType) &&
+            (identical(other.groupedResults, _this.groupedResults) ||
+                other.groupedResults == _this.groupedResults) &&
+            (identical(other.fullResults, _this.fullResults) ||
+                other.fullResults == _this.fullResults) &&
+            (identical(other.isLoading, _this.isLoading) ||
+                other.isLoading == _this.isLoading) &&
+            const DeepCollectionEquality()
+                .equals(other.selectedEditions, _this.selectedEditions) &&
+            (identical(other.searchInPali, _this.searchInPali) ||
+                other.searchInPali == _this.searchInPali) &&
+            (identical(other.searchInSinhala, _this.searchInSinhala) ||
+                other.searchInSinhala == _this.searchInSinhala) &&
+            const DeepCollectionEquality().equals(other.scope, _this.scope) &&
+            (identical(other.isPhraseSearch, _this.isPhraseSearch) ||
+                other.isPhraseSearch == _this.isPhraseSearch) &&
+            (identical(other.isAnywhereInText, _this.isAnywhereInText) ||
+                other.isAnywhereInText == _this.isAnywhereInText) &&
+            (identical(other.proximityDistance, _this.proximityDistance) ||
+                other.proximityDistance == _this.proximityDistance) &&
+            (identical(other.isPanelDismissed, _this.isPanelDismissed) ||
+                other.isPanelDismissed == _this.isPanelDismissed) &&
+            (identical(other.isExactMatch, _this.isExactMatch) ||
+                other.isExactMatch == _this.isExactMatch) &&
+            const DeepCollectionEquality()
+                .equals(other.countByResultType, _this.countByResultType) &&
+            const DeepCollectionEquality()
+                .equals(other.expandedFTSGroups, _this.expandedFTSGroups) &&
+            const DeepCollectionEquality()
+                .equals(other.expandedDefinitions, _this.expandedDefinitions) &&
+            const DeepCollectionEquality().equals(
+                other.selectedDictionaryIds, _this.selectedDictionaryIds));
+  }
+
+  @override
+  int get hashCode {
+    final _this = this as SearchState;
+    return Object.hashAll([
+      runtimeType,
+      _this.rawQueryText,
+      _this.effectiveQueryText,
+      const DeepCollectionEquality().hash(_this.recentSearches),
+      _this.selectedResultType,
+      _this.groupedResults,
+      _this.fullResults,
+      _this.isLoading,
+      const DeepCollectionEquality().hash(_this.selectedEditions),
+      _this.searchInPali,
+      _this.searchInSinhala,
+      const DeepCollectionEquality().hash(_this.scope),
+      _this.isPhraseSearch,
+      _this.isAnywhereInText,
+      _this.proximityDistance,
+      _this.isPanelDismissed,
+      _this.isExactMatch,
+      const DeepCollectionEquality().hash(_this.countByResultType),
+      const DeepCollectionEquality().hash(_this.expandedFTSGroups),
+      const DeepCollectionEquality().hash(_this.expandedDefinitions),
+      const DeepCollectionEquality().hash(_this.selectedDictionaryIds)
+    ]);
+  }
+
+  @override
+  String toString() {
+    final _this = this as SearchState;
+    return 'SearchState(rawQueryText: ${_this.rawQueryText}, effectiveQueryText: ${_this.effectiveQueryText}, recentSearches: ${_this.recentSearches}, selectedResultType: ${_this.selectedResultType}, groupedResults: ${_this.groupedResults}, fullResults: ${_this.fullResults}, isLoading: ${_this.isLoading}, selectedEditions: ${_this.selectedEditions}, searchInPali: ${_this.searchInPali}, searchInSinhala: ${_this.searchInSinhala}, scope: ${_this.scope}, isPhraseSearch: ${_this.isPhraseSearch}, isAnywhereInText: ${_this.isAnywhereInText}, proximityDistance: ${_this.proximityDistance}, isPanelDismissed: ${_this.isPanelDismissed}, isExactMatch: ${_this.isExactMatch}, countByResultType: ${_this.countByResultType}, expandedFTSGroups: ${_this.expandedFTSGroups}, expandedDefinitions: ${_this.expandedDefinitions}, selectedDictionaryIds: ${_this.selectedDictionaryIds})';
   }
 }
 
 /// @nodoc
-abstract class _$$SearchStateImplCopyWith<$Res>
-    implements $SearchStateCopyWith<$Res> {
-  factory _$$SearchStateImplCopyWith(
-          _$SearchStateImpl value, $Res Function(_$SearchStateImpl) then) =
-      __$$SearchStateImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SearchStateCopyWith<$Res> {
+  factory $SearchStateCopyWith(
+          SearchState value, $Res Function(SearchState) _then) =
+      _$SearchStateCopyWithImpl;
   @useResult
   $Res call(
       {String rawQueryText,
@@ -298,12 +224,11 @@ abstract class _$$SearchStateImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SearchStateImplCopyWithImpl<$Res>
-    extends _$SearchStateCopyWithImpl<$Res, _$SearchStateImpl>
-    implements _$$SearchStateImplCopyWith<$Res> {
-  __$$SearchStateImplCopyWithImpl(
-      _$SearchStateImpl _value, $Res Function(_$SearchStateImpl) _then)
-      : super(_value, _then);
+class _$SearchStateCopyWithImpl<$Res> implements $SearchStateCopyWith<$Res> {
+  _$SearchStateCopyWithImpl(this._self, this._then);
+
+  final SearchState _self;
+  final $Res Function(SearchState) _then;
 
   /// Create a copy of SearchState
   /// with the given fields replaced by the non-null parameter values.
@@ -331,115 +256,395 @@ class __$$SearchStateImplCopyWithImpl<$Res>
     Object? expandedDefinitions = null,
     Object? selectedDictionaryIds = null,
   }) {
-    return _then(_$SearchStateImpl(
+    return _then(SearchState(
       rawQueryText: null == rawQueryText
-          ? _value.rawQueryText
+          ? _self.rawQueryText
           : rawQueryText // ignore: cast_nullable_to_non_nullable
               as String,
       effectiveQueryText: null == effectiveQueryText
-          ? _value.effectiveQueryText
+          ? _self.effectiveQueryText
           : effectiveQueryText // ignore: cast_nullable_to_non_nullable
               as String,
       recentSearches: null == recentSearches
-          ? _value._recentSearches
+          ? _self.recentSearches
           : recentSearches // ignore: cast_nullable_to_non_nullable
               as List<RecentSearch>,
       selectedResultType: null == selectedResultType
-          ? _value.selectedResultType
+          ? _self.selectedResultType
           : selectedResultType // ignore: cast_nullable_to_non_nullable
               as SearchResultType,
       groupedResults: null == groupedResults
-          ? _value.groupedResults
+          ? _self.groupedResults
           : groupedResults // ignore: cast_nullable_to_non_nullable
               as AsyncValue<GroupedSearchResult?>,
       fullResults: null == fullResults
-          ? _value.fullResults
+          ? _self.fullResults
           : fullResults // ignore: cast_nullable_to_non_nullable
               as AsyncValue<List<SearchResult>?>,
       isLoading: null == isLoading
-          ? _value.isLoading
+          ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
       selectedEditions: null == selectedEditions
-          ? _value._selectedEditions
+          ? _self.selectedEditions
           : selectedEditions // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       searchInPali: null == searchInPali
-          ? _value.searchInPali
+          ? _self.searchInPali
           : searchInPali // ignore: cast_nullable_to_non_nullable
               as bool,
       searchInSinhala: null == searchInSinhala
-          ? _value.searchInSinhala
+          ? _self.searchInSinhala
           : searchInSinhala // ignore: cast_nullable_to_non_nullable
               as bool,
       scope: null == scope
-          ? _value._scope
+          ? _self.scope
           : scope // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       isPhraseSearch: null == isPhraseSearch
-          ? _value.isPhraseSearch
+          ? _self.isPhraseSearch
           : isPhraseSearch // ignore: cast_nullable_to_non_nullable
               as bool,
       isAnywhereInText: null == isAnywhereInText
-          ? _value.isAnywhereInText
+          ? _self.isAnywhereInText
           : isAnywhereInText // ignore: cast_nullable_to_non_nullable
               as bool,
       proximityDistance: null == proximityDistance
-          ? _value.proximityDistance
+          ? _self.proximityDistance
           : proximityDistance // ignore: cast_nullable_to_non_nullable
               as int,
       isPanelDismissed: null == isPanelDismissed
-          ? _value.isPanelDismissed
+          ? _self.isPanelDismissed
           : isPanelDismissed // ignore: cast_nullable_to_non_nullable
               as bool,
       isExactMatch: null == isExactMatch
-          ? _value.isExactMatch
+          ? _self.isExactMatch
           : isExactMatch // ignore: cast_nullable_to_non_nullable
               as bool,
       countByResultType: null == countByResultType
-          ? _value._countByResultType
+          ? _self.countByResultType
           : countByResultType // ignore: cast_nullable_to_non_nullable
               as Map<SearchResultType, int>,
       expandedFTSGroups: null == expandedFTSGroups
-          ? _value._expandedFTSGroups
+          ? _self.expandedFTSGroups
           : expandedFTSGroups // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       expandedDefinitions: null == expandedDefinitions
-          ? _value._expandedDefinitions
+          ? _self.expandedDefinitions
           : expandedDefinitions // ignore: cast_nullable_to_non_nullable
               as Set<String>,
       selectedDictionaryIds: null == selectedDictionaryIds
-          ? _value._selectedDictionaryIds
+          ? _self.selectedDictionaryIds
           : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
               as Set<String>,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [SearchState].
+extension SearchStatePatterns on SearchState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SearchState value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SearchState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SearchState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String rawQueryText,
+            String effectiveQueryText,
+            List<RecentSearch> recentSearches,
+            SearchResultType selectedResultType,
+            AsyncValue<GroupedSearchResult?> groupedResults,
+            AsyncValue<List<SearchResult>?> fullResults,
+            bool isLoading,
+            Set<String> selectedEditions,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            bool isPanelDismissed,
+            bool isExactMatch,
+            Map<SearchResultType, int> countByResultType,
+            Set<String> expandedFTSGroups,
+            Set<String> expandedDefinitions,
+            Set<String> selectedDictionaryIds)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState() when $default != null:
+        return $default(
+            _that.rawQueryText,
+            _that.effectiveQueryText,
+            _that.recentSearches,
+            _that.selectedResultType,
+            _that.groupedResults,
+            _that.fullResults,
+            _that.isLoading,
+            _that.selectedEditions,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.isPanelDismissed,
+            _that.isExactMatch,
+            _that.countByResultType,
+            _that.expandedFTSGroups,
+            _that.expandedDefinitions,
+            _that.selectedDictionaryIds);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String rawQueryText,
+            String effectiveQueryText,
+            List<RecentSearch> recentSearches,
+            SearchResultType selectedResultType,
+            AsyncValue<GroupedSearchResult?> groupedResults,
+            AsyncValue<List<SearchResult>?> fullResults,
+            bool isLoading,
+            Set<String> selectedEditions,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            bool isPanelDismissed,
+            bool isExactMatch,
+            Map<SearchResultType, int> countByResultType,
+            Set<String> expandedFTSGroups,
+            Set<String> expandedDefinitions,
+            Set<String> selectedDictionaryIds)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState():
+        return $default(
+            _that.rawQueryText,
+            _that.effectiveQueryText,
+            _that.recentSearches,
+            _that.selectedResultType,
+            _that.groupedResults,
+            _that.fullResults,
+            _that.isLoading,
+            _that.selectedEditions,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.isPanelDismissed,
+            _that.isExactMatch,
+            _that.countByResultType,
+            _that.expandedFTSGroups,
+            _that.expandedDefinitions,
+            _that.selectedDictionaryIds);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String rawQueryText,
+            String effectiveQueryText,
+            List<RecentSearch> recentSearches,
+            SearchResultType selectedResultType,
+            AsyncValue<GroupedSearchResult?> groupedResults,
+            AsyncValue<List<SearchResult>?> fullResults,
+            bool isLoading,
+            Set<String> selectedEditions,
+            bool searchInPali,
+            bool searchInSinhala,
+            Set<String> scope,
+            bool isPhraseSearch,
+            bool isAnywhereInText,
+            int proximityDistance,
+            bool isPanelDismissed,
+            bool isExactMatch,
+            Map<SearchResultType, int> countByResultType,
+            Set<String> expandedFTSGroups,
+            Set<String> expandedDefinitions,
+            Set<String> selectedDictionaryIds)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SearchState() when $default != null:
+        return $default(
+            _that.rawQueryText,
+            _that.effectiveQueryText,
+            _that.recentSearches,
+            _that.selectedResultType,
+            _that.groupedResults,
+            _that.fullResults,
+            _that.isLoading,
+            _that.selectedEditions,
+            _that.searchInPali,
+            _that.searchInSinhala,
+            _that.scope,
+            _that.isPhraseSearch,
+            _that.isAnywhereInText,
+            _that.proximityDistance,
+            _that.isPanelDismissed,
+            _that.isExactMatch,
+            _that.countByResultType,
+            _that.expandedFTSGroups,
+            _that.expandedDefinitions,
+            _that.selectedDictionaryIds);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$SearchStateImpl extends _SearchState {
-  const _$SearchStateImpl(
+class _SearchState extends SearchState {
+  const _SearchState(
       {this.rawQueryText = '',
       this.effectiveQueryText = '',
-      final List<RecentSearch> recentSearches = const [],
+      List<RecentSearch> recentSearches = const [],
       this.selectedResultType = SearchResultType.topResults,
       this.groupedResults = const AsyncValue.data(null),
       this.fullResults = const AsyncValue.data(null),
       this.isLoading = false,
-      final Set<String> selectedEditions = const {},
+      Set<String> selectedEditions = const {},
       this.searchInPali = true,
       this.searchInSinhala = true,
-      final Set<String> scope = const {},
+      Set<String> scope = const {},
       this.isPhraseSearch = true,
       this.isAnywhereInText = false,
       this.proximityDistance = 10,
       this.isPanelDismissed = false,
       this.isExactMatch = false,
-      final Map<SearchResultType, int> countByResultType = const {},
-      final Set<String> expandedFTSGroups = const {},
-      final Set<String> expandedDefinitions = const {},
-      final Set<String> selectedDictionaryIds = const {}})
+      Map<SearchResultType, int> countByResultType = const {},
+      Set<String> expandedFTSGroups = const {},
+      Set<String> expandedDefinitions = const {},
+      Set<String> selectedDictionaryIds = const {}})
       : _recentSearches = recentSearches,
         _selectedEditions = selectedEditions,
         _scope = scope,
@@ -645,22 +850,25 @@ class _$SearchStateImpl extends _SearchState {
     return EqualUnmodifiableSetView(_selectedDictionaryIds);
   }
 
+  /// Create a copy of SearchState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SearchState(rawQueryText: $rawQueryText, effectiveQueryText: $effectiveQueryText, recentSearches: $recentSearches, selectedResultType: $selectedResultType, groupedResults: $groupedResults, fullResults: $fullResults, isLoading: $isLoading, selectedEditions: $selectedEditions, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, isPanelDismissed: $isPanelDismissed, isExactMatch: $isExactMatch, countByResultType: $countByResultType, expandedFTSGroups: $expandedFTSGroups, expandedDefinitions: $expandedDefinitions, selectedDictionaryIds: $selectedDictionaryIds)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SearchStateCopyWith<_SearchState> get copyWith =>
+      __$SearchStateCopyWithImpl<_SearchState>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SearchStateImpl &&
+            other is _SearchState &&
             (identical(other.rawQueryText, rawQueryText) ||
                 other.rawQueryText == rawQueryText) &&
             (identical(other.effectiveQueryText, effectiveQueryText) ||
                 other.effectiveQueryText == effectiveQueryText) &&
             const DeepCollectionEquality()
-                .equals(other._recentSearches, _recentSearches) &&
+                .equals(other.recentSearches, _recentSearches) &&
             (identical(other.selectedResultType, selectedResultType) ||
                 other.selectedResultType == selectedResultType) &&
             (identical(other.groupedResults, groupedResults) ||
@@ -670,12 +878,12 @@ class _$SearchStateImpl extends _SearchState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             const DeepCollectionEquality()
-                .equals(other._selectedEditions, _selectedEditions) &&
+                .equals(other.selectedEditions, _selectedEditions) &&
             (identical(other.searchInPali, searchInPali) ||
                 other.searchInPali == searchInPali) &&
             (identical(other.searchInSinhala, searchInSinhala) ||
                 other.searchInSinhala == searchInSinhala) &&
-            const DeepCollectionEquality().equals(other._scope, _scope) &&
+            const DeepCollectionEquality().equals(other.scope, _scope) &&
             (identical(other.isPhraseSearch, isPhraseSearch) ||
                 other.isPhraseSearch == isPhraseSearch) &&
             (identical(other.isAnywhereInText, isAnywhereInText) ||
@@ -687,187 +895,195 @@ class _$SearchStateImpl extends _SearchState {
             (identical(other.isExactMatch, isExactMatch) ||
                 other.isExactMatch == isExactMatch) &&
             const DeepCollectionEquality()
-                .equals(other._countByResultType, _countByResultType) &&
+                .equals(other.countByResultType, _countByResultType) &&
             const DeepCollectionEquality()
-                .equals(other._expandedFTSGroups, _expandedFTSGroups) &&
+                .equals(other.expandedFTSGroups, _expandedFTSGroups) &&
             const DeepCollectionEquality()
-                .equals(other._expandedDefinitions, _expandedDefinitions) &&
+                .equals(other.expandedDefinitions, _expandedDefinitions) &&
             const DeepCollectionEquality()
-                .equals(other._selectedDictionaryIds, _selectedDictionaryIds));
+                .equals(other.selectedDictionaryIds, _selectedDictionaryIds));
   }
 
   @override
-  int get hashCode => Object.hashAll([
-        runtimeType,
-        rawQueryText,
-        effectiveQueryText,
-        const DeepCollectionEquality().hash(_recentSearches),
-        selectedResultType,
-        groupedResults,
-        fullResults,
-        isLoading,
-        const DeepCollectionEquality().hash(_selectedEditions),
-        searchInPali,
-        searchInSinhala,
-        const DeepCollectionEquality().hash(_scope),
-        isPhraseSearch,
-        isAnywhereInText,
-        proximityDistance,
-        isPanelDismissed,
-        isExactMatch,
-        const DeepCollectionEquality().hash(_countByResultType),
-        const DeepCollectionEquality().hash(_expandedFTSGroups),
-        const DeepCollectionEquality().hash(_expandedDefinitions),
-        const DeepCollectionEquality().hash(_selectedDictionaryIds)
-      ]);
+  int get hashCode {
+    return Object.hashAll([
+      runtimeType,
+      rawQueryText,
+      effectiveQueryText,
+      const DeepCollectionEquality().hash(_recentSearches),
+      selectedResultType,
+      groupedResults,
+      fullResults,
+      isLoading,
+      const DeepCollectionEquality().hash(_selectedEditions),
+      searchInPali,
+      searchInSinhala,
+      const DeepCollectionEquality().hash(_scope),
+      isPhraseSearch,
+      isAnywhereInText,
+      proximityDistance,
+      isPanelDismissed,
+      isExactMatch,
+      const DeepCollectionEquality().hash(_countByResultType),
+      const DeepCollectionEquality().hash(_expandedFTSGroups),
+      const DeepCollectionEquality().hash(_expandedDefinitions),
+      const DeepCollectionEquality().hash(_selectedDictionaryIds)
+    ]);
+  }
+
+  @override
+  String toString() {
+    return 'SearchState(rawQueryText: $rawQueryText, effectiveQueryText: $effectiveQueryText, recentSearches: $recentSearches, selectedResultType: $selectedResultType, groupedResults: $groupedResults, fullResults: $fullResults, isLoading: $isLoading, selectedEditions: $selectedEditions, searchInPali: $searchInPali, searchInSinhala: $searchInSinhala, scope: $scope, isPhraseSearch: $isPhraseSearch, isAnywhereInText: $isAnywhereInText, proximityDistance: $proximityDistance, isPanelDismissed: $isPanelDismissed, isExactMatch: $isExactMatch, countByResultType: $countByResultType, expandedFTSGroups: $expandedFTSGroups, expandedDefinitions: $expandedDefinitions, selectedDictionaryIds: $selectedDictionaryIds)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$SearchStateCopyWith<$Res>
+    implements $SearchStateCopyWith<$Res> {
+  factory _$SearchStateCopyWith(
+          _SearchState value, $Res Function(_SearchState) _then) =
+      __$SearchStateCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String rawQueryText,
+      String effectiveQueryText,
+      List<RecentSearch> recentSearches,
+      SearchResultType selectedResultType,
+      AsyncValue<GroupedSearchResult?> groupedResults,
+      AsyncValue<List<SearchResult>?> fullResults,
+      bool isLoading,
+      Set<String> selectedEditions,
+      bool searchInPali,
+      bool searchInSinhala,
+      Set<String> scope,
+      bool isPhraseSearch,
+      bool isAnywhereInText,
+      int proximityDistance,
+      bool isPanelDismissed,
+      bool isExactMatch,
+      Map<SearchResultType, int> countByResultType,
+      Set<String> expandedFTSGroups,
+      Set<String> expandedDefinitions,
+      Set<String> selectedDictionaryIds});
+}
+
+/// @nodoc
+class __$SearchStateCopyWithImpl<$Res> implements _$SearchStateCopyWith<$Res> {
+  __$SearchStateCopyWithImpl(this._self, this._then);
+
+  final _SearchState _self;
+  final $Res Function(_SearchState) _then;
 
   /// Create a copy of SearchState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$SearchStateImplCopyWith<_$SearchStateImpl> get copyWith =>
-      __$$SearchStateImplCopyWithImpl<_$SearchStateImpl>(this, _$identity);
+  $Res call({
+    Object? rawQueryText = null,
+    Object? effectiveQueryText = null,
+    Object? recentSearches = null,
+    Object? selectedResultType = null,
+    Object? groupedResults = null,
+    Object? fullResults = null,
+    Object? isLoading = null,
+    Object? selectedEditions = null,
+    Object? searchInPali = null,
+    Object? searchInSinhala = null,
+    Object? scope = null,
+    Object? isPhraseSearch = null,
+    Object? isAnywhereInText = null,
+    Object? proximityDistance = null,
+    Object? isPanelDismissed = null,
+    Object? isExactMatch = null,
+    Object? countByResultType = null,
+    Object? expandedFTSGroups = null,
+    Object? expandedDefinitions = null,
+    Object? selectedDictionaryIds = null,
+  }) {
+    return _then(_SearchState(
+      rawQueryText: null == rawQueryText
+          ? _self.rawQueryText
+          : rawQueryText // ignore: cast_nullable_to_non_nullable
+              as String,
+      effectiveQueryText: null == effectiveQueryText
+          ? _self.effectiveQueryText
+          : effectiveQueryText // ignore: cast_nullable_to_non_nullable
+              as String,
+      recentSearches: null == recentSearches
+          ? _self._recentSearches
+          : recentSearches // ignore: cast_nullable_to_non_nullable
+              as List<RecentSearch>,
+      selectedResultType: null == selectedResultType
+          ? _self.selectedResultType
+          : selectedResultType // ignore: cast_nullable_to_non_nullable
+              as SearchResultType,
+      groupedResults: null == groupedResults
+          ? _self.groupedResults
+          : groupedResults // ignore: cast_nullable_to_non_nullable
+              as AsyncValue<GroupedSearchResult?>,
+      fullResults: null == fullResults
+          ? _self.fullResults
+          : fullResults // ignore: cast_nullable_to_non_nullable
+              as AsyncValue<List<SearchResult>?>,
+      isLoading: null == isLoading
+          ? _self.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      selectedEditions: null == selectedEditions
+          ? _self._selectedEditions
+          : selectedEditions // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      searchInPali: null == searchInPali
+          ? _self.searchInPali
+          : searchInPali // ignore: cast_nullable_to_non_nullable
+              as bool,
+      searchInSinhala: null == searchInSinhala
+          ? _self.searchInSinhala
+          : searchInSinhala // ignore: cast_nullable_to_non_nullable
+              as bool,
+      scope: null == scope
+          ? _self._scope
+          : scope // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      isPhraseSearch: null == isPhraseSearch
+          ? _self.isPhraseSearch
+          : isPhraseSearch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isAnywhereInText: null == isAnywhereInText
+          ? _self.isAnywhereInText
+          : isAnywhereInText // ignore: cast_nullable_to_non_nullable
+              as bool,
+      proximityDistance: null == proximityDistance
+          ? _self.proximityDistance
+          : proximityDistance // ignore: cast_nullable_to_non_nullable
+              as int,
+      isPanelDismissed: null == isPanelDismissed
+          ? _self.isPanelDismissed
+          : isPanelDismissed // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isExactMatch: null == isExactMatch
+          ? _self.isExactMatch
+          : isExactMatch // ignore: cast_nullable_to_non_nullable
+              as bool,
+      countByResultType: null == countByResultType
+          ? _self._countByResultType
+          : countByResultType // ignore: cast_nullable_to_non_nullable
+              as Map<SearchResultType, int>,
+      expandedFTSGroups: null == expandedFTSGroups
+          ? _self._expandedFTSGroups
+          : expandedFTSGroups // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      expandedDefinitions: null == expandedDefinitions
+          ? _self._expandedDefinitions
+          : expandedDefinitions // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+      selectedDictionaryIds: null == selectedDictionaryIds
+          ? _self._selectedDictionaryIds
+          : selectedDictionaryIds // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
+    ));
+  }
 }
 
-abstract class _SearchState extends SearchState {
-  const factory _SearchState(
-      {final String rawQueryText,
-      final String effectiveQueryText,
-      final List<RecentSearch> recentSearches,
-      final SearchResultType selectedResultType,
-      final AsyncValue<GroupedSearchResult?> groupedResults,
-      final AsyncValue<List<SearchResult>?> fullResults,
-      final bool isLoading,
-      final Set<String> selectedEditions,
-      final bool searchInPali,
-      final bool searchInSinhala,
-      final Set<String> scope,
-      final bool isPhraseSearch,
-      final bool isAnywhereInText,
-      final int proximityDistance,
-      final bool isPanelDismissed,
-      final bool isExactMatch,
-      final Map<SearchResultType, int> countByResultType,
-      final Set<String> expandedFTSGroups,
-      final Set<String> expandedDefinitions,
-      final Set<String> selectedDictionaryIds}) = _$SearchStateImpl;
-  const _SearchState._() : super._();
-
-  /// Current search query text (raw user input)
-  @override
-  String get rawQueryText;
-
-  /// Effective query text (sanitized + converted to Sinhala if Singlish)
-  /// This is computed once when query changes and used for:
-  /// - Repository searches (via SearchQuery)
-  /// - UI highlighting (avoids re-conversion per result row)
-  @override
-  String get effectiveQueryText;
-
-  /// Recent search history
-  @override
-  List<RecentSearch> get recentSearches;
-
-  /// Currently selected category in results view
-  @override
-  SearchResultType get selectedResultType;
-
-  /// Categorized results for "Top Results" tab (grouped by category)
-  /// null = invalid query (didn't search); an error = the search failed.
-  /// Loading is [isLoading], not this.
-  @override
-  AsyncValue<GroupedSearchResult?> get groupedResults;
-
-  /// Full results for the selected category (async state)
-  /// null = invalid query (didn't search), [] = valid query with no results
-  @override
-  AsyncValue<List<SearchResult>?> get fullResults;
-
-  /// Whether results are currently loading
-  @override
-  bool get isLoading;
-
-  /// Selected editions to search (empty = default to BJT)
-  @override
-  Set<String> get selectedEditions;
-
-  /// Whether to search in Pali text
-  @override
-  bool get searchInPali;
-
-  /// Whether to search in Sinhala text
-  @override
-  bool get searchInSinhala;
-
-  /// Search scope using tree node keys (e.g., 'sp', 'dn', 'kn-dhp').
-  ///
-  /// Empty set = search all content (no scope filter applied).
-  /// Non-empty = search only within the selected scope (OR logic).
-  ///
-  /// This is set by:
-  /// - Quick filter chips (e.g., clicking "Sutta" sets {'sp'})
-  /// - Refine dialog tree selection (e.g., {'dn', 'mn'})
-  @override
-  Set<String> get scope;
-
-  /// Whether to search as a phrase (consecutive words) or separate words.
-  /// - true (DEFAULT) = phrase search (words must be adjacent)
-  /// - false = separate-word search (words within proximity distance)
-  @override
-  bool get isPhraseSearch;
-
-  /// Whether to ignore proximity and search anywhere in the same text unit.
-  /// Only applies when [isPhraseSearch] is false.
-  /// - true = search for words anywhere in the text (uses very large proximity)
-  /// - false (DEFAULT) = use [proximityDistance] for proximity constraint
-  @override
-  bool get isAnywhereInText;
-
-  /// Proximity distance for multi-word separate-word queries.
-  /// Only applies when [isPhraseSearch] is false and [isAnywhereInText] is false.
-  /// Default 10 = words within 10 tokens (NEAR/10).
-  /// Range: 1-100.
-  @override
-  int get proximityDistance;
-
-  /// Whether the panel was dismissed (user clicked result or close button)
-  /// Panel reopens when user focuses the search bar again
-  @override
-  bool get isPanelDismissed;
-
-  /// Whether exact match is enabled (default: false = prefix matching)
-  /// When false: "සති" matches "සතිපට්ඨානය", "සතිපට්ඨාන", etc.
-  /// When true: "සති" matches only "සති" exactly
-  @override
-  bool get isExactMatch;
-
-  /// Result counts per category (for tab badges)
-  /// Updated independently from categorized results
-  @override
-  Map<SearchResultType, int> get countByResultType;
-
-  /// Tracks which FTS result groups are expanded (by nodeKey)
-  /// Used to show/hide secondary matches in grouped FTS results
-  @override
-  Set<String> get expandedFTSGroups;
-
-  /// Definition results showing their full meaning (by result id)
-  @override
-  Set<String> get expandedDefinitions;
-
-  /// Dictionary IDs selected for filtering (e.g., {'BUS', 'MS'} for Sinhala).
-  /// Empty set = "All" (no filter applied).
-  ///
-  /// Single source of truth for both quick chips and refine dialog,
-  /// following the same pattern as [scope] for title/FTS filters.
-  @override
-  Set<String> get selectedDictionaryIds;
-
-  /// Create a copy of SearchState
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SearchStateImplCopyWith<_$SearchStateImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

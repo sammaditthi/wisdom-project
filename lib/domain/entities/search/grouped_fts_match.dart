@@ -16,7 +16,7 @@ part 'grouped_fts_match.freezed.dart';
 /// [SearchResult] it is handed, so there is no second copy here to fall out of
 /// step.
 @freezed
-class GroupedFTSMatch with _$GroupedFTSMatch {
+abstract class GroupedFTSMatch with _$GroupedFTSMatch {
   const GroupedFTSMatch._();
 
   const factory GroupedFTSMatch({

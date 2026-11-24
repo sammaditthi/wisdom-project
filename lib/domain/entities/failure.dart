@@ -6,7 +6,7 @@ part 'failure.freezed.dart';
 
 /// Represents a failure that can occur in the domain layer
 @freezed
-class Failure with _$Failure {
+sealed class Failure with _$Failure {
   const Failure._();
 
   /// Failure when loading data from a source

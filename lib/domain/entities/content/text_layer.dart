@@ -16,7 +16,7 @@ part 'text_layer.freezed.dart';
 /// TextLayers flatten the page-based structure into a sequential list of segments
 /// for easier alignment across different editions.
 @freezed
-class TextLayer with _$TextLayer {
+abstract class TextLayer with _$TextLayer {
   const TextLayer._();
 
   const factory TextLayer({

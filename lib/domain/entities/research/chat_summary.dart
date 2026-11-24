@@ -10,7 +10,7 @@ part 'chat_summary.g.dart';
 /// per chat) so listing recents never parses 25 transcripts; see
 /// `ChatHistoryRepository`.
 @freezed
-class ChatSummary with _$ChatSummary {
+abstract class ChatSummary with _$ChatSummary {
   const factory ChatSummary({
     /// Stable id — also the suffix of the transcript's storage key.
     required String id,

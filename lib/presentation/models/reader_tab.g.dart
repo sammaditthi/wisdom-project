@@ -6,8 +6,7 @@ part of 'reader_tab.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ReaderTabImpl _$$ReaderTabImplFromJson(Map<String, dynamic> json) =>
-    _$ReaderTabImpl(
+_ReaderTab _$ReaderTabFromJson(Map<String, dynamic> json) => _ReaderTab(
       label: json['label'] as String,
       fullName: json['fullName'] as String,
       nodeKey: json['nodeKey'] as String?,
@@ -26,7 +25,7 @@ _$ReaderTabImpl _$$ReaderTabImplFromJson(Map<String, dynamic> json) =>
       scrollOffset: (json['scrollOffset'] as num?)?.toDouble() ?? 0.0,
     );
 
-Map<String, dynamic> _$$ReaderTabImplToJson(_$ReaderTabImpl instance) =>
+Map<String, dynamic> _$ReaderTabToJson(_ReaderTab instance) =>
     <String, dynamic>{
       'label': instance.label,
       'fullName': instance.fullName,

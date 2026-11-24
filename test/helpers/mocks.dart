@@ -12,7 +12,7 @@ import 'package:the_wisdom_project/data/datasources/dictionary_datasource.dart';
 
 /// This file defines which classes Mockito should generate mocks for.
 /// After adding a class here, run:
-///   dart run build_runner build --delete-conflicting-outputs
+///   dart run build_runner build
 ///
 /// This will generate `mocks.mocks.dart` with mock implementations.
 @GenerateMocks([

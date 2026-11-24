@@ -7,7 +7,7 @@ part 'grouped_search_result.freezed.dart';
 /// Container for search results grouped by result type
 /// Used for the top results tab that shows max 3 results per result type
 @freezed
-class GroupedSearchResult with _$GroupedSearchResult {
+abstract class GroupedSearchResult with _$GroupedSearchResult {
   const GroupedSearchResult._();
 
   const factory GroupedSearchResult({

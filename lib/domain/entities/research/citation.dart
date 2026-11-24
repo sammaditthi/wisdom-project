@@ -8,7 +8,7 @@ part 'citation.g.dart';
 /// Mapped from the backend's `grounding_metadata` — see the `/research` contract in
 /// `docs/todo/research/wisdom-project-rag-qa-design.md` §5.5 and §7.
 @freezed
-class Citation with _$Citation {
+abstract class Citation with _$Citation {
   const factory Citation({
     /// SuttaCentral uid, e.g. "sn15.3" or "pli-tv-bu-vb-np18".
     required String uid,

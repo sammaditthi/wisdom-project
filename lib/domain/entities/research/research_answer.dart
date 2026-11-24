@@ -6,7 +6,7 @@ part 'research_answer.g.dart';
 
 /// The grounded answer returned by the `/research` backend (design doc §7).
 @freezed
-class ResearchAnswer with _$ResearchAnswer {
+abstract class ResearchAnswer with _$ResearchAnswer {
   const factory ResearchAnswer({
     /// The answer prose, in the same language as the question. Carries inline
     /// `[[cite:uid]]` markers at each grounded span — the answer renderer

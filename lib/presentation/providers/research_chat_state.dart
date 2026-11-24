@@ -8,7 +8,7 @@ part 'research_chat_state.freezed.dart';
 
 /// UI state for the Q&A chat window.
 @freezed
-class ResearchChatState with _$ResearchChatState {
+abstract class ResearchChatState with _$ResearchChatState {
   // Private ctor so the class can carry getters ([userTurnCount], …).
   const ResearchChatState._();
 

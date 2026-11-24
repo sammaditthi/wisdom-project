@@ -444,7 +444,7 @@ cat test/[generated_test].dart
 flutter test test/[generated_test].dart
 
 # If mocks were added, regenerate
-dart run build_runner build --delete-conflicting-outputs
+dart run build_runner build
 
 # Add tests to commit
 git add test/

@@ -166,7 +166,7 @@ flutter analyze         # No lint errors
 flutter test            # All tests pass
 flutter test integration_test/  # E2E tests pass
 dart format lib/ test/  # 2-space indentation
-dart run build_runner build --delete-conflicting-outputs  # Regenerate Freezed
+dart run build_runner build  # Regenerate Freezed
 ```
 
 ---

@@ -8,7 +8,7 @@ part 'bjt_section.freezed.dart';
 /// Each BJT page has two sections - one for Pali and one for Sinhala.
 /// Uses ISO 639-1 language codes: 'pi' for Pali, 'si' for Sinhala.
 @freezed
-class BJTSection with _$BJTSection {
+abstract class BJTSection with _$BJTSection {
   const BJTSection._();
 
   const factory BJTSection({

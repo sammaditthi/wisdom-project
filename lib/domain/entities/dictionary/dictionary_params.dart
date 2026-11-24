@@ -5,7 +5,7 @@ part 'dictionary_params.freezed.dart';
 /// Parameters for dictionary word lookup (tap-on-word feature)
 /// Used with dictionaryLookupProvider
 @freezed
-class DictionaryLookupParams with _$DictionaryLookupParams {
+abstract class DictionaryLookupParams with _$DictionaryLookupParams {
   const factory DictionaryLookupParams({
     /// The word to look up
     required String word,
@@ -25,7 +25,7 @@ class DictionaryLookupParams with _$DictionaryLookupParams {
 /// Parameters for dictionary definition search (search tab integration)
 /// Used with dictionarySearchProvider and dictionaryCountProvider
 @freezed
-class DictionarySearchParams with _$DictionarySearchParams {
+abstract class DictionarySearchParams with _$DictionarySearchParams {
   const factory DictionarySearchParams({
     /// The search query text
     required String query,

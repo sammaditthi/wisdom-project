@@ -70,7 +70,7 @@ analyze() {
 # Hashes, not `git diff`, so a fresh but uncommitted regen passes.
 generated_code() {
   local after
-  dart run build_runner build --delete-conflicting-outputs &&
+  dart run build_runner build &&
     flutter gen-l10n &&
     after=$(generated_hashes) &&
     if [ "$GENERATED_BEFORE" != "$after" ]; then

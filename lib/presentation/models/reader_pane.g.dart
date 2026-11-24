@@ -6,14 +6,13 @@ part of 'reader_pane.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ReaderPaneImpl _$$ReaderPaneImplFromJson(Map<String, dynamic> json) =>
-    _$ReaderPaneImpl(
+_ReaderPane _$ReaderPaneFromJson(Map<String, dynamic> json) => _ReaderPane(
       paneId: json['paneId'] as String,
       layerId: json['layerId'] as String,
       isVisible: json['isVisible'] as bool? ?? true,
     );
 
-Map<String, dynamic> _$$ReaderPaneImplToJson(_$ReaderPaneImpl instance) =>
+Map<String, dynamic> _$ReaderPaneToJson(_ReaderPane instance) =>
     <String, dynamic>{
       'paneId': instance.paneId,
       'layerId': instance.layerId,

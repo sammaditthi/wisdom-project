@@ -6,7 +6,7 @@ part 'search_result.freezed.dart';
 
 /// Represents a single search result
 @freezed
-class SearchResult with _$SearchResult {
+abstract class SearchResult with _$SearchResult {
   const SearchResult._();
 
   const factory SearchResult({

@@ -6,8 +6,7 @@ part of 'chat_summary.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ChatSummaryImpl _$$ChatSummaryImplFromJson(Map<String, dynamic> json) =>
-    _$ChatSummaryImpl(
+_ChatSummary _$ChatSummaryFromJson(Map<String, dynamic> json) => _ChatSummary(
       id: json['id'] as String,
       title: json['title'] as String,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -15,7 +14,7 @@ _$ChatSummaryImpl _$$ChatSummaryImplFromJson(Map<String, dynamic> json) =>
           ResearchMode.fast,
     );
 
-Map<String, dynamic> _$$ChatSummaryImplToJson(_$ChatSummaryImpl instance) =>
+Map<String, dynamic> _$ChatSummaryToJson(_ChatSummary instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,

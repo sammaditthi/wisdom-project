@@ -4,7 +4,7 @@ part 'search_query.freezed.dart';
 
 /// Represents a search query with filters
 @freezed
-class SearchQuery with _$SearchQuery {
+abstract class SearchQuery with _$SearchQuery {
   const factory SearchQuery({
     /// The search query text
     required String queryText,

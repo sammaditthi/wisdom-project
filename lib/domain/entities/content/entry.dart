@@ -8,7 +8,7 @@ part 'entry.freezed.dart';
 ///
 /// Used by all editions (BJT, SuttaCentral, PTS, etc.)
 @freezed
-class Entry with _$Entry {
+abstract class Entry with _$Entry {
   const Entry._();
 
   const factory Entry({

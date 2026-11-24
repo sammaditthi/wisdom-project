@@ -22,7 +22,7 @@ part 'reader_tab.g.dart';
 /// or bump `StorageKeys.openTabs` to a new version so the old data is ignored
 /// instead of misread.
 @freezed
-class ReaderTab with _$ReaderTab {
+abstract class ReaderTab with _$ReaderTab {
   const ReaderTab._();
 
   @Assert(

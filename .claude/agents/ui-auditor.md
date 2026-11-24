@@ -13,7 +13,7 @@ Your audits produce actionable, prioritized findings that help make this dhamma 
 ## Project Context
 
 - **Architecture**: Clean Architecture with Riverpod. `lib/domain/` (entities, repos), `lib/data/` (implementations), `lib/presentation/` (screens, widgets, providers), `lib/core/` (localization, themes, constants)
-- **Immutability**: Freezed entities. Regenerate with `dart run build_runner build --delete-conflicting-outputs`
+- **Immutability**: Freezed entities. Regenerate with `dart run build_runner build`
 - **Error Handling**: `Either<Failure, T>` via dartz
 - **Text Formatting**: Markers `**bold**`, `__underline__`, `{footnote}` in content
 - **Multi-Edition**: Supports BJT, SuttaCentral sources

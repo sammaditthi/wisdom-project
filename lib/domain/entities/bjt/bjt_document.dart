@@ -9,7 +9,7 @@ part 'bjt_document.freezed.dart';
 /// - Page-based structure (physical book pages)
 /// - Dual-language per page (Pali and Sinhala columns)
 @freezed
-class BJTDocument with _$BJTDocument {
+abstract class BJTDocument with _$BJTDocument {
   const BJTDocument._();
 
   const factory BJTDocument({

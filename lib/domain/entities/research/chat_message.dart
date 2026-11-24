@@ -18,7 +18,7 @@ abstract class ChatRole {
 /// is a UI-only field attached to assistant turns and is intentionally NOT sent
 /// back as history — see [toHistoryJson].
 @freezed
-class ChatMessage with _$ChatMessage {
+abstract class ChatMessage with _$ChatMessage {
   const ChatMessage._();
 
   const factory ChatMessage({

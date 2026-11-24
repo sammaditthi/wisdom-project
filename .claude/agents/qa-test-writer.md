@@ -124,6 +124,6 @@ test('should update state correctly', () async {
 ## Important Notes
 
 - Before running `flutter test`, ask for user confirmation
-- After writing tests, regenerate Freezed files if needed: `dart run build_runner build --delete-conflicting-outputs`
+- After writing tests, regenerate Freezed files if needed: `dart run build_runner build`
 - Explain your test strategy and what each test group covers
 - Use comments in tests to explain complex scenarios
