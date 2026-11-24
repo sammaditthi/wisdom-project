@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Turns a dictionary meaning's simple HTML (`<b>`, `<i>`, `<br>`, entities)
 /// into styled spans. With [dropLinkText], link text is left out: DPD's only

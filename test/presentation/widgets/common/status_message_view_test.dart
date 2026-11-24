@@ -10,7 +10,7 @@ library;
 import 'dart:async' show TimeoutException;
 import 'dart:io' show SocketException, HandshakeException;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/domain/entities/failure.dart';
 import 'package:the_wisdom_project/presentation/widgets/common/status_message_view.dart';

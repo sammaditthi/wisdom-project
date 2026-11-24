@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Placeholder for the Notes section — intentionally a blank canvas until the
 /// Notes feature is designed.

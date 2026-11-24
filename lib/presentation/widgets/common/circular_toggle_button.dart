@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A circular toggle button with active/inactive visual states.
 /// Used for binary toggles like exact match and proximity in search/dictionary UIs.

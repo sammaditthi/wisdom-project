@@ -6,7 +6,7 @@
 // presentation/providers/ to core/ to avoid a layer violation.
 // Do all three notifiers together for consistency.
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_fonts.dart';

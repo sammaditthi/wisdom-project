@@ -5,9 +5,10 @@
 /// other half: a refusal reaches the user.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/data/database/database_installation.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
@@ -27,7 +28,7 @@ void main() {
       UncontrolledProviderScope(
         container: container,
         child: MaterialApp(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           builder: (context, child) => TabLimitMessage(child: child!),
           home: home,

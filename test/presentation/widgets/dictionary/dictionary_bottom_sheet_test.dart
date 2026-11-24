@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/domain/entities/dictionary/dictionary_entry.dart';
 import 'package:the_wisdom_project/domain/entities/failure.dart';
@@ -51,7 +52,7 @@ void main() {
         selectedDictionaryWordProvider.overrideWith((ref) => selectedWord),
       ],
       child: MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
         home: MediaQuery(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Accents that are the same in every theme: the colour scheme's "fixed"
 /// roles. The Today card draws with them: primary the moon and the sun,

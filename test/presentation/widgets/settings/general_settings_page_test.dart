@@ -6,10 +6,11 @@
 /// clamped value, and the version in both app languages.
 library;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/app_language.dart';
+import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 import 'package:the_wisdom_project/core/storage/storage_keys.dart';
@@ -68,7 +69,7 @@ void main() {
           // The real theme, so the segmented buttons carry the app's shape and
           // the typography extensions are the shipped ones.
           theme: AppTheme.light(),
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: const Scaffold(body: GeneralSettingsPage()),
         ),

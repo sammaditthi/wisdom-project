@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
 import '../../../core/theme/text_entry_theme.dart';
 import '../../../domain/entities/bjt/bjt_page.dart';

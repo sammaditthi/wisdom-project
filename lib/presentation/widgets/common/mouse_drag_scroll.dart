@@ -1,5 +1,5 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Lets a mouse drag the scrollable in [child], as touch can: Flutter leaves
 /// the mouse out on desktop and web. For sideways rows. No scrollbar or

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The look every dropdown menu shares (`MenuAnchor` and its submenus): the
 /// search match options, the reader's toolbar menus and the research mode

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The shape every [SegmentedButton] shares: a soft rectangle instead of
 /// Material 3's stadium.
