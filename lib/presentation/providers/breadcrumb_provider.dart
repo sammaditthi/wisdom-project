@@ -1,19 +1,9 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../utils/content_text_formatter.dart';
 import 'content_language_provider.dart';
 import 'navigation_tree_provider.dart';
 import 'pali_letter_options_provider.dart';
 import 'tab_provider.dart';
-
-/// Owns the focus node of the breadcrumb's `SelectionArea`, so the reader's
-/// scroll keys can treat focus there as focus on nothing. Out of Tab order:
-/// it holds a selection, and shows no focus ring.
-final breadcrumbFocusNodeProvider = Provider<FocusNode>((ref) {
-  final node = FocusNode(debugLabel: 'Breadcrumb', skipTraversal: true);
-  ref.onDispose(node.dispose);
-  return node;
-});
 
 /// Derived provider that builds the breadcrumb segments for the active tab.
 ///

@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/theme_notifier.dart';
 import '../providers/app_section_provider.dart';
-import '../providers/breadcrumb_provider.dart' show breadcrumbFocusNodeProvider;
 import '../providers/in_page_search_focus_provider.dart';
 import '../providers/in_page_search_provider.dart';
 import '../providers/last_selected_text_provider.dart';
@@ -311,10 +310,9 @@ class StepSuttaAction extends ContextAction<StepSuttaIntent> {
   }
 }
 
-/// Scrolls the reader — only when focus is in the reader's text, on the
-/// breadcrumb (which takes focus only to hold a selection), or on nothing. On a
-/// navigator row, a tab or a button the arrows keep their usual job of moving
-/// focus, and in a text box they move the caret.
+/// Scrolls the reader — only when focus is in the reader's text or on
+/// nothing. On a navigator row, a tab or a button the arrows keep their usual
+/// job of moving focus, and in a text box they move the caret.
 class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
   final WidgetRef ref;
 
@@ -329,9 +327,7 @@ class ScrollReaderAction extends ContextAction<ScrollReaderIntent> {
     if (handle == null || !readerKeysAllowed(ref) || isTypingInTextBox()) {
       return false;
     }
-    return isFocusOnNothing(idleFocus) ||
-        handle.hasFocus ||
-        ref.read(breadcrumbFocusNodeProvider).hasFocus;
+    return isFocusOnNothing(idleFocus) || handle.hasFocus;
   }
 
   @override

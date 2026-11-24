@@ -98,9 +98,9 @@ class OverlayStackSync extends ConsumerWidget {
     // they'd silently copy A's text. Clearing the provider on every tab
     // switch makes Ctrl+C either copy what's actually visible/selected on
     // the new tab or be a no-op — never the wrong tab's text. The same goes
-    // for another sutta opening in the same tab (prev/next): its text and
-    // breadcrumb replace the selected ones without reporting the selection
-    // gone.
+    // for another sutta opening in the same tab (prev/next): Flutter replaces
+    // the selected text without reporting the selection gone, and focus
+    // leaves the reader, so Cmd+C would reach this fallback.
     ref.listen<int>(activeTabIndexProvider, (_, __) {
       ref.read(lastSelectedTextProvider.notifier).state = null;
     });

@@ -5,9 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/utils/responsive_utils.dart';
 import '../../providers/breadcrumb_provider.dart';
-import '../../providers/last_selected_text_provider.dart';
 import '../../providers/navigator_sync_provider.dart';
 import '../../providers/tab_provider.dart';
+import '../common/mouse_drag_scroll.dart';
 
 /// Displays the active tab's position in the Tipitaka hierarchy as a
 /// breadcrumb trail in the AppBar (e.g., "සුත්ත පිටකය › දීඝ නිකාය › බ්‍රහ්මජාලසුත්තං").
@@ -17,8 +17,6 @@ import '../../providers/tab_provider.dart';
 /// - Leaf segment (last) is non-tappable.
 /// - Too long for the bar: one line that scrolls sideways, opened at its end
 ///   so the page's own name shows. No scrollbar.
-/// - Selectable: a mouse drag selects (so it doesn't drag-scroll), and the
-///   copy keeps the ` › ` separators.
 /// - Reacts to tab switches, tab closes, and navigation language changes.
 class BreadcrumbWidget extends ConsumerStatefulWidget {
   const BreadcrumbWidget({super.key});
@@ -107,39 +105,14 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
         // A short trail sits at the start, not at the reversed end.
         alignment: AlignmentDirectional.centerStart,
         widthFactor: 1,
-        child: SelectionArea(
-          focusNode: ref.watch(breadcrumbFocusNodeProvider),
-          // Feeds SmartCopyAction's fallback, which rescues Cmd+C on web
-          // when focus has left the selection.
-          onSelectionChanged: (selection) =>
-              ref.read(lastSelectedTextProvider.notifier).state =
-                  (selection == null || selection.plainText.isEmpty)
-                      ? null
-                      : selection.plainText,
-          // No stretch past the trail's ends on Android.
-          child: ScrollConfiguration(
-            behavior:
-                ScrollConfiguration.of(context).copyWith(overscroll: false),
-            child: SingleChildScrollView(
-              // A new path opens at its end again.
-              key: ObjectKey(segments),
-              scrollDirection: Axis.horizontal,
-              // Scroll offset 0 is the end of the trail.
-              reverse: true,
-              // RichText, not Text.rich: Text would add the AppBar's default
-              // style and system text scaling. These two hooks are what Text
-              // adds to make it selectable; Builder gives a context below the
-              // SelectionArea to find them.
-              child: Builder(
-                builder: (context) => RichText(
-                  text: TextSpan(children: spans),
-                  softWrap: false,
-                  selectionRegistrar: SelectionContainer.maybeOf(context),
-                  selectionColor:
-                      DefaultSelectionStyle.of(context).selectionColor,
-                ),
-              ),
-            ),
+        child: MouseDragScroll(
+          child: SingleChildScrollView(
+            // A new path opens at its end again.
+            key: ObjectKey(segments),
+            scrollDirection: Axis.horizontal,
+            // Scroll offset 0 is the end of the trail.
+            reverse: true,
+            child: RichText(text: TextSpan(children: spans), softWrap: false),
           ),
         ),
       ),
