@@ -157,6 +157,19 @@ database_copy() {
   flutter test integration_test/bundled_database_copy_test.dart -d macos
 }
 
+# A device test builds from a temp listener.dart with a random path, so each
+# run leaves a ~75 MB .dart_tool/flutter_build folder nothing reuses. Removes
+# those whose listener is gone; a run still going keeps its own.
+prune_test_build_caches() {
+  local dir listener
+  for dir in .dart_tool/flutter_build/*/; do
+    [ -f "$dir/kernel_snapshot_program.d" ] || continue
+    listener=$(tr ' ' '\n' < "$dir/kernel_snapshot_program.d" |
+      grep -m1 'flutter_test_listener.*/listener\.dart')
+    if [ -n "$listener" ] && [ ! -e "$listener" ]; then rm -rf "$dir"; fi
+  done
+}
+
 integration_chrome() {
   ./scripts/app/web/test_chrome.sh
 }
@@ -182,6 +195,7 @@ if [ "$QUICK" = false ]; then
   else
     COPY_TEST_MISSING=true
   fi
+  prune_test_build_caches
   run_step "integration · Chrome" integration_chrome
 fi
 
