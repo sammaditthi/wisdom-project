@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
-    show LogicalKeyboardKey, PhysicalKeyboardKey;
+    show LogicalKeyboardKey, PhysicalKeyboardKey, SystemChannels;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:the_wisdom_project/presentation/models/reader_layout.dart';
@@ -181,6 +181,70 @@ void main() {
           reason: 'Cmd+A after a click in the Sinhala column selects its rows');
       expect(sinhalaSelection, isNot(contains(pali)),
           reason: 'and none of the Pali column');
+    },
+  );
+
+  // Next replaces the selected text without Flutter reporting the selection
+  // gone, and focus leaves the reader, so Cmd+C reaches the remembered
+  // selection. OverlayStackSync forgets it when the tab's sutta changes.
+  testWidgets(
+    'Cmd+C after Next copies nothing of the sutta left behind',
+    (tester) async {
+      pinDesktopWindow(tester);
+      // What the app sends to the clipboard; the real one stays untouched.
+      String? copied;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'Clipboard.setData') {
+            copied = (call.arguments as Map)['text'] as String;
+          }
+          return null;
+        },
+      );
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+
+      final container = await pumpReaderApp(tester, withShortcuts: true);
+      await openTab(
+        tester,
+        container,
+        tabFromNode(container, 'dn-1-1')
+            .copyWith(layout: ReaderLayout.sideBySide),
+      );
+
+      Future<void> pressCmd(
+          LogicalKeyboardKey key, PhysicalKeyboardKey physicalKey) async {
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft,
+            physicalKey: PhysicalKeyboardKey.metaLeft);
+        await tester.sendKeyEvent(key, physicalKey: physicalKey);
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft,
+            physicalKey: PhysicalKeyboardKey.metaLeft);
+        await pumpForSettle(tester);
+      }
+
+      // The Pali column: a click in its margin, then Cmd+A.
+      final reader = tester.getRect(readerScrollView);
+      await tester.tapAt(Offset(reader.left + 12, reader.top + 150),
+          kind: PointerDeviceKind.mouse);
+      await tester.pump(const Duration(milliseconds: 600));
+      await pressCmd(LogicalKeyboardKey.keyA, PhysicalKeyboardKey.keyA);
+      final selected = container.read(lastSelectedTextProvider);
+      expect(selected, isNotEmpty, reason: 'Cmd+A selects the Pali column');
+
+      await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
+      expect(copied, selected, reason: 'Cmd+C copies the selection shown');
+
+      copied = null;
+      await tester.tap(find.byIcon(Icons.skip_next),
+          kind: PointerDeviceKind.mouse);
+      await pumpForSettle(tester);
+      expect(container.read(activeNodeKeyProvider), 'dn-1-2');
+
+      await pressCmd(LogicalKeyboardKey.keyC, PhysicalKeyboardKey.keyC);
+      expect(copied, isNull,
+          reason: 'Nothing is selected in dn-1-2, so Cmd+C copies nothing, '
+              'not the dn-1-1 text selected before Next');
     },
   );
 

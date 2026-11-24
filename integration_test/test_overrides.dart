@@ -16,14 +16,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 import 'package:the_wisdom_project/data/datasources/bjt_document_local_datasource.dart';
+import 'package:the_wisdom_project/presentation/keyboard/app_shortcuts.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/search_provider.dart'
+    show sharedPreferencesProvider;
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
+import 'package:the_wisdom_project/presentation/widgets/app/overlay_stack_sync.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
 
@@ -175,20 +180,32 @@ Future<void> typeText(WidgetTester tester, Finder finder, String text) {
 }
 
 /// Pumps the tab bar over the reader, with the real data sources, and waits
-/// for the navigation tree to load.
-Future<ProviderContainer> pumpReaderApp(WidgetTester tester) async {
+/// for the navigation tree to load. [withShortcuts] adds the app's keys and
+/// overlay sync around it, as main.dart does.
+Future<ProviderContainer> pumpReaderApp(
+  WidgetTester tester, {
+  bool withShortcuts = false,
+}) async {
+  // The overlay sync reads the recent searches, kept in SharedPreferences.
+  if (withShortcuts) SharedPreferences.setMockInitialValues({});
+  final prefs = withShortcuts ? await SharedPreferences.getInstance() : null;
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        if (prefs != null) sharedPreferencesProvider.overrideWithValue(prefs),
         bjtDocumentDataSourceProvider.overrideWithValue(
           BJTDocumentLocalDataSourceImpl(),
         ),
         keyValueStoreOverride(),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: Scaffold(
+        builder: withShortcuts
+            ? (context, child) =>
+                AppShortcuts(child: OverlayStackSync(child: child!))
+            : null,
+        home: const Scaffold(
           body: Column(
             children: [
               TabBarWidget(),
