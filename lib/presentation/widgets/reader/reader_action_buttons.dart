@@ -189,10 +189,10 @@ class _LayoutMenuButton extends ConsumerWidget {
   }
 }
 
-/// More options (⋯ on Apple platforms, ⋮ elsewhere): Copy link, Open on
-/// SuttaCentral where the text has a counterpart there, and on the web Open as
-/// HTML page. A generic menu, since most of its rows open the text elsewhere
-/// rather than share it.
+/// More options (⋯ on Apple platforms, ⋮ elsewhere): Copy link, Copy path,
+/// Open on SuttaCentral where the text has a counterpart there, and on the web
+/// Open as HTML page. A generic menu, since most of its rows open the text
+/// elsewhere rather than share it.
 class _MoreMenuButton extends ConsumerWidget {
   final bool visible;
 
@@ -214,6 +214,11 @@ class _MoreMenuButton extends ConsumerWidget {
           icon: Icon(Icons.content_copy, size: 20, color: ink),
           label: l10n.copyLink,
           onSelected: () => copyActiveTabLink(context, ref),
+        ),
+        MenuRow(
+          icon: Icon(Icons.account_tree_outlined, size: 20, color: ink),
+          label: l10n.copyPath,
+          onSelected: () => copyActiveTabPath(context, ref),
         ),
         if (onSuttaCentral)
           MenuRow(

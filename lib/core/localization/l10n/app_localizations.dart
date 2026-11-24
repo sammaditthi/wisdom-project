@@ -920,6 +920,18 @@ abstract class AppLocalizations {
   /// **'Link copied'**
   String get linkCopied;
 
+  /// The reader's ⋮ menu row that copies the breadcrumb: the text's place in the Tipitaka, names joined by ›
+  ///
+  /// In en, this message translates to:
+  /// **'Copy path'**
+  String get copyPath;
+
+  /// Snackbar in the reader after Copy path
+  ///
+  /// In en, this message translates to:
+  /// **'Path copied'**
+  String get pathCopied;
+
   /// Snackbar when opening a reader tab is refused because the most tabs allowed are already open
   ///
   /// In en, this message translates to:

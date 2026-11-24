@@ -5,6 +5,9 @@ import 'navigation_tree_provider.dart';
 import 'pali_letter_options_provider.dart';
 import 'tab_provider.dart';
 
+/// Drawn between the breadcrumb's names, and kept in a copied path.
+const breadcrumbSeparator = ' \u203A ';
+
 /// Derived provider that builds the breadcrumb segments for the active tab.
 ///
 /// Returns a list of `({String nodeKey, String displayName})` records in

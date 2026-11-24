@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
 import 'package:the_wisdom_project/data/datasources/suttacentral_concordance_datasource.dart';
+import 'package:the_wisdom_project/presentation/providers/breadcrumb_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/parallel_text_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/suttacentral_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
@@ -17,6 +19,7 @@ void main() {
     WidgetTester tester,
     String nodeKey, {
     required SuttaCentralRefResolver resolver,
+    List<Override> overrides = const [],
   }) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -26,6 +29,7 @@ void main() {
           // No parallel-text tree: keeps the toolbar from loading one.
           parallelTextNodeProvider.overrideWithValue(null),
           suttaCentralRefResolverProvider.overrideWith((ref) => resolver),
+          ...overrides,
         ],
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -112,6 +116,42 @@ void main() {
       );
 
       handle.dispose();
+    });
+  });
+
+  group('Reader ⋮ menu: Copy path', () {
+    testWidgets('copies the whole breadcrumb with its › marks', (tester) async {
+      // What the app sends to the clipboard.
+      String? copied;
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'Clipboard.setData') {
+            copied = (call.arguments as Map)['text'] as String;
+          }
+          return null;
+        },
+      );
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(SystemChannels.platform, null));
+
+      await openMoreMenu(
+        tester,
+        'dn-1',
+        resolver: const SuttaCentralRefResolver({}),
+        overrides: [
+          breadcrumbPathProvider.overrideWithValue(const [
+            (nodeKey: 'sp', displayName: 'සුත්තපිටක'),
+            (nodeKey: 'dn', displayName: 'දීඝනිකාය'),
+            (nodeKey: 'dn-1', displayName: 'සීලක්ඛන්ධවග්ගො'),
+          ]),
+        ],
+      );
+      await tester.tap(find.text('Copy path'));
+      await tester.pumpAndSettle();
+
+      expect(copied, 'සුත්තපිටක › දීඝනිකාය › සීලක්ඛන්ධවග්ගො');
+      expect(find.text('Path copied'), findsOneWidget);
     });
   });
 }

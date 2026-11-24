@@ -724,6 +724,16 @@
     "description": "Confirmation after a link was copied (the citation sheet's button label, or a snackbar in the reader)"
   },
 
+  "copyPath": "Copy path",
+  "@copyPath": {
+    "description": "The reader's ⋮ menu row that copies the breadcrumb: the text's place in the Tipitaka, names joined by ›"
+  },
+
+  "pathCopied": "Path copied",
+  "@pathCopied": {
+    "description": "Snackbar in the reader after Copy path"
+  },
+
   "tabLimitReached": "You have {count} tabs open. Close one before opening another.",
   "@tabLimitReached": {
     "description": "Snackbar when opening a reader tab is refused because the most tabs allowed are already open",

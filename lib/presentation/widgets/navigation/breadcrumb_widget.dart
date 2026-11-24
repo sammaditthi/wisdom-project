@@ -66,7 +66,7 @@ class _BreadcrumbWidgetState extends ConsumerState<BreadcrumbWidget> {
     for (int i = 0; i < segments.length; i++) {
       // Separator between segments
       if (i > 0) {
-        spans.add(TextSpan(text: ' \u203A ', style: leafStyle));
+        spans.add(TextSpan(text: breadcrumbSeparator, style: leafStyle));
       }
 
       if (i < segments.length - 1) {

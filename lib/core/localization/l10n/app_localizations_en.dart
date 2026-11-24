@@ -438,6 +438,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get linkCopied => 'Link copied';
 
   @override
+  String get copyPath => 'Copy path';
+
+  @override
+  String get pathCopied => 'Path copied';
+
+  @override
   String tabLimitReached(int count) {
     return 'You have $count tabs open. Close one before opening another.';
   }

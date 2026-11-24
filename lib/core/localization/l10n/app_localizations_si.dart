@@ -439,6 +439,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get linkCopied => 'සබැඳිය පිටපත් විය';
 
   @override
+  String get copyPath => 'මාර්ගය පිටපත් කරන්න';
+
+  @override
+  String get pathCopied => 'මාර්ගය පිටපත් විය';
+
+  @override
   String tabLimitReached(int count) {
     return 'ටැබ් $countක් විවෘතව ඇත. අලුතෙන් ටැබ් එකක් විවෘත කිරීමට පෙර එකක් වසන්න.';
   }
