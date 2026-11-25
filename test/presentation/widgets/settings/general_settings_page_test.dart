@@ -8,11 +8,12 @@ library;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/app_language.dart';
 import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
-import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
+import 'package:the_wisdom_project/core/storage/key_value_store.dart';
 import 'package:the_wisdom_project/core/storage/storage_keys.dart';
 import 'package:the_wisdom_project/core/theme/app_theme.dart';
 import 'package:the_wisdom_project/core/theme/theme_notifier.dart';
@@ -48,12 +49,14 @@ void main() {
   Future<ProviderContainer> pumpPage(
     WidgetTester tester, {
     List<Override> overrides = const [],
+    KeyValueStore? keyValueStore,
     Locale locale = const Locale('en'),
     Size window = const Size(760, 1600),
   }) async {
     tester.useWindow(window);
 
     final container = createTestContainer(
+      keyValueStore: keyValueStore,
       overrides: [
         // Pinned: the default resolves from the host's locales, which would make
         // the App Language selector's starting segment machine-dependent.
@@ -190,10 +193,7 @@ void main() {
       tester,
     ) async {
       final store = InMemoryKeyValueStore();
-      final container = await pumpPage(
-        tester,
-        overrides: [keyValueStoreProvider.overrideWithValue(store)],
-      );
+      final container = await pumpPage(tester, keyValueStore: store);
 
       expect(segment<AppLanguage>(find.text('English')), findsOneWidget);
       expect(segment<AppLanguage>(find.text('සිංහල')), findsOneWidget);
@@ -249,10 +249,10 @@ void main() {
       );
       final container = await pumpPage(
         tester,
+        keyValueStore: InMemoryKeyValueStore({
+          StorageKeys.contentLanguage: 'pali',
+        }),
         overrides: [
-          keyValueStoreProvider.overrideWithValue(
-            InMemoryKeyValueStore({StorageKeys.contentLanguage: 'pali'}),
-          ),
           currentEditionProvider.overrideWithValue(sinhalaOnlyEdition),
         ],
       );

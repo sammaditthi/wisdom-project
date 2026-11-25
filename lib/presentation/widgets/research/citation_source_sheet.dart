@@ -99,7 +99,7 @@ class _CitationSourceSheetState extends ConsumerState<CitationSourceSheet> {
     // What the citation opens, through the lookup search uses: a reference
     // the model typed may sit inside a range ("AN 1.1" opens AN 1.1-10).
     // Null while loading or when uncovered.
-    final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+    final resolver = ref.watch(suttaCentralRefResolverProvider).value;
     final target = resolver?.resolve(citation.uid);
     final nodeKey = target?.nodeKey;
     // Named after what opens, like search's jump row: "Dhp 5" shows "Dhp 1-20".

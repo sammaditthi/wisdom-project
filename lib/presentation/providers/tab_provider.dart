@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../core/constants/constants.dart';
 import '../../core/storage/key_value_store.dart';
@@ -29,7 +30,7 @@ import 'reader_unit_provider.dart';
 class TabsNotifier extends StateNotifier<List<ReaderTab>> {
   TabsNotifier(this._store) : super(_loadTabs(_store)) {
     // fireImmediately:false — don't write back the value we just read.
-    // Capture the RemoveListener so dispose() can detach explicitly. Not
+    // Capture the remove callback so dispose() can detach explicitly. Not
     // strictly required (the notifier itself is being disposed), but it
     // future-proofs against accidental re-entrancy if dispose grows.
     _removeStateListener = addListener(_onStateChanged, fireImmediately: false);
@@ -37,7 +38,7 @@ class TabsNotifier extends StateNotifier<List<ReaderTab>> {
 
   final KeyValueStore _store;
   Timer? _saveDebounce;
-  late final RemoveListener _removeStateListener;
+  late final void Function() _removeStateListener;
 
   static const _saveDebounceDelay = Duration(milliseconds: 500);
 

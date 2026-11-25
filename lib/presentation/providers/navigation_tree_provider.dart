@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 // `TipitakaNodeKeys` comes from here too — the app's constants.dart re-exports
 // the shared one, so importing both is what the analyzer flags.
 import 'package:wisdom_shared/wisdom_shared.dart';

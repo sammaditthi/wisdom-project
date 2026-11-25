@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 /// Top-level app sections shown in the navigation rail (tablet/desktop) or
 /// the bottom navigation bar (mobile).

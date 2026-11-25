@@ -15,6 +15,7 @@ import 'dart:convert';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
@@ -26,6 +27,7 @@ import 'package:the_wisdom_project/presentation/keyboard/app_shortcuts.dart';
 import 'package:the_wisdom_project/presentation/models/reader_tab.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart'
     show sharedPreferencesProvider;
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
@@ -191,6 +193,7 @@ Future<ProviderContainer> pumpReaderApp(
   final prefs = withShortcuts ? await SharedPreferences.getInstance() : null;
   await tester.pumpWidget(
     ProviderScope(
+      retry: noProviderRetry,
       overrides: [
         if (prefs != null) sharedPreferencesProvider.overrideWithValue(prefs),
         bjtDocumentDataSourceProvider.overrideWithValue(

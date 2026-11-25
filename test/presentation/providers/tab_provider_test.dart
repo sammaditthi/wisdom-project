@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/core/constants/constants.dart';
-import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 import 'package:the_wisdom_project/core/storage/shared_preferences_key_value_store.dart';
 import 'package:the_wisdom_project/core/storage/storage_keys.dart';
 import 'package:the_wisdom_project/domain/entities/search/search_result_type.dart';
@@ -451,11 +450,7 @@ void main() {
     /// One app run: a container over the shared storage.
     ProviderContainer startApp() {
       final container = createTestContainer(
-        overrides: [
-          keyValueStoreProvider.overrideWithValue(
-            SharedPreferencesKeyValueStore(prefs),
-          ),
-        ],
+        keyValueStore: SharedPreferencesKeyValueStore(prefs),
       );
       addTearDown(container.dispose);
       return container;

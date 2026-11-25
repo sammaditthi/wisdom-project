@@ -10,6 +10,7 @@ import 'package:the_wisdom_project/core/utils/pali_letter_options.dart';
 import 'package:the_wisdom_project/domain/entities/content/content_language.dart';
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/breadcrumb_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/reader/multi_pane_reader_widget.dart';
@@ -50,6 +51,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: [
             bjtDocumentDataSourceProvider.overrideWithValue(
               BJTDocumentLocalDataSourceImpl(),
@@ -434,7 +436,7 @@ void main() {
         // dn-1-2 all read dn-1. The unit's start coordinate can, and it is
         // what replaced the start-coordinate fields this test used to read off
         // the tab.
-        final unit = container.read(activeReaderUnitProvider).valueOrNull;
+        final unit = container.read(activeReaderUnitProvider).value;
         expect(
           unit,
           isNotNull,

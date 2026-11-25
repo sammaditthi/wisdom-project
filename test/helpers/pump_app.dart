@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:the_wisdom_project/domain/repositories/navigation_tree_repository.dart';
@@ -10,9 +11,11 @@ import 'package:the_wisdom_project/data/datasources/tree_local_datasource.dart';
 import 'package:the_wisdom_project/data/datasources/bjt_document_datasource.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
+import 'package:the_wisdom_project/core/storage/key_value_store.dart';
 import 'package:the_wisdom_project/core/storage/key_value_store_provider.dart';
 
 import 'fake_key_value_store.dart';
@@ -21,16 +24,18 @@ import 'fake_key_value_store.dart';
 /// [keyValueStoreProvider]).
 ///
 /// `pumpApp`, `pumpAppWithScaffold`, and `createTestContainer` prepend
-/// these automatically — tests that build their own [ProviderScope]
-/// directly (e.g. when they need raw widget control) should pass this
-/// list as the scope's `overrides`.
+/// these automatically, and turn retry off as the app does. Tests that build
+/// their own [ProviderScope] directly should pass this list as the scope's
+/// `overrides`, and `retry: noProviderRetry` if a provider in it can fail.
 ///
-/// Each call returns a *fresh* in-memory store. Tests that need to share
-/// or inspect a store across multiple calls can override
-/// [keyValueStoreProvider] again in their per-call `overrides:` —
-/// caller-supplied overrides win because they come last.
-List<Override> defaultTestOverrides() => [
-  keyValueStoreProvider.overrideWithValue(InMemoryKeyValueStore()),
+/// Each call returns a *fresh* in-memory store unless given [keyValueStore].
+/// Riverpod 3 throws when one provider is overridden twice in a container, so
+/// a test that needs its own store passes it here (or to
+/// [createTestContainer]), never as a second override.
+List<Override> defaultTestOverrides({KeyValueStore? keyValueStore}) => [
+  keyValueStoreProvider.overrideWithValue(
+    keyValueStore ?? InMemoryKeyValueStore(),
+  ),
 ];
 
 /// Creates a test wrapper with Riverpod ProviderScope
@@ -59,6 +64,7 @@ extension PumpApp on WidgetTester {
   }) async {
     await pumpWidget(
       ProviderScope(
+        retry: noProviderRetry,
         overrides: [...defaultTestOverrides(), ...overrides],
         child: MaterialApp(
           theme: theme,
@@ -80,6 +86,7 @@ extension PumpApp on WidgetTester {
   }) async {
     await pumpWidget(
       ProviderScope(
+        retry: noProviderRetry,
         overrides: [...defaultTestOverrides(), ...overrides],
         child: MaterialApp(
           home: Scaffold(body: widget),
@@ -148,10 +155,15 @@ class TestProviderOverrides {
 /// ```
 ProviderContainer createTestContainer({
   List<Override> overrides = const [],
+  KeyValueStore? keyValueStore,
   ProviderContainer? parent,
 }) {
   return ProviderContainer(
-    overrides: [...defaultTestOverrides(), ...overrides],
+    retry: noProviderRetry,
+    overrides: [
+      ...defaultTestOverrides(keyValueStore: keyValueStore),
+      ...overrides,
+    ],
     parent: parent,
   );
 }

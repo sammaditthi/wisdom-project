@@ -23,6 +23,7 @@ import 'dart:io' show SocketException;
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:the_wisdom_project/core/localization/app_localizations_delegates.dart';
 import 'package:the_wisdom_project/core/localization/l10n/app_localizations.dart';
@@ -36,6 +37,7 @@ import 'package:the_wisdom_project/domain/entities/search/search_result_type.dar
 import 'package:the_wisdom_project/presentation/providers/dictionary_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/search_state.dart';
 import 'package:the_wisdom_project/presentation/widgets/common/app_emblem.dart';
@@ -62,6 +64,7 @@ Future<void> _pumpHosted(
 }) async {
   await tester.pumpWidget(
     ProviderScope(
+      retry: noProviderRetry,
       overrides: [...defaultTestOverrides(), ...overrides],
       child: MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
@@ -426,6 +429,7 @@ void main() {
       late ProviderContainer container;
       await tester.pumpWidget(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: [
             ...defaultTestOverrides(),
             // Pre-set the lookup word so the sheet mounts.

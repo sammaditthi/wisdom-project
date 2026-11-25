@@ -14,6 +14,7 @@ import 'package:the_wisdom_project/presentation/providers/app_language_provider.
 import 'package:the_wisdom_project/presentation/providers/content_language_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/breadcrumb_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tab_bar_widget.dart';
 import 'package:the_wisdom_project/presentation/widgets/navigation/tree_navigator_widget.dart';
@@ -48,6 +49,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: [
             // Pin the device locale so the baseline App Language is English
             // regardless of the host machine's locale.

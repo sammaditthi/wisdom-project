@@ -41,7 +41,7 @@ class SearchResultsPanel extends ConsumerWidget {
     final theme = Theme.of(context);
     // Which sutta each FTS row belongs to — null until the tree loads, and the
     // stored key stands in until it does.
-    final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
+    final resolver = ref.watch(readerUnitResolverProvider).value;
 
     // Tab walks the panel as it shows: chips, tabs, then results, before it
     // moves on. The results are one block in that order, placed where the
@@ -145,7 +145,7 @@ class SearchResultsPanel extends ConsumerWidget {
     }
 
     // Invalid query - didn't search
-    final categorizedResults = topResults.valueOrNull;
+    final categorizedResults = topResults.value;
     if (categorizedResults == null) {
       return StatusMessageView(
         variant: StatusVariant.invalid,

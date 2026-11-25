@@ -872,7 +872,7 @@ void main() {
           notifier.updateQuery('dhamma');
           async.elapse(const Duration(milliseconds: 350));
 
-          expect(notifier.state.groupedResults.valueOrNull, isNotNull);
+          expect(notifier.state.groupedResults.value, isNotNull);
         });
       });
 

@@ -24,8 +24,8 @@ final referenceSearchResultProvider = Provider<SearchResult?>((ref) {
   final query = ref.watch(searchStateProvider.select((s) => s.rawQueryText));
   if (query.trim().isEmpty) return null;
 
-  // valueOrNull is null while the asset is still loading or if it failed.
-  final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+  // value is null while the asset is still loading or if it failed.
+  final resolver = ref.watch(suttaCentralRefResolverProvider).value;
   if (resolver == null) return null;
 
   final typed = SuttaCentralRefResolver.parseRef(query);

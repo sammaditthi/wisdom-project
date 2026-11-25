@@ -108,7 +108,7 @@ void main() {
 
       // Verify via provider state that top results have all 3 categories.
       final state = tester.getSearchState();
-      final grouped = state.groupedResults.valueOrNull;
+      final grouped = state.groupedResults.value;
       expect(grouped, isNotNull, reason: 'Top results should be loaded');
       expect(grouped!.isNotEmpty, isTrue, reason: 'Should have results');
 

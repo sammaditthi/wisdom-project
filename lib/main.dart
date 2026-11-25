@@ -16,6 +16,7 @@ import 'presentation/keyboard/app_shortcuts.dart';
 import 'presentation/screens/app_shell.dart';
 import 'presentation/screens/database_install_screen.dart';
 import 'presentation/widgets/common/app_emblem.dart';
+import 'presentation/providers/provider_retry.dart';
 import 'presentation/providers/search_provider.dart';
 import 'presentation/providers/app_language_provider.dart';
 import 'presentation/providers/tab_provider.dart'
@@ -150,6 +151,7 @@ Future<void> _start() async {
 
   runApp(
     ProviderScope(
+      retry: noProviderRetry,
       overrides: [
         // Provide SharedPreferences for recent searches
         sharedPreferencesProvider.overrideWithValue(sharedPrefs),

@@ -232,7 +232,7 @@ class _DictionarySheetState extends ConsumerState<_DictionarySheet> {
     final entriesAsync = ref.watch(dictionaryLookupProvider(lookupParams));
     final totalCount = ref.watch(
       dictionaryLookupCountProvider(lookupParams)
-          .select((asyncValue) => asyncValue.valueOrNull),
+          .select((asyncValue) => asyncValue.value),
     );
     final theme = Theme.of(context);
 

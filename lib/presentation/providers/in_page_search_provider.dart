@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../../core/utils/search_match_finder.dart';
 import '../../core/utils/search_query_utils.dart';
@@ -279,7 +280,7 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
 
     final unit = (nodeKey == null || nodeKey.isEmpty)
         ? null
-        : _ref.read(readerUnitResolverProvider).valueOrNull?.unitFor(nodeKey);
+        : _ref.read(readerUnitResolverProvider).value?.unitFor(nodeKey);
 
     // Read the specific tab's document (not the active tab's). Loading or
     // errored is as unanswerable as a missing unit, and is why this reads the
@@ -287,7 +288,7 @@ class InPageSearchNotifier extends StateNotifier<Map<int, InPageSearchState>> {
     // two states and left the old query's matches standing.
     final document = unit == null
         ? null
-        : _ref.read(bjtDocumentProvider(requestFor(unit))).valueOrNull;
+        : _ref.read(bjtDocumentProvider(requestFor(unit))).value;
 
     if (unit == null || document == null) {
       // The query has already been committed to state, so leaving the previous

@@ -114,12 +114,12 @@ final activeReaderUnitProvider = Provider<AsyncValue<ReaderUnit?>>((ref) {
 /// [activeDocumentRequestProvider]; it stays because it is what the navigation
 /// tests assert the active tab landed on.
 final activeContentFileIdProvider = Provider<String?>((ref) {
-  return ref.watch(activeReaderUnitProvider).valueOrNull?.contentFileId;
+  return ref.watch(activeReaderUnitProvider).value?.contentFileId;
 });
 
 /// The pages the active tab's unit needs — null when it has no unit.
 final activeDocumentRequestProvider = Provider<DocumentRequest?>((ref) {
-  final unit = ref.watch(activeReaderUnitProvider).valueOrNull;
+  final unit = ref.watch(activeReaderUnitProvider).value;
   if (unit == null || unit.contentFileId.trim().isEmpty) return null;
   return requestFor(unit);
 });
@@ -142,8 +142,8 @@ final currentBJTDocumentProvider = Provider<AsyncValue<BJTDocument?>>((ref) {
 /// handed a finite list once, and `AnchoredPageList` builds it lazily.
 /// Null while either half is still loading, or when the tab has no unit.
 final activeDocumentSliceProvider = Provider<DocumentSlice?>((ref) {
-  final unit = ref.watch(activeReaderUnitProvider).valueOrNull;
-  final document = ref.watch(currentBJTDocumentProvider).valueOrNull;
+  final unit = ref.watch(activeReaderUnitProvider).value;
+  final document = ref.watch(currentBJTDocumentProvider).value;
   if (unit == null || document == null) return null;
   return DocumentSlice.of(document, unit.range);
 });

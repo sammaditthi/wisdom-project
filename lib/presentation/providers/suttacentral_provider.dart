@@ -26,7 +26,7 @@ final suttaCentralRefResolverProvider = FutureProvider<SuttaCentralRefResolver>(
 /// counterpart there (or the concordance hasn't loaded).
 final activeSuttaCentralUrlProvider = Provider<Uri?>((ref) {
   final nodeKey = ref.watch(activeNodeKeyProvider);
-  final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+  final resolver = ref.watch(suttaCentralRefResolverProvider).value;
   if (nodeKey == null || resolver == null) return null;
   return resolver.suttaCentralUrl(nodeKey);
 });
@@ -43,7 +43,7 @@ const _translatorNames = {
 /// tab, or null when it opens no translation.
 final activeSuttaCentralTranslatorProvider = Provider<String?>((ref) {
   final nodeKey = ref.watch(activeNodeKeyProvider);
-  final resolver = ref.watch(suttaCentralRefResolverProvider).valueOrNull;
+  final resolver = ref.watch(suttaCentralRefResolverProvider).value;
   if (nodeKey == null || resolver == null) return null;
   return _translatorNames[resolver.suttaCentralTranslator(nodeKey)];
 });

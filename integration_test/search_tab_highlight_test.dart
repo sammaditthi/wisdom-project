@@ -25,6 +25,7 @@ import 'package:the_wisdom_project/domain/entities/search/search_result_type.dar
 import 'package:the_wisdom_project/presentation/providers/document_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/fts_highlight_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/navigation_tree_provider.dart';
+import 'package:the_wisdom_project/presentation/providers/provider_retry.dart';
 import 'package:the_wisdom_project/presentation/providers/search_provider.dart';
 import 'package:the_wisdom_project/presentation/providers/tab_provider.dart';
 import 'package:the_wisdom_project/presentation/screens/reader_screen.dart';
@@ -59,6 +60,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: [
             sharedPreferencesProvider.overrideWithValue(prefs),
             bjtDocumentDataSourceProvider.overrideWithValue(

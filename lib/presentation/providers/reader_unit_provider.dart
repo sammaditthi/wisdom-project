@@ -34,7 +34,7 @@ enum ReaderStep { previous, next }
 final neighbourLeafProvider = Provider.autoDispose
     .family<TipitakaTreeNode?, (String, ReaderStep)>((ref, arg) {
       final (nodeKey, step) = arg;
-      final resolver = ref.watch(readerUnitResolverProvider).valueOrNull;
+      final resolver = ref.watch(readerUnitResolverProvider).value;
       if (resolver == null) return null;
 
       final leaf = switch (step) {
