@@ -538,18 +538,29 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
     // derived provider's listener runs inside Riverpod's refresh pass, where a
     // tab write rebuilds activeTabProvider a second time; Riverpod 3 throws
     // on that in debug and stops refreshing (riverpod#4808). These run inside
-    // the action itself (a layout pick, Next), before any rebuild.
+    // the action itself (a layout pick, Next), before any rebuild. So they
+    // also see a close half-done: the per-tab search map shifted, the active
+    // index not yet moved.
 
     // Layout changes — sync reading position by logical entry, not pixels.
     // Pixel offsets are meaningless across layouts (stacked is ~2x taller than
     // side-by-side per entry). The entry at the viewport top becomes the
     // anchor, so the new layout opens on it and builds nothing above it.
     // Same length with a new layout at the active index is a layout switch:
-    // opening or closing a tab changes the length, and only
-    // updateActiveTabLayoutProvider rewrites a tab's layout.
+    // only updateActiveTabLayoutProvider rewrites a tab's layout.
     ref.listen(tabsProvider, (previous, next) {
-      if (previous == null || _switchingTabs) return;
-      if (previous.length != next.length) return;
+      if (previous == null) return;
+      // A tab opened or closed. Per-tab state keyed by position is about to
+      // shift (closeTabProvider re-indexes the search map before it moves the
+      // active index), so treat it as a tab switch until the next frame.
+      if (previous.length != next.length) {
+        _switchingTabs = true;
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _switchingTabs = false,
+        );
+        return;
+      }
+      if (_switchingTabs) return;
       final index = ref.read(activeTabIndexProvider);
       if (index < 0 || index >= next.length) return;
       if (previous[index].layout == next[index].layout) return;

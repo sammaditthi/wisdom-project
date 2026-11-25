@@ -737,6 +737,64 @@ void main() {
     );
 
     // ---------------------------------------------------------------
+    // Test 6b: Closing the active tab leaves the next tab where it was
+    // ---------------------------------------------------------------
+    // Closing tab 0 shifts tab 1's search state into slot 0 before the
+    // active index moves. Read half-way through the close, that looked like
+    // "the active tab got a new match", and the reader jumped tab 1 to it.
+    testWidgets(
+      '6b. Closing the active tab leaves the next tab\'s reading position',
+      (tester) async {
+        final container = await pumpReaderApp(tester);
+
+        // Tab A, nothing searched. Tab B, with a current match near its top
+        // (the sutta opens "එවං මෙ සුතං"), so there is text below to read on.
+        await openTab(tester, container, tabFromNode(container, 'dn-1-1'));
+        await openTab(tester, container, tabFromNode(container, 'dn-1-2'));
+        await openSearchBar(tester, container);
+        await enterSearchQuery(tester, 'එවං');
+        expect(readSearchState(container, 1).currentMatch, isNotNull);
+
+        // Read on in B, away from the match.
+        final controller = readerScrollController(tester);
+        controller.jumpTo(controller.offset + 400);
+        await pumpForSettle(tester);
+
+        // Back to A. The switch saves B's position.
+        container.read(activeTabIndexProvider.notifier).state = 0;
+        await pumpForSettle(tester);
+        final saved = container.read(tabsProvider)[1];
+        expect(
+          saved.scrollOffset,
+          greaterThan(100),
+          reason: 'B must be read away from its match for this test to bite',
+        );
+
+        // Close A, the active tab, with its tab's close button.
+        final tabCloseButtons = find.descendant(
+          of: find.byType(TabBarWidget),
+          matching: find.byIcon(Icons.close),
+        );
+        await tester.tap(tabCloseButtons.first);
+        await pumpForSettle(tester);
+
+        final remaining = container.read(tabsProvider).single;
+        expect(remaining.nodeKey, 'dn-1-2');
+        expect(container.read(activeTabIndexProvider), 0);
+        expect(
+          remaining.anchor,
+          saved.anchor,
+          reason: 'Closing A must not anchor B at its search match',
+        );
+        expect(
+          remaining.scrollOffset,
+          closeTo(saved.scrollOffset, 1),
+          reason: 'B must reopen where it was being read',
+        );
+      },
+    );
+
+    // ---------------------------------------------------------------
     // Test 7: Closing all tabs clears all search state
     // ---------------------------------------------------------------
     testWidgets('7. Close all tabs → all search state cleared', (tester) async {
