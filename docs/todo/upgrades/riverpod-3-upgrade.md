@@ -4,7 +4,7 @@ Investigated 2026-10-08. No code changed yet. Not started.
 
 ## Decision
 
-Upgrade `flutter_riverpod` from 2.6.1 to 3.4.3 as a plain version bump, and turn Riverpod's new automatic retry off. The work is mostly mechanical and low risk (measured below). Don't add code generation or `riverpod_lint` yet: the current toolchain blocks both (see "Blocked for now").
+Upgrade `flutter_riverpod` from 2.6.1 to 3.5.0 as a plain version bump, and turn Riverpod's new automatic retry off. The work is mostly mechanical and low risk (measured below, on 3.4.3). `riverpod_lint` and code generation wait for step 6.
 
 ## How to use this plan
 
@@ -19,7 +19,7 @@ Upgrade `flutter_riverpod` from 2.6.1 to 3.4.3 as a plain version bump, and turn
 
 Rules:
 
-- Step 1 is one PR on its own branch, cut from `main` after `feat/search-pane-redesign` merges.
+- Step 1 is one PR on its own branch, cut from `main`.
 - Do it after the [Flutter 3.50 upgrade](../../done/upgrades/flutter-3-50-upgrade-plan.md) has merged, never alongside it. That upgrade reformats most files, so a Riverpod branch open at the same time would conflict on nearly every file it touches. On its lock, `flutter_riverpod` 3.5.0 (the latest, 2026-11-06) resolves (dry run, 2026-11-25).
 - Steps 2–5 are separate PRs after step 1. Each is optional.
 - Step 1 has to edit some existing tests (imports, retry, one double override). The upgrade forces these edits, but CLAUDE.md says tests aren't changed without the user's OK, so ask before starting. Write no new tests; a separate agent does that.
@@ -111,7 +111,7 @@ Benchmarked on both versions as a compiled release build, best of 5 runs (µs = 
 
 ## Step 1 — The upgrade
 
-1. In `pubspec.yaml`: `flutter_riverpod: ^3.4.3`.
+1. In `pubspec.yaml`: `flutter_riverpod: ^3.5.0`.
 2. Add `import 'package:flutter_riverpod/legacy.dart';` to every file that names `StateNotifier`, `StateNotifierProvider`, `StateProvider` or `StateController` (the analyzer lists them). Drop the `flutter_riverpod.dart` import wherever it then shows as unused.
 3. Rename `.valueOrNull` to `.value`. Find them with `grep -rn valueOrNull lib integration_test`.
 4. Wherever `Override` is named as a type (`test/helpers/pump_app.dart`, `integration_test/test_overrides.dart`, a few tests), add `import 'package:flutter_riverpod/misc.dart' show Override;`.
