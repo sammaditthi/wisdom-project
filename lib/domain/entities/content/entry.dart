@@ -39,8 +39,15 @@ abstract class Entry with _$Entry {
   /// Checks if this entry has an associated footnote
   bool get hasFootnote => footnoteReference != null;
 
-  /// Returns plain text with all formatting markers removed
-  String get plainText => ContentMarkers.stripMarkers(rawText);
+  /// Cached storage for [plainText]. Same shape as [markedRanges]' cache.
+  static final Expando<String> _plainTextCache = Expando('plainText');
+
+  /// Returns plain text with all formatting markers removed.
+  ///
+  /// Cached because the reader reads it in `build()` and in-page search scans
+  /// every entry on each query.
+  String get plainText =>
+      _plainTextCache[this] ??= ContentMarkers.stripMarkers(rawText);
 
   // No `segments` accessor here on purpose. `parseContentMarkers` (wisdom_shared)
   // gives the richer view — underline and footnote labels, which the range API
