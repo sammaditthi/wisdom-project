@@ -1,8 +1,8 @@
 # First Android Release
 
 > **Status 2026-10-12: not started.** Android has not been built since the app
-> moved to Drift, and Flutter 3.44.1 already refuses its build setup. This Mac
-> has no Android SDK.
+> moved to Drift, and Flutter (3.44.1 then, 3.50.1 now) refuses its build
+> setup. This Mac has no Android SDK.
 
 Only Android's own items. What both phones share is in
 [`first-ios-release.md`](first-ios-release.md): do those too. The section
@@ -11,9 +11,19 @@ numbers match.
 ## 1. Build
 
 - **Build tools.** Gradle, the Android Gradle Plugin, Kotlin and Java are
-  older than Flutter accepts, so the first build fails until they are raised:
-  "Android: already broken, now further behind" in
-  [`flutter-3-50-upgrade-plan.md`](../upgrades/flutter-3-50-upgrade-plan.md).
+  older than Flutter accepts, so the first build fails until they are raised.
+  Flutter 3.50.1's floors
+  (`flutter_tools/gradle/.../DependencyVersionChecker.kt`):
+
+  | | Repo | 3.50.1 refuses below | 3.50 template |
+  | --- | --- | --- | --- |
+  | Gradle (`android/gradle/wrapper/gradle-wrapper.properties:5`) | 8.3 | 9.3.1 | 9.5.0 |
+  | Android Gradle Plugin (`android/settings.gradle:21`) | 8.1.0 | 9.1.1 | 9.3.1 |
+  | Kotlin plugin (`android/settings.gradle:22`) | 1.8.22 | 2.4.10 | 2.4.20 |
+  | Java (`android/app/build.gradle:14`) | 1.8 | 17 | 17 |
+
+  AGP 9 has Kotlin built in, so the `kotlin-android` plugin goes. Keep the
+  manifest's label and deep-link filters. The default `minSdk` is 24.
 - **Signing.** Release builds still use the debug key
   (`android/app/build.gradle`).
 - **App name.** `android:label` in `android/app/src/main/AndroidManifest.xml`

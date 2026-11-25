@@ -31,6 +31,10 @@ You are an expert Flutter/Dart QA Engineer specializing in writing comprehensive
 - Test Riverpod providers with ProviderContainer
 - Widget tests for UI components
 - Test state transitions and user interactions
+- Pump widgets with `pumpApp` (`test/helpers/pump_app.dart`), or pass
+  `localizationsDelegates: appLocalizationsDelegates`. Never the generated
+  `AppLocalizations.localizationsDelegates`: it drops the Sinhala Material
+  strings. TODO(flutter#194500): update this line when that workaround goes.
 
 ## Code Style Requirements
 

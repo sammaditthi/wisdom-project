@@ -15,7 +15,14 @@ Section 2 was its step 10.
 ## 1. Build
 
 - The first iOS and Android builds since Drift. They are also the first to
-  fetch `package:sqlite3`'s native binaries.
+  fetch `package:sqlite3`'s native binaries, and Flutter 3.50.1's own iOS and
+  Android files (skipped at the upgrade; `flutter precache --ios --android`
+  fetches them ahead).
+- **Flutter 3.50 template.** The minimum iOS goes from 13 to 15 and the app
+  moves to the UIScene lifecycle
+  ([migration](https://docs.flutter.dev/release/breaking-changes/uiscenedelegate)).
+  Check `ios/Runner.xcodeproj/project.pbxproj` after the first build. This Mac
+  has Xcode 26.2; 3.50 shipped after Xcode 27.
 - **Signing.** iOS needs a signed export.
 - **Store upload** isn't scripted: the mobile `deploy.sh` scripts are
   placeholders in [`test-all-and-release-all.md`](../../done/ops/test-all-and-release-all.md).

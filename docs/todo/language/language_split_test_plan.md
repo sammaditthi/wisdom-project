@@ -306,7 +306,8 @@ and (b) corrected/improved 10 Sinhala values + added 4 new keys
 
 ### Status: nothing breaks (so these are "harden coverage", not "fix breakage")
 
-- **Every existing widget test pumps the English locale** (`AppLocalizations.localizationsDelegates`;
+- **Every existing widget test pumps the English locale** (`appLocalizationsDelegates`, not
+  the generated list, until TODO(flutter#194500) is done;
   `dictionary_bottom_sheet_test` hard-sets `Locale('en')`). The pass changed **only
   Sinhala values** and left all **English values identical**, so every `find.text('Light'/'Pali'/…)`
   assertion still matches.

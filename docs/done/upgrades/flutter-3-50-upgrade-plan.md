@@ -1,8 +1,7 @@
 # Flutter 3.50 upgrade
 
-> **Status 2026-11-25: done on branch `chore/flutter-3-50`, not merged.**
-> Left: the Impeller check by eye (step 2.3). After that, move this doc to
-> `docs/done/upgrades/`.
+> **Status 2026-11-25: done** on branch `chore/flutter-3-50`. Nothing is left
+> in this doc: every follow-up has a home, listed under "Follow-ups".
 >
 > The plan was written for 3.47 (2026-10-08). By the time it ran, 3.50.1 was
 > the stable release, so the upgrade went straight there and took in the
@@ -30,9 +29,9 @@
 | Step | What | Status |
 | --- | --- | --- |
 | 1 | Flutter 3.50.1 and the code generators | Done, `0a337ba` |
-| 2 | Check the app: tests, builds, rendering | Done except 2.3 (by eye) |
+| 2 | Check the app: tests, builds, rendering | Done |
 | 3 | Raise `sdk:` and reformat | Done, `d7775d3` |
-| 4 | Clean-ups | Partly done, `81a92fe` `3bd605f` |
+| 4 | Clean-ups | Done, `81a92fe` `3bd605f`; the rest skipped on purpose |
 | 5 | Move to `material_ui` | Done, `7075895` |
 
 Step 5 ran before step 3: the analyze gate fails on the 3.50 deprecations,
@@ -44,7 +43,7 @@ and the format commit should hold nothing but formatting.
   so `build_runner` crashed. freezed 4 fixes it. It needs `abstract` on the 26
   single-variant `@freezed` classes and `sealed` on `Failure`.
 - build_runner stays on 2.16: mockito 5.8.1 caps `build` below 5, and
-  build_runner 2.17 needs `build` 5. Try 2.17 again when mockito moves.
+  build_runner 2.17 needs `build` 5.
 - build_runner 2.16 ignores `--delete-conflicting-outputs`. It's gone from
   `scripts/app/test.sh`, `CLAUDE.md` and the agent and doc files.
 - `flutter pub get` added the `build/` and platform excludes to
@@ -57,31 +56,11 @@ and the format commit should hold nothing but formatting.
 | --- | --- |
 | `scripts/app/test.sh` (format, generated code, analyze, unit + widget, wisdom_shared, databases, macOS and Chrome integration) | 9 of 9 steps pass, first run. Same unit and widget test count as on 3.44.1. |
 | Chrome, first visit (`test_chrome.sh --first-visit`, one file) | Passes: the databases download and install into a fresh profile |
-| `flutter build web --release` | Builds. `serviceWorkerVersion` is still filled, so `deploy.sh`'s check passes. |
+| `flutter build web --release` | Builds. `serviceWorkerVersion` is still filled, so `deploy.sh`'s check passes. Its new Wasm dry run passes too. |
 | `flutter build macos --release` | Builds; it raised the minimum macOS to 12 |
 | Static site, Dart 3.12.1 vs 3.14.0 | Byte-identical |
 | Static site, before vs after step 3 | Byte-identical |
-| 2.3 Impeller vs Skia on macOS, by eye | **Not done (you)** |
-
-**2.3, by eye (you).** Impeller is the macOS renderer from 3.47 on (Skia
-before). Compare a sutta with conjuncts such as ඤ්ජ and ණ්ඩ, footnotes,
-search highlights, and the Today card's sky:
-
-```bash
-flutter run -d macos                       # Impeller (the default now)
-flutter run -d macos --no-enable-impeller  # Skia, for comparison
-```
-
-If Sinhala looks wrong under Impeller, opt out in `macos/Runner/Info.plist`
-and say why in a comment (Flutter will remove the opt-out in a later release):
-
-```xml
-<key>FLTEnableImpeller</key>
-<false/>
-```
-
-Impeller has no raster cache, so the sky's `isComplex` hint no longer caches
-it as a bitmap. Watch the Today card for dropped frames.
+| Impeller vs Skia on macOS, by eye (Sinhala conjuncts, text weight, the Today card's sky) | Done 2026-11-25. Impeller stays on: no opt-out, no font-weight change. |
 
 ### 3. SDK floor and reformat
 
@@ -103,7 +82,7 @@ Done:
   variants, so a new variant that isn't handled is a compile error.
 - `_` instead of `__` and `___` for unused closure parameters in `lib/`.
 
-Not done, on purpose:
+Skipped on purpose:
 
 - `dart migrate --step=cleanup`'s other edits: `class X;` with no body, and
   enum constructors without `const`. New syntax that fixes nothing.
@@ -125,57 +104,27 @@ Not done, on purpose:
   generated file, so the analyze gate stays green.
 - Fixed upstream in
   [flutter#194500](https://github.com/flutter/flutter/pull/194500)
-  (2026-11-23), not yet in stable. When it lands: drop the `header:` line in
-  `l10n.yaml`, regenerate, and check that the generated list imports
-  material_ui. If it does, `appLocalizationsDelegates` can go.
+  (2026-11-23), not yet in stable.
 
-## Still open
+## Follow-ups
 
-### Android: already broken, now further behind
+Each lives where the work will happen:
 
-Not caused by the upgrade: 3.44.1 already refused this setup. Flutter 3.50.1's
-floors (`flutter_tools/gradle/.../DependencyVersionChecker.kt`):
+| What | Where |
+| --- | --- |
+| Undo the gen-l10n workaround once flutter#194500 is in stable | `TODO(flutter#194500)` in `l10n.yaml` and `app_localizations_delegates.dart` |
+| build_runner 2.17 (waits on mockito); flutter_lints 4 → 6 | `TODO`s in `pubspec.yaml` |
+| Flutter's deprecated service-worker token | `TODO` in `web/flutter_bootstrap.js`; `deploy.sh` stops if it goes |
+| Android build tools below Flutter's floors | [`first-android-release.md`](../../todo/mobile-release/first-android-release.md), section 1 |
+| iOS 15 minimum, UIScene, iOS/Android engine files | [`first-ios-release.md`](../../todo/mobile-release/first-ios-release.md), section 1 |
+| Riverpod 2 → 3 (next) | [`riverpod-3-upgrade.md`](../../todo/upgrades/riverpod-3-upgrade.md) |
+| Windows Sinhala IME retest (fix #189968 is in 3.50) | [`windows-sinhala-ime-bug.md`](../../general/windows-sinhala-ime-bug.md) |
 
-| | Repo | 3.50.1 refuses below | 3.50 template |
-| --- | --- | --- | --- |
-| Gradle (`android/gradle/wrapper/gradle-wrapper.properties:5`) | 8.3 | 9.3.1 | 9.5.0 |
-| Android Gradle Plugin (`android/settings.gradle:21`) | 8.1.0 | 9.1.1 | 9.3.1 |
-| Kotlin plugin (`android/settings.gradle:22`) | 1.8.22 | 2.4.10 | 2.4.20 |
-| Java (`android/app/build.gradle:14`) | 1.8 | 17 | 17 |
+Nothing to do, for the record:
 
-Fix it with the first Android build
-([first-android-release.md](../mobile-release/first-android-release.md),
-section 1). AGP 9 has Kotlin built in, so the `kotlin-android` plugin goes.
-Keep the manifest's label and deep-link filters. The default `minSdk` is 24.
-
-### iOS: on the first build
-
-The minimum iOS goes from 13 to 15 (the 3.50 template), and the app moves to
-the UIScene lifecycle. Check `ios/Runner.xcodeproj/project.pbxproj` after the
-first iOS build. This Mac has Xcode 26.2; 3.50 is the first stable release
-after Xcode 27 and iOS 27 shipped.
-
-### Web: things to know
-
-- The build prints that its service worker "is deprecated and will be removed
-  in a future Flutter release". `web/flutter_bootstrap.js` reads that token to
-  register `offline_worker.js`. When a Flutter release drops it, `deploy.sh`
-  stops with an error. The replacement is `--web-content-hash` with
-  `precache_manifest.json`.
-- `flutter build web` now runs a Wasm dry run, and it passes. `--wasm` is an
-  option to try; 3.50.1 fixes a freeze with `--wasm` plus cross-origin
-  isolation, which this app uses.
-
-### Separate work, not part of this plan
-
-- **Riverpod 2 → 3**, next
-  ([riverpod-3-upgrade.md](riverpod-3-upgrade.md)). On this branch's lock,
-  `flutter_riverpod` 3.5.0, `riverpod_generator` 4.0.10 and `riverpod_lint`
-  3.2.0 resolve (dry run, 2026-11-25).
-- `flutter_lints` 4 → 6.
-- `dartz` has had no release since 2021-12-03.
-- The Windows Sinhala IME fix (#189968) is in 3.50; a retest on Windows is
-  open ([windows-sinhala-ime-bug.md](../../general/windows-sinhala-ime-bug.md)).
+- `dartz` has had no release since 2021-12-03. It works on 3.50.
+- `--wasm` builds pass the dry run; 3.50.1 fixes a freeze with `--wasm` plus
+  cross-origin isolation, which this app uses.
 
 ## Handover notes
 
@@ -189,7 +138,6 @@ after Xcode 27 and iOS 27 shipped.
 - `flutter drive` on the web now prints "The --pwa-strategy option is
   deprecated" for every file. Flutter sets that itself; `test_chrome.sh`
   doesn't pass it.
-- Next: the Impeller check (2.3), then merge, then Riverpod 3.
 
 ## Sources
 

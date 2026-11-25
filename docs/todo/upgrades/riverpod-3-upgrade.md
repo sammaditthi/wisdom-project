@@ -20,7 +20,7 @@ Upgrade `flutter_riverpod` from 2.6.1 to 3.4.3 as a plain version bump, and turn
 Rules:
 
 - Step 1 is one PR on its own branch, cut from `main` after `feat/search-pane-redesign` merges.
-- Do it after the [Flutter 3.50 upgrade](flutter-3-50-upgrade-plan.md) has merged, never alongside it. That upgrade reformats most files, so a Riverpod branch open at the same time would conflict on nearly every file it touches. On its lock, `flutter_riverpod` 3.5.0 (the latest, 2026-11-06) resolves (dry run, 2026-11-25).
+- Do it after the [Flutter 3.50 upgrade](../../done/upgrades/flutter-3-50-upgrade-plan.md) has merged, never alongside it. That upgrade reformats most files, so a Riverpod branch open at the same time would conflict on nearly every file it touches. On its lock, `flutter_riverpod` 3.5.0 (the latest, 2026-11-06) resolves (dry run, 2026-11-25).
 - Steps 2–5 are separate PRs after step 1. Each is optional.
 - Step 1 has to edit some existing tests (imports, retry, one double override). The upgrade forces these edits, but CLAUDE.md says tests aren't changed without the user's OK, so ask before starting. Write no new tests; a separate agent does that.
 - When a step is done, set its status and add a handover note at the end of this doc.
@@ -107,7 +107,7 @@ Benchmarked on both versions as a compiled release build, best of 5 runs (µs = 
 
 ### No longer blocked
 
-`riverpod_lint` needed Dart ≥ 3.13 and `riverpod_generator` needed `freezed_annotation ^3`. The [Flutter 3.50 upgrade](flutter-3-50-upgrade-plan.md) brings Dart 3.14.0 and Freezed 4 (`freezed_annotation` 3.1.0). On its lock, `flutter_riverpod` 3.5.0, `riverpod_lint` 3.2.0 and `riverpod_generator` 4.0.10 resolve together (dry run, 2026-11-25).
+`riverpod_lint` needed Dart ≥ 3.13 and `riverpod_generator` needed `freezed_annotation ^3`. The [Flutter 3.50 upgrade](../../done/upgrades/flutter-3-50-upgrade-plan.md) brings Dart 3.14.0 and Freezed 4 (`freezed_annotation` 3.1.0). On its lock, `flutter_riverpod` 3.5.0, `riverpod_lint` 3.2.0 and `riverpod_generator` 4.0.10 resolve together (dry run, 2026-11-25).
 
 ## Step 1 — The upgrade
 

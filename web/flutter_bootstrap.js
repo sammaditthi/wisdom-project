@@ -26,6 +26,8 @@ window.addEventListener('error', (event) => {
 // Filled by `flutter build web`; null under `flutter run` and `flutter drive`,
 // so the worker never registers there. A deprecated Flutter token, so
 // scripts/app/web/deploy.sh stops if the built file has no number here.
+// TODO: when Flutter drops the token, move to `--web-content-hash` and its
+// `precache_manifest.json`.
 const serviceWorkerVersion = {{flutter_service_worker_version}};
 
 // No worker served this page: a first visit, or a hard reload. Reading

@@ -2,7 +2,7 @@ arb-dir: lib/core/localization/l10n
 template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
 nullable-getter: false
-# gen-l10n in Flutter 3.50.1 still names flutter_localizations' deprecated
-# delegates; drop this once flutter#194500 reaches stable. The app uses
-# lib/core/localization/app_localizations_delegates.dart instead.
+# TODO(flutter#194500): drop this line once the fix is in stable. gen-l10n in
+# Flutter 3.50.1 still names flutter_localizations' deprecated delegates; the
+# app uses lib/core/localization/app_localizations_delegates.dart instead.
 header: "// ignore_for_file: deprecated_member_use"

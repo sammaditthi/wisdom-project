@@ -100,10 +100,13 @@ dev_dependencies:
 
   # Code Generation
   freezed: ^4.0.3
+  # TODO: build_runner 2.17 needs `build` 5, which mockito 5.8.1 doesn't allow.
+  # Move up when mockito does.
   build_runner: ^2.16.2
   json_serializable: ^6.15.2
 
   # Linting
+  # TODO: flutter_lints 6 is out; the bump turns on new lints to fix.
   flutter_lints: ^4.0.0
   mockito: ^5.8.1
 
