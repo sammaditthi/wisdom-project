@@ -533,43 +533,52 @@ class _MultiPaneReaderWidgetState extends ConsumerState<MultiPaneReaderWidget>
       }
     });
 
-    // Listen to layout changes — sync reading position by logical entry, not
-    // pixels. Pixel offsets are meaningless across layouts (stacked is ~2x
-    // taller than side-by-side per entry). The entry at the viewport top
-    // becomes the anchor, so the new layout opens on it and builds nothing
-    // above it.
-    ref.listen<ReaderLayout>(activeReaderLayoutProvider, (previous, next) {
-      if (previous != null && previous != next && !_switchingTabs) {
-        // Capture top-visible entry from the OLD layout (still mounted)
-        final topEntry = _entryKeyRegistry.findTopVisibleEntry(
-          _scrollController,
-        );
-        // Clear stale keys from old layout before rebuild
-        _entryKeyRegistry.clear();
+    // The two listeners below write the tab (an anchor), so they listen to the
+    // notifiers that change, not to the active tab's derived providers. A
+    // derived provider's listener runs inside Riverpod's refresh pass, where a
+    // tab write rebuilds activeTabProvider a second time; Riverpod 3 throws
+    // on that in debug and stops refreshing (riverpod#4808). These run inside
+    // the action itself (a layout pick, Next), before any rebuild.
 
-        // Match set is layout-scoped — refresh against the new layout.
-        // Also covered by the suppression guard above: tab switches skip
-        // this because each tab's matches already align with its own layout.
-        ref
-            .read(inPageSearchStatesProvider.notifier)
-            .recomputeActiveTabMatches();
+    // Layout changes — sync reading position by logical entry, not pixels.
+    // Pixel offsets are meaningless across layouts (stacked is ~2x taller than
+    // side-by-side per entry). The entry at the viewport top becomes the
+    // anchor, so the new layout opens on it and builds nothing above it.
+    // Same length with a new layout at the active index is a layout switch:
+    // opening or closing a tab changes the length, and only
+    // updateActiveTabLayoutProvider rewrites a tab's layout.
+    ref.listen(tabsProvider, (previous, next) {
+      if (previous == null || _switchingTabs) return;
+      if (previous.length != next.length) return;
+      final index = ref.read(activeTabIndexProvider);
+      if (index < 0 || index >= next.length) return;
+      if (previous[index].layout == next[index].layout) return;
 
-        _anchorAt(topEntry);
-      }
+      // Capture top-visible entry from the OLD layout (still mounted)
+      final topEntry = _entryKeyRegistry.findTopVisibleEntry(_scrollController);
+      // Clear stale keys from old layout before rebuild
+      _entryKeyRegistry.clear();
+      _anchorAt(topEntry);
+
+      // Match set is layout-scoped — refresh against the new layout. After
+      // the anchor, so the first match it reveals wins, as before. Tab
+      // switches skip all this: each tab's matches already fit its layout.
+      ref.read(inPageSearchStatesProvider.notifier).recomputeActiveTabMatches();
     });
 
-    // Listen to in-page search state changes to trigger scroll-to-match, and
-    // to bring the toolbar back when find closes.
-    ref.listen<InPageSearchState>(activeInPageSearchStateProvider, (
-      previous,
-      next,
-    ) {
-      if (next.currentMatch != null &&
-          next.revealCount != previous?.revealCount &&
+    // In-page search changes trigger scroll-to-match, and bring the toolbar
+    // back when find closes. The active tab's entry, read as
+    // activeInPageSearchStateProvider does.
+    ref.listen(inPageSearchStatesProvider, (previous, next) {
+      final index = ref.read(activeTabIndexProvider);
+      final before = previous?[index];
+      final after = next[index] ?? InPageSearchState();
+      if (after.currentMatch != null &&
+          after.revealCount != before?.revealCount &&
           !_switchingTabs) {
-        _scrollToCurrentMatch(next);
+        _scrollToCurrentMatch(after);
       }
-      if ((previous?.isVisible ?? false) && !next.isVisible) _showToolbar();
+      if ((before?.isVisible ?? false) && !after.isVisible) _showToolbar();
     });
 
     // The unit resolves before its text does, so both are watched: the unit
