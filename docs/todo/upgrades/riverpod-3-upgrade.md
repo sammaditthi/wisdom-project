@@ -8,14 +8,20 @@ Investigated 2026-10-08 on 3.4.3. Step 1 done 2026-11-25 on `chore/riverpod-3`, 
 
 ## How to use this plan
 
-| Step | What | Size | Status |
-| --- | --- | --- | --- |
-| 1 | The upgrade itself | M | Done 2026-11-25 |
-| 2 | Tabs in one notifier | L | Optional |
-| 3 | Settings save themselves | M | Optional; best done with step 2 |
-| 4 | Theme and font size load like other settings | S | Optional |
-| 5 | Action providers become notifier methods | M | Optional; best done with step 2 |
-| 6 | `riverpod_lint`, maybe code generation | S | Measured, not worth it yet |
+| Step | What | Size | Worth it? ([why](#worth-doing)) | Status |
+| --- | --- | --- | --- | --- |
+| 1 | The upgrade itself | M | — | Done 2026-11-25 |
+| 2 | Tabs in one notifier | L | Yes, the one real payoff; when tabs are next worked on | Optional |
+| 3 | Settings save themselves | M | Small; only together with step 2 | Optional |
+| 4 | Theme and font size load like other settings | S | Tidiness only; fold into the pinch-to-zoom work | Optional |
+| 5 | Action providers become notifier methods | M | The tab ones with step 2; the rest no | Optional |
+| 6 | `riverpod_lint`, maybe code generation | S | No (measured) | Not planned |
+
+**Rules for new code**, from what the upgrade taught (no refactor needed):
+
+- A `ref.listen` on a *derived* provider (one computed from others) never writes provider state. Listen to the `StateNotifier` / `StateProvider` that changes instead (runtime change 3).
+- A test that builds its own `ProviderScope` around a provider that can fail passes `retry: noProviderRetry`.
+- A test that needs its own store passes `createTestContainer(keyValueStore: …)`, never a second `keyValueStoreProvider` override.
 
 Rules:
 
@@ -93,7 +99,7 @@ The upgrade doesn't simplify anything by itself. But `Notifier` (available since
 
 Tab state lives in five places: `tabsProvider`, `activeTabIndexProvider`, `inPageSearchStatesProvider` and `ftsHighlightProvider` (both maps keyed by tab *index*), and `activeTabIndexPersistenceProvider`. `closeTabProvider` (`lib/presentation/providers/tab_lifecycle_provider.dart`) keeps them in sync by hand. It re-numbers both maps, and it sets the index to `-1` and back "to force the listener to fire".
 
-Give each tab a stable id. Let one `Notifier` own the tab list and the active tab, and key per-tab state by tab id. The re-indexing, the `-1` flip and the separate persistence provider all go away. Tests name `activeTabIndexProvider` about 70 times, about 40 of them setting it.
+Give each tab a stable id. Let one `Notifier` own the tab list and the active tab, and key per-tab state by tab id. The re-indexing, the `-1` flip and the separate persistence provider all go away, and so does the layout listener's "same length, new layout at the active index" test in `multi_pane_reader_widget.dart`, which becomes a tab-id comparison. Tests name `activeTabIndexProvider` about 70 times, about 40 of them setting it.
 
 ### Step 3 — Settings save themselves (M)
 
@@ -132,9 +138,26 @@ Tidiness only: the saved theme already applies before the first paint, since `Sh
 
 Fifteen providers only hold a function (`Provider<... Function(...)>`), for example `closeTabProvider`, `switchTabProvider`, `openTabFromNodeKeyProvider`, `selectNodeProvider` and `toggleNodeExpansionProvider`. Each action belongs on the notifier that owns the state it changes. The tab ones are best done together with step 2.
 
-### Not worth doing
+## Worth doing?
 
-Converting the 16 simple `StateProvider`s to `Notifier` classes. That adds a class per value, and the legacy import is fine.
+Assessed 2026-11-25, after step 1. The upgrade needs none of these: the legacy providers carry no deprecation in 3.5.0, and nothing below fixes a bug users see today.
+
+- **Step 2 — yes, the one with a real payoff.** Tab state keyed by *position* is where this code keeps breaking: closing a tab re-keys two maps and the find bar's debounce timers by hand, and the `-1` flip exists only to make a listener fire. Step 1's reader fix also had to infer "same tab" from list length, because tabs have no id. Cost: L, with heavy test churn. Do it when tabs are next worked on, as its own PR.
+- **Step 3 — small.** Only three older settings use the "separate listener started in `main.dart`" pattern; newer ones (`BoolSettingNotifier`, `SavedChoiceNotifier`) already save in their own methods, so the trap isn't spreading. Done alone, `main.dart` still starts the active tab's listener. Merging `ContentLanguageNotifier` and `AppLanguageNotifier` into the generic notifier saves two near-copies. Fold into step 2.
+- **Step 4 — tidiness only.** Nothing visible changes. [`pinch-to-zoom.md`](../reader/pinch-to-zoom.md) already plans to change `FontScaleNotifier`; do it there.
+- **Step 5 — the tab actions with step 2, the rest no.** Each function provider captures its `Ref`; Riverpod 3 throws if one is used after its provider rebuilds, and none rebuilds today. A latent risk, not a bug.
+- **Step 6 — no.** Measured: one false positive and a 6× slower analyze.
+
+### Anything else? Considered, not worth it
+
+- **Converting every `StateNotifier` to `Notifier`** (15 classes, the "legacy" exit). Not deprecated. `FakeSearchStateNotifier` serves 9 test files and `search_state_notifier_test.dart` builds its notifier directly, so `SearchStateNotifier` alone means a test rewrite. Convert a notifier only when it is being rewritten anyway; steps 2–3 cover seven of them.
+- **The 16 simple `StateProvider`s as `Notifier`s.** A class per value, and the legacy import is fine.
+- **`ProviderContainer.test()` and `tester.container()` in tests.** Tests dispose containers by hand about 55 times and call `ProviderScope.containerOf` 19 times. No sweep; new tests should use them.
+- **`switch` on `AsyncValue` instead of `.when`** (it is sealed in 3.x). Only 8 `.when` calls, and `.when` also covers the refresh and reload cases (`skipLoadingOnRefresh`) that a plain `switch` would have to spell out; that rule is why a retrying provider still showed its error.
+- **Pausing hidden sections** (wrapping `app_shell.dart`'s `IndexedStack` children in `TickerMode`, which Riverpod 3 pauses on). Home's minute clock and hidden screens would stop rebuilding, but their listeners would not run while hidden: the reader's tab-switch listener, which saves the old tab's scroll offset before the switch, would run late for a tab opened from Home by a deep link.
+- **Throwing the `Failure` instead of `Exception(failure.userMessage)`** (8 places). Not a Riverpod question now that retry is off; the panels already pick their copy by context. It belongs to [the error-handling standard](../refactor/generic-server-call-and-error-handling-standard.md) if ever.
+- **Offline persistence and mutations.** Experimental in 3.x, and the app has its own `KeyValueStore` persistence.
+- **`ref.mounted`.** Nothing needs it: every notifier that holds a `Ref` lives as long as the app.
 
 ## Step 6 — `riverpod_lint` and code generation
 
