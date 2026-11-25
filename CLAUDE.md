@@ -16,6 +16,12 @@ The Wisdom Project - a Tipitaka and commentary browsing app with parallel Pali/S
 - **Text Formatting**: Markers `**bold**`, `__underline__`, `{footnote}` in content
 - **Multi-Edition**: Architecture supports multiple content sources (BJT, SuttaCentral) - see `docs/decisions/multi_edition_architecture.md`
 
+## Riverpod (3.x)
+Traps found in the upgrade (`docs/done/upgrades/riverpod-3-upgrade.md`):
+- A `ref.listen` on a *derived* provider never writes provider state; listen to the `StateNotifier` / `StateProvider` that changes. Otherwise debug builds throw "rebuild … multiple times in the same frame" and stop refreshing.
+- A test that builds its own `ProviderScope` / `ProviderContainer` around a provider that can fail passes `retry: noProviderRetry`.
+- A test that needs its own store uses `createTestContainer(keyValueStore: …)`, never a second `keyValueStoreProvider` override (overriding twice throws).
+
 ## Code Style
 - **Always use `const`**: Use `const` for constructors, variables, and collections when values are compile-time constants. Avoids `prefer_const_constructors` and `prefer_const_declarations` lint warnings.
 - **Keep doc comments to a minimum.** Few lines max saying what it does and why,
